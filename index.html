@@ -485,7 +485,7 @@ function renderCos(){for(const k of["aura","wing"]){const E=$("eq_"+k);if(E)rend
 setInterval(()=>{if($("pgMod").style.display!=="flex")return;const ch=normCh(me&&me.ch);document.querySelectorAll("#pgBody canvas[data-cv]").forEach(cv=>{if(cv.offsetParent){const[k,id]=cv.dataset.cv.split("|");cosPreview(cv,k,id,ch);}});},60);
 function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodLv(),mine=(me&&me.fish)||{};
   enhMat=enhMat.filter((i,n)=>(mine[fKey(i)]||0)-1>=enhMat.slice(0,n+1).filter(j=>j===i).length);const used={};enhMat.forEach(i=>used[i]=(used[i]||0)+1);
-  const mb=enhMat.reduce((a,i)=>a+matBonus(i,L),0),base=enhBase(L),tot=Math.min(100,base+mb),cost=enhCost(L);
+  const mb=enhMat.reduce((a,i)=>a+matBonus(i,L),0),base=enhBase(L),pity=(me&&me.enhPity)||0,tot=Math.min(100,base+mb+pity),cost=enhCost(L);
   const fishes=FISH.map((f,i)=>[i,(mine[fKey(i)]||0)-1-(used[i]||0)]).filter(([i,c])=>FISH[i][1]>0&&c>0).sort((a,b)=>FISH[b[0]][1]-FISH[a[0]][1]);
   const pct=v=>(v>=10?v.toFixed(0):v.toFixed(1))+"%";
   S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:37px">🎣</div><b style="font-size:18.5px">${rodSkin(L)} <span style="color:var(--acc)">+${L}</span></b><canvas id="enhRodCv" width="240" height="60" style="display:block;margin:6px auto 0;width:160px;height:40px"></canvas><div style="font-size:11px;color:var(--sub)">${L<50?`외형은 5강마다 바뀌어요 · 다음 외형: +${Math.floor(L/5)*5+5} 「${rodSkin(Math.floor(L/5)*5+5)}」`:"👑 최고 외형"}</div><div style="font-size:12px;color:var(--sub);margin-top:4px">좋은 물고기(10만 원↑) 확률 <b style="color:var(--tx)">+${(rodBonus(L)*100).toFixed(2)}%p</b>${L<50?` → <b style="color:var(--ok)">+${(rodBonus(L+1)*100).toFixed(2)}%p</b>`:""}</div>
@@ -493,7 +493,7 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodL
   (L>=50?`<div class="card" style="text-align:center;font-weight:900">👑 최대 강화 달성!</div>`:
   `<div class="card"><div style="display:flex;justify-content:space-between;font-size:12px"><span>+${L} → +${L+1} 비용</span><b>${formatMoneyReadable(cost)}</b></div>
     <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px"><span>기본 성공 확률</span><b>${pct(base)}</b></div>
-    <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px"><span>재료 보너스</span><b style="color:var(--ok)">+${mb.toFixed(1)}%</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px"><span>실패 보너스 (실패할 때마다 쌓임)</span><b style="color:var(--ok)">+${pity.toFixed(1)}%</b></div><div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>재료 보너스</span><b style="color:var(--ok)">+${mb.toFixed(1)}%</b></div>
     <div style="display:flex;justify-content:space-between;font-size:14.5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)"><span style="font-weight:900">최종 성공 확률</span><b style="color:var(--acc)">${pct(tot)}</b></div>
     <div style="font-size:11px;color:var(--sub);margin:12px 0 6px">재료 (최대 5마리 · 누르면 빼기)</div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${[0,1,2,3,4].map(n=>{const i=enhMat[n];return i===undefined?`<div style="height:54px;border:1.5px dashed var(--line);border-radius:10px"></div>`:`<button data-mrm="${n}" style="height:54px;background:var(--card2);border-radius:10px;font-size:9px;line-height:1.25;padding:2px;overflow:hidden">${esc(FISH[i][2])}<br><b style="color:var(--ok)">+${matBonus(i,L).toFixed(1)}%</b></button>`;}).join("")}</div>
@@ -506,9 +506,10 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodL
   if($("enhGo"))$("enhGo").onclick=enhDo;}
 function enhDo(){if(enhBusy)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const L=rodLv();if(L>=50)return;const cost=enhCost(L);if(me.cash<cost)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);
   const mine=me.fish||{};for(const i of enhMat){const k=fKey(i);if(!((mine[k]||0)-1>=enhMat.filter(j=>j===i).length))return toast("재료 물고기가 부족해요 (1마리는 도감용)"),renderEnh();}
-  const tot=Math.min(100,enhBase(L)+enhMat.reduce((a,i)=>a+matBonus(i,L),0));enhBusy=true;
+  const tot=Math.min(100,enhBase(L)+enhMat.reduce((a,i)=>a+matBonus(i,L),0)+(me.enhPity||0));enhBusy=true;
   me.cash-=cost;for(const i of enhMat){const k=fKey(i);me.fish[k]=(me.fish[k]||0)-1;}enhMat=[];const ok=Math.random()*100<tot;
   let drop=false;if(!ok&&L>=ENH_DROP_LV&&Math.random()<ENH_DROP_P){drop=true;me.rodLv=L-1;}
+  if(ok)me.enhPity=0;else me.enhPity=(me.enhPity||0)+enhBase(L)*.05;
   if(ok){me.rodLv=L+1;if(me.rodLv%10===0||me.rodLv>=30)broadcast(`⚒️ ${myName()}님이 낚싯대를 +${me.rodLv}강으로 강화했어요!`);}
   saveMe();renderHeader();renderFishInfo();renderEnh();
   toast(ok?`✨ 강화 성공! 낚싯대 +${L+1}\n좋은 물고기 확률 +${(rodBonus(L+1)*100).toFixed(2)}%p`:(drop?`💔 강화 실패… 레벨 하락! +${L} → +${L-1}`:`💥 강화 실패… (+${L} 유지)`)+`\n성공 확률 ${tot.toFixed(1)}%였어요`);setTimeout(()=>{enhBusy=false;renderEnh();},600);}
@@ -1155,7 +1156,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261125-001500";
+const APP_VERSION="20261125-002000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
