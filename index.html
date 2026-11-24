@@ -128,6 +128,7 @@ nav button.on{color:var(--tx);font-weight:700}
 #fCharGrid button.on{border-color:var(--acc);background:#2a2410}#fCharGrid button small{font-size:10px;color:var(--acc);font-weight:700}#fCharGrid button small.own{color:var(--sub)}#fCharGrid button.lock canvas{opacity:.55}#fCharGrid canvas{width:70px;height:75px}
 #pgMod{position:fixed;inset:0;padding:12px;z-index:38;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #pgMod>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
+.gone{display:none!important}
 .pgBtns{display:flex;gap:8px;margin:2px 0 8px}.pgBtns button{flex:1;background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:13px}
 #fInfo{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #fInfo>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
@@ -183,7 +184,7 @@ nav button.on{color:var(--tx);font-weight:700}
 <div id="onlineList" class="olist" style="display:none"></div>
 <div id="notices"></div>
 <main>
-  <section class="sec on" id="s-market"><div class="pgBtns"><button data-pg="wallet">👛 내 자산</button><button data-pg="rank">🏆 순위</button><button data-pg="admin" id="navAdmin" style="display:none">🛠️ 관리</button></div><div id="coinList"></div></section>
+  <section class="sec on" id="s-market"><div class="pgBtns"><button data-pg="wallet">👛 내 자산</button><button data-pg="rank">🏆 순위</button><button data-pg="admin" id="navAdmin" class="gone" style="display:none">🛠️ 관리</button></div><div id="coinList"></div></section>
   <section class="sec" id="s-wallet">
     <div class="card"><h3>👤 내 정보</h3>
       <div style="display:flex;justify-content:space-between;align-items:center"><div><b id="wName" style="font-size:17px">-</b><div id="wLv" style="font-size:12px;color:var(--sub);margin-top:3px"></div></div><div style="text-align:right"><small style="color:var(--sub);font-size:11px">현금</small><div class="big" id="wCash" style="font-size:18px">-</div></div></div>
@@ -271,8 +272,8 @@ nav button.on{color:var(--tx);font-weight:700}
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
 <button id="admFab" title="관리" style="display:none">🛠️</button>
 <button id="chatFab">💬<span id="chatBadge"></span></button>
-<div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:30px">✨</div><div style="font-size:17px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:13px;color:var(--sub);margin-bottom:14px"></div><button onclick="location.reload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:15px">지금 새로고침</button></div></div>
-<div id="updBar" style="display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;background:#1e3a5f;border:1px solid #3b82f6;color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:10px;white-space:nowrap">✨ 새 버전이 나왔어요<button onclick="location.reload()" style="background:var(--acc);color:#111;font-weight:800;border-radius:9px;padding:6px 12px">새로고침</button><button onclick="this.parentNode.style.display='none'" style="color:#9fb3c8;font-size:15px">✕</button></div>
+<div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:30px">✨</div><div style="font-size:17px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:13px;color:var(--sub);margin-bottom:14px"></div><button onclick="hardReload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:15px">지금 새로고침</button></div></div>
+<div id="updBar" style="display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;background:#1e3a5f;border:1px solid #3b82f6;color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:10px;white-space:nowrap">✨ 새 버전이 나왔어요<button onclick="hardReload()" style="background:var(--acc);color:#111;font-weight:800;border-radius:9px;padding:6px 12px">새로고침</button><button onclick="this.parentNode.style.display='none'" style="color:#9fb3c8;font-size:15px">✕</button></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -533,7 +534,7 @@ function renderFTicker(){const T=$("fTicker");if(!T||!$("s-fish").classList.cont
 
 /* ===================== 접속자 ===================== */
 let lastPres="",onlineMap={};function pushPresence(){if(!fdb||!myId||!me||!me._loaded||!me.name)return;const o={name:myName(),lv:lvOf(me),ch:normCh(me.ch),t:Date.now()};const j=o.name+"|"+o.lv;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();}
-function onlinePeople(){const out=[];for(const[id,v]of Object.entries(onlineMap)){if(!v)continue;out.push({name:id===myId?myName():(String(v.name||"접속자").slice(0,12)),lv:v.lv|0,me:id===myId});}return out.sort((a,b)=>b.me-a.me);}
+function onlinePeople(){const out=[];for(const[id,v]of Object.entries(onlineMap)){if(!v)continue;out.push({name:id===myId?myName():(String(v.name||(players[id]&&players[id].name)||"접속자").slice(0,12)),lv:v.lv|0,me:id===myId});}return out.sort((a,b)=>b.me-a.me);}
 let fbConnected=false;function updOnline(){const L=onlinePeople(),n=Math.max(1,L.length);$("dot").classList.toggle("on",fbConnected);
   $("online").innerHTML=fbConnected?`<b>${n}명</b> 접속 중 ▾`:"연결 중…";
   const chips=L.length?L.map(p=>`<span class="ochip${p.me?' me':''}"><i></i>${esc(p.name)}${p.me?' (나)':''}${p.lv?` <small style="color:var(--sub)">Lv.${p.lv}</small>`:''}</span>`).join(""):'<span style="color:var(--sub)">나만 있어요</span>';
@@ -690,7 +691,7 @@ function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${idx+1}번 ${
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
 function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id===myId)continue;const v=onlineMap[id];if(!v||now-(v.t||0)>180000){delete fOthers[id];continue;}
     const has=typeof v.fx==="number",sp=has?{x:v.fx,y:v.fy}:spawnOf(id);
-    const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.ch=typeof v.ch==="number"?v.ch:-1;o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||"").slice(0,10);
+    const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.ch=typeof v.ch==="number"?v.ch:-1;o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
     if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if(o.fct||Date.now()-v.fc.t<8000)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?(v.fc.i+1)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=10000000?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
 function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
@@ -717,14 +718,15 @@ function landFish(t){const i=rollFish(),[,base,name]=FISH[i];const tax=base>0?Ma
   if(base>=10000000){broadcast(`🏆 [대어 포착!] ${myName()}님이 낚시로 ${name}을(를) 잡았어요! (+${formatMoneyReadable(base)})`);if(fdb)fdb.ref("market/fishHof").push({name:myName(),fish:name,v:base,t:Date.now()}).catch(()=>{});}
   renderFishInfo();}
 let fHof=[];
-function renderFishInfo(){const box=$("fishInfo");if(!box||$("fInfo").style.display!=="flex")return;const mine=me&&me.fish||{};
+let fDexOf=null;
+function renderFishInfo(){const box=$("fishInfo");if(!box||$("fInfo").style.display!=="flex")return;const subj=(fDexOf&&players[fDexOf])?players[fDexOf]:me;const other=subj!==me;const mine=subj&&subj.fish||{};
   document.querySelectorAll("#fishTabs button").forEach(b=>b.classList.toggle("on",b.dataset.f===fTab));
-  if(fTab==="dex"){const n=fishCountOf(me);let h=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:16px">📖 내 도감 ${n} / ${FISH.length}종</b><div style="font-size:12px;color:var(--sub);margin-top:2px">낚시 ${(me.fishN||0).toLocaleString()}회 · 총 수익 ${formatMoneyReadable(me.fishEarn||0)}</div></div><div style="font-size:12px;color:var(--sub);text-align:right">다 모으면<br><b style="color:#ffcf4d">1억 원</b></div></div><div style="height:6px;background:var(--line);border-radius:3px;margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:${n/FISH.length*100}%;background:var(--acc)"></i></div></div><div class="card" style="padding:6px 10px">`;
+  if(fTab==="dex"){const n=fishCountOf(subj);let h=(other?`<button id="fDexBack" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;margin-bottom:8px">← 내 도감으로</button>`:"")+`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:16px">📖 ${other?esc(subj.name||"?")+"님의 도감":"내 도감"} ${n} / ${FISH.length}종</b><div style="font-size:12px;color:var(--sub);margin-top:2px">낚시 ${(subj.fishN||0).toLocaleString()}회 · 총 수익 ${formatMoneyReadable(subj.fishEarn||0)}</div></div><div style="font-size:12px;color:var(--sub);text-align:right">다 모으면<br><b style="color:#ffcf4d">1억 원</b></div></div><div style="height:6px;background:var(--line);border-radius:3px;margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:${n/FISH.length*100}%;background:var(--acc)"></i></div></div><div class="card" style="padding:6px 10px">`;
     FISH.forEach(([,v,nm],i)=>{const c=mine[fKey(i)]||0;h+=`<div class="rk" data-fi="${i}" style="padding:8px 2px;cursor:pointer"><div class="n" style="width:30px;font-size:12px">${i+1}</div><div class="w">${c?esc(nm):'<span style="color:var(--sub)">???</span>'}</div><div class="v" style="font-size:12px">${c?`<span class="${v<0?'down':'up'}">${formatMoneyReadable(v)}</span> · ${c}개`:''}</div></div>`;});
-    box.innerHTML=h+"</div>";box.querySelectorAll("[data-fi]").forEach(e=>e.onclick=()=>{const i=+e.dataset.fi;if(!(mine[fKey(i)]>0))return toast("아직 못 잡은 물고기예요");const own=[];const all={...players};all[myId]=me;for(const id in all){const c=((all[id]||{}).fish||{})[fKey(i)];if(c>0)own.push(`${(all[id].name||"?")} ${c}개`);}toast(`🔍 ${FISH[i][2]} 소유자\n${own.join(", ")}`);});}
+    box.innerHTML=h+"</div>";if($("fDexBack"))$("fDexBack").onclick=()=>{fDexOf=null;renderFishInfo();$("fishInfo").scrollTop=0;};box.querySelectorAll("[data-fi]").forEach(e=>e.onclick=()=>{const i=+e.dataset.fi;if(!(mine[fKey(i)]>0))return toast("아직 못 잡은 물고기예요");const own=[];const all={...players};all[myId]=me;for(const id in all){const c=((all[id]||{}).fish||{})[fKey(i)];if(c>0)own.push(`${(all[id].name||"?")} ${c}개`);}toast(`🔍 ${FISH[i][2]} 소유자\n${own.join(", ")}`);});}
   else if(fTab==="rank"){const all={...players};if(me&&myId)all[myId]=me;const L=Object.entries(all).filter(([,p])=>p&&(p.fishN||0)>0).map(([id,p])=>({id,name:p.name||"?",dex:fishCountOf(p),n:p.fishN||0,e:p.fishEarn||0}));
-    const sec=(title,key,fmt)=>{const s=L.slice().sort((a,b)=>b[key]-a[key]).slice(0,10);return `<div class="card"><h3>${title}</h3>${s.length?s.map((x,i)=>`<div class="rk${x.id===myId?' me':''}"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i+1}</div><div class="w">${esc(x.name)}</div><div class="v">${fmt(x)}</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">아직 낚시한 사람이 없어요</div>'}</div>`;};
-    box.innerHTML=sec("📖 도감 수집 순위","dex",x=>`${x.dex}종 <small style="color:var(--sub)">(${(x.dex/FISH.length*100).toFixed(1)}%)</small>`)+sec("📊 낚시 횟수 순위","n",x=>x.n.toLocaleString()+"회")+sec("💰 낚시 수익 순위","e",x=>formatMoneyReadable(x.e));}
+    const sec=(title,key,fmt)=>{const s=L.slice().sort((a,b)=>b[key]-a[key]).slice(0,10);return `<div class="card"><h3>${title}</h3>${s.length?s.map((x,i)=>`<div class="rk${x.id===myId?' me':''}" data-pid="${x.id}" style="cursor:pointer"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i+1}</div><div class="w">${esc(x.name)}</div><div class="v">${fmt(x)}</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">아직 낚시한 사람이 없어요</div>'}</div>`;};
+    box.innerHTML=sec("📖 도감 수집 순위","dex",x=>`${x.dex}종 <small style="color:var(--sub)">(${(x.dex/FISH.length*100).toFixed(1)}%)</small>`)+sec("📊 낚시 횟수 순위","n",x=>x.n.toLocaleString()+"회")+sec("💰 낚시 수익 순위","e",x=>formatMoneyReadable(x.e))+'<div style="font-size:11px;color:var(--sub);text-align:center">이름을 누르면 그 사람 도감을 볼 수 있어요</div>';box.querySelectorAll("[data-pid]").forEach(e=>e.onclick=()=>{const id=e.dataset.pid;fDexOf=id===myId?null:id;fTab="dex";renderFishInfo();$("fishInfo").scrollTop=0;});}
   else{box.innerHTML=`<div class="card"><h3>🏆 대어 명예의 전당 (1,000만 원 이상)</h3>${fHof.length?fHof.slice().reverse().map(h=>{const d=new Date(h.t);return `<div class="rk"><div class="w"><b>${esc(h.fish)}</b><small>${esc(h.name)} · ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}</small></div><div class="v up">${formatMoneyReadable(h.v)}</div></div>`;}).join(""):'<div style="color:var(--sub);font-size:13px">아직 대어를 낚은 사람이 없어요</div>'}</div>`;}}
 function fishInit(){if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCv=$("fishCv");fCtx=fCv.getContext("2d");fishResize();window.addEventListener("resize",fishResize);
   const pt=e=>{const r=fCv.getBoundingClientRect();return{x:(e.clientX-r.left)/fScale,y:(e.clientY-r.top)/fScale};};let down=false;
@@ -732,7 +734,7 @@ function fishInit(){if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCv=$("
   fCv.addEventListener("pointerdown",e=>{if(TOUCH)return;down=true;go(e);});fCv.addEventListener("pointermove",e=>{if(down)go(e);});window.addEventListener("pointerup",()=>down=false);
   window.addEventListener("keydown",e=>{if(!fishActive()||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if($("fMk").style.display==="flex"){if(e.key==="Escape")closeMarket();return;}if(e.key===" "){e.preventDefault();if(!e.repeat)fishAction();return;}if(e.key==="Enter"){e.preventDefault();openFChat();return;}if(e.key==="e"||e.key==="E"){if(nearShop(fp.x,fp.y))openMarket();return;}const k=e.key.length===1?e.key.toLowerCase():e.key;if(k in{ArrowUp:1,ArrowDown:1,ArrowLeft:1,ArrowRight:1,w:1,a:1,s:1,d:1}){fKeys[k]=true;e.preventDefault();}});
   window.addEventListener("keyup",e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;fKeys[k]=false;});
-  $("fishBtn").onclick=fishAction;document.querySelectorAll("#fishTabs button").forEach(b=>b.onclick=()=>{fTab=b.dataset.f;renderFishInfo();});
+  $("fishBtn").onclick=fishAction;document.querySelectorAll("#fishTabs button").forEach(b=>b.onclick=()=>{fTab=b.dataset.f;if(fTab!=="dex")fDexOf=null;renderFishInfo();});
   setInterval(()=>{if(fishActive())setFishBtn();},300);
   const waitDb=setInterval(()=>{if(!fdb)return;clearInterval(waitDb);fdb.ref("market/fishHof").limitToLast(30).on("value",s=>{const v=s.val()||{};fHof=Object.values(v).filter(x=>x&&x.t).sort((a,b)=>a.t-b.t);if(fTab==="hof")renderFishInfo();});},300);}
 function fishShow(on){if(on){if(!fishShow.sp&&myId){fishShow.sp=1;const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fishResize();fishSyncOthers();setFishBtn();renderFishInfo();if(!fRaf){fPrev=0;fRaf=requestAnimationFrame(fishLoop);}fLastSent="";}
@@ -740,7 +742,7 @@ function fishShow(on){if(on){if(!fishShow.sp&&myId){fishShow.sp=1;const sp=spawn
 fishInit();
 $("fChBtn").onclick=openChar;$("fCharX").onclick=()=>$("fChar").style.display="none";$("fChar").onclick=e=>{if(e.target.id==="fChar")$("fChar").style.display="none";};
 window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("fChar").style.display==="flex")$("fChar").style.display="none";});
-function openFInfo(t){fTab=t;fKeys={};$("fInfo").style.display="flex";renderFishInfo();$("fishInfo").scrollTop=0;}
+function openFInfo(t){fTab=t;fDexOf=null;fKeys={};$("fInfo").style.display="flex";renderFishInfo();$("fishInfo").scrollTop=0;}
 function closeFInfo(){$("fInfo").style.display="none";}
 document.querySelectorAll("[data-fo]").forEach(b=>b.onclick=()=>openFInfo(b.dataset.fo));$("fInfoX").onclick=closeFInfo;$("fInfo").onclick=e=>{if(e.target.id==="fInfo")closeFInfo();};
 window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("fInfo").style.display==="flex")closeFInfo();});
@@ -797,10 +799,11 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-145725";
+const APP_VERSION="20261124-150139";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
+function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
-  try{document.activeElement&&document.activeElement.blur();}catch(e){}const tick=()=>{$("updCnt").textContent="새로고침해야 계속할 수 있어요 · "+n+"초 뒤 자동 새로고침";if(n--<=0){location.reload();return;}updT=setTimeout(tick,1000);};tick();}
+  try{document.activeElement&&document.activeElement.blur();}catch(e){}const tick=()=>{$("updCnt").textContent="새로고침해야 계속할 수 있어요 · "+n+"초 뒤 자동 새로고침";if(n--<=0){hardReload();return;}updT=setTimeout(tick,1000);};tick();}
 
 const LOAD_T=Date.now();{const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/forceReload").on("value",s=>{const v=s.val();if(typeof v==="number"&&v>LOAD_T&&Date.now()-v<120000)showUpdate("관리자가 새로고침을 요청했어요");});},300);}
 {const R=$("fRow");try{if(localStorage.getItem("jc_tk")==="0")R.classList.add("tkoff");}catch(e){}
