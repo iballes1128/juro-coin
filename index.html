@@ -172,6 +172,11 @@ nav button.on{color:var(--tx);font-weight:700}
   header{padding:10px 14px 8px}.brand h1{font-size:16px}.assets{margin-top:8px;gap:8px}.assets div{padding:7px 10px}.assets b{font-size:14px}
   .notice{margin:8px 14px 0;padding:8px 10px;font-size:12px}.pgBtns button{padding:9px 0;font-size:12px}
 }
+.btBg{position:fixed;inset:0;padding:12px;z-index:45;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center}
+.btBox{background:var(--bg);width:100%;max-width:420px;max-height:88vh;overflow-y:auto;border-radius:18px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid var(--line)}
+.btBig{font-size:54px;font-weight:900;text-align:center;line-height:1.15;margin:6px 0}
+.rps{display:flex;gap:10px;margin:14px 0 6px}.rps button{flex:1;font-size:38px;line-height:1.1;background:var(--card);border-radius:16px;padding:14px 0 10px;border:2px solid transparent}.rps button small{display:block;font-size:12px;color:var(--sub);margin-top:4px}.rps button.on{border-color:var(--acc);background:#2a2410}.rps button:disabled{opacity:.55}
+.btBox .go{margin-top:6px}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -186,7 +191,7 @@ nav button.on{color:var(--tx);font-weight:700}
 <div id="onlineList" class="olist" style="display:none"></div>
 <div id="notices"></div>
 <main>
-  <section class="sec on" id="s-market"><div class="pgBtns"><button data-pg="wallet">👛 내 자산</button><button data-pg="rank">🏆 순위</button><button data-pg="admin" id="navAdmin" class="gone" style="display:none">🛠️ 관리</button></div><div id="coinList"></div></section>
+  <section class="sec on" id="s-market"><div class="pgBtns"><button data-pg="wallet">👛 내 자산</button><button data-pg="rank">🏆 순위</button><button id="btOpen">⚔️ 배틀</button><button data-pg="admin" id="navAdmin" class="gone" style="display:none">🛠️ 관리</button></div><div id="coinList"></div></section>
   <section class="sec" id="s-wallet">
     <div class="card"><h3>👤 내 정보</h3>
       <div style="display:flex;justify-content:space-between;align-items:center"><div><b id="wName" style="font-size:17px">-</b><div id="wLv" style="font-size:12px;color:var(--sub);margin-top:3px"></div></div><div style="text-align:right"><small style="color:var(--sub);font-size:11px">현금</small><div class="big" id="wCash" style="font-size:18px">-</div></div></div>
@@ -279,6 +284,24 @@ nav button.on{color:var(--tx);font-weight:700}
 <button id="chatFab">💬<span id="chatBadge"></span></button>
 <div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:30px">✨</div><div style="font-size:17px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:13px;color:var(--sub);margin-bottom:14px"></div><button onclick="hardReload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:15px">지금 새로고침</button></div></div>
 <div id="updBar" style="display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;background:#1e3a5f;border:1px solid #3b82f6;color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:10px;white-space:nowrap">✨ 새 버전이 나왔어요<button onclick="hardReload()" style="background:var(--acc);color:#111;font-weight:800;border-radius:9px;padding:6px 12px">새로고침</button><button onclick="this.parentNode.style.display='none'" style="color:#9fb3c8;font-size:15px">✕</button></div>
+<div id="btMod" class="btBg"><div class="btBox">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="font-size:17px">⚔️ 배틀 · 가위바위보</b><button id="btModX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div>
+  <div id="btStat" style="font-size:12px;color:var(--sub);margin-bottom:8px"></div>
+  <div class="lbl" style="margin-top:4px">상대 (접속 중인 사람)</div><select id="btTo"></select>
+  <div class="tabs2" style="margin:12px 0 8px"><button data-bk="cash" class="on">💰 돈</button><button data-bk="coin">🪙 코인</button></div>
+  <div id="btCashRow"><input id="btAmt" inputmode="numeric" placeholder="판돈 (원)"></div>
+  <div id="btCoinRow" style="display:none"><select id="btCoin"></select><div class="nick"><input id="btCnt" inputmode="numeric" placeholder="코인 개수"><button id="btAll">전부</button></div></div>
+  <div style="font-size:12px;color:var(--sub);line-height:1.65;margin:12px 0 8px">· 상대도 똑같은 판돈을 걸어요<br>· 신청하면 내 판돈이 먼저 보관되고, 상대가 60초 안에 수락하면 시작해요<br>· 시작되면 5초 안에 가위·바위·보 중에 골라요 (안 고르면 패배)<br>· 이긴 사람이 판돈을 전부 가져가고, 비기면 돌려받아요<br>· 상대 돈·코인이 모자라거나 거절하면 성사되지 않고 판돈이 돌아와요</div>
+  <button class="go buy" id="btGo">⚔️ 배틀 신청</button>
+</div></div>
+<div id="btInc" class="btBg" style="z-index:46"><div class="btBox" style="text-align:center"><div style="font-size:34px">⚔️</div><div id="btIncT" style="font-weight:900;font-size:18px;margin:4px 0"></div><div id="btIncS" style="font-size:14px"></div><div id="btIncC" style="color:var(--sub);font-size:12px;margin:8px 0 12px"></div>
+  <div style="display:flex;gap:8px"><button class="go" id="btIncNo" style="flex:1;background:var(--card2)">거절</button><button class="go" id="btIncYes" style="flex:1;background:var(--acc);color:#111">수락</button></div></div></div>
+<div id="btWait" class="btBg" style="z-index:46"><div class="btBox" style="text-align:center"><div style="font-size:34px">⏳</div><div style="font-weight:900;font-size:17px;margin:4px 0">배틀 신청 중</div><div id="btWaitS" style="font-size:14px"></div><div id="btWaitC" style="color:var(--sub);font-size:12px;margin:8px 0 12px"></div>
+  <button class="go" id="btWaitNo" style="background:var(--card2)">신청 취소</button></div></div>
+<div id="btPlay" class="btBg" style="z-index:47"><div class="btBox" style="text-align:center"><div id="btpHead" style="font-size:14px;color:var(--sub)"></div><div id="btpStake" style="font-weight:700;font-size:14px;margin:4px 0"></div>
+  <div id="btpBig" class="btBig"></div><div id="btpMsg" style="font-size:13px;min-height:20px"></div>
+  <div class="rps" id="btpRps"><button data-c="s">✌️<small>가위</small></button><button data-c="r">✊<small>바위</small></button><button data-c="p">🖐️<small>보</small></button></div>
+  <div id="btpRes"></div><button class="go" id="btpOk" style="display:none;background:var(--acc);color:#111">확인</button></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -842,6 +865,135 @@ const LOAD_T=Date.now();{const w=setInterval(()=>{if(!fdb)return;clearInterval(w
   const set=on=>{R.classList.toggle("tkoff",!on);try{localStorage.setItem("jc_tk",on?"1":"0");}catch(e){}fishResize.w=0;fishResize();};$("fTkHide").onclick=()=>set(false);$("fTkShow").onclick=()=>set(true);}
 $("admFab").onclick=()=>openPg("admin");setInterval(()=>{const f=$("admFab");if(f)f.style.display=isOwner?"":"none";},800);
 $("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload").set(Date.now()).then(()=>toast("🔄 모두에게 새로고침을 보냈어요")).catch(()=>toast("실패"));};
+/* BT-BEGIN ===================== ⚔️ 배틀 (가위바위보) ===================== */
+const BT_REQ_MS=60000,BT_PICK_MS=5000,BT_GRACE=800,BT_PATH="market/battles";
+const BT_EMO={r:"✊",s:"✌️",p:"🖐️"},BT_BEATS={r:"s",s:"p",p:"r"};
+let srvOff=0,bFrom={},bTo={},battles={},btClosed={},btDismiss={},btMy={},btResolving={},btIncId=null,btWaitId=null,btPlayId=null,btKind="cash";
+const nowS=()=>Date.now()+srvOff;
+const btDone=id=>(me.bdone||[]).includes(id);
+function btMarkDone(id){me.bdone=(me.bdone||[]).concat(id).slice(-80);}
+function btStakeTxt(b){return b.type==="coin"?`${b.coin} ${formatCoinReadable(b.amt)}`:formatMoneyReadable(b.amt);}
+function btCanPay(b){if(b.type==="coin"){const h=me.coins&&me.coins[b.coin];return!!(h&&h.count>=b.amt&&b.amt>0);}return me.cash>=b.amt;}
+/* 내 판돈을 자산에서 빼기 (성공: {cost}, 실패: null) */
+function btTake(b){
+  if(b.type==="coin"){const h=me.coins&&me.coins[b.coin];if(!h||!(h.count>0)||!(h.count>=b.amt))return null;const cost=Math.round(h.cost/h.count*b.amt);h.count-=b.amt;h.cost-=cost;if(h.count<=0){h.count=0;h.cost=0;}return{cost};}
+  if(!(me.cash>=b.amt))return null;me.cash-=b.amt;return{cost:0};}
+/* n배 지급 (1: 환불, 2: 승리) */
+function btGive(b,n,cost){
+  if(b.type==="coin"){me.coins=me.coins||{};const h=me.coins[b.coin]||(me.coins[b.coin]={count:0,cost:0,since:0});h.count+=b.amt*n;h.cost+=cost;h.since=M.k;}
+  else me.cash+=b.amt*n;}
+function btActive(){const now=nowS();for(const id in battles){const b=battles[id];if(!b||btDone(id))continue;if(b.st==="play")return id;if(b.st==="pending"&&b.from===myId&&now-b.t<BT_REQ_MS+3000)return id;}return null;}
+
+/* 상태 바꾸기 (신청 중일 때만 가능한 트랜잭션) */
+async function btSetSt(id,st,why,extra,fresh){
+  try{const r=await fdb.ref(BT_PATH+"/"+id).transaction(cur=>{if(cur===null)return cur;if(cur.st!=="pending")return;if(fresh&&nowS()-cur.t>BT_REQ_MS+2000)return;cur.st=st;cur.why=why||"";if(extra)Object.assign(cur,extra);return cur;});
+    const v=r.snapshot.val();return!!(r.committed&&v&&v.st===st);}catch(e){return false;}}
+
+async function btResolve(id){
+  if(Date.now()-(btResolving[id]||0)<3000)return;btResolving[id]=Date.now();
+  try{const s=await fdb.ref(BT_PATH+"/"+id).once("value");const b=s.val();if(!b||b.result||b.st!=="play")return;
+    const ok=x=>x==="r"||x==="s"||x==="p"?x:"";const pk=b.pick||{};const pa=ok(pk[b.from]),pb=ok(pk[b.to]);let w;
+    if(!pa&&!pb)w="draw";else if(!pa)w=b.to;else if(!pb)w=b.from;else w=pa===pb?"draw":(BT_BEATS[pa]===pb?b.from:b.to);
+    await fdb.ref(BT_PATH+"/"+id+"/result").transaction(cur=>cur?undefined:{w,pa,pb});}catch(e){}}
+
+/* 신청 만들기 */
+async function btCreate(){
+  if(!me||!me._loaded||!fdb)return toast("연결 중이에요");if(btActive())return toast("⚠️ 이미 진행 중인 배틀이 있어요");
+  const to=$("btTo").value;if(!to)return toast("상대를 골라 주세요");const op=players[to];if(!op||!onlineMap[to])return toast("상대가 지금 접속 중이 아니에요");
+  let b;
+  if(btKind==="cash"){const amt=parseInt(($("btAmt").value||"").replace(/[^0-9]/g,""),10);if(!(amt>0))return toast("⚠️ 판돈을 확인해 주세요");
+    if(me.cash<amt)return toast("💸 내 잔액이 부족해요");if((op.cash||0)<amt)return toast("상대 돈이 부족해서 신청할 수 없어요");
+    b={type:"cash",coin:"",amt,px:0};}
+  else{const coin=$("btCoin").value,n=parseInt(($("btCnt").value||"").replace(/[^0-9]/g,""),10),ci=COINS.findIndex(c=>c[0]===coin);if(ci<0)return toast("코인을 골라 주세요");if(!(n>0))return toast("⚠️ 코인 개수를 확인해 주세요");
+    if(M.coins[ci].delisted)return toast("상장폐지된 코인이에요");const h=me.coins&&me.coins[coin];if(!h||h.count<n)return toast("내 코인이 부족해요");
+    const oh=(op.coins||{})[coin];if(!oh||!(oh.count>=n))return toast("상대가 그 코인을 그만큼 갖고 있지 않아서 신청할 수 없어요");
+    b={type:"coin",coin,amt:n,px:priceOf(ci)};}
+  const tk=btTake(b);if(!tk)return toast("판돈이 부족해요");
+  Object.assign(b,{from:myId,fromName:myName(),to,toName:String(op.name||"?"),st:"pending",why:"",esc:true,costA:tk.cost,costB:0,t:nowS()});
+  saveMe();renderHeader();
+  try{await fdb.ref(BT_PATH).push().set(b);}catch(e){btGive(b,1,tk.cost);saveMe();renderAll();return toast("신청에 실패했어요 (판돈은 돌려받았어요)");}
+  $("btMod").style.display="none";toast(`⚔️ ${b.toName}님에게 배틀을 신청했어요\n판돈 ${btStakeTxt(b)} · 60초 안에 수락하면 시작해요`);renderAll();}
+
+async function btAccept(id){
+  const b=battles[id];if(!b||b.st!=="pending"||b.to!==myId||!me||!me._loaded)return;
+  if(nowS()-b.t>BT_REQ_MS)return toast("시간이 지난 신청이에요");const act=btActive();if(act&&act!==id)return toast("⚠️ 이미 진행 중인 배틀이 있어요");
+  btDismiss[id]=1;const tk=btTake(b);
+  if(!tk){await btSetSt(id,"declined","poor");btRender();return toast("💸 판돈이 부족해서 성사되지 않았어요");}
+  saveMe();renderHeader();const startT=nowS()+300;
+  const ok=await btSetSt(id,"play","",{startT,costB:tk.cost},true);
+  if(!ok){btGive(b,1,tk.cost);saveMe();renderAll();return toast("이미 취소됐거나 시간이 지난 신청이에요 (판돈은 돌려받았어요)");}
+  renderAll();}
+function btDecline(id){btDismiss[id]=1;btSetSt(id,"declined","no");btRender();}
+function btCancel(id){btSetSt(id,"cancel","cancel");btRender();}
+function btPick(id,c){const b=battles[id];if(!b||b.st!=="play"||nowS()>=b.startT+BT_PICK_MS||b.result)return;btMy[id]=c;fdb.ref(BT_PATH+"/"+id+"/pick/"+myId).set(c).catch(()=>{});btRender();}
+
+/* 돈 정산: 신청 취소·거절 환불, 결과 지급 (사람마다 자기 몫만, 한 번만) */
+function btProcess(){
+  if(!me||!me._loaded||localMode||!fdb)return;const now=nowS();let changed=false;
+  for(const id in battles){const b=battles[id];if(!b||btDone(id))continue;const mine=b.from===myId;
+    if(b.st==="declined"||b.st==="cancel"||b.st==="expired"){
+      if(mine&&b.esc){btGive(b,1,b.costA||0);toast(`⚔️ 배틀이 성사되지 않았어요 (${b.st==="declined"?(b.why==="poor"?"상대 판돈 부족":"상대가 거절"):b.st==="cancel"?"신청 취소":"응답 없음"})\n판돈 ${btStakeTxt(b)}이(가) 돌아왔어요`);}
+      btMarkDone(id);changed=true;continue;}
+    if(b.st==="pending"){if(mine&&now-b.t>BT_REQ_MS+3000)btSetSt(id,"expired","timeout");continue;}
+    if(b.st==="play"){
+      if(!b.result){if(now>=b.startT+BT_PICK_MS+BT_GRACE)btResolve(id);continue;}
+      const r=b.result,own=(mine?b.costA:b.costB)||0,opn=mine?b.toName:b.fromName;
+      if(r.w==="draw"){btGive(b,1,own);me.bd=(me.bd||0)+1;}
+      else if(r.w===myId){btGive(b,2,own+Math.round(b.amt*(b.px||0)));me.bw=(me.bw||0)+1;broadcast(`⚔️ ${myName()}님이 ${opn}님과의 가위바위보 배틀에서 승리! (+${btStakeTxt(b)})`);}
+      else me.bl=(me.bl||0)+1;
+      btMarkDone(id);changed=true;}}
+  if(changed){saveMe();renderAll();}}
+
+/* ---------- 화면 ---------- */
+function openBtMod(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");
+  const ids=Object.keys(onlineMap).filter(id=>id!==myId&&players[id]&&players[id].name);
+  $("btTo").innerHTML=ids.length?'<option value="">상대 고르기</option>'+ids.map(id=>`<option value="${id}">${esc(players[id].name)}</option>`).join(""):'<option value="">지금 접속 중인 사람이 없어요</option>';
+  const hs=COINS.map(([n],ci)=>[n,ci,(me.coins&&me.coins[n])||{count:0}]).filter(x=>x[2].count>0&&!M.coins[x[1]].delisted);
+  $("btCoin").innerHTML=hs.length?hs.map(x=>`<option value="${x[0]}">${x[0]} (보유 ${formatCoinReadable(x[2].count)})</option>`).join(""):'<option value="">보유 코인이 없어요</option>';
+  $("btStat").textContent=`내 전적 ${me.bw||0}승 ${me.bl||0}패 ${me.bd||0}무`;$("btMod").style.display="flex";}
+function btRenderPlay(id){
+  const b=battles[id],now=nowS(),L=b.startT+BT_PICK_MS-now,mine=b.from===myId,opn=mine?b.toName:b.fromName,r=b.result,my=btMy[id]||((b.pick||{})[myId])||"";
+  $("btpHead").textContent="나 vs "+opn;$("btpStake").textContent="판돈 각 "+btStakeTxt(b)+" · 이기면 전부 가져가요";
+  document.querySelectorAll("#btpRps button").forEach(x=>{x.classList.toggle("on",x.dataset.c===my);x.disabled=!!r||L<=0;});
+  const res=$("btpRes"),ok=$("btpOk");
+  if(r){const mp=mine?r.pa:r.pb,op=mine?r.pb:r.pa,win=r.w===myId,draw=r.w==="draw";
+    $("btpBig").textContent=draw?"🤝 무승부":win?"🎉 승리!":"😭 패배";$("btpBig").style.color=draw?"var(--tx)":win?"var(--up)":"var(--down)";
+    $("btpMsg").innerHTML=draw?"판돈이 돌아와요":win?`<b class="up">+${esc(btStakeTxt(b))}</b> 가져갔어요!`:`<b class="down">-${esc(btStakeTxt(b))}</b>`+(!mp?" · 선택 안 해서 기권패":"");
+    res.innerHTML=`<div style="font-size:44px;margin:6px 0">${mp?BT_EMO[mp]:"❓"} <span style="font-size:16px;color:var(--sub)">vs</span> ${op?BT_EMO[op]:"❓"}</div><div style="font-size:12px;color:var(--sub)">나 · ${esc(opn)}</div>`;ok.style.display="block";}
+  else{ok.style.display="none";res.innerHTML="";$("btpBig").style.color="var(--acc)";
+    if(L>0){$("btpBig").textContent=Math.min(5,Math.ceil(L/1000));$("btpMsg").textContent=my?"선택 완료! 바꿀 수도 있어요 (결과는 5초 뒤)":"5초 안에 고르세요! 안 고르면 패배";}
+    else{$("btpBig").textContent="⏳";$("btpMsg").textContent="결과 집계 중…";}}}
+function btRender(){
+  if(!me||!me._loaded||!fdb)return;const now=nowS();let playId=null,inc=null,wait=null;
+  for(const id in battles){const b=battles[id];if(!b)continue;
+    if(b.st==="play"&&!btClosed[id]&&now<b.startT+25000){if(!playId||b.startT>battles[playId].startT)playId=id;}
+    else if(b.st==="pending"&&now-b.t<BT_REQ_MS){if(b.to===myId&&!btDismiss[id])inc=id;else if(b.from===myId)wait=id;}}
+  if(inc){const b=battles[inc];if(!btCanPay(b)){btDismiss[inc]=1;btSetSt(inc,"declined","poor");toast(`💸 판돈이 부족해서 성사되지 않았어요\n(${b.fromName}님의 신청: ${btStakeTxt(b)})`);inc=null;}}
+  btPlayId=playId;btIncId=inc;btWaitId=wait;
+  $("btPlay").style.display=playId?"flex":"none";if(playId)btRenderPlay(playId);
+  const showInc=!playId&&inc,showWait=!playId&&wait;
+  $("btInc").style.display=showInc?"flex":"none";
+  if(showInc){const b=battles[inc];$("btIncT").textContent=`${b.fromName}님의 배틀 신청!`;$("btIncS").textContent=`가위바위보 · 판돈 각 ${btStakeTxt(b)} (이기면 전부)`;$("btIncC").textContent=`${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초 안에 답하세요`;}
+  $("btWait").style.display=showWait?"flex":"none";
+  if(showWait){const b=battles[wait];$("btWaitS").textContent=`${b.toName}님 · 판돈 ${btStakeTxt(b)}`;$("btWaitC").textContent=`수락을 기다리는 중… ${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초`;}}
+
+function btInit(){
+  fdb.ref(".info/serverTimeOffset").on("value",s=>{srvOff=s.val()||0;});
+  const upd=()=>{battles=Object.assign({},bFrom,bTo);btProcess();btRender();};
+  fdb.ref(BT_PATH).orderByChild("from").equalTo(myId).on("value",s=>{bFrom=s.val()||{};upd();});
+  fdb.ref(BT_PATH).orderByChild("to").equalTo(myId).on("value",s=>{bTo=s.val()||{};upd();});
+  setInterval(()=>{btProcess();btRender();},300);
+  /* 한 달 지난 끝난 기록 정리 (내가 신청한 것만) */
+  setTimeout(()=>{const lim=Date.now()-30*86400000;for(const id in bFrom){const b=bFrom[id];if(b&&b.t<lim&&b.st!=="pending"&&(b.st!=="play"||b.result)&&me&&btDone(id))fdb.ref(BT_PATH+"/"+id).remove().catch(()=>{});}},20000);}
+{const g=id=>document.getElementById(id);
+ g("btOpen").onclick=openBtMod;g("btModX").onclick=()=>g("btMod").style.display="none";g("btMod").onclick=e=>{if(e.target.id==="btMod")g("btMod").style.display="none";};
+ document.querySelectorAll("[data-bk]").forEach(b=>b.onclick=()=>{btKind=b.dataset.bk;document.querySelectorAll("[data-bk]").forEach(x=>x.classList.toggle("on",x===b));g("btCashRow").style.display=btKind==="cash"?"block":"none";g("btCoinRow").style.display=btKind==="coin"?"block":"none";});
+ g("btAll").onclick=()=>{const n=g("btCoin").value,h=me&&me.coins&&me.coins[n];if(h)g("btCnt").value=h.count;};
+ g("btGo").onclick=btCreate;g("btIncYes").onclick=()=>btIncId&&btAccept(btIncId);g("btIncNo").onclick=()=>btIncId&&btDecline(btIncId);g("btWaitNo").onclick=()=>btWaitId&&btCancel(btWaitId);
+ document.querySelectorAll("#btpRps button").forEach(x=>x.onclick=()=>btPlayId&&btPick(btPlayId,x.dataset.c));
+ g("btpOk").onclick=()=>{if(btPlayId)btClosed[btPlayId]=1;btRender();};}
+/* BT-END */
+
 /* ===================== 틱 루프 ===================== */
 rebuild();me=JSON.parse(JSON.stringify(local));renderAll();
 setInterval(()=>{const K=nowK();const left=TICK-((Date.now()-EPOCH)%TICK);$("tickFill").style.width=(100-left/TICK*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";
@@ -888,6 +1040,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:17px;font-weight:900;
   fdb.ref("transfers").orderByChild("to").equalTo(myId).on("value",s=>{if(!me._loaded)return;const v=s.val()||{};let got=0;const names=[],notes=[];
     let gotFish=0;for(const id in v){const x=v[id];if(me.claimed.includes(id))continue;if(typeof x.fish==="number"&&FISH[x.fish]){me.fish=me.fish||{};me.fish[fKey(x.fish)]=(me.fish[fKey(x.fish)]||0)+1;gotFish++;}else if(!(x.net>0))continue;me.cash+=x.net||0;got+=x.net||0;if(x.note)notes.push(x.note);else names.push(x.fromName||"누군가");me.claimed.push(id);fdb.ref("transfers/"+id).remove().catch(()=>{});}
     if(got||gotFish){me.claimed=me.claimed.slice(-100);saveMe();toast(notes.length?notes.join("\n"):`💸 ${names.join(", ")}님에게서 ${formatMoneyReadable(got)} 받았어요!`);renderAll();}});
+  btInit();
   const L=$("chatLog");
   fdb.ref("chat").limitToLast(60).on("child_added",s=>{const m=s.val()||{};if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300)});else{addMsg({me:m.from===myId,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}});
   setInterval(()=>{fdb.ref("chat").orderByChild("t").endAt(Date.now()-86400000).limitToFirst(50).once("value",s=>{const v=s.val();if(v)for(const k in v)fdb.ref("chat/"+k).remove().catch(()=>{});});},300000);
