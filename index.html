@@ -496,7 +496,7 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodL
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${[0,1,2,3,4].map(n=>{const i=enhMat[n];return i===undefined?`<div style="height:54px;border:1.5px dashed var(--line);border-radius:10px"></div>`:`<button data-mrm="${n}" style="height:54px;background:var(--card2);border-radius:10px;font-size:10px;line-height:1.25;padding:2px;overflow:hidden">${esc(FISH[i][2])}<br><b style="color:var(--ok)">+${matBonus(i,L).toFixed(1)}%</b></button>`;}).join("")}</div>
     <button class="go buy" id="enhGo" style="margin-top:12px;width:100%;border-radius:12px;padding:13px 0;font-weight:900;${enhBusy?"opacity:.6":""}">⚒️ 강화하기 · ${formatMoneyReadable(cost)}</button>
     <div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">실패하면 돈과 재료만 사라지고 레벨은 그대로예요</div></div>
-  <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:12px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 확률이 많이 올라요 · 레벨이 높을수록 효과가 줄어들어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">넣을 물고기가 없어요 · 광장에서 낚아 오세요</div>'}</div>`);
+  <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:12px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 많이 올라요 · 레벨이 높아지면 싼 물고기는 거의 효과가 없어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">넣을 물고기가 없어요 · 광장에서 낚아 오세요</div>'}</div>`);
   S.querySelectorAll("[data-mrm]").forEach(b=>b.onclick=()=>{enhMat.splice(+b.dataset.mrm,1);renderEnh();});
   S.querySelectorAll("[data-madd]").forEach(b=>b.onclick=()=>{if(enhMat.length>=5)return toast("재료는 최대 5마리까지 넣을 수 있어요");enhMat.push(+b.dataset.madd);renderEnh();});
   if($("enhGo"))$("enhGo").onclick=enhDo;}
@@ -719,9 +719,9 @@ function drawWing(c,x,y,dir,id,t,bob){if(!id)return;const f=Math.sin(t/260)*.12;
 const rodLv=()=>Math.min(50,(me&&me.rodLv)|0);
 const rodBonus=L=>L*.0003;
 const enhCost=L=>Math.round(500000*Math.pow(1.1,L)/10000)*10000;
-const enhBase=L=>Math.max(5,95-L*1.85);
-const matBase=v=>v<=0?0:Math.max(.5,2.5*Math.log10(Math.max(v,50)/50));
-const matBonus=(i,L)=>matBase(FISH[i][1])*5/(L+5);
+const enhBase=L=>Math.max(3,95-L*2.2);
+const matTier=v=>v<=0?0:Math.max(1,Math.log10(v));
+const matBonus=(i,L)=>{const t=matTier(FISH[i][1]);return t?.8*t*Math.exp(-L/(2*t)):0;};
 let fBaitPro=false;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FISH.reduce((a,f)=>a+f[0],0);
 function rollFish(){const add=(fBaitPro?.003:0)+rodBonus(rodLv()),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);const W=i=>FISH[i][0]*(FISH[i][1]>=100000?kR:kN);let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
 const fKey=i=>"f"+i;
@@ -1007,7 +1007,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-195000";
+const APP_VERSION="20261124-195500";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
