@@ -511,11 +511,11 @@ function enhDo(){if(enhBusy)return;if(!me||!me._loaded)return toast("닉네임�
   toast(ok?`✨ 강화 성공! 낚싯대 +${L+1}\n좋은 물고기 확률 +${(rodBonus(L+1)*100).toFixed(2)}%p`:(drop?`💔 강화 실패… 레벨 하락! +${L} → +${L-1}`:`💥 강화 실패… (+${L} 유지)`)+`\n성공 확률 ${tot.toFixed(1)}%였어요`);setTimeout(()=>{enhBusy=false;renderEnh();},600);}
 
 const ACH=[
- {c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",50000],[7,"초심자",300000],[30,"단골손님",1500000],[100,"개근왕",5000000],[365,"전설의 출석러",20000000]]},
- {c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",1000000],[50,"숙련 낚시꾼",3000000],[75,"베테랑 낚시꾼",10000000],[100,"바다의 지배자",30000000]]},
- {c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",1000000],[5,"월척 전문가",5000000],[10,"심해의 제왕",10000000],[30,"포세이돈",50000000]]},
+ {c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",100000],[7,"초심자",1000000],[30,"단골손님",3000000],[100,"개근왕",10000000],[365,"전설의 출석러",30000000]]},
+ {c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",300000],[50,"숙련 낚시꾼",1000000],[75,"베테랑 낚시꾼",3000000],[100,"바다의 지배자",10000000]]},
+ {c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000],[5,"월척 전문가",1000000],[10,"심해의 제왕",3000000],[30,"포세이돈",10000000]]},
  {c:"📈 코인 수익률 (한 번 팔 때)",k:"pr",u:"%",tiers:[[10,"개미 투자자",300000],[30,"단타의 고수",1000000],[50,"차트 도사",3000000],[100,"워렌 버핏",10000000]]},
- {c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",300000],[1e9,"십억 부자",3000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
+ {c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",1000000],[1e9,"십억 부자",5000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
 const achId=(k,i)=>k+i;
 function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.bestPR||0)*100);if(k==="money")return assetOf(p);return 0;}
 const titleOf=id=>{for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i][1];return "";};
@@ -1106,7 +1106,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-231000";
+const APP_VERSION="20261124-231500";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
