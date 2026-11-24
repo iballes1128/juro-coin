@@ -703,8 +703,8 @@ const FISH=[
 [5,10000000,"꼴바오의 잃어버린 방탄모🪖"],[4,20000000,"가을이🐶"],[3.5,30000000,"씨몽키🐒"],[3,40000000,"츄파츄가 먹다남긴 참이슬🍾"],[2,50000000,"짜흐으으으으으으응👨🏽‍🦲"],[2.5,70000000,"쮸빠찌예~!ㅋ"],[1.75,100000000,"글꼴의 다이아몬드 엠블럼💎"],[1.5,300000000,"눈댕의 아이패드"],[1.25,500000000,"주로월드"],[1,1000000000,"로또 1등 종이"],[4.5,15000000,"귀요븟"],[7,7000000,"민하의 건축학개론 책"],[6.5,8000000,"외딴섬의 스위치"]];
 FISH.forEach(f=>{f[0]*=f[1]>=1e8?.4:f[1]>=1e7?.5:f[1]>=1e6?.35:1;}); // 밸런스 A안: 비싼 물고기 확률 조정
 const FISH_TOTAL=FISH.reduce((s,f)=>s+f[0],0);
-const GEAR={rod:{n:"낚싯대",i:"🎣",list:[["basic","기본 낚싯대",0,"기본으로 지급돼요"]]},bait:{n:"미끼",i:"🪱",list:[["basic","기본 미끼",0,"입질까지 1.5~5.5초"],["pro","고급 미끼",500000,"입질 30% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.3%p · 100개 묶음",100],["max","최고급 미끼",1500000,"입질 45% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.7%p · 100개 묶음",100]]}};
-const baitKey=id=>id==="max"?"baitM":"baitN";const BAIT_FX={basic:[1,0],pro:[.7,.003],max:[.55,.007]};
+const GEAR={rod:{n:"낚싯대",i:"🎣",list:[["basic","기본 낚싯대",0,"기본으로 지급돼요"]]},bait:{n:"미끼",i:"🪱",list:[["basic","기본 미끼",0,"입질까지 1.5~5.5초"],["mid","중급 미끼",300000,"입질 20% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.3%p · 100개 묶음",100],["pro","고급 미끼",700000,"입질 30% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.5%p · 100개 묶음",100],["max","최고급 미끼",1200000,"입질 40% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.7%p · 100개 묶음",100]]}};
+const baitKey=id=>id==="max"?"baitM":id==="mid"?"baitL":"baitN";const BAIT_FX={basic:[1,0],mid:[.8,.003],pro:[.7,.005],max:[.6,.007]};
 const ownsGear=(k,id)=>id==="basic"||(k==="bait"?((me&&me[baitKey(id)])|0)>0:!!(me&&me.gear&&me.gear[k+"_"+id]));
 const eqOf=k=>{const v=me&&me.eq&&me.eq[k];return v&&ownsGear(k,v)?v:"basic";};
 const gearName=k=>GEAR[k].list.find(x=>x[0]===eqOf(k))[1];
@@ -913,7 +913,7 @@ function fishStep(dt,t){
   if(fstate==="idle"){let vx=0,vy=0;if(fKeys.ArrowLeft||fKeys.a)vx--;if(fKeys.ArrowRight||fKeys.d)vx++;if(fKeys.ArrowUp||fKeys.w)vy--;if(fKeys.ArrowDown||fKeys.s)vy++;
     if(fJoyV){vx=fJoyV.x;vy=fJoyV.y;}if(vx||vy){fp.tx=null;fp.via=null;}else if(fp.tx!=null){const gx=fp.via?fp.via.x:fp.tx,gy=fp.via?fp.via.y:fp.ty;const dx=gx-fp.x,dy=gy-fp.y,dd=Math.hypot(dx,dy);if(dd<=Math.max(2,.11*dt)){fp.x=gx;fp.y=gy;if(fp.via)fp.via=null;else fp.tx=null;}else{vx=dx/dd;vy=dy/dd;}}
     if(vx||vy){const l=Math.hypot(vx,vy),sp=.11*dt*(fJoyV?Math.max(.45,fJoyV.m):1);const nx=fp.x+vx/l*sp,ny=fp.y+vy/l*sp;if(walkable(nx,ny)){fp.x=nx;fp.y=ny;}else if(walkable(nx,fp.y))fp.x=nx;else if(walkable(fp.x,ny))fp.y=ny;else fp.tx=null;if(vx)fp.dir=vx>0?1:-1;}}
-  else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const bid=eqOf("bait"),fx=BAIT_FX[bid]||BAIT_FX.basic;fBaitPro=fx[1];if(bid!=="basic"){const bk=baitKey(bid);me[bk]=Math.max(0,(me[bk]|0)-1);if(!me[bk]){me.eq.bait="basic";saveMe();toast(`🪱 ${bid==="max"?"최고급":"고급"} 미끼를 다 썼어요! 기본 미끼로 바뀌었어요`);}}fBite=(1500+Math.random()*4000)*fx[0];setFishBtn();}
+  else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const bid=eqOf("bait"),fx=BAIT_FX[bid]||BAIT_FX.basic;fBaitPro=fx[1];if(bid!=="basic"){const bk=baitKey(bid);me[bk]=Math.max(0,(me[bk]|0)-1);if(!me[bk]){me.eq.bait="basic";saveMe();toast(`🪱 ${({mid:"중급",pro:"고급",max:"최고급"})[bid]} 미끼를 다 썼어요! 기본 미끼로 바뀌었어요`);}}fBite=(1500+Math.random()*4000)*fx[0];setFishBtn();}
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;o.x+=dx*Math.min(1,dt/120);o.y+=dy*Math.min(1,dt/120);}
@@ -1051,7 +1051,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-213500";
+const APP_VERSION="20261124-214000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
