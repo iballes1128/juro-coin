@@ -457,12 +457,12 @@ let gearArm=null;
 function gearRow(k,[id,nm,pr,desc,pack],mode){if(k==="rod"){nm=`기본 낚싯대 +${rodLv()}`;desc=`좋은 물고기 확률 +${(rodBonus(rodLv())*100).toFixed(2)}%p · ⚒️ 강화에서 올려요`;}const own=ownsGear(k,id)&&!pack,on=eqOf(k)===id,arm=gearArm===k+id;
   const btn=mode==="eq"?(on?`<span style="font-size:12px;color:var(--acc);font-weight:900">장착 중</span>`:`<button data-geq="${k}|${id}" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700">장착</button>`)
     :(own?`<span style="font-size:12px;color:var(--sub);font-weight:700">${on?"장착 중":"보유"}</span>`:`<button data-gbuy="${k}|${id}" style="background:${arm?"var(--up)":"var(--acc)"};color:${arm?"#fff":"#111"};border-radius:9px;padding:7px 12px;font-size:12px;font-weight:900">${arm?"한 번 더 눌러 구매":formatMoneyReadable(pr)}</button>`);
-  const cnt=k==="bait"&&id!=="basic"?` <span style="color:var(--acc);font-size:12px">남은 ${(me&&me.baitN)|0}개</span>`:"";return `<div class="rk" style="padding:10px 2px"><div style="font-size:24px;width:34px;text-align:center">${GEAR[k].i}</div><div class="w"><b>${nm}${cnt}</b><small>${desc}</small></div><div class="v">${btn}</div></div>`;}
+  const cnt=k==="bait"&&id!=="basic"?` <span style="color:var(--acc);font-size:12px">남은 ${(me&&me[baitKey(id)])|0}개</span>`:"";return `<div class="rk" style="padding:10px 2px"><div style="font-size:24px;width:34px;text-align:center">${GEAR[k].i}</div><div class="w"><b>${nm}${cnt}</b><small>${desc}</small></div><div class="v">${btn}</div></div>`;}
 function bindGear(root){root.querySelectorAll("[data-geq]").forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.geq.split("|");me.eq=me.eq||{};me.eq[k]=id;saveMe();toast(`${GEAR[k].i} ${gearName(k)} 장착!`);renderGear();});
   root.querySelectorAll("[data-gbuy]").forEach(b=>b.onclick=()=>{if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const[k,id]=b.dataset.gbuy.split("|"),it=GEAR[k].list.find(x=>x[0]===id);
     if(gearArm!==k+id){gearArm=k+id;renderGear();setTimeout(()=>{if(gearArm===k+id){gearArm=null;renderGear();}},4000);return;}
     gearArm=null;if(me.cash<it[2]){renderGear();return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(it[2])} 필요)`);}
-    me.cash-=it[2];if(it[4])me.baitN=(me.baitN|0)+it[4];else{me.gear=me.gear||{};me.gear[k+"_"+id]=true;}me.eq=me.eq||{};me.eq[k]=id;saveMe();renderHeader();toast(`🛍️ ${it[1]}${it[4]?" "+it[4]+"개":""} 구매! 바로 장착했어요 (-${formatMoneyReadable(it[2])})`);if(!it[4])broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);renderGear();});}
+    me.cash-=it[2];if(it[4]){const bk=baitKey(id);me[bk]=(me[bk]|0)+it[4];}else{me.gear=me.gear||{};me.gear[k+"_"+id]=true;}me.eq=me.eq||{};me.eq[k]=id;saveMe();renderHeader();toast(`🛍️ ${it[1]}${it[4]?" "+it[4]+"개":""} 구매! 바로 장착했어요 (-${formatMoneyReadable(it[2])})`);if(!it[4])broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);renderGear();});}
 function renderGear(){for(const k of["rod","bait"]){const E=$("eq_"+k);if(E){E.innerHTML=GEAR[k].list.filter(x=>ownsGear(k,x[0])).map(x=>gearRow(k,x,"eq")).join("");bindGear(E);}}
   if(pgCur==="shop"&&pgSub==="bait"){const S=$("s-shop");S.innerHTML=`<div class="card">${GEAR[pgSub].list.filter(x=>x[2]>0).map(x=>gearRow(pgSub,x,"shop")).join("")}<div style="font-size:11px;color:var(--sub);margin-top:8px">${pgSub==="bait"?"미끼는 던질 때마다 1개씩 써요 · 다 쓰면 기본 미끼로 바뀌어요":"한 번 사면 계속 쓸 수 있어요"} · 🎽 마이 → 장비에서 바꿔 낄 수 있어요</div></div>`;bindGear(S);}}
 let cosArm=null,enhMat=[],enhBusy=false;
@@ -703,8 +703,9 @@ const FISH=[
 [5,10000000,"꼴바오의 잃어버린 방탄모🪖"],[4,20000000,"가을이🐶"],[3.5,30000000,"씨몽키🐒"],[3,40000000,"츄파츄가 먹다남긴 참이슬🍾"],[2,50000000,"짜흐으으으으으으응👨🏽‍🦲"],[2.5,70000000,"쮸빠찌예~!ㅋ"],[1.75,100000000,"글꼴의 다이아몬드 엠블럼💎"],[1.5,300000000,"눈댕의 아이패드"],[1.25,500000000,"주로월드"],[1,1000000000,"로또 1등 종이"],[4.5,15000000,"귀요븟"],[7,7000000,"민하의 건축학개론 책"],[6.5,8000000,"외딴섬의 스위치"]];
 FISH.forEach(f=>{f[0]*=f[1]>=1e8?.4:f[1]>=1e7?.5:f[1]>=1e6?.35:1;}); // 밸런스 A안: 비싼 물고기 확률 조정
 const FISH_TOTAL=FISH.reduce((s,f)=>s+f[0],0);
-const GEAR={rod:{n:"낚싯대",i:"🎣",list:[["basic","기본 낚싯대",0,"기본으로 지급돼요"]]},bait:{n:"미끼",i:"🪱",list:[["basic","기본 미끼",0,"입질까지 1.5~5.5초"],["pro","고급 미끼",1000000,"입질 30% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.3%p · 100개 묶음",100]]}};
-const ownsGear=(k,id)=>id==="basic"||(k==="bait"?((me&&me.baitN)|0)>0:!!(me&&me.gear&&me.gear[k+"_"+id]));
+const GEAR={rod:{n:"낚싯대",i:"🎣",list:[["basic","기본 낚싯대",0,"기본으로 지급돼요"]]},bait:{n:"미끼",i:"🪱",list:[["basic","기본 미끼",0,"입질까지 1.5~5.5초"],["pro","고급 미끼",500000,"입질 30% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.3%p · 100개 묶음",100],["max","최고급 미끼",1500000,"입질 45% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.7%p · 100개 묶음",100]]}};
+const baitKey=id=>id==="max"?"baitM":"baitN";const BAIT_FX={basic:[1,0],pro:[.7,.003],max:[.55,.007]};
+const ownsGear=(k,id)=>id==="basic"||(k==="bait"?((me&&me[baitKey(id)])|0)>0:!!(me&&me.gear&&me.gear[k+"_"+id]));
 const eqOf=k=>{const v=me&&me.eq&&me.eq[k];return v&&ownsGear(k,v)?v:"basic";};
 const gearName=k=>GEAR[k].list.find(x=>x[0]===eqOf(k))[1];
 const COS={aura:{n:"오라",i:"✨",list:[["star","별빛 오라",10000000],["fire","불꽃 오라",20000000],["ice","얼음 오라",30000000],["rainbow","무지개 오라",60000000],["gold","황금 오라",150000000]]},
@@ -763,8 +764,8 @@ const enhBase=L=>Math.max(5,90-L*1.85);
 const ENH_DROP_LV=25,ENH_DROP_P=.1;
 const matTier=v=>v<=0?0:Math.max(1,Math.log10(v));
 const matBonus=(i,L)=>{const t=matTier(FISH[i][1]);return t?.5*Math.pow(1.6,t)*Math.exp(-L/(2.5*t)):0;};
-let fBaitPro=false;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FISH.reduce((a,f)=>a+f[0],0);
-function rollFish(){const add=(fBaitPro?.003:0)+rodBonus(rodLv()),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);const W=i=>FISH[i][0]*(FISH[i][1]>=100000?kR:kN);let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
+let fBaitPro=0;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FISH.reduce((a,f)=>a+f[0],0);
+function rollFish(){const add=(fBaitPro||0)+rodBonus(rodLv()),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);const W=i=>FISH[i][0]*(FISH[i][1]>=100000?kR:kN);let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
 const fKey=i=>"f"+i;
 function fishCountOf(p){let n=0;const m=(p&&p.fish)||{};for(const k in m)if(typeof m[k]==="number"&&m[k]>=0)n++;return n;}
 const hasSeen=(p,i)=>{const m=(p&&p.fish)||{};return typeof m[fKey(i)]==="number";};
@@ -912,7 +913,7 @@ function fishStep(dt,t){
   if(fstate==="idle"){let vx=0,vy=0;if(fKeys.ArrowLeft||fKeys.a)vx--;if(fKeys.ArrowRight||fKeys.d)vx++;if(fKeys.ArrowUp||fKeys.w)vy--;if(fKeys.ArrowDown||fKeys.s)vy++;
     if(fJoyV){vx=fJoyV.x;vy=fJoyV.y;}if(vx||vy){fp.tx=null;fp.via=null;}else if(fp.tx!=null){const gx=fp.via?fp.via.x:fp.tx,gy=fp.via?fp.via.y:fp.ty;const dx=gx-fp.x,dy=gy-fp.y,dd=Math.hypot(dx,dy);if(dd<=Math.max(2,.11*dt)){fp.x=gx;fp.y=gy;if(fp.via)fp.via=null;else fp.tx=null;}else{vx=dx/dd;vy=dy/dd;}}
     if(vx||vy){const l=Math.hypot(vx,vy),sp=.11*dt*(fJoyV?Math.max(.45,fJoyV.m):1);const nx=fp.x+vx/l*sp,ny=fp.y+vy/l*sp;if(walkable(nx,ny)){fp.x=nx;fp.y=ny;}else if(walkable(nx,fp.y))fp.x=nx;else if(walkable(fp.x,ny))fp.y=ny;else fp.tx=null;if(vx)fp.dir=vx>0?1:-1;}}
-  else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const pb=eqOf("bait")==="pro";fBaitPro=pb;if(pb){me.baitN=Math.max(0,(me.baitN|0)-1);if(!me.baitN){me.eq.bait="basic";saveMe();toast("🪱 고급 미끼를 다 썼어요! 기본 미끼로 바뀌었어요");}}fBite=(1500+Math.random()*4000)*(pb?.7:1);setFishBtn();}
+  else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const bid=eqOf("bait"),fx=BAIT_FX[bid]||BAIT_FX.basic;fBaitPro=fx[1];if(bid!=="basic"){const bk=baitKey(bid);me[bk]=Math.max(0,(me[bk]|0)-1);if(!me[bk]){me.eq.bait="basic";saveMe();toast(`🪱 ${bid==="max"?"최고급":"고급"} 미끼를 다 썼어요! 기본 미끼로 바뀌었어요`);}}fBite=(1500+Math.random()*4000)*fx[0];setFishBtn();}
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;o.x+=dx*Math.min(1,dt/120);o.y+=dy*Math.min(1,dt/120);}
@@ -1050,7 +1051,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-212500";
+const APP_VERSION="20261124-213500";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
