@@ -41,7 +41,7 @@ main{padding:10px 16px}
 .badge{display:inline-block;font-size:10px;font-weight:700;border-radius:5px;padding:1px 5px;margin-left:4px;vertical-align:1px}
 .b-new{background:#3a2a05;color:#ffcf4d}.b-warn{background:#3d1117;color:#ff8a96}.b-dead{background:#2a2d35;color:#9aa1ad}
 .spark{width:64px;height:28px;flex:none}
-#coinList .nm{flex:0 1 170px}
+@media (min-width:940px){#coinList{padding-right:58px}}
 .pr{text-align:right;min-width:96px}.pr b{display:block;font-weight:700}.pr small{font-size:12px;font-weight:500}
 .card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px}
 .card h3{font-size:14px;color:var(--sub);font-weight:500;margin-bottom:8px}
@@ -258,7 +258,7 @@ nav button.on{color:var(--tx);font-weight:700}
   </section>
 </main>
 <nav id="nav">
-  <button data-s="market" class="on"><i>📈</i>코인방</button>
+  <button data-s="market" class="on"><i>📈</i>코인</button>
   <button data-s="fish"><i>🏞️</i>광장</button>
 </nav>
 <div class="sheetBg" id="sheetBg"></div>
@@ -290,7 +290,7 @@ nav button.on{color:var(--tx);font-weight:700}
   <div id="chatOn"></div><div id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
 <button id="admFab" class="gone">🛠️</button><button id="navAdmin" class="gone"></button>
-<div style="display:none"><button id="btOpen"></button><button id="fChBtn"></button></div><div id="dock"><button data-pg="my"><i>👤</i>마이</button><button data-pg="shop"><i>🛍️</i>상점</button><button data-pg="rank"><i>🏆</i>순위</button><button id="admDock" style="display:none"><i>🛠️</i>관리</button></div>
+<div style="display:none"><button id="btOpen"></button><button id="fChBtn"></button></div><div id="dock"><button data-pg="my"><i>👤</i>마이</button><button data-pg="shop"><i>🛍️</i>상점</button><button data-pg="enh"><i>⚒️</i>강화</button><button data-pg="rank"><i>🏆</i>순위</button><button id="admDock" style="display:none"><i>🛠️</i>관리</button></div>
 <div id="gNotice"></div>
 <button id="chatFab">💬<span id="chatBadge"></span></button>
 <div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:30px">✨</div><div style="font-size:17px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:13px;color:var(--sub);margin-bottom:14px"></div><button onclick="hardReload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:15px">지금 새로고침</button></div></div>
@@ -418,7 +418,7 @@ function renderHeader(){if(!me)return;$("hCash").textContent=formatMoneyReadable
 function renderWallet(){if(!me)return;$("wName").textContent=myName();$("wLv").textContent=`Lv.${lvOf(me)} · 경험치 ${expOf(me)}`;renderAtt();$("wCash").textContent=formatMoneyReadable(me.cash);
   let html="",te=0,tc=0;for(const[n]of COINS){const h=me.coins[n];if(!h||h.count<=0)continue;const ci=COINS.findIndex(c=>c[0]===n),p=priceOf(ci),ev=h.count*p,pf=ev-h.cost,pr=h.cost>0?(pf/h.cost*100).toFixed(1):"0.0";te+=ev;tc+=h.cost;
     html+=`<div class="hold" data-ci="${ci}"><div class="t"><span>${n}${M.coins[ci].delisted?' <span class="badge b-dead">상폐</span>':''}</span><span class="${pf>=0?'up':'down'}">${pf>=0?'+':''}${pr}%</span></div><div class="s"><span>보유</span><span>${formatCoinReadable(h.count)}</span><span>평단가</span><span>${formatCoinPrice(Math.round(h.cost/h.count))}</span><span>평가금액</span><span>${formatMoneyReadable(ev)}</span><span>평가손익</span><span class="${pf>=0?'up':'down'}">${pf>=0?'+':''}${formatMoneyReadable(pf)}</span></div></div>`;}
-  if(!html)html='<div class="muted">보유 중인 코인이 없어요.<br>코인방에서 코인을 눌러 사 보세요!</div>';else{const pf=te-tc;html+=`<div class="hold"><div class="t"><span>총 평가자산</span><span>${formatMoneyReadable(te)}</span></div><div class="s"><span>총 평가손익</span><span class="${pf>=0?'up':'down'}">${pf>=0?'+':''}${formatMoneyReadable(pf)} (${tc?((pf/tc*100).toFixed(1)):'0.0'}%)</span></div></div>`;}
+  if(!html)html='<div class="muted">보유 중인 코인이 없어요.<br>코인에서 코인을 눌러 사 보세요!</div>';else{const pf=te-tc;html+=`<div class="hold"><div class="t"><span>총 평가자산</span><span>${formatMoneyReadable(te)}</span></div><div class="s"><span>총 평가손익</span><span class="${pf>=0?'up':'down'}">${pf>=0?'+':''}${formatMoneyReadable(pf)} (${tc?((pf/tc*100).toFixed(1)):'0.0'}%)</span></div></div>`;}
   $("holdings").innerHTML=html;$("holdings").querySelectorAll(".hold[data-ci]").forEach(e=>e.onclick=()=>openSheet(+e.dataset.ci));
   const sel=$("sendTo"),v=sel.value;sel.innerHTML='<option value="">받는 사람 선택</option>'+Object.entries(players).filter(([id])=>id!==myId).map(([id,p])=>`<option value="${id}">${esc(p.name||'이름없음')}</option>`).join("");sel.value=v;}
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -447,8 +447,9 @@ function renderRank(){const all={...players};if(me&&myId)all[myId]=me;const L=$(
 /* ===================== 거래 시트 ===================== */
 function openSheet(ci){if($("pgMod"))$("pgMod").style.display="none";curCoin=ci;$("qty").value="";setMode(M.coins[ci].delisted?"sell":"buy");$("sheetBg").style.display="block";requestAnimationFrame(()=>$("sheet").classList.add("on"));renderSheet();}
 $("shClose").onclick=()=>closeSheet();
-["dex","equip","shop"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
-["s-wallet","s-dex","s-equip","s-shop","s-rank","s-admin"].forEach(id=>$("pgBody").appendChild($(id)));
+["dex","equip","shop","enh"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
+["s-wallet","s-dex","s-equip","s-shop","s-enh","s-rank","s-admin"].forEach(id=>$("pgBody").appendChild($(id)));
+$("s-enh").innerHTML=`<div class="card" style="text-align:center;padding:36px 10px"><div style="font-size:44px">🎣⚒️</div><b style="font-size:16px">낚싯대 강화</b><div style="color:var(--sub);font-size:13px;margin-top:6px">준비 중이에요. 곧 열려요!</div><div style="font-size:12px;color:var(--sub);margin-top:12px">지금 장착 중: <b style="color:var(--tx)">기본 낚싯대</b></div></div>`;
 $("s-dex").appendChild($("fishInfo"));$("fishInfo").style.padding="0";$("fishInfo").style.overflowY="visible";
 $("s-equip").innerHTML=`<div class="card"><h3>🧑 캐릭터</h3><div style="font-size:12px;color:var(--sub);margin-bottom:6px">가지고 있는 캐릭터 중에서 골라 입어요. 새 캐릭터는 🛍️ 상점에서 살 수 있어요.</div><div id="eqGrid" class="cgrid" style="padding:4px 0 0"></div></div>`+`<div class="card"><h3>🎣 낚싯대</h3><div id="eq_rod"></div></div><div class="card"><h3>🪱 미끼</h3><div id="eq_bait"></div></div>`+[["✨","오라"],["🪽","날개"]].map(([i,n])=>`<div class="card"><h3>${i} ${n}</h3><div style="font-size:13px;color:var(--sub)">아직 장착할 게 없어요 · 곧 상점에 나와요</div></div>`).join("");
 let gearArm=null;
@@ -463,14 +464,14 @@ function bindGear(root){root.querySelectorAll("[data-geq]").forEach(b=>b.onclick
     me.cash-=it[2];if(it[4])me.baitN=(me.baitN|0)+it[4];else{me.gear=me.gear||{};me.gear[k+"_"+id]=true;}me.eq=me.eq||{};me.eq[k]=id;saveMe();renderHeader();toast(`🛍️ ${it[1]}${it[4]?" "+it[4]+"개":""} 구매! 바로 장착했어요 (-${formatMoneyReadable(it[2])})`);if(!it[4])broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);renderGear();});}
 function renderGear(){for(const k of["rod","bait"]){const E=$("eq_"+k);if(E){E.innerHTML=GEAR[k].list.filter(x=>ownsGear(k,x[0])).map(x=>gearRow(k,x,"eq")).join("");bindGear(E);}}
   if(pgCur==="shop"&&pgSub==="bait"){const S=$("s-shop");S.innerHTML=`<div class="card">${GEAR[pgSub].list.filter(x=>x[2]>0).map(x=>gearRow(pgSub,x,"shop")).join("")}<div style="font-size:11px;color:var(--sub);margin-top:8px">${pgSub==="bait"?"미끼는 던질 때마다 1개씩 써요 · 다 쓰면 기본 미끼로 바뀌어요":"한 번 사면 계속 쓸 수 있어요"} · 🎽 마이 → 장비에서 바꿔 낄 수 있어요</div></div>`;bindGear(S);}}
-const PG_G={my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"]]},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["rod","🎣 낚싯대"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"]]},rank:{t:"🏆 순위"},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
+const PG_G={my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"]]},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"]]},rank:{t:"🏆 순위"},enh:{t:"⚒️ 강화"},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
 let pgCur="my",pgSub="wallet";
 function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;if(pgSub==="ch"){if(!$("shGrid"))S.innerHTML=`<div style="font-size:12px;color:var(--sub);margin-bottom:8px">기본 남자·여자는 무료예요. 🔒 누르고 한 번 더 누르면 구매하고 바로 입어요.</div><div id="shGrid" class="cgrid" style="padding:0"></div>`;renderCharPick();}
   else if(pgSub==="bait")renderGear();
   else{const n={rod:"🎣 낚싯대",aura:"✨ 오라",wing:"🪽 날개"}[pgSub];S.innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div style="font-size:40px">🚧</div><b style="font-size:16px">${n}</b><div style="color:var(--sub);font-size:13px;margin-top:6px">준비 중이에요. 곧 열려요!</div></div>`;}}
 function openPg(p,sub){if(p==="wallet"){p="my";sub="wallet";}if(p==="dex"){p="my";sub="dex";}const G=PG_G[p];pgCur=p;pgSub=sub||(G.tabs?G.tabs[0][0]:p);fKeys={};
   const T=$("pgTabs");T.style.display=G.tabs?"flex":"none";T.innerHTML=G.tabs?G.tabs.map(([k,n])=>`<button data-pt="${k}" class="${k===pgSub?"on":""}" style="font-size:12px">${n}</button>`).join(""):"";T.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>openPg(p,b.dataset.pt));
-  const sec=p==="my"?pgSub:p;["wallet","dex","equip","shop","rank","admin"].forEach(x=>$("s-"+x).classList.toggle("on",x===sec));
+  const sec=p==="my"?pgSub:p;["wallet","dex","equip","shop","enh","rank","admin"].forEach(x=>$("s-"+x).classList.toggle("on",x===sec));
   $("pgTitle").textContent=G.t;$("pgMod").style.display="flex";$("pgBody").scrollTop=0;if(sec==="dex"){fTab="dex";}if(sec!=="dex")fDexOf=null;renderAll();renderShop();renderCharPick();renderGear();renderFishInfo();if(p==="admin")renderAccLog();}
 function closePg(){$("pgMod").style.display="none";}
 document.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>openPg(b.dataset.pg));$("pgX").onclick=closePg;$("pgMod").onclick=e=>{if(e.target.id==="pgMod")closePg();};
@@ -539,7 +540,7 @@ $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)ret
 
 /* ===================== 채팅 + 레벨업 ===================== */
 function hhmm(t){const d=new Date(t||Date.now());return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
-function addMsg(o){if(!o.me&&window._chatNote)window._chatNote();const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small${!o.me&&o.from?` data-bt="${o.from}" style="cursor:pointer" title="눌러서 배틀 신청"`:""}>${!o.me&&o.from?"⚔️ ":""}${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🏞️ 광장":"📈 코인방"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
+function addMsg(o){if(!o.me&&window._chatNote)window._chatNote();const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small${!o.me&&o.from?` data-bt="${o.from}" style="cursor:pointer" title="눌러서 배틀 신청"`:""}>${!o.me&&o.from?"⚔️ ":""}${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🏞️ 광장":"📈 코인"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
   const atB=L.scrollHeight-L.scrollTop-L.clientHeight<60;L.appendChild(d);while(L.children.length>120)L.firstChild.remove();if(atB||o.me)L.scrollTop=L.scrollHeight;}
 function chatPush(o){if(sessBlocked)return;if(!o.sys)o.loc=(typeof fishActive==="function"&&fishActive())?"fish":"coin";if(!fdb)return addMsg(o);fdb.ref("chat").push({...o,t:Date.now(),from:myId}).catch(()=>{});}
 function broadcast(text,kind){chatPush({sys:true,text,kind:kind||""});}
@@ -760,7 +761,7 @@ function fishDraw(t){const c=fCtx;
     {const mx=RPS_NPC.x+18,my=RPS_NPC.y+2;c.strokeStyle="#374151";c.lineWidth=1.6;c.beginPath();c.moveTo(mx,my);c.lineTo(mx,my-24);c.moveTo(mx-5,my);c.lineTo(mx+5,my);c.stroke();c.fillStyle="#111827";c.beginPath();c.ellipse(mx,my-27,3,4,0,0,7);c.fill();c.fillStyle="#9ca3af";c.fillRect(mx-2.5,my-29,5,1.2);}
     const mine=onPad(fp.x,fp.y);for(const[cc,cx]of RPS_PADS){const on=mine===cc,X=cx-PAD_W/2;c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.roundRect(X,PAD_Y+4,PAD_W,PAD_H,10);c.fill();c.fillStyle=on?"#fde68a":({s:"#93c5fd",r:"#fca5a5",p:"#86efac"})[cc];c.beginPath();c.roundRect(X,PAD_Y,PAD_W,PAD_H,10);c.fill();c.strokeStyle="rgba(255,255,255,.8)";c.lineWidth=1.5;c.stroke();c.font="18px sans-serif";c.textAlign="center";c.fillText(BT_EMO[cc],cx,PAD_Y+42);c.font="bold 8px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(0,0,0,.6)";c.fillText(RPS_NAME[cc],cx,PAD_Y+58);}}
   // 사람과 장식은 y순서로
-  const people=[{y:RPS_NPC.y,f:()=>{human(c,RPS_NPC.x,RPS_NPC.y,-1,0,0,{shirt:"#b91c1c",pants:"#111827",hair:"#1f1410",hs:"side"});c.fillStyle="#fde047";c.beginPath();c.moveTo(RPS_NPC.x-4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x-4,RPS_NPC.y-23);c.fill();c.beginPath();c.moveTo(RPS_NPC.x+4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x+4,RPS_NPC.y-23);c.fill();c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(RPS_HOST).width+12;c.fillStyle="rgba(185,28,28,.9)";c.beginPath();c.roundRect(RPS_NPC.x-w/2,RPS_NPC.y-58,w,13,6);c.fill();c.fillStyle="#fff";c.fillText(RPS_HOST,RPS_NPC.x,RPS_NPC.y-48.5);}}];for(const id in fOthers){const o=fOthers[id];people.push({y:o.y,f:()=>{if(o.fs==="away"){c.globalAlpha=.55;drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);c.globalAlpha=1;c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(0,0,0,.5)";c.beginPath();c.roundRect(o.x-24,o.y+4,48,13,6);c.fill();c.fillStyle="#cbd5e1";c.fillText("📈 코인방",o.x,o.y+13.5);return;}if(o.fs&&o.fs!=="idle"){const bx=fishBobX(o.x,o.y,o.dir||1),by=fishBobY(o.x,o.y);drawLine(c,o.x+(o.dir||1)*18,o.y-36,bx,by,o.fs==="bite",t);drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,false,{x0:o.x+(o.dir||1)*18,y0:o.y-36},o.fs,false,t);}else drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);}});}
+  const people=[{y:RPS_NPC.y,f:()=>{human(c,RPS_NPC.x,RPS_NPC.y,-1,0,0,{shirt:"#b91c1c",pants:"#111827",hair:"#1f1410",hs:"side"});c.fillStyle="#fde047";c.beginPath();c.moveTo(RPS_NPC.x-4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x-4,RPS_NPC.y-23);c.fill();c.beginPath();c.moveTo(RPS_NPC.x+4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x+4,RPS_NPC.y-23);c.fill();c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(RPS_HOST).width+12;c.fillStyle="rgba(185,28,28,.9)";c.beginPath();c.roundRect(RPS_NPC.x-w/2,RPS_NPC.y-58,w,13,6);c.fill();c.fillStyle="#fff";c.fillText(RPS_HOST,RPS_NPC.x,RPS_NPC.y-48.5);}}];for(const id in fOthers){const o=fOthers[id];people.push({y:o.y,f:()=>{if(o.fs==="away"){c.globalAlpha=.55;drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);c.globalAlpha=1;c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(0,0,0,.5)";c.beginPath();c.roundRect(o.x-24,o.y+4,48,13,6);c.fill();c.fillStyle="#cbd5e1";c.fillText("📈 코인",o.x,o.y+13.5);return;}if(o.fs&&o.fs!=="idle"){const bx=fishBobX(o.x,o.y,o.dir||1),by=fishBobY(o.x,o.y);drawLine(c,o.x+(o.dir||1)*18,o.y-36,bx,by,o.fs==="bite",t);drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,false,{x0:o.x+(o.dir||1)*18,y0:o.y-36},o.fs,false,t);}else drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);}});}
   people.push({y:fp.y,f:()=>{const fishing=fstate!=="idle";const rx=fp.x+fp.dir*18,ry=fp.y-36;if(fishing&&fstate!=="cast")drawLine(c,rx,ry,fBob.x,fBob.y,fstate==="bite",t);
     if(fstate==="cast"){const k=Math.min(1,(t-fT)/500);drawLine(c,rx,ry,rx+(fBob.x-rx)*k,ry+(fBob.y-ry)*k,false,t);}
     drawPerson(c,fp.x,fp.y,myName(),chOf(myId),fp.dir,fp.tx!=null||fKeysOn()||!!fJoyV,fishing?{x0:rx,y0:ry}:null,fstate,true,t);}});
@@ -927,7 +928,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-191800";
+const APP_VERSION="20261124-192500";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
