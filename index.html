@@ -511,25 +511,30 @@ function enhDo(){if(enhBusy)return;if(!me||!me._loaded)return toast("닉네임�
   toast(ok?`✨ 강화 성공! 낚싯대 +${L+1}\n좋은 물고기 확률 +${(rodBonus(L+1)*100).toFixed(2)}%p`:(drop?`💔 강화 실패… 레벨 하락! +${L} → +${L-1}`:`💥 강화 실패… (+${L} 유지)`)+`\n성공 확률 ${tot.toFixed(1)}%였어요`);setTimeout(()=>{enhBusy=false;renderEnh();},600);}
 
 const ACH=[
- {c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",100000],[7,"초심자",1000000],[30,"단골손님",5000000],[100,"개근왕",20000000],[365,"전설의 출석러",100000000]]},
- {c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",3000000],[50,"숙련 낚시꾼",10000000],[75,"베테랑 낚시꾼",30000000],[100,"바다의 지배자",100000000]]},
- {c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",5000000],[5,"월척 전문가",20000000],[10,"심해의 제왕",50000000],[30,"포세이돈",200000000]]},
- {c:"📈 코인 수익률 (한 번 팔 때)",k:"pr",u:"%",tiers:[[10,"개미 투자자",1000000],[30,"단타의 고수",5000000],[50,"차트 도사",20000000],[100,"워렌 버핏",50000000]]},
- {c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",1000000],[1e9,"십억 부자",10000000],[1e10,"재벌",100000000],[1e11,"거부",1000000000],[1e12,"조만장자",10000000000]]}];
+ {c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",50000],[7,"초심자",300000],[30,"단골손님",1500000],[100,"개근왕",5000000],[365,"전설의 출석러",20000000]]},
+ {c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",1000000],[50,"숙련 낚시꾼",3000000],[75,"베테랑 낚시꾼",10000000],[100,"바다의 지배자",30000000]]},
+ {c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",1000000],[5,"월척 전문가",5000000],[10,"심해의 제왕",10000000],[30,"포세이돈",50000000]]},
+ {c:"📈 코인 수익률 (한 번 팔 때)",k:"pr",u:"%",tiers:[[10,"개미 투자자",300000],[30,"단타의 고수",1000000],[50,"차트 도사",3000000],[100,"워렌 버핏",10000000]]},
+ {c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",300000],[1e9,"십억 부자",3000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
 const achId=(k,i)=>k+i;
 function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.bestPR||0)*100);if(k==="money")return assetOf(p);return 0;}
 const titleOf=id=>{for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i][1];return "";};
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title):"";
 function achCheck(){if(!me||!me._loaded||sessBlocked)return;me.ach=me.ach||{};let got=0;const nw=[];
-  for(const a of ACH){const v=achVal(a.k);a.tiers.forEach(([need,nm,rw],i)=>{const id=achId(a.k,i);if(!me.ach[id]&&v>=need){me.ach[id]=Date.now();got+=rw;nw.push([nm,rw,i===a.tiers.length-1||rw>=20000000]);}});}
+  for(const a of ACH){const v=achVal(a.k);a.tiers.forEach(([need,nm,rw],i)=>{const id=achId(a.k,i);if(!me.ach[id]&&v>=need){me.ach[id]=Date.now();got+=rw;nw.push([nm,rw,i===a.tiers.length-1||rw>=10000000]);}});}
   if(!nw.length)return;me.cash+=got;saveMe();renderHeader();toast(`🏅 업적 달성! 칭호 「${nw.map(x=>x[0]).join("」「")}」\n보상 +${formatMoneyReadable(got)}`);
   nw.filter(x=>x[2]).forEach(x=>broadcast(`🏅 ${myName()}님이 업적 달성! 칭호 「${x[0]}」 획득 (+${formatMoneyReadable(x[1])})`));if(pgCur==="ach"||pgSub==="title")renderAch();}
 setInterval(achCheck,5000);
 function fmtNeed(a,need){return a.k==="money"?formatMoneyReadable(need):need+a.u;}
 function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach||{});const total=ACH.reduce((n,a)=>n+a.tiers.length,0),done=Object.keys((me&&me.ach)||{}).length;
     S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:13px;color:var(--sub)">달성한 업적</div><b style="font-size:22px">${done} / ${total}</b><div style="font-size:12px;color:var(--sub);margin-top:4px">달성하면 보상이 바로 들어오고, 👤 마이 → 🎖️ 칭호에서 칭호를 달 수 있어요</div></div>`+
-    ACH.map(a=>{const v=achVal(a.k);return `<div class="card"><h3>${a.c} <small style="color:var(--sub);font-weight:500">지금 ${a.k==="money"?formatMoneyReadable(v):v+a.u}</small></h3>`+a.tiers.map(([need,nm,rw],i)=>{const ok=me&&me.ach&&me.ach[achId(a.k,i)],pc=Math.min(100,v/need*100);
-      return `<div style="padding:8px 2px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>${ok?"✅":"⬜"} <b>「${nm}」</b> <span style="color:var(--sub)">${fmtNeed(a,need)}</span></span><span style="color:${ok?"var(--sub)":"var(--acc)"};font-weight:700;font-size:12px">${ok?"받음":"+"+formatMoneyReadable(rw)}</span></div>${ok?"":`<div style="height:4px;background:var(--card2);border-radius:2px;margin-top:5px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--acc)"></div></div>`}</div>`;}).join("")+`</div>`;}).join("");}
+    ACH.map(a=>{const v=achVal(a.k),got=a.tiers.filter((t,i)=>me&&me.ach&&me.ach[achId(a.k,i)]),ni=a.tiers.findIndex((t,i)=>!(me&&me.ach&&me.ach[achId(a.k,i)])),nx=ni>=0?a.tiers[ni]:null;
+      const pc=nx?Math.min(100,Math.floor(v/nx[0]*100)):100;const cur=a.k==="money"?formatMoneyReadable(v):v+a.u;
+      return `<div class="card"><h3>${a.c}</h3>${got.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">${got.map(t=>`<span style="font-size:11px;padding:3px 8px;border-radius:12px;background:var(--card2);color:var(--sub)">✅ 「${t[1]}」</span>`).join("")}</div>`:""}`+
+      (nx?`<div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span>다음 목표 <b>「${nx[1]}」</b></span><b style="color:var(--acc);font-size:13px">+${formatMoneyReadable(nx[2])}</b></div>
+        <div style="font-size:12px;color:var(--sub);margin:4px 0 6px">${fmtNeed(a,nx[0])} 달성하기 · 지금 ${cur}</div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--acc)"></div></div><b style="font-size:13px;min-width:38px;text-align:right">${pc}%</b></div>`
+        :`<div style="text-align:center;font-weight:900;padding:6px 0">👑 모두 달성!</div>`)+`</div>`;}).join("");}
   const T=$("s-title");if(T&&pgCur==="my"&&pgSub==="title"){const own=[];for(const a of ACH)a.tiers.forEach(([need,nm],i)=>{const id=achId(a.k,i);if(me&&me.ach&&me.ach[id])own.push([id,nm,a.c]);});const cur=(me&&me.title&&me.ach&&me.ach[me.title])?me.title:"";
     T.innerHTML=`<div class="card"><h3>🎖️ 칭호</h3><div style="font-size:12px;color:var(--sub);margin-bottom:8px">단 칭호는 광장에서 이름 위에 보여요 · 업적을 달성하면 늘어나요</div><div style="display:flex;flex-wrap:wrap;gap:6px">`+
       [["","없음",""]].concat(own).map(([id,nm,c])=>`<button data-tt="${id}" style="padding:8px 12px;border-radius:20px;font-size:13px;font-weight:700;background:${cur===id?"var(--acc)":"var(--card2)"};color:${cur===id?"#111":"var(--tx)"}" title="${c}">${id?"「"+esc(nm)+"」":"칭호 없음"}</button>`).join("")+`</div>${own.length?"":'<div style="color:var(--sub);font-size:13px;margin-top:10px">아직 칭호가 없어요 · 🏅 업적을 달성해 보세요</div>'}</div>`;
@@ -1098,7 +1103,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-225000";
+const APP_VERSION="20261124-230000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
