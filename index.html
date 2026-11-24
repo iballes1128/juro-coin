@@ -509,7 +509,7 @@ $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)ret
 
 /* ===================== 채팅 + 레벨업 ===================== */
 function hhmm(t){const d=new Date(t||Date.now());return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
-function addMsg(o){if(!o.me&&window._chatNote)window._chatNote();const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small>${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🎣 낚시터":"📈 코인방"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
+function addMsg(o){if(!o.me&&window._chatNote)window._chatNote();const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small${!o.me&&o.from?` data-bt="${o.from}" style="cursor:pointer" title="눌러서 배틀 신청"`:""}>${!o.me&&o.from?"⚔️ ":""}${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🎣 낚시터":"📈 코인방"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
   const atB=L.scrollHeight-L.scrollTop-L.clientHeight<60;L.appendChild(d);while(L.children.length>120)L.firstChild.remove();if(atB||o.me)L.scrollTop=L.scrollHeight;}
 function chatPush(o){if(sessBlocked)return;if(!o.sys)o.loc=(typeof fishActive==="function"&&fishActive())?"fish":"coin";if(!fdb)return addMsg(o);fdb.ref("chat").push({...o,t:Date.now(),from:myId}).catch(()=>{});}
 function broadcast(text,kind){chatPush({sys:true,text,kind:kind||""});}
@@ -585,10 +585,12 @@ function renderFTicker(){const T=$("fTicker");if(!T||!$("s-fish").classList.cont
 
 /* ===================== 접속자 ===================== */
 let lastPres="",onlineMap={};function pushPresence(){if(sessBlocked||!fdb||!myId||!me||!me._loaded||!me.name)return;const o={name:myName(),lv:lvOf(me),ch:normCh(me.ch),t:Date.now()};const j=o.name+"|"+o.lv;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();}
-function onlinePeople(){const out=[];for(const[id,v]of Object.entries(onlineMap)){if(!v)continue;out.push({name:id===myId?myName():(String(v.name||(players[id]&&players[id].name)||"접속자").slice(0,12)),lv:v.lv|0,me:id===myId});}return out.sort((a,b)=>b.me-a.me);}
+function onlinePeople(){const out=[];for(const[id,v]of Object.entries(onlineMap)){if(!v)continue;out.push({id,name:id===myId?myName():(String(v.name||(players[id]&&players[id].name)||"접속자").slice(0,12)),lv:v.lv|0,me:id===myId});}return out.sort((a,b)=>b.me-a.me);}
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-bt]");if(!el)return;const id=el.dataset.bt;if(!id||id===myId)return;e.stopPropagation();openBtWith(id);});
+function openBtWith(id){if(!onlineMap[id])return toast("지금 접속 중인 사람에게만 배틀을 신청할 수 있어요");if(typeof setChatOpen==="function"&&innerWidth<940)setChatOpen(false);openBtMod();const sel=$("btTo");if([...sel.options].some(o=>o.value===id))sel.value=id;toast(`⚔️ ${(players[id]&&players[id].name)||"상대"}님에게 배틀 신청`);}
 let fbConnected=false;function updOnline(){const L=onlinePeople(),n=Math.max(1,L.length);$("dot").classList.toggle("on",fbConnected);
   $("online").innerHTML=fbConnected?`<b>${n}명</b> 접속 중 ▾`:"연결 중…";
-  const chips=L.length?L.map(p=>`<span class="ochip${p.me?' me':''}"><i></i>${esc(p.name)}${p.me?' (나)':''}${p.lv?` <small style="color:var(--sub)">Lv.${p.lv}</small>`:''}</span>`).join(""):'<span style="color:var(--sub)">나만 있어요</span>';
+  const chips=L.length?L.map(p=>`<span class="ochip${p.me?' me':''}"${p.me?'':` data-bt="${p.id}" title="눌러서 배틀 신청" style="cursor:pointer"`}><i></i>${esc(p.name)}${p.me?' (나)':''}${p.lv?` <small style="color:var(--sub)">Lv.${p.lv}</small>`:''}</span>`).join(""):'<span style="color:var(--sub)">나만 있어요</span>';
   $("onlineList").innerHTML="<b>🟢 지금 접속 중</b>"+chips;$("chatOn").innerHTML=chips;}
 $("whoBtn").onclick=()=>{const e=$("onlineList");e.style.display=e.style.display==="none"?"block":"none";updOnline();};
 /* ===================== 🎣 낚시터 (2D) ===================== */
@@ -723,6 +725,8 @@ function fishDraw(t){const c=fCtx;
     else{c.fillStyle=["#ffd166","#ef476f","#ffffff","#c77dff"][Math.floor(d.c*4)];c.beginPath();c.arc(d.x,d.y-2,2.2,0,7);c.fill();}}});
   people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
   {const st=rpsState();c.font="bold 11px 'Noto Sans KR',sans-serif";const tw=c.measureText(st.text).width+14,bx=RPS_NPC.x-tw/2,by=RPS_NPC.y-84;c.fillStyle=st.hot?"#fde047":"rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,tw,20,9);c.fill();c.beginPath();c.moveTo(RPS_NPC.x-4,by+20);c.lineTo(RPS_NPC.x+4,by+20);c.lineTo(RPS_NPC.x,by+26);c.fill();c.fillStyle="#111";c.textAlign="center";c.fillText(st.text,RPS_NPC.x,by+14);}
+  {const now=nowS(),into=now%RPS_MS,left=Math.ceil((RPS_MS-into)/1000),rev=into<5000;const tx=rev?`✊ 가위바위보 결과 공개!`:`✊ 가위바위보 ${Math.floor(left/60)}:${String(left%60).padStart(2,"0")}`;c.font="bold 11px 'Noto Sans KR',sans-serif";const w=c.measureText(tx).width+18;c.fillStyle=left<=5||rev?"rgba(220,38,38,.9)":"rgba(10,12,16,.62)";c.beginPath();c.roundRect(FW/2-w/2,6,w,20,10);c.fill();
+    c.fillStyle="rgba(255,255,255,.25)";c.fillRect(FW/2-w/2+9,22,(w-18)*(rev?1:into/RPS_MS),2);c.fillStyle="#fff";c.textAlign="center";c.fillText(tx,FW/2,20);}
   const skL=(x,y,n)=>{if(!(n>0))return;c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
   skL(fp.x,fp.y,me&&me.rps);for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk);}
   const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p)drawBubble(c,p.x,p.y,b.text);}
@@ -876,7 +880,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-174356";
+const APP_VERSION="20261124-174815";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
@@ -1124,7 +1128,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:17px;font-weight:900;
   sessStart();
   btInit();
   const L=$("chatLog");
-  fdb.ref("chat").limitToLast(60).on("child_added",s=>{const m=s.val()||{};if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300)});else{addMsg({me:m.from===myId,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}});
+  fdb.ref("chat").limitToLast(60).on("child_added",s=>{const m=s.val()||{};if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300)});else{addMsg({me:m.from===myId,from:m.from,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}});
   setInterval(()=>{fdb.ref("chat").orderByChild("t").endAt(Date.now()-86400000).limitToFirst(50).once("value",s=>{const v=s.val();if(v)for(const k in v)fdb.ref("chat/"+k).remove().catch(()=>{});});},300000);
   showNotices();renderAll();
 }catch(e){console.error(e);toast("서버 연결 실패: 새로고침해 주세요");}})();
