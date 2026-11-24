@@ -322,7 +322,7 @@ nav button.on{color:var(--tx);font-weight:700}
 const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",1000000,333000,3000000,"#d4af37"],["이더리움",300000,100000,900000,"#627eea"],["페페",100000,33000,300000,"#3d9a3d"],
   ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
 const NEWCOINS=["테더골드","플라즈마","페페"];
-const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
+const K_V2_T=Date.parse("2026-11-24T12:25:00Z");const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
 const DEFAULT_EPOCH=1795440000000;
 const MIG_T=1795503651243,MIG_F={"시바이누":10/3,"리플":10};/* 시바이누 300→1000, 리플 30→300 개편: 이전에 내린 가격지정 이벤트는 같은 비율로 환산 */
 
@@ -356,16 +356,18 @@ function stepTo(K){const m=M,E=EVENTS;
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
-        if(c.a<-1.204&&!(c.doom>0))c.a+=.002;if(c.a>.642)c.a-=.002;
+        const v2=k>=K_V2;if(v2){/* 큰 흐름: 30분~3시간 동안 오름/유지/내림 국면이 이어짐 */if((c.adk|0)<=0){const t=r();c.ad=t<.4?.00015*(.5+r()):(t<.8?-.00015*(.5+r()):0);c.adk=180+Math.floor(r()*900);}c.adk--;c.a+=c.ad;if(c.a>.8)c.a-=.002;if(c.a<-.9&&!(c.doom>0))c.a+=.002;}
+        if(c.a<-1.204&&!(c.doom>0))c.a+=.002;if(c.a>(v2?1:.642))c.a-=.002;
         let pct;
         if(c.wave>0){c.wave--;pct=c.wdir*(.012+r()*.012);}
         else if(r()<.0004){c.wave=6+Math.floor(r()*14);c.wdir=r()<.5?1:-1;if(c.price>base*2)c.wdir=-1;pct=0;}
         else{if(c.trendCount<=0){const t=r();c.trend=t<.45?1:(t<.9?-1:0);c.trendCount=6+Math.floor(r()*25);c.s=.002*(.3+r()*1.2);}
           c.trendCount--;const dev=Math.log(c.price/base)-c.a;
-          pct=c.trend*c.s+(r()+r()+r()-1.5)*.006-.01*dev;}
+          pct=c.trend*c.s+(r()+r()+r()-1.5)*.006-(v2?.008:.01)*dev;}
         applyPct(c,ci,pct);}
       if(c.price<=mn*1.05){c.delisted=true;c.delistK=k;c.rate=0;c.dl.push({k,price:c.price});}
       c.hist.push(c.delisted?0:c.price);if(c.hist.length>8700)c.hist.shift();}}}
+const K_V2=Math.floor((K_V2_T-EPOCH)/TICK);
 const nowK=()=>Math.max(0,Math.floor((Date.now()-EPOCH)/TICK));
 function rebuild(){M=newMarket();stepTo(nowK());}
 const priceOf=ci=>M.coins[ci].delisted?0:M.coins[ci].price;
@@ -1106,7 +1108,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-231500";
+const APP_VERSION="20261124-232000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
