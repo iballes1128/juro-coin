@@ -134,7 +134,7 @@ nav button.on{color:var(--tx);font-weight:700}
 #fChar>div{background:var(--bg);width:100%;max-width:520px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;padding:4px 14px 18px;overflow-y:auto}
 .cgrid button{background:var(--card);border:2px solid transparent;border-radius:12px;padding:4px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700}
-.cgrid button.on{border-color:var(--acc);background:#2a2410}.cgrid button small{font-size:10px;color:var(--acc);font-weight:700}.cgrid button small.own{color:var(--sub)}.cgrid button.lock canvas{opacity:.55}.cgrid canvas{width:70px;height:75px}
+.cgrid button.on{border-color:var(--acc);background:#2a2410}.cgrid button small{font-size:10px;color:var(--acc);font-weight:700;white-space:normal;text-align:center;line-height:1.25;word-break:keep-all}.cgrid button small.own{color:var(--sub)}.cgrid button.lock canvas{opacity:.55}.cgrid canvas{width:70px;height:75px}
 #pgMod{position:fixed;inset:0;padding:12px;z-index:38;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #pgMod>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 .gone{display:none!important}
@@ -632,15 +632,15 @@ $("attBtn").onclick=doAtt;
 /* ===================== 관리자 ===================== */
 async function pushEvent(ev){if(!isOwner)return;if(!fdb)return;const list=EVENTS.concat(ev).filter(e=>e.t>Date.now()-86400000*30).slice(-400);
   try{await fdb.ref("market/events").set({list:JSON.stringify(list)});}catch(e){toast("저장 실패");}}
-document.querySelectorAll("[data-all]").forEach(b=>b.onclick=async()=>{const m=b.dataset.all,t=Date.now();await pushEvent([{t,c:"*",m}]);const nm={down:"하락",crash:"폭락",surge:"폭등"}[m];broadcast(`📉 전체 코인 시장에 ${nm} 장세가 연출됩니다! (1분간 유지)`);toast("전체 "+nm+" 시작");});
-$("admAuto").onclick=async()=>{const t=Date.now();await pushEvent([{t,c:"*",m:"auto"}].concat(COINS.map(c=>({t,c:c[0],m:"auto"}))));broadcast("🔄 모든 코인 시장 개입 해제 완료! 다시 자연스럽게 등락합니다 ✨");toast("개입 해제");};
-document.querySelectorAll("[data-one]").forEach(b=>b.onclick=async()=>{const c=$("admCoin").value,m=b.dataset.one;await pushEvent([{t:Date.now(),c,m}]);const nm={up:"상승",down:"하락",surge:"폭등",crash:"폭락"}[m];broadcast(`🛠️ [관리자] ${c} 코인 ${nm} 모드 (1분간)`);toast(c+" "+nm);});
+document.querySelectorAll("[data-all]").forEach(b=>b.onclick=async()=>{const m=b.dataset.all,t=Date.now();await pushEvent([{t,c:"*",m}]);const nm={down:"하락",crash:"폭락",surge:"폭등"}[m];toast("전체 "+nm+" 시작");});
+$("admAuto").onclick=async()=>{const t=Date.now();await pushEvent([{t,c:"*",m:"auto"}].concat(COINS.map(c=>({t,c:c[0],m:"auto"}))));toast("개입 해제");};
+document.querySelectorAll("[data-one]").forEach(b=>b.onclick=async()=>{const c=$("admCoin").value,m=b.dataset.one;await pushEvent([{t:Date.now(),c,m}]);const nm={up:"상승",down:"하락",surge:"폭등",crash:"폭락"}[m];toast(c+" "+nm);});
 $("admSet").onclick=async()=>{const c=$("admCoin").value,ci=COINS.findIndex(x=>x[0]===c),p=parseInt(($("admPrice").value||"").replace(/,/g,""),10),[,,mn,mx]=COINS[ci];
   if(!(p>=mn&&p<=mx))return toast(`⚠️ ${c} 허용 범위: ${formatCoinPrice(mn)} ~ ${formatCoinPrice(mx)}`);if(M.coins[ci].delisted)return toast("❌ 상장폐지된 코인은 가격을 수정할 수 없어요");
-  await pushEvent([{t:Date.now(),c,m:"set",p}]);$("admPrice").value="";broadcast(`🛠️ [관리자] ${c} 시세가 ${formatCoinPrice(p)}(으)로 설정됩니다`);toast("다음 갱신 때 적용돼요");};
+  await pushEvent([{t:Date.now(),c,m:"set",p}]);$("admPrice").value="";toast("다음 갱신 때 적용돼요");};
 $("admGive").onclick=async()=>{const id=$("admUser").value,amt=parseInt(($("admAmt").value||"").replace(/,/g,""),10);if(!id||isNaN(amt))return toast("⚠️ 사람과 금액을 확인해주세요");
   if(id===myId){me.cash+=amt;saveMe();}else{const p=players[id];if(!p)return;try{await fdb.ref("players/"+id+"/cash").set((p.cash||0)+amt);}catch(e){return toast("지급 실패");}}
-  $("admAmt").value="";const nm=id===myId?myName():(players[id].name||"");broadcast(`🛠️ [관리자 지급] ${nm}님께 ${formatMoneyReadable(amt)} 지급!`);toast("지급 완료");renderAll();};
+  $("admAmt").value="";const nm=id===myId?myName():(players[id].name||"");toast("지급 완료");renderAll();};
 $("admReset").onclick=async()=>{if(!confirmReset())return;const t=Date.now();
   for(const[id,p]of Object.entries(players)){if(id===myId)continue;let sum=0;for(const n in(p.coins||{}))sum+=p.coins[n].cost||0;try{await fdb.ref("players/"+id).update({cash:(p.cash||0)+sum,coins:null,t});}catch(e){}}
   let s=0;for(const n in me.coins)s+=me.coins[n].cost||0;me.cash+=s;me.coins={};saveMe();
@@ -1073,7 +1073,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-222000";
+const APP_VERSION="20261124-223000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
