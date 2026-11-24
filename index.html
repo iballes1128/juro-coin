@@ -129,6 +129,8 @@ nav button.on{color:var(--tx);font-weight:700}
 .pgBtns{display:flex;gap:8px;margin:2px 0 8px}.pgBtns button{flex:1;background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:13px}
 #fInfo{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #fInfo>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
+#fTicker{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 8px;padding-bottom:1px}#fTicker::-webkit-scrollbar{display:none}
+#fTicker span{flex:none;background:var(--card);border-radius:9px;padding:4px 8px;font-size:11px;white-space:nowrap;color:var(--sub)}#fTicker b{color:var(--tx);font-weight:700;margin:0 3px}
 .fopens{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:2px 0 10px}.fopens button{background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:12.5px;white-space:nowrap}
 #fFeed{position:absolute;left:8px;top:8px;right:8px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;pointer-events:none}
 #fFeed div{background:rgba(10,12,16,.62);color:#fff;font-size:11px;padding:3px 9px;border-radius:9px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .5s}
@@ -195,6 +197,7 @@ nav button.on{color:var(--tx);font-weight:700}
   </section>
   <section class="sec" id="s-fish">
     <div class="fopens"><button id="fChBtn">🧑 캐릭터</button><button data-fo="dex">📖 도감</button><button data-fo="rank">🏆 순위</button><button data-fo="hof">🐋 명예의 전당</button></div>
+    <div id="fTicker"></div>
     <div id="fishWrap"><canvas id="fishCv"></canvas><div id="fishRes"></div><div id="fFeed"></div>
       <div id="fJoy"><i></i></div><button id="fAct">🎣<small>던지기</small></button></div>
     <button id="fishBtn" class="fbtn">🎣 낚싯대 던지기</button>
@@ -513,7 +516,8 @@ function setChatOpen(o){$("chatSide").classList.toggle("open",o);if(o){chatUnrea
 window._chatNote=()=>{if(chatVisible())return;chatUnread++;const e=$("chatBadge");e.textContent=chatUnread>99?"99+":chatUnread;e.style.display="block";};
 $("chatFab").onclick=()=>setChatOpen(!$("chatSide").classList.contains("open"));$("chatClose").onclick=()=>setChatOpen(false);
 document.querySelectorAll("#rankTabs button").forEach(b=>b.onclick=()=>{rankKey=b.dataset.k;document.querySelectorAll("#rankTabs button").forEach(x=>x.classList.toggle("on",x===b));renderRank();});
-function renderAll(){renderAttBar();renderHeader();renderMarket();renderWallet();renderRank();renderSheet();renderAdmin();showNotices();renderFishInfo();}
+function renderAll(){renderAttBar();renderHeader();renderMarket();renderWallet();renderRank();renderSheet();renderAdmin();showNotices();renderFishInfo();renderFTicker();}
+function renderFTicker(){const T=$("fTicker");if(!T||!$("s-fish").classList.contains("on"))return;T.innerHTML=COINS.map(([n],ci)=>{const c=M.coins[ci];if(c.delisted)return `<span>${n}<b>상폐</b></span>`;const r=c.rate||0;return `<span>${n}<b>${formatCoinPrice(c.price).replace("원","")}</b><em class="${r>0?"up":r<0?"down":"flat"}" style="font-style:normal">${r>0?"▲":r<0?"▼":"-"}${Math.abs(r)}%</em></span>`;}).join("");}
 
 /* ===================== 접속자 ===================== */
 let lastPres="",onlineMap={};function pushPresence(){if(!fdb||!myId||!me)return;const o={name:myName(),lv:lvOf(me),ch:typeof me.ch==="number"?me.ch:-1,t:Date.now()};const j=o.name+"|"+o.lv;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();}
@@ -568,7 +572,7 @@ c.fillStyle=o.pants||"#2b2f3a";c.fillRect(x-5,y-9,4,9+lg*.3);c.fillRect(x+1,y-9,
     if(o.hs==="bob"||o.hs==="long"){c.beginPath();c.arc(x,y-29.5+bob,7.6,Math.PI*1.05,Math.PI*1.95);c.fill();c.beginPath();c.ellipse(x+dir*2.5,y-31.5+bob,5.2,2.4,dir*.25,0,7);c.fill();c.beginPath();c.moveTo(x-dir*7.6,y-30+bob);c.lineTo(x-dir*7.4,y-(o.hs==="long"?22:24)+bob);c.lineTo(x-dir*3.5,y-26+bob);c.lineTo(x-dir*3,y-31+bob);c.fill();}
     if(o.hs==="pony"){c.fillRect(x-7.5,y-31+bob,15,3);}}
   if(o.mask){c.fillStyle=o.mask;c.fillRect(x-7,y-28+bob,14,6);c.fillStyle="#f2c9a0";c.fillRect(x-5+dir*1,y-31+bob,10,3);}
-  c.fillStyle="#222";c.fillRect(x+dir*2-1,y-29+bob,2,2);if(o.fem){c.fillRect(x+dir*2-1+(dir>0?1.5:-1.5),y-30+bob,1.2,1.2);c.fillStyle="rgba(244,114,182,.55)";c.beginPath();c.arc(x+dir*3.6,y-25.6+bob,1.4,0,7);c.fill();c.fillStyle="#b45309";c.fillRect(x+dir*4.2-.6,y-24.2+bob,1.4,.8);}
+  c.fillStyle="#222";c.fillRect(x+dir*2-1,y-29+bob,2,2);if(o.fem){c.fillRect(x+dir*2-1+(dir>0?1.5:-1.5),y-30+bob,1.2,1.2);c.fillStyle="#b45309";c.fillRect(x+dir*4.2-.6,y-24.2+bob,1.4,.8);}
   if(o.patch){c.fillStyle="#111";c.fillRect(x+dir*2-2,y-30+bob,4,3);c.fillRect(x-7,y-31+bob,14,1);}
   if(o.band){c.fillStyle=o.band;c.beginPath();c.arc(x,y-30+bob,7.3,Math.PI,0);c.fill();c.beginPath();c.moveTo(x-dir*6,y-31+bob);c.lineTo(x-dir*11,y-29+bob);c.lineTo(x-dir*7,y-27+bob);c.fill();}
   if(o.hat){c.fillStyle=o.hat;c.beginPath();c.ellipse(x,y-33+bob,11,3,0,0,7);c.fill();c.beginPath();c.roundRect(x-6,y-40+bob,12,8,3);c.fill();}}
@@ -781,7 +785,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-144317";
+const APP_VERSION="20261124-144548";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 let updT=null;function showUpdate(){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
   try{document.activeElement&&document.activeElement.blur();}catch(e){}const tick=()=>{$("updCnt").textContent="새로고침해야 계속할 수 있어요 · "+n+"초 뒤 자동 새로고침";if(n--<=0){location.reload();return;}updT=setTimeout(tick,1000);};tick();}
