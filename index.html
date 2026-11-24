@@ -555,16 +555,17 @@ const SKIN_PRICE={11:0,13:0,12:1e6,14:1e6,2:1e6,1:1e6,3:1e6,4:1e6,5:1e6,6:1e6,7:
 const CH_ORDER=[11,13,12,14,2,1,3,4,5,6,7,8,15,9,10];
 const normCh=ch=>(typeof ch==="number"&&ch in SKIN_PRICE)?ch:11;
 const ownsSkin=(p,ch)=>SKIN_PRICE[ch]===0||!!(p&&p.skins&&p.skins["s"+ch]);
-function human(c,x,y,dir,bob,lg,o){c.fillStyle=o.pants||"#2b2f3a";c.fillRect(x-5,y-9,4,9+lg*.3);c.fillRect(x+1,y-9,4,9-lg*.3);
+function human(c,x,y,dir,bob,lg,o){
+  if(o.hs==="long"||o.hs==="bob"){const L=o.hs==="long";c.fillStyle=o.hair;c.beginPath();c.moveTo(x-dir*1-8.2,y-29+bob);c.quadraticCurveTo(x-dir*2-9.5,y-(L?17:22)+bob,x-dir*3-5,y-(L?14:20)+bob);c.lineTo(x-dir*1+5,y-(L?15:21)+bob);c.quadraticCurveTo(x+7.5,y-(L?20:23)+bob,x+7.6,y-29+bob);c.closePath();c.fill();}
+c.fillStyle=o.pants||"#2b2f3a";c.fillRect(x-5,y-9,4,9+lg*.3);c.fillRect(x+1,y-9,4,9-lg*.3);
   if(o.dress){c.fillStyle=o.shirt;c.beginPath();c.moveTo(x-6,y-21+bob);c.lineTo(x+6,y-21+bob);c.lineTo(x+9,y-6+bob);c.lineTo(x-9,y-6+bob);c.fill();}
   else{c.fillStyle=o.shirt;c.beginPath();c.roundRect(x-7,y-22+bob,14,14,4);c.fill();if(o.stripe){c.fillStyle=o.stripe;for(let k=0;k<3;k++)c.fillRect(x-7,y-20+bob+k*4,14,1.6);}}
-  if(o.hs==="long"||o.hs==="bob"){const L=o.hs==="long";c.fillStyle=o.hair;c.beginPath();c.moveTo(x-dir*1-8.2,y-29+bob);c.quadraticCurveTo(x-dir*2-9.5,y-(L?17:22)+bob,x-dir*3-5,y-(L?14:20)+bob);c.lineTo(x-dir*1+5,y-(L?15:21)+bob);c.quadraticCurveTo(x+7.5,y-(L?20:23)+bob,x+7.6,y-29+bob);c.closePath();c.fill();}
   if(o.hs==="pony"){c.fillStyle=o.hair;c.beginPath();c.ellipse(x-dir*9,y-27+bob,3.2,6,-dir*.4,0,7);c.fill();c.fillStyle="#f43f5e";c.beginPath();c.arc(x-dir*7,y-31+bob,1.8,0,7);c.fill();}
   c.fillStyle=o.skin||"#f2c9a0";c.beginPath();c.arc(x,y-28+bob,7,0,7);c.fill();
   if(o.hair){c.fillStyle=o.hair;c.beginPath();c.arc(x,y-30+bob,7,Math.PI,0);c.fill();
     if(o.hs==="spiky"){c.beginPath();for(let k=0;k<5;k++){const bx=x-7+k*3.5;c.moveTo(bx,y-32+bob);c.lineTo(bx+1.75,y-39+bob-(k%2)*1.5);c.lineTo(bx+3.5,y-32+bob);}c.fill();}
     if(o.hs==="side"){c.beginPath();c.moveTo(x-7,y-31+bob);c.quadraticCurveTo(x+dir*2,y-40+bob,x+dir*9,y-30+bob);c.lineTo(x+dir*7,y-28+bob);c.fill();}
-    if(o.hs==="bob"||o.hs==="long"){c.beginPath();c.arc(x,y-29.5+bob,7.6,Math.PI*1.05,Math.PI*1.95);c.fill();c.beginPath();c.ellipse(x+dir*2.5,y-31.5+bob,5.2,2.4,dir*.25,0,7);c.fill();c.beginPath();c.moveTo(x-dir*7.6,y-30+bob);c.lineTo(x-dir*7.4,y-(o.hs==="long"?19:23)+bob);c.lineTo(x-dir*3.5,y-26+bob);c.lineTo(x-dir*3,y-31+bob);c.fill();}
+    if(o.hs==="bob"||o.hs==="long"){c.beginPath();c.arc(x,y-29.5+bob,7.6,Math.PI*1.05,Math.PI*1.95);c.fill();c.beginPath();c.ellipse(x+dir*2.5,y-31.5+bob,5.2,2.4,dir*.25,0,7);c.fill();c.beginPath();c.moveTo(x-dir*7.6,y-30+bob);c.lineTo(x-dir*7.4,y-(o.hs==="long"?22:24)+bob);c.lineTo(x-dir*3.5,y-26+bob);c.lineTo(x-dir*3,y-31+bob);c.fill();}
     if(o.hs==="pony"){c.fillRect(x-7.5,y-31+bob,15,3);}}
   if(o.mask){c.fillStyle=o.mask;c.fillRect(x-7,y-28+bob,14,6);c.fillStyle="#f2c9a0";c.fillRect(x-5+dir*1,y-31+bob,10,3);}
   c.fillStyle="#222";c.fillRect(x+dir*2-1,y-29+bob,2,2);if(o.fem){c.fillRect(x+dir*2-1+(dir>0?1.5:-1.5),y-30+bob,1.2,1.2);c.fillStyle="rgba(244,114,182,.55)";c.beginPath();c.arc(x+dir*3.6,y-25.6+bob,1.4,0,7);c.fill();c.fillStyle="#b45309";c.fillRect(x+dir*4.2-.6,y-24.2+bob,1.4,.8);}
@@ -780,11 +781,11 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-144015";
+const APP_VERSION="20261124-144317";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 let updT=null;function showUpdate(){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
-  const tick=()=>{if(busy()){$("updCnt").textContent="입력 중이라 자동 새로고침을 멈췄어요";return;}$("updCnt").textContent=n+"초 뒤 자동으로 새로고침돼요";if(n--<=0){location.reload();return;}updT=setTimeout(tick,1000);};tick();}
-setInterval(checkUpdate,30000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate();});
+  try{document.activeElement&&document.activeElement.blur();}catch(e){}const tick=()=>{$("updCnt").textContent="새로고침해야 계속할 수 있어요 · "+n+"초 뒤 자동 새로고침";if(n--<=0){location.reload();return;}updT=setTimeout(tick,1000);};tick();}
+setInterval(checkUpdate,20000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate();});
 /* ===================== 틱 루프 ===================== */
 rebuild();me=JSON.parse(JSON.stringify(local));renderAll();
 setInterval(()=>{const K=nowK();const left=TICK-((Date.now()-EPOCH)%TICK);$("tickFill").style.width=(100-left/TICK*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";
