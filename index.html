@@ -9,7 +9,7 @@
 <style>
 :root{--bg:#0e1014;--card:#171a21;--card2:#1f232c;--line:#262b35;--tx:#eef1f6;--sub:#8b93a3;--up:#f04452;--down:#3b82f6;--acc:#f5b400;--ok:#22c55e}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html,body{background:var(--bg);color:var(--tx);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:15px}
+html,body{background:var(--bg);color:var(--tx);font-family:"Noto Sans KR",system-ui,sans-serif;font-size:14px}
 body{max-width:560px;margin:0 auto;min-height:100vh;padding-bottom:56px}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 input,select{font:inherit;color:var(--tx);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%;outline:none}
@@ -17,158 +17,158 @@ input:focus,select:focus{border-color:var(--acc)}
 .up{color:var(--up)}.down{color:var(--down)}.flat{color:var(--sub)}
 header{position:sticky;top:0;z-index:5;background:rgba(14,16,20,.94);backdrop-filter:blur(8px);padding:14px 16px 10px;border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;justify-content:space-between}
-.brand h1{font-size:18px;font-weight:900;letter-spacing:-.3px}.brand h1 span{color:var(--acc)}
-.who{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px}
+.brand h1{font-size:16.5px;font-weight:900;letter-spacing:-.3px}.brand h1 span{color:var(--acc)}
+.who{font-size:11px;color:var(--sub);display:flex;align-items:center;gap:6px}
 .who b{color:var(--tx);font-weight:700}
 .dot{width:7px;height:7px;border-radius:50%;background:var(--sub);display:inline-block}.dot.on{background:var(--ok)}
 .assets{display:flex;gap:10px;margin-top:10px}
 .assets div{flex:1;background:var(--card);border-radius:12px;padding:9px 12px}
-.assets small{display:block;color:var(--sub);font-size:11px}
-.assets b{font-size:15px;font-weight:700}
+.assets small{display:block;color:var(--sub);font-size:10px}
+.assets b{font-size:14px;font-weight:700}
 .tickbar{height:3px;background:var(--line);border-radius:2px;margin-top:10px;overflow:hidden}
 .tickbar i{display:block;height:100%;background:var(--acc);width:0}
-.ticklbl{font-size:11px;color:var(--sub);margin-top:4px;display:flex;justify-content:space-between}
-.notice{margin:10px 16px 0;background:#2a1418;border:1px solid #5a2028;color:#ffb3bb;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5;white-space:pre-line}
+.ticklbl{font-size:10px;color:var(--sub);margin-top:4px;display:flex;justify-content:space-between}
+.notice{margin:10px 16px 0;background:#2a1418;border:1px solid #5a2028;color:#ffb3bb;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.5;white-space:pre-line}
 .notice.tr{background:#171b24;border-color:#2b3242;color:var(--tx)}
 .notice.info{background:#14202e;border-color:#23405f;color:#b8d4f5}
 main{padding:10px 16px}
 .sec{display:none}.sec.on{display:block}
-#pgTabs button,#rankTabs button{white-space:nowrap;font-size:11.5px!important;padding-left:2px;padding-right:2px;letter-spacing:-.3px}
+#pgTabs button,#rankTabs button{white-space:nowrap;font-size:10.5px!important;padding-left:2px;padding-right:2px;letter-spacing:-.3px}
 .row{display:flex;align-items:center;gap:10px;padding:12px 4px;border-bottom:1px solid var(--line);cursor:pointer}
 .row:active{background:var(--card)}
-.ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex:none}
-.nm{flex:1;min-width:0}.nm b{font-weight:700}.nm small{display:block;font-size:11px;color:var(--sub);margin-top:2px}
-.badge{display:inline-block;font-size:10px;font-weight:700;border-radius:5px;padding:1px 5px;margin-left:4px;vertical-align:1px}
+.ic{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex:none}
+.nm{flex:1;min-width:0}.nm b{font-weight:700}.nm small{display:block;font-size:10px;color:var(--sub);margin-top:2px}
+.badge{display:inline-block;font-size:9px;font-weight:700;border-radius:5px;padding:1px 5px;margin-left:4px;vertical-align:1px}
 .b-new{background:#3a2a05;color:#ffcf4d}.b-warn{background:#3d1117;color:#ff8a96}.b-dead{background:#2a2d35;color:#9aa1ad}
 .spark{width:64px;height:28px;flex:none}
 @media (min-width:940px){#coinList{padding-right:58px}}
-.pr{text-align:right;min-width:96px}.pr b{display:block;font-weight:700}.pr small{font-size:12px;font-weight:500}
+.pr{text-align:right;min-width:96px}.pr b{display:block;font-weight:700}.pr small{font-size:11px;font-weight:500}
 .card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px}
-.card h3{font-size:14px;color:var(--sub);font-weight:500;margin-bottom:8px}
-.big{font-size:22px;font-weight:900}
+.card h3{font-size:13px;color:var(--sub);font-weight:500;margin-bottom:8px}
+.big{font-size:20px;font-weight:900}
 .hold{padding:12px 0;border-bottom:1px solid var(--line)}.hold:last-child{border:0}
 .hold .t{display:flex;justify-content:space-between;font-weight:700}
-.hold .s{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:12px;color:var(--sub);margin-top:6px}
+.hold .s{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px;font-size:11px;color:var(--sub);margin-top:6px}
 .hold .s span:nth-child(even){text-align:right;color:var(--tx)}
 .tabs2{display:flex;background:var(--card);border-radius:12px;padding:4px;margin-bottom:10px}
-.tabs2 button{flex:1;padding:8px;border-radius:9px;font-size:13px;color:var(--sub);font-weight:500}
+.tabs2 button{flex:1;padding:8px;border-radius:9px;font-size:12px;color:var(--sub);font-weight:500}
 .tabs2 button.on{background:var(--card2);color:var(--tx);font-weight:700}
-.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chips button{flex:none;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:12px;color:var(--sub)}.chips button.on{background:var(--acc);color:#111;border-color:var(--acc);font-weight:700}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:4px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}.chips button{flex:none;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:11px;color:var(--sub)}.chips button.on{background:var(--acc);color:#111;border-color:var(--acc);font-weight:700}
 .rk{display:flex;align-items:center;gap:10px;padding:11px 4px;border-bottom:1px solid var(--line)}
 .rk .n{width:30px;text-align:center;font-weight:900;color:var(--sub)}
 .rk .n.g{color:#ffcf4d}.rk .n.s{color:#cfd6e0}.rk .n.b{color:#e3a06b}
-.rk .w{flex:1}.rk .w small{display:block;font-size:11px;color:var(--sub)}
-.rk .v{text-align:right;font-weight:700;font-size:14px}
+.rk .w{flex:1}.rk .w small{display:block;font-size:10px;color:var(--sub)}
+.rk .v{text-align:right;font-weight:700;font-size:13px}
 .rk.me{background:rgba(245,180,0,.07);border-radius:10px}
 nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;display:flex;background:rgba(18,20,26,.97);border-top:1px solid var(--line);padding:3px 4px calc(3px + env(safe-area-inset-bottom));z-index:6}
-nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:10px;color:var(--sub);padding:3px 0}
-nav button i{font-style:normal;font-size:16px}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;font-size:9px;color:var(--sub);padding:3px 0}
+nav button i{font-style:normal;font-size:14.5px}
 nav button.on{color:var(--tx);font-weight:700}
-.olist{position:sticky;top:0;margin:8px 16px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;z-index:4}
-.olist b{display:block;font-size:12px;color:var(--sub);font-weight:500;margin-bottom:6px}
-.ochip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border-radius:999px;padding:4px 10px;margin:0 6px 6px 0;font-size:13px}.ochip i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block}
+.olist{position:sticky;top:0;margin:8px 16px 0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;z-index:4}
+.olist b{display:block;font-size:11px;color:var(--sub);font-weight:500;margin-bottom:6px}
+.ochip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border-radius:999px;padding:4px 10px;margin:0 6px 6px 0;font-size:12px}.ochip i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block}
 .ochip.me{outline:1px solid var(--acc)}
 #chatSide{position:fixed;z-index:30;background:var(--bg);display:flex;flex-direction:column;padding:12px}
-.chatHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:15px}#chatClose{font-size:18px;color:var(--sub)}
+.chatHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px}#chatClose{font-size:16.5px;color:var(--sub)}
 #chatOn{margin-bottom:8px;max-height:64px;overflow-y:auto}
 #chatLog{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding:4px 0 10px}
-.msg{max-width:88%;background:var(--card);border-radius:11px 11px 11px 4px;padding:6px 10px;font-size:12.5px;line-height:1.4;word-break:break-all}
-.msg small{display:block;font-size:10px;color:var(--sub);margin-bottom:1px}
+.msg{max-width:88%;background:var(--card);border-radius:11px 11px 11px 4px;padding:6px 10px;font-size:11.5px;line-height:1.4;word-break:break-all}
+.msg small{display:block;font-size:9px;color:var(--sub);margin-bottom:1px}
 #dock{position:fixed;right:4px;top:50%;transform:translateY(-50%);z-index:19;display:flex;flex-direction:column;gap:4px}
-#dock button{width:46px;padding:5px 0 4px;border-radius:12px;background:rgba(24,27,34,.88);border:1px solid var(--line);font-size:9px;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 2px 8px rgba(0,0,0,.35);white-space:nowrap}
-#dock button i{font-style:normal;font-size:17px}
-@media (max-width:939px){body{padding-right:48px!important}#dock{right:3px}#dock button{width:42px;font-size:8.5px;padding:4px 0 3px}#dock button i{font-size:15px}header,.attBar{margin-right:-48px}}
-@media (min-width:940px){#dock{right:auto;left:calc(var(--cl) + var(--cw) + 2px - 52px)}#dock button{width:50px;font-size:10px}}
-#gNotice{position:fixed;left:50%;top:10px;transform:translate(-50%,-140%);z-index:65;background:linear-gradient(90deg,#7c2d12,#b45309);color:#fff;font-weight:800;font-size:14px;padding:10px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:transform .35s;max-width:92vw;text-align:center;white-space:pre-line;pointer-events:none}
+#dock button{width:46px;padding:5px 0 4px;border-radius:12px;background:rgba(24,27,34,.88);border:1px solid var(--line);font-size:8.5px;color:var(--sub);display:flex;flex-direction:column;align-items:center;gap:1px;box-shadow:0 2px 8px rgba(0,0,0,.35);white-space:nowrap}
+#dock button i{font-style:normal;font-size:15.5px}
+@media (max-width:939px){body{padding-right:48px!important}#dock{right:3px}#dock button{width:42px;font-size:8px;padding:4px 0 3px}#dock button i{font-size:14px}header,.attBar{margin-right:-48px}}
+@media (min-width:940px){#dock{right:auto;left:calc(var(--cl) + var(--cw) + 2px - 52px)}#dock button{width:50px;font-size:9px}}
+#gNotice{position:fixed;left:50%;top:10px;transform:translate(-50%,-140%);z-index:65;background:linear-gradient(90deg,#7c2d12,#b45309);color:#fff;font-weight:800;font-size:13px;padding:10px 18px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.5);transition:transform .35s;max-width:92vw;text-align:center;white-space:pre-line;pointer-events:none}
 #gNotice.on{transform:translate(-50%,0)}
-#admFab{position:fixed;left:14px;bottom:calc(60px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;background:var(--card2);border:1px solid var(--line);font-size:19px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+#admFab{position:fixed;left:14px;bottom:calc(60px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;background:var(--card2);border:1px solid var(--line);font-size:17.5px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 @media (min-width:940px){#admFab{left:calc(var(--cl) + 12px)}}
-#chatFab{position:fixed;right:14px;bottom:calc(60px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:var(--acc);color:#111;font-size:22px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.4)}
-#chatBadge{position:absolute;top:-2px;right:-2px;background:var(--up);color:#fff;font-size:11px;font-weight:700;border-radius:9px;padding:1px 6px;display:none}
+#chatFab{position:fixed;right:14px;bottom:calc(60px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:var(--acc);color:#111;font-size:20px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+#chatBadge{position:absolute;top:-2px;right:-2px;background:var(--up);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:1px 6px;display:none}
 @media (max-width:939px){#chatSide{left:0;right:0;bottom:0;height:72vh;border-radius:18px 18px 0 0;border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.5);display:none}#chatSide.open{display:flex}}
 
 .msg.me{align-self:flex-end;background:#3a2f06;border-radius:12px 12px 4px 12px}
-.msg .tm{white-space:nowrap;font-size:10px;color:var(--sub);opacity:.8;display:inline-block}
-.msg.sys{align-self:center;background:none;color:var(--sub);font-size:11px;text-align:center;max-width:100%;white-space:pre-line}
+.msg .tm{white-space:nowrap;font-size:9px;color:var(--sub);opacity:.8;display:inline-block}
+.msg.sys{align-self:center;background:none;color:var(--sub);font-size:10px;text-align:center;max-width:100%;white-space:pre-line}
 .chatIn{display:flex;gap:8px}.chatIn button{background:var(--acc);color:#111;font-weight:700;border-radius:10px;padding:0 16px;flex:none}
 .sheetBg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:20;display:none}
 .sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,100%);width:100%;max-width:560px;background:var(--card);border-radius:18px 18px 0 0;z-index:21;transition:transform .22s;max-height:92vh;overflow-y:auto;padding:14px 16px calc(18px + env(safe-area-inset-bottom))}
 .sheet.on{transform:translate(-50%,0)}
-.grab{display:none}#shClose{position:absolute;top:10px;right:12px;width:36px;height:36px;border-radius:50%;background:var(--card2);color:var(--sub);font-size:18px;z-index:2}#shClose:hover{color:var(--tx)}
+.grab{display:none}#shClose{position:absolute;top:10px;right:12px;width:36px;height:36px;border-radius:50%;background:var(--card2);color:var(--sub);font-size:16.5px;z-index:2}#shClose:hover{color:var(--tx)}
 .sh-top{display:flex;justify-content:space-between;align-items:flex-start}
-.sh-top .big{font-size:26px}
+.sh-top .big{font-size:24px}
 #chart{width:100%;height:170px;display:block;margin:10px 0 6px}
-.ranges{display:flex;gap:6px;margin-bottom:12px}.ranges button{flex:1;background:var(--card2);border-radius:8px;padding:6px;font-size:12px;color:var(--sub)}.ranges button.on{color:var(--tx);outline:1px solid var(--acc)}
+.ranges{display:flex;gap:6px;margin-bottom:12px}.ranges button{flex:1;background:var(--card2);border-radius:8px;padding:6px;font-size:11px;color:var(--sub)}.ranges button.on{color:var(--tx);outline:1px solid var(--acc)}
 .bs{display:flex;background:var(--card2);border-radius:12px;padding:4px;margin-bottom:12px}
 .bs button{flex:1;padding:9px;border-radius:9px;font-weight:700;color:var(--sub)}
 .bs button.on.buy{background:var(--up);color:#fff}.bs button.on.sell{background:var(--down);color:#fff}
-.qbtns{display:flex;gap:6px;margin:8px 0}.qbtns button{flex:1;background:var(--card2);border-radius:8px;padding:8px 0;font-size:13px}
-.prev{font-size:13px;color:var(--sub);line-height:1.8;margin:6px 0 12px}
+.qbtns{display:flex;gap:6px;margin:8px 0}.qbtns button{flex:1;background:var(--card2);border-radius:8px;padding:8px 0;font-size:12px}
+.prev{font-size:12px;color:var(--sub);line-height:1.8;margin:6px 0 12px}
 .prev b{color:var(--tx);float:right;font-weight:500}
-.go{width:100%;padding:14px;border-radius:12px;font-weight:900;font-size:16px;color:#fff}
+.go{width:100%;padding:14px;border-radius:12px;font-weight:900;font-size:14.5px;color:#fff}
 .go.buy{background:var(--up)}.go.sell{background:var(--down)}.go:disabled{opacity:.35}
-.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);background:#222733;border:1px solid var(--line);border-radius:12px;padding:11px 16px;z-index:40;font-size:14px;transition:transform .25s;max-width:92%;white-space:pre-line;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.toast{position:fixed;left:50%;top:18px;transform:translate(-50%,-140%);background:#222733;border:1px solid var(--line);border-radius:12px;padding:11px 16px;z-index:40;font-size:13px;transition:transform .25s;max-width:92%;white-space:pre-line;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 .toast.on{transform:translate(-50%,0)}
 #alerts{position:fixed;top:132px;left:50%;transform:translateX(-50%);width:calc(100% - 24px);max-width:536px;z-index:15;display:flex;flex-direction:column;gap:6px;pointer-events:none}
-.alert{pointer-events:auto;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.5;white-space:pre-line;box-shadow:0 8px 24px rgba(0,0,0,.45);animation:aIn .25s;transition:opacity .4s,transform .4s;cursor:pointer}
+.alert{pointer-events:auto;border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.5;white-space:pre-line;box-shadow:0 8px 24px rgba(0,0,0,.45);animation:aIn .25s;transition:opacity .4s,transform .4s;cursor:pointer}
 .alert.buy{background:#2a1418;border:1px solid #6a2430;color:#ffc2c8}.alert.sell{background:#132033;border:1px solid #27466e;color:#bcd7fb}
 .alert.out{opacity:0;transform:translateY(-8px)}@keyframes aIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
 .adm .g{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin:8px 0}
-.adm button.a{background:var(--card2);border-radius:9px;padding:10px 0;font-size:13px;font-weight:700}
+.adm button.a{background:var(--card2);border-radius:9px;padding:10px 0;font-size:12px;font-weight:700}
 .adm button.r{color:var(--up)}.adm button.b{color:var(--down)}
 .adm .l{display:flex;gap:6px;margin:8px 0}.adm .l>*{flex:1}
-.lbl{font-size:12px;color:var(--sub);margin:10px 0 4px}
-.muted{color:var(--sub);font-size:13px;text-align:center;padding:30px 0}
-.attBar{margin:10px 16px 0;background:#2e2506;border:1px solid #5c4a0c;color:#ffd75e;border-radius:12px;padding:10px 12px;font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:8px}.attBar button{background:var(--acc);color:#111;font-weight:700;border-radius:8px;padding:6px 12px;flex:none}
-.nick{display:flex;gap:8px;margin-top:8px}.nick button{background:var(--card2);border-radius:10px;padding:0 14px;flex:none;font-size:13px}
+.lbl{font-size:11px;color:var(--sub);margin:10px 0 4px}
+.muted{color:var(--sub);font-size:12px;text-align:center;padding:30px 0}
+.attBar{margin:10px 16px 0;background:#2e2506;border:1px solid #5c4a0c;color:#ffd75e;border-radius:12px;padding:10px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}.attBar button{background:var(--acc);color:#111;font-weight:700;border-radius:8px;padding:6px 12px;flex:none}
+.nick{display:flex;gap:8px;margin-top:8px}.nick button{background:var(--card2);border-radius:10px;padding:0 14px;flex:none;font-size:12px}
 #fishWrap{position:relative;border-radius:14px;overflow:hidden;margin:0 auto 10px;width:fit-content;max-width:100%;touch-action:none;user-select:none;-webkit-user-select:none}
 #fishCv{display:block;touch-action:none}
-.fbtn{width:100%;padding:15px;border-radius:12px;font-weight:900;font-size:16px;color:#fff;background:#1f7a4d;margin-bottom:10px}
+.fbtn{width:100%;padding:15px;border-radius:12px;font-weight:900;font-size:14.5px;color:#fff;background:#1f7a4d;margin-bottom:10px}
 .fbtn:disabled{background:var(--card2);color:var(--sub)}.fbtn.wait{background:#2b4a6b}.fbtn.bite{background:var(--up);animation:fpulse .35s infinite alternate}
 @keyframes fpulse{from{transform:scale(1)}to{transform:scale(1.03)}}
 #fishRes{position:absolute;left:50%;top:44%;transform:translate(-50%,-50%) scale(.9);background:rgba(14,16,20,.93);border:1px solid var(--line);border-radius:14px;padding:14px 18px;text-align:center;min-width:220px;opacity:0;pointer-events:none;transition:.2s}
 #fishRes.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
-#fChatOpen{position:absolute;right:8px;top:8px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.45);font-size:18px}
+#fChatOpen{position:absolute;right:8px;top:8px;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.45);font-size:16.5px}
 #fChatBox{position:absolute;left:8px;right:8px;bottom:8px;display:none}#fChatBox input{background:rgba(14,16,20,.9)}
 #fChar{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #fChar>div{background:var(--bg);width:100%;max-width:520px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column;overflow:hidden}
 .cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;padding:4px 14px 18px;overflow-y:auto}
-.cgrid button{background:var(--card);border:2px solid transparent;border-radius:12px;padding:4px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;font-weight:700}
-.cgrid button.on{border-color:var(--acc);background:#2a2410}.cgrid button small{font-size:10px;color:var(--acc);font-weight:700;white-space:normal;text-align:center;line-height:1.25;word-break:keep-all}.cgrid button small.own{color:var(--sub)}.cgrid button.lock canvas{opacity:.55}.cgrid canvas{width:70px;height:75px}
+.cgrid button{background:var(--card);border:2px solid transparent;border-radius:12px;padding:4px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10px;font-weight:700}
+.cgrid button.on{border-color:var(--acc);background:#2a2410}.cgrid button small{font-size:9px;color:var(--acc);font-weight:700;white-space:normal;text-align:center;line-height:1.25;word-break:keep-all}.cgrid button small.own{color:var(--sub)}.cgrid button.lock canvas{opacity:.55}.cgrid canvas{width:70px;height:75px}
 #pgMod{position:fixed;inset:0;padding:12px;z-index:38;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #pgMod>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 .gone{display:none!important}
-.pgBtns{display:flex;gap:8px;margin:2px 0 8px}.pgBtns button{flex:1;background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:13px}
+.pgBtns{display:flex;gap:8px;margin:2px 0 8px}.pgBtns button{flex:1;background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:12px}
 #fSell{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #fSell>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 #fInfo{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #fInfo>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 #fRow{display:flex;gap:8px;justify-content:center;align-items:flex-start;margin-bottom:10px}#fRow #fishWrap{margin:0}
 #fTicker{display:flex;flex-direction:column;gap:4px}
-#fTicker span{display:block;background:var(--card);border-radius:9px;padding:5px 8px;font-size:11px;color:var(--sub);line-height:1.35}#fTicker small{display:block;font-size:10.5px}#fTicker b{display:block;color:var(--tx);font-weight:700;font-size:12px}#fTicker em{float:right;font-style:normal;font-size:10px}
-#fTkCol{flex:none;width:128px}#fTkHide{width:100%;background:var(--card2);border-radius:8px;padding:4px 0;font-size:11px;color:var(--sub);margin-bottom:4px}
-#fTkShow{position:absolute;left:8px;top:8px;display:none;background:rgba(10,12,16,.6);color:#fff;font-size:11px;font-weight:700;border-radius:9px;padding:4px 9px}
+#fTicker span{display:block;background:var(--card);border-radius:9px;padding:5px 8px;font-size:10px;color:var(--sub);line-height:1.35}#fTicker small{display:block;font-size:9.5px}#fTicker b{display:block;color:var(--tx);font-weight:700;font-size:11px}#fTicker em{float:right;font-style:normal;font-size:9px}
+#fTkCol{flex:none;width:128px}#fTkHide{width:100%;background:var(--card2);border-radius:8px;padding:4px 0;font-size:10px;color:var(--sub);margin-bottom:4px}
+#fTkShow{position:absolute;left:8px;top:8px;display:none;background:rgba(10,12,16,.6);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:4px 9px}
 #fRow.tkoff #fTkCol{display:none}#fRow.tkoff #fTkShow{display:block}
-@media (max-width:600px){#fRow{gap:5px}#fTkCol{width:86px}#fTicker{width:auto;gap:3px}#fTicker span{padding:2px 5px;line-height:1.2;border-radius:7px}#fTicker small{font-size:8.5px}#fTicker b{font-size:10px}#fTicker em{font-size:8.5px}#fTkHide{font-size:10px}}
-.fopens{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:2px 0 10px}.fopens button{background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:12.5px;white-space:nowrap}
+@media (max-width:600px){#fRow{gap:5px}#fTkCol{width:86px}#fTicker{width:auto;gap:3px}#fTicker span{padding:2px 5px;line-height:1.2;border-radius:7px}#fTicker small{font-size:8px}#fTicker b{font-size:9px}#fTicker em{font-size:8px}#fTkHide{font-size:9px}}
+.fopens{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:2px 0 10px}.fopens button{background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:11.5px;white-space:nowrap}
 #fFeed{position:absolute;left:8px;top:8px;right:8px;display:flex;flex-direction:column;align-items:flex-end;gap:3px;pointer-events:none}
-#fFeed div{background:rgba(10,12,16,.62);color:#fff;font-size:11px;padding:3px 9px;border-radius:9px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .5s}
+#fFeed div{background:rgba(10,12,16,.62);color:#fff;font-size:10px;padding:3px 9px;border-radius:9px;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .5s}
 #fJoy{position:absolute;left:6px;bottom:6px;width:84px;height:84px;border-radius:50%;background:rgba(0,0,0,.28);border:2px solid rgba(255,255,255,.22);display:none;touch-action:none}
 #fJoy i{position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none}
-#fAct{position:absolute;right:10px;bottom:10px;width:64px;height:64px;border-radius:50%;background:rgba(31,122,77,.92);color:#fff;font-size:19px;font-weight:900;display:none;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;box-shadow:0 3px 10px rgba(0,0,0,.4);touch-action:manipulation}
-#fAct small{font-size:10px;font-weight:700}#fAct.wait{background:rgba(43,74,107,.92)}#fAct.bite{background:var(--up);animation:fpulse .35s infinite alternate}#fAct.off{background:rgba(40,44,54,.75);color:var(--sub)}
+#fAct{position:absolute;right:10px;bottom:10px;width:64px;height:64px;border-radius:50%;background:rgba(31,122,77,.92);color:#fff;font-size:17.5px;font-weight:900;display:none;flex-direction:column;align-items:center;justify-content:center;line-height:1.1;box-shadow:0 3px 10px rgba(0,0,0,.4);touch-action:manipulation}
+#fAct small{font-size:9px;font-weight:700}#fAct.wait{background:rgba(43,74,107,.92)}#fAct.bite{background:var(--up);animation:fpulse .35s infinite alternate}#fAct.off{background:rgba(40,44,54,.75);color:var(--sub)}
 @media (hover:none),(pointer:coarse){#fJoy{display:block}#fAct{display:flex}#fishBtn{display:none}}
 #fMk{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #fMk>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 #fMkBody{overflow-y:auto;padding:0 14px 20px}
-.mki{display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--line)}.mki .w{flex:1;min-width:0}.mki small{display:block;color:var(--sub);font-size:11px}
-.mki button{flex:none;border-radius:9px;padding:8px 12px;font-weight:700;font-size:13px;background:var(--card2)}.mki button.buy{background:var(--up);color:#fff}
-.mki input{width:110px;flex:none;padding:7px 9px;font-size:13px}
+.mki{display:flex;align-items:center;gap:8px;padding:10px 2px;border-bottom:1px solid var(--line)}.mki .w{flex:1;min-width:0}.mki small{display:block;color:var(--sub);font-size:10px}
+.mki button{flex:none;border-radius:9px;padding:8px 12px;font-weight:700;font-size:12px;background:var(--card2)}.mki button.buy{background:var(--up);color:#fff}
+.mki input{width:110px;flex:none;padding:7px 9px;font-size:12px}
 .sRow.sel{background:var(--card);border-radius:10px 10px 0 0;border-bottom-color:transparent}.sellForm{background:var(--card);border-radius:0 0 10px 10px;padding:8px 10px 10px;margin-bottom:6px}.sellForm button.buy{background:var(--up);color:#fff;border-radius:9px;padding:0 16px;font-weight:700;flex:none;white-space:nowrap}
 .fhelp.mo{display:none}
 @media (hover:none),(pointer:coarse){.fhelp.pc{display:none}.fhelp.mo{display:none}}
 @media (hover:hover) and (pointer:fine){#fishBtn{display:none}}
-.fhelp{font-size:12px;color:var(--sub);text-align:center;margin:-4px 0 10px;line-height:1.5}
+.fhelp{font-size:11px;color:var(--sub);text-align:center;margin:-4px 0 10px;line-height:1.5}
 @media (min-width:940px){:root{--cw:min(900px,calc(100vw - 400px));--cl:calc((100vw - var(--cw) - 352px)/2)}
   body{max-width:var(--cw);margin:0 0 0 var(--cl)}nav,.sheet,#fMk>div{max-width:var(--cw)!important}nav{left:var(--cl);transform:none}
   .sheet{left:var(--cl);transform:translate(0,100%)}.sheet.on{transform:translate(0,0)}
@@ -176,15 +176,15 @@ nav button.on{color:var(--tx);font-weight:700}
   .toast{left:calc(var(--cl) + var(--cw)/2)}
   #chatSide{left:calc(var(--cl) + var(--cw) + 12px);top:0;width:340px;height:100vh;border-left:1px solid var(--line);border-right:1px solid var(--line)}#chatFab,#chatClose{display:none}}
 @media (max-width:600px){
-  .row{padding:8px 2px;gap:8px}.ic{width:28px;height:28px;font-size:11px}.nm b{font-size:14px}.nm small{font-size:10px;margin-top:1px}
-  .spark{width:52px;height:22px}.pr{min-width:84px}.pr b{font-size:14px}.pr small{font-size:11px}
-  header{padding:10px 14px 8px}.brand h1{font-size:16px}.assets{margin-top:8px;gap:8px}.assets div{padding:7px 10px}.assets b{font-size:14px}
-  .notice{margin:8px 14px 0;padding:8px 10px;font-size:12px}.pgBtns button{padding:9px 0;font-size:12px}
+  .row{padding:8px 2px;gap:8px}.ic{width:28px;height:28px;font-size:10px}.nm b{font-size:13px}.nm small{font-size:9px;margin-top:1px}
+  .spark{width:52px;height:22px}.pr{min-width:84px}.pr b{font-size:13px}.pr small{font-size:10px}
+  header{padding:10px 14px 8px}.brand h1{font-size:14.5px}.assets{margin-top:8px;gap:8px}.assets div{padding:7px 10px}.assets b{font-size:13px}
+  .notice{margin:8px 14px 0;padding:8px 10px;font-size:11px}.pgBtns button{padding:9px 0;font-size:11px}
 }
 .btBg{position:fixed;inset:0;padding:12px;z-index:45;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center}
 .btBox{background:var(--bg);width:100%;max-width:420px;max-height:88vh;overflow-y:auto;border-radius:18px;padding:16px;box-shadow:0 20px 60px rgba(0,0,0,.6);border:1px solid var(--line)}
-.btBig{font-size:54px;font-weight:900;text-align:center;line-height:1.15;margin:6px 0}
-.rps{display:flex;gap:10px;margin:14px 0 6px}.rps button{flex:1;font-size:38px;line-height:1.1;background:var(--card);border-radius:16px;padding:14px 0 10px;border:2px solid transparent}.rps button small{display:block;font-size:12px;color:var(--sub);margin-top:4px}.rps button.on{border-color:var(--acc);background:#2a2410}.rps button:disabled{opacity:.55}
+.btBig{font-size:49.5px;font-weight:900;text-align:center;line-height:1.15;margin:6px 0}
+.rps{display:flex;gap:10px;margin:14px 0 6px}.rps button{flex:1;font-size:35px;line-height:1.1;background:var(--card);border-radius:16px;padding:14px 0 10px;border:2px solid transparent}.rps button small{display:block;font-size:11px;color:var(--sub);margin-top:4px}.rps button.on{border-color:var(--acc);background:#2a2410}.rps button:disabled{opacity:.55}
 .btBox .go{margin-top:6px}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -203,12 +203,12 @@ nav button.on{color:var(--tx);font-weight:700}
   <section class="sec on" id="s-market"><div id="coinList"></div></section>
   <section class="sec" id="s-wallet">
     <div class="card"><h3>👤 내 정보</h3>
-      <div style="display:flex;justify-content:space-between;align-items:center"><div><b id="wName" style="font-size:17px">-</b><div id="wLv" style="font-size:12px;color:var(--sub);margin-top:3px"></div></div><div style="text-align:right"><small style="color:var(--sub);font-size:11px">현금</small><div class="big" id="wCash" style="font-size:18px">-</div></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center"><div><b id="wName" style="font-size:15.5px">-</b><div id="wLv" style="font-size:11px;color:var(--sub);margin-top:3px"></div></div><div style="text-align:right"><small style="color:var(--sub);font-size:10px">현금</small><div class="big" id="wCash" style="font-size:16.5px">-</div></div></div>
       <div class="nick"><input id="nickIn" maxlength="10" placeholder="닉네임 바꾸기"><button id="nickBtn">변경</button></div>
     </div>
-    <div class="card"><h3>📅 출석체크</h3><div id="attInfo" style="font-size:13px;color:var(--sub);line-height:1.6;margin-bottom:10px"></div><button class="go" id="attBtn" style="background:var(--acc);color:#111">출석체크하고 100만원 받기</button></div>
+    <div class="card"><h3>📅 출석체크</h3><div id="attInfo" style="font-size:12px;color:var(--sub);line-height:1.6;margin-bottom:10px"></div><button class="go" id="attBtn" style="background:var(--acc);color:#111">출석체크하고 100만원 받기</button></div>
     <div class="card"><h3>📊 코인 보유 현황</h3><div id="holdings"></div></div>
-    <div class="card" style="text-align:center"><button id="accSwitch" style="font-size:12px;color:var(--sub);margin-right:14px">📱 다른 계정으로 로그인</button><button id="pinChange" style="font-size:12px;color:var(--sub);margin-right:14px">🔐 비밀번호 변경</button><button id="admLogin" style="font-size:12px;color:var(--sub)">🔑 관리자 로그인</button></div>
+    <div class="card" style="text-align:center"><button id="accSwitch" style="font-size:11px;color:var(--sub);margin-right:14px">📱 다른 계정으로 로그인</button><button id="pinChange" style="font-size:11px;color:var(--sub);margin-right:14px">🔐 비밀번호 변경</button><button id="admLogin" style="font-size:11px;color:var(--sub)">🔑 관리자 로그인</button></div>
     <div class="card"><h3>💸 송금 (수수료 20%)</h3>
       <select id="sendTo"></select>
       <div class="nick"><input id="sendAmt" inputmode="numeric" placeholder="보낼 금액(원)"><button id="sendBtn">보내기</button></div>
@@ -244,15 +244,15 @@ nav button.on{color:var(--tx);font-weight:700}
       <div class="l"><input id="admAmt" inputmode="numeric" placeholder="금액(원, 음수면 회수)"><button class="a" id="admGive">지급</button></div>
     </div>
     <div class="card"><h3>👥 플레이어 관리</h3>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:8px;line-height:1.5">같은 이름이 여러 개면 <b style="color:#ffb020">중복</b>으로 표시돼요. 삭제하면 그 사람 기록이 사라지고, 그 기기에서는 닉네임부터 다시 시작해요.</div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">같은 이름이 여러 개면 <b style="color:#ffb020">중복</b>으로 표시돼요. 삭제하면 그 사람 기록이 사라지고, 그 기기에서는 닉네임부터 다시 시작해요.</div>
       <div id="admPlayers"></div>
     </div>
     <div class="card"><h3>🔄 전체 새로고침</h3>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:8px;line-height:1.5">지금 접속 중인 모든 사람 화면에 새로고침 창을 띄워서 5초 뒤 강제로 새로고침해요.</div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">지금 접속 중인 모든 사람 화면에 새로고침 창을 띄워서 5초 뒤 강제로 새로고침해요.</div>
       <button class="a" style="width:100%" id="admReload">모두 새로고침 시키기</button>
     </div>
     <div class="card"><h3>🧹 코인 시장 전면 초기화</h3>
-      <div style="font-size:12px;color:var(--sub);margin-bottom:8px;line-height:1.5">모든 코인을 기본 가격으로 되돌리고, 모든 사람의 보유 코인을 매수 원금 그대로 현금으로 돌려줘요.</div>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">모든 코인을 기본 가격으로 되돌리고, 모든 사람의 보유 코인을 매수 원금 그대로 현금으로 돌려줘요.</div>
       <button class="a r" style="width:100%" id="admReset">초기화 실행</button>
     </div>
   </section>
@@ -264,28 +264,28 @@ nav button.on{color:var(--tx);font-weight:700}
 <div class="sheetBg" id="sheetBg"></div>
 <div class="sheet" id="sheet">
   <button id="shClose" aria-label="닫기">✕</button>
-  <div class="sh-top" style="padding-right:40px"><div><div id="shName" style="font-weight:700;font-size:16px"></div><div class="big" id="shPrice"></div><div id="shRate" style="font-size:13px;font-weight:700"></div></div>
-    <div style="text-align:right;font-size:12px;color:var(--sub);line-height:1.7" id="shRange"></div></div>
+  <div class="sh-top" style="padding-right:40px"><div><div id="shName" style="font-weight:700;font-size:14.5px"></div><div class="big" id="shPrice"></div><div id="shRate" style="font-size:12px;font-weight:700"></div></div>
+    <div style="text-align:right;font-size:11px;color:var(--sub);line-height:1.7" id="shRange"></div></div>
   <canvas id="chart"></canvas>
   <div class="ranges" id="ranges"><button data-n="30" class="on">5분</button><button data-n="180">30분</button><button data-n="360">1시간</button><button data-n="1080">3시간</button></div>
-  <div id="shHold" style="font-size:13px;color:var(--sub);margin-bottom:10px"></div>
+  <div id="shHold" style="font-size:12px;color:var(--sub);margin-bottom:10px"></div>
   <div class="bs"><button class="buy on" data-m="buy">매수</button><button class="sell" data-m="sell">매도</button></div>
   <input id="qty" inputmode="numeric" placeholder="수량(개)">
   <div class="qbtns" id="qbtns"></div>
   <div class="prev" id="prev"></div>
   <button class="go buy" id="goBtn">매수하기</button>
 </div>
-<div id="pgMod"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px"><b id="pgTitle" style="font-size:17px"></b><button id="pgX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div><div class="tabs2" id="pgTabs" style="margin:0 16px 10px;display:none"></div><div id="pgBody" style="overflow-y:auto;padding:0 16px 24px"></div></div></div>
-<div id="fChar" class="fmodal"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px"><b style="font-size:17px">🧑 캐릭터 · 스킨 상점</b><button id="fCharX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div>
-  <div style="font-size:12px;color:var(--sub);padding:0 14px 8px">기본 남자·여자는 무료예요. 나머지 스킨은 내 현금으로 열 수 있어요 (🔒 누르고 한 번 더 누르면 구매)</div><div id="fCharGrid" class="cgrid"></div></div></div>
-<div id="fSell"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px"><b style="font-size:17px">🐟 어시장</b><button id="fSellX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div>
-  <div style="font-size:12px;color:var(--sub);padding:0 14px 8px">잡은 물고기를 시세대로 바로 팔아요 (수수료 10%). 다른 사람과 사고팔려면 🏪 거래소로 가세요.</div>
+<div id="pgMod"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px"><b id="pgTitle" style="font-size:15.5px"></b><button id="pgX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div><div class="tabs2" id="pgTabs" style="margin:0 16px 10px;display:none"></div><div id="pgBody" style="overflow-y:auto;padding:0 16px 24px"></div></div></div>
+<div id="fChar" class="fmodal"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px"><b style="font-size:15.5px">🧑 캐릭터 · 스킨 상점</b><button id="fCharX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
+  <div style="font-size:11px;color:var(--sub);padding:0 14px 8px">기본 남자·여자는 무료예요. 나머지 스킨은 내 현금으로 열 수 있어요 (🔒 누르고 한 번 더 누르면 구매)</div><div id="fCharGrid" class="cgrid"></div></div></div>
+<div id="fSell"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px"><b style="font-size:15.5px">🐟 어시장</b><button id="fSellX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
+  <div style="font-size:11px;color:var(--sub);padding:0 14px 8px">잡은 물고기를 시세대로 바로 팔아요 (수수료 10%). 다른 사람과 사고팔려면 🏪 거래소로 가세요.</div>
   <div id="fSellTop" style="padding:0 14px 8px"></div><div id="fSellBody" style="overflow-y:auto;padding:0 14px 20px"></div></div></div>
-<div id="fInfo"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:17px" id="fInfoT">📖 도감</b><button id="fInfoX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div>
+<div id="fInfo"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px" id="fInfoT">📖 도감</b><button id="fInfoX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
   <div class="tabs2" id="fishTabs" style="margin:0 14px 8px;display:none"><button data-f="dex" class="on">📖 도감</button><button data-f="rank">🏆 순위</button><button data-f="hof">🐋 명예의 전당</button></div><div id="fishInfo" style="overflow-y:auto;padding:0 14px 20px"></div></div></div>
-<div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:17px">🐟 주로 거래소</b><button id="fMkX" style="font-size:22px;color:var(--sub)">✕</button></div>
+<div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px">🐟 주로 거래소</b><button id="fMkX" style="font-size:20px;color:var(--sub)">✕</button></div>
   <div class="tabs2" id="fMkTabs" style="margin:0 14px 6px"><button data-m="list" class="on">🛒 매물</button><button data-m="sell">📤 올리기 (판매·교환)</button></div>
-  <div style="font-size:11px;color:var(--sub);padding:0 14px 6px">판매는 수수료 10% 빼고 입금 · 교환은 수수료 없이 물건끼리 바꿔요</div><div id="fMkBody"></div></div></div>
+  <div style="font-size:10px;color:var(--sub);padding:0 14px 6px">판매는 수수료 10% 빼고 입금 · 교환은 수수료 없이 물건끼리 바꿔요</div><div id="fMkBody"></div></div></div>
 <aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><button id="chatClose">✕</button></div>
   <div id="chatOn"></div><div id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
@@ -293,27 +293,27 @@ nav button.on{color:var(--tx);font-weight:700}
 <div style="display:none"><button id="btOpen"></button><button id="fChBtn"></button></div><div id="dock"><button data-pg="my"><i>👤</i>마이</button><button data-pg="shop"><i>🛍️</i>상점</button><button data-pg="enh"><i>⚒️</i>강화</button><button data-pg="rank"><i>🏆</i>순위</button><button data-pg="ach"><i>🏅</i>업적</button><button id="admDock" style="display:none"><i>🛠️</i>관리</button></div>
 <div id="gNotice"></div>
 <button id="chatFab">💬<span id="chatBadge"></span></button>
-<div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:30px">✨</div><div style="font-size:17px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:13px;color:var(--sub);margin-bottom:14px"></div><button onclick="hardReload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:15px">지금 새로고침</button></div></div>
-<div id="updBar" style="display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;background:#1e3a5f;border:1px solid #3b82f6;color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:10px;white-space:nowrap">✨ 새 버전이 나왔어요<button onclick="hardReload()" style="background:var(--acc);color:#111;font-weight:800;border-radius:9px;padding:6px 12px">새로고침</button><button onclick="this.parentNode.style.display='none'" style="color:#9fb3c8;font-size:15px">✕</button></div>
+<div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:27.5px">✨</div><div style="font-size:15.5px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:12px;color:var(--sub);margin-bottom:14px"></div><button onclick="hardReload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:14px">지금 새로고침</button></div></div>
+<div id="updBar" style="display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;background:#1e3a5f;border:1px solid #3b82f6;color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:10px;white-space:nowrap">✨ 새 버전이 나왔어요<button onclick="hardReload()" style="background:var(--acc);color:#111;font-weight:800;border-radius:9px;padding:6px 12px">새로고침</button><button onclick="this.parentNode.style.display='none'" style="color:#9fb3c8;font-size:14px">✕</button></div>
 <div id="btMod" class="btBg"><div class="btBox">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="font-size:17px">⚔️ 배틀 · 가위바위보</b><button id="btModX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div>
-  <div id="btStat" style="font-size:12px;color:var(--sub);margin-bottom:8px"></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="font-size:15.5px">⚔️ 배틀 · 가위바위보</b><button id="btModX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
+  <div id="btStat" style="font-size:11px;color:var(--sub);margin-bottom:8px"></div>
   <div class="lbl" style="margin-top:4px">상대 (접속 중인 사람)</div><select id="btTo"></select>
   <div class="tabs2" style="margin:12px 0 8px"><button data-bk="cash" class="on">💰 돈</button><button data-bk="coin">🪙 코인</button></div>
   <div id="btCashRow"><input id="btAmt" inputmode="numeric" placeholder="판돈 (원)"></div>
   <div id="btCoinRow" style="display:none"><select id="btCoin"></select><div class="nick"><input id="btCnt" inputmode="numeric" placeholder="코인 개수"><button id="btAll">전부</button></div></div>
-  <div style="font-size:12px;color:var(--sub);line-height:1.65;margin:12px 0 8px">· 상대도 똑같은 판돈을 걸어요<br>· 신청하면 내 판돈이 먼저 보관되고, 상대가 60초 안에 수락하면 시작해요<br>· 시작되면 5초 안에 가위·바위·보 중에 골라요 (안 고르면 패배)<br>· 이긴 사람이 판돈을 전부 가져가고, 비기면 돌려받아요<br>· 상대 돈·코인이 모자라거나 거절하면 성사되지 않고 판돈이 돌아와요</div>
+  <div style="font-size:11px;color:var(--sub);line-height:1.65;margin:12px 0 8px">· 상대도 똑같은 판돈을 걸어요<br>· 신청하면 내 판돈이 먼저 보관되고, 상대가 60초 안에 수락하면 시작해요<br>· 시작되면 5초 안에 가위·바위·보 중에 골라요 (안 고르면 패배)<br>· 이긴 사람이 판돈을 전부 가져가고, 비기면 돌려받아요<br>· 상대 돈·코인이 모자라거나 거절하면 성사되지 않고 판돈이 돌아와요</div>
   <button class="go buy" id="btGo">⚔️ 배틀 신청</button>
 </div></div>
-<div id="btInc" class="btBg" style="z-index:46"><div class="btBox" style="text-align:center"><div style="font-size:34px">⚔️</div><div id="btIncT" style="font-weight:900;font-size:18px;margin:4px 0"></div><div id="btIncS" style="font-size:14px"></div><div id="btIncC" style="color:var(--sub);font-size:12px;margin:8px 0 12px"></div>
+<div id="btInc" class="btBg" style="z-index:46"><div class="btBox" style="text-align:center"><div style="font-size:31.5px">⚔️</div><div id="btIncT" style="font-weight:900;font-size:16.5px;margin:4px 0"></div><div id="btIncS" style="font-size:13px"></div><div id="btIncC" style="color:var(--sub);font-size:11px;margin:8px 0 12px"></div>
   <div style="display:flex;gap:8px"><button class="go" id="btIncNo" style="flex:1;background:var(--card2)">거절</button><button class="go" id="btIncYes" style="flex:1;background:var(--acc);color:#111">수락</button></div></div></div>
-<div id="btWait" class="btBg" style="z-index:46"><div class="btBox" style="text-align:center"><div style="font-size:34px">⏳</div><div style="font-weight:900;font-size:17px;margin:4px 0">배틀 신청 중</div><div id="btWaitS" style="font-size:14px"></div><div id="btWaitC" style="color:var(--sub);font-size:12px;margin:8px 0 12px"></div>
+<div id="btWait" class="btBg" style="z-index:46"><div class="btBox" style="text-align:center"><div style="font-size:31.5px">⏳</div><div style="font-weight:900;font-size:15.5px;margin:4px 0">배틀 신청 중</div><div id="btWaitS" style="font-size:13px"></div><div id="btWaitC" style="color:var(--sub);font-size:11px;margin:8px 0 12px"></div>
   <button class="go" id="btWaitNo" style="background:var(--card2)">신청 취소</button></div></div>
-<div id="btPlay" class="btBg" style="z-index:47"><div class="btBox" style="text-align:center"><div id="btpHead" style="font-size:14px;color:var(--sub)"></div><div id="btpStake" style="font-weight:700;font-size:14px;margin:4px 0"></div>
-  <div id="btpBig" class="btBig"></div><div id="btpMsg" style="font-size:13px;min-height:20px"></div>
+<div id="btPlay" class="btBg" style="z-index:47"><div class="btBox" style="text-align:center"><div id="btpHead" style="font-size:13px;color:var(--sub)"></div><div id="btpStake" style="font-weight:700;font-size:13px;margin:4px 0"></div>
+  <div id="btpBig" class="btBig"></div><div id="btpMsg" style="font-size:12px;min-height:20px"></div>
   <div class="rps" id="btpRps"><button data-c="s">✌️<small>가위</small></button><button data-c="r">✊<small>바위</small></button><button data-c="p">🖐️<small>보</small></button></div>
   <div id="btpRes"></div><button class="go" id="btpOk" style="display:none;background:var(--acc);color:#111">확인</button></div></div>
-<div id="sessMod" class="btBg" style="z-index:90;background:rgba(14,16,20,.97)"><div class="btBox" style="text-align:center"><div style="font-size:34px">🔒</div><div id="sessT" style="font-weight:900;font-size:17px;margin:6px 0"></div><div id="sessD" style="font-size:13px;color:var(--sub);line-height:1.7;margin-bottom:14px;white-space:pre-line"></div>
+<div id="sessMod" class="btBg" style="z-index:90;background:rgba(14,16,20,.97)"><div class="btBox" style="text-align:center"><div style="font-size:31.5px">🔒</div><div id="sessT" style="font-weight:900;font-size:15.5px;margin:6px 0"></div><div id="sessD" style="font-size:12px;color:var(--sub);line-height:1.7;margin-bottom:14px;white-space:pre-line"></div>
   <button class="go" id="sessYes" style="background:var(--acc);color:#111"></button><button class="go" id="sessNo" style="background:var(--card2);margin-top:8px"></button></div></div>
 <div class="toast" id="toast"></div>
 
@@ -425,10 +425,10 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",
 
 /* ===================== 화면: 순위 ===================== */
 function fishRankHtml(){const all={...players};if(me&&myId)all[myId]=me;const L=Object.entries(all).filter(([,p])=>p&&(p.fishN||0)>0).map(([id,p])=>({id,name:p.name||"?",dex:fishCountOf(p),n:p.fishN||0,e:p.fishEarn||0}));
-  const sec=(title,key,fmt)=>{const s=L.slice().sort((a,b)=>b[key]-a[key]).slice(0,10);return `<div class="card"><h3>${title}</h3>${s.length?s.map((x,i)=>`<div class="rk${x.id===myId?' me':''}" data-fpid="${x.id}" style="cursor:pointer"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i+1}</div><div class="w">${esc(x.name)}</div><div class="v">${fmt(x)}</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">아직 낚시한 사람이 없어요</div>'}</div>`;};
-  return sec("📖 도감 수집 순위","dex",x=>`${x.dex}종 <small style="color:var(--sub)">(${(x.dex/FISH.length*100).toFixed(1)}%)</small>`)+sec("📊 낚시 횟수 순위","n",x=>x.n.toLocaleString()+"회")+sec("💰 낚시 수익 순위","e",x=>formatMoneyReadable(x.e))+'<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">이름을 누르면 그 사람 도감을 볼 수 있어요</div>';}
+  const sec=(title,key,fmt)=>{const s=L.slice().sort((a,b)=>b[key]-a[key]).slice(0,10);return `<div class="card"><h3>${title}</h3>${s.length?s.map((x,i)=>`<div class="rk${x.id===myId?' me':''}" data-fpid="${x.id}" style="cursor:pointer"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i+1}</div><div class="w">${esc(x.name)}</div><div class="v">${fmt(x)}</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">아직 낚시한 사람이 없어요</div>'}</div>`;};
+  return sec("📖 도감 수집 순위","dex",x=>`${x.dex}종 <small style="color:var(--sub)">(${(x.dex/FISH.length*100).toFixed(1)}%)</small>`)+sec("📊 낚시 횟수 순위","n",x=>x.n.toLocaleString()+"회")+sec("💰 낚시 수익 순위","e",x=>formatMoneyReadable(x.e))+'<div style="font-size:10px;color:var(--sub);text-align:center;margin-top:6px">이름을 누르면 그 사람 도감을 볼 수 있어요</div>';}
 function renderRank(){const all={...players};if(me&&myId)all[myId]=me;const L=$("rankList");let list=[];
-  if(rankKey==="enh"){$("profitChips").style.display="none";const R=Object.entries(all).map(([id,p])=>({id,name:p.name||"?",lv:Math.min(50,(p&&p.rodLv)|0)})).filter(x=>x.lv>0).sort((a,b)=>b.lv-a.lv).slice(0,30);L.innerHTML=R.length?R.map((x,i)=>`<div class="rk${x.id===myId?" me":""}"><div class="n ${i===0?"g":i===1?"s":i===2?"b":""}">${i===0?"👑":i===1?"🥈":i===2?"🥉":i+1}</div><div class="w"><b>${esc(x.name)}</b><small>좋은 물고기 +${(rodBonus(x.lv)*100).toFixed(2)}%p</small></div><div class="v" style="color:var(--acc);font-weight:900">🎣 +${x.lv}</div></div>`).join(""):'<div class="card" style="color:var(--sub);font-size:13px;text-align:center">아직 강화한 사람이 없어요</div>';return;}
+  if(rankKey==="enh"){$("profitChips").style.display="none";const R=Object.entries(all).map(([id,p])=>({id,name:p.name||"?",lv:Math.min(50,(p&&p.rodLv)|0)})).filter(x=>x.lv>0).sort((a,b)=>b.lv-a.lv).slice(0,30);L.innerHTML=R.length?R.map((x,i)=>`<div class="rk${x.id===myId?" me":""}"><div class="n ${i===0?"g":i===1?"s":i===2?"b":""}">${i===0?"👑":i===1?"🥈":i===2?"🥉":i+1}</div><div class="w"><b>${esc(x.name)}</b><small>좋은 물고기 +${(rodBonus(x.lv)*100).toFixed(2)}%p</small></div><div class="v" style="color:var(--acc);font-weight:900">🎣 +${x.lv}</div></div>`).join(""):'<div class="card" style="color:var(--sub);font-size:12px;text-align:center">아직 강화한 사람이 없어요</div>';return;}
   if(rankKey==="hof"){$("profitChips").style.display="none";L.innerHTML=hofHtml();return;}
   if(rankKey==="fish"){$("profitChips").style.display="none";L.innerHTML=fishRankHtml();L.querySelectorAll("[data-fpid]").forEach(e=>e.onclick=()=>{const id=e.dataset.fpid;openPg("my","dex");fDexOf=id===myId?null:id;renderFishInfo();$("pgBody").scrollTop=0;});return;}
   const ch=$("profitChips");ch.style.display=rankKey==="profit"?"flex":"none";if(!ch.children.length){["전체",...COINS.map(c=>c[0])].forEach(n=>{const b=document.createElement("button");b.textContent=n==="전체"?"전체 합산":n;b.dataset.c=n;b.onclick=()=>{profitCoin=n;renderRank();};ch.appendChild(b);});}
@@ -450,27 +450,27 @@ function openSheet(ci){if($("pgMod"))$("pgMod").style.display="none";curCoin=ci;
 $("shClose").onclick=()=>closeSheet();
 ["dex","equip","shop","enh","ach","title"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
 ["s-wallet","s-dex","s-equip","s-title","s-shop","s-enh","s-ach","s-rank","s-admin"].forEach(id=>$("pgBody").appendChild($(id)));
-$("s-enh").innerHTML=`<div class="card" style="text-align:center;padding:36px 10px"><div style="font-size:44px">🎣⚒️</div><b style="font-size:16px">낚싯대 강화</b><div style="color:var(--sub);font-size:13px;margin-top:6px">준비 중이에요. 곧 열려요!</div><div style="font-size:12px;color:var(--sub);margin-top:12px">지금 장착 중: <b style="color:var(--tx)">기본 낚싯대</b></div></div>`;
+$("s-enh").innerHTML=`<div class="card" style="text-align:center;padding:36px 10px"><div style="font-size:40.5px">🎣⚒️</div><b style="font-size:14.5px">낚싯대 강화</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div><div style="font-size:11px;color:var(--sub);margin-top:12px">지금 장착 중: <b style="color:var(--tx)">기본 낚싯대</b></div></div>`;
 $("s-dex").appendChild($("fishInfo"));$("fishInfo").style.padding="0";$("fishInfo").style.overflowY="visible";
-$("s-equip").innerHTML=`<div class="card"><h3>🧑 캐릭터</h3><div style="font-size:12px;color:var(--sub);margin-bottom:6px">가지고 있는 캐릭터 중에서 골라 입어요. 새 캐릭터는 🛍️ 상점에서 살 수 있어요.</div><div id="eqGrid" class="cgrid" style="padding:4px 0 0"></div></div>`+`<div class="card"><h3>🎣 낚싯대</h3><div id="eq_rod"></div></div><div class="card"><h3>🪱 미끼</h3><div id="eq_bait"></div></div>`+`<div class="card"><h3>✨ 오라</h3><div id="eq_aura" class="cgrid" style="padding:4px 0 0"></div></div><div class="card"><h3>🪽 날개</h3><div id="eq_wing" class="cgrid" style="padding:4px 0 0"></div></div>`;
+$("s-equip").innerHTML=`<div class="card"><h3>🧑 캐릭터</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">가지고 있는 캐릭터 중에서 골라 입어요. 새 캐릭터는 🛍️ 상점에서 살 수 있어요.</div><div id="eqGrid" class="cgrid" style="padding:4px 0 0"></div></div>`+`<div class="card"><h3>🎣 낚싯대</h3><div id="eq_rod"></div></div><div class="card"><h3>🪱 미끼</h3><div id="eq_bait"></div></div>`+`<div class="card"><h3>✨ 오라</h3><div id="eq_aura" class="cgrid" style="padding:4px 0 0"></div></div><div class="card"><h3>🪽 날개</h3><div id="eq_wing" class="cgrid" style="padding:4px 0 0"></div></div>`;
 let gearArm=null;
 function gearRow(k,[id,nm,pr,desc,pack],mode){if(k==="rod"){nm=`기본 낚싯대 +${rodLv()}`;desc=`좋은 물고기 확률 +${(rodBonus(rodLv())*100).toFixed(2)}%p · ⚒️ 강화에서 올려요`;}const own=ownsGear(k,id)&&!pack,on=eqOf(k)===id,arm=gearArm===k+id;
-  const btn=mode==="eq"?(on?`<span style="font-size:12px;color:var(--acc);font-weight:900">장착 중</span>`:`<button data-geq="${k}|${id}" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700">장착</button>`)
-    :(own?`<span style="font-size:12px;color:var(--sub);font-weight:700">${on?"장착 중":"보유"}</span>`:`<button data-gbuy="${k}|${id}" style="background:${arm?"var(--up)":"var(--acc)"};color:${arm?"#fff":"#111"};border-radius:9px;padding:7px 12px;font-size:12px;font-weight:900">${arm?"한 번 더 눌러 구매":formatMoneyReadable(pr)}</button>`);
-  const cnt=k==="bait"&&id!=="basic"?` <span style="color:var(--acc);font-size:12px">남은 ${(me&&me[baitKey(id)])|0}개</span>`:"";return `<div class="rk" style="padding:10px 2px"><div style="font-size:24px;width:34px;text-align:center">${GEAR[k].i}</div><div class="w"><b>${nm}${cnt}</b><small>${desc}</small></div><div class="v">${btn}</div></div>`;}
+  const btn=mode==="eq"?(on?`<span style="font-size:11px;color:var(--acc);font-weight:900">장착 중</span>`:`<button data-geq="${k}|${id}" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:11px;font-weight:700">장착</button>`)
+    :(own?`<span style="font-size:11px;color:var(--sub);font-weight:700">${on?"장착 중":"보유"}</span>`:`<button data-gbuy="${k}|${id}" style="background:${arm?"var(--up)":"var(--acc)"};color:${arm?"#fff":"#111"};border-radius:9px;padding:7px 12px;font-size:11px;font-weight:900">${arm?"한 번 더 눌러 구매":formatMoneyReadable(pr)}</button>`);
+  const cnt=k==="bait"&&id!=="basic"?` <span style="color:var(--acc);font-size:11px">남은 ${(me&&me[baitKey(id)])|0}개</span>`:"";return `<div class="rk" style="padding:10px 2px"><div style="font-size:22px;width:34px;text-align:center">${GEAR[k].i}</div><div class="w"><b>${nm}${cnt}</b><small>${desc}</small></div><div class="v">${btn}</div></div>`;}
 function bindGear(root){root.querySelectorAll("[data-geq]").forEach(b=>b.onclick=()=>{const[k,id]=b.dataset.geq.split("|");me.eq=me.eq||{};me.eq[k]=id;saveMe();toast(`${GEAR[k].i} ${gearName(k)} 장착!`);renderGear();});
   root.querySelectorAll("[data-gbuy]").forEach(b=>b.onclick=()=>{if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const[k,id]=b.dataset.gbuy.split("|"),it=GEAR[k].list.find(x=>x[0]===id);
     if(gearArm!==k+id){gearArm=k+id;renderGear();setTimeout(()=>{if(gearArm===k+id){gearArm=null;renderGear();}},4000);return;}
     gearArm=null;if(me.cash<it[2]){renderGear();return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(it[2])} 필요)`);}
     me.cash-=it[2];if(it[4]){const bk=baitKey(id);me[bk]=(me[bk]|0)+it[4];}else{me.gear=me.gear||{};me.gear[k+"_"+id]=true;}me.eq=me.eq||{};me.eq[k]=id;saveMe();renderHeader();toast(`🛍️ ${it[1]}${it[4]?" "+it[4]+"개":""} 구매! 바로 장착했어요 (-${formatMoneyReadable(it[2])})`);if(!it[4])broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);renderGear();});}
 function renderGear(){for(const k of["rod","bait"]){const E=$("eq_"+k);if(E){E.innerHTML=GEAR[k].list.filter(x=>ownsGear(k,x[0])).map(x=>gearRow(k,x,"eq")).join("");bindGear(E);}}
-  if(pgCur==="shop"&&pgSub==="bait"){const S=$("s-shop");S.innerHTML=`<div class="card">${GEAR[pgSub].list.filter(x=>x[2]>0).map(x=>gearRow(pgSub,x,"shop")).join("")}<div style="font-size:11px;color:var(--sub);margin-top:8px">${pgSub==="bait"?"미끼는 던질 때마다 1개씩 써요 · 다 쓰면 기본 미끼로 바뀌어요":"한 번 사면 계속 쓸 수 있어요"} · 🎽 마이 → 장비에서 바꿔 낄 수 있어요</div></div>`;bindGear(S);}}
+  if(pgCur==="shop"&&pgSub==="bait"){const S=$("s-shop");S.innerHTML=`<div class="card">${GEAR[pgSub].list.filter(x=>x[2]>0).map(x=>gearRow(pgSub,x,"shop")).join("")}<div style="font-size:10px;color:var(--sub);margin-top:8px">${pgSub==="bait"?"미끼는 던질 때마다 1개씩 써요 · 다 쓰면 기본 미끼로 바뀌어요":"한 번 사면 계속 쓸 수 있어요"} · 🎽 마이 → 장비에서 바꿔 낄 수 있어요</div></div>`;bindGear(S);}}
 let cosArm=null,enhMat=[],enhBusy=false;
 function cosPreview(cv,k,id,ch){const g=cv.getContext("2d"),t=performance.now();g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.scale(2.2,2.2);const x=cv.width/4.4,y=cv.height/2.2-8;
   if(k==="aura")drawAura(g,x,y,id,t,0);if(k==="wing")drawWing(g,x,y,1,id,t,0);drawChar(g,x,y,ch,0,1,0,0);if(k==="aura")drawAura(g,x,y,id,t,1);}
 function renderCosGrid(G,k,mode){const list=COS[k].list.filter(x=>mode==="shop"||ownsCos(k,x[0])),cur=eqCos(k),ch=normCh(me&&me.ch);
   const items=(mode==="eq"?[["","없음",0]]:[]).concat(list);
-  G.innerHTML=items.length?items.map(([id,nm,pr])=>{const own=!id||ownsCos(k,id),arm=cosArm===k+id,on=cur===id;return `<button data-cos="${k}|${id}" class="${on?"on":""}${own?"":" lock"}"><canvas width="140" height="150" data-cv="${k}|${id}" style="opacity:1"></canvas><span>${nm}</span><small class="${own?"own":""}">${on?"사용 중":own?(id?"보유":""):(arm?"한 번 더 눌러 구매":"🔒 "+formatMoneyReadable(pr))}</small></button>`;}).join(""):'<div style="color:var(--sub);font-size:13px">아직 없어요 · 🛍️ 상점에서 살 수 있어요</div>';
+  G.innerHTML=items.length?items.map(([id,nm,pr])=>{const own=!id||ownsCos(k,id),arm=cosArm===k+id,on=cur===id;return `<button data-cos="${k}|${id}" class="${on?"on":""}${own?"":" lock"}"><canvas width="140" height="150" data-cv="${k}|${id}" style="opacity:1"></canvas><span>${nm}</span><small class="${own?"own":""}">${on?"사용 중":own?(id?"보유":""):(arm?"한 번 더 눌러 구매":"🔒 "+formatMoneyReadable(pr))}</small></button>`;}).join(""):'<div style="color:var(--sub);font-size:12px">아직 없어요 · 🛍️ 상점에서 살 수 있어요</div>';
   G.querySelectorAll("canvas[data-cv]").forEach(cv=>{const[kk,id]=cv.dataset.cv.split("|");cosPreview(cv,kk,id,ch);});
   G.querySelectorAll("[data-cos]").forEach(b=>b.onclick=()=>{if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const[kk,id]=b.dataset.cos.split("|");me.eq=me.eq||{};
     if(id&&!ownsCos(kk,id)){const it=COS[kk].list.find(x=>x[0]===id);if(cosArm!==kk+id){cosArm=kk+id;renderCos();setTimeout(()=>{if(cosArm===kk+id){cosArm=null;renderCos();}},4000);return;}
@@ -479,25 +479,25 @@ function renderCosGrid(G,k,mode){const list=COS[k].list.filter(x=>mode==="shop"|
     else if(mode==="shop"&&eqCos(kk)===id&&id){me.eq[kk]="";saveMe();renderHeader();lastPres="";pushPresence();renderCos();return toast(`${COS[kk].i} 장착 해제`);}
     me.eq[kk]=id;saveMe();renderHeader();lastPres="";pushPresence();renderCos();if(id)toast(`${COS[kk].i} ${COS[kk].list.find(x=>x[0]===id)[1]} 장착!`);});}
 function renderCos(){for(const k of["aura","wing"]){const E=$("eq_"+k);if(E)renderCosGrid(E,k,"eq");}
-  if(pgCur==="shop"&&(pgSub==="aura"||pgSub==="wing")){const S=$("s-shop");if(!$("shCos")||S.dataset.k!==pgSub){S.dataset.k=pgSub;S.innerHTML=`<div style="font-size:12px;color:var(--sub);margin-bottom:8px">${pgSub==="aura"?"발밑에 화려한 효과가 생겨요":"등 뒤에 날개가 달려요"} · 한 번 사면 계속 써요 · 🔒 누르고 한 번 더 누르면 구매 · 낀 걸 다시 누르면 해제</div><div id="shCos" class="cgrid" style="padding:0"></div>`;}renderCosGrid($("shCos"),pgSub,"shop");}}
+  if(pgCur==="shop"&&(pgSub==="aura"||pgSub==="wing")){const S=$("s-shop");if(!$("shCos")||S.dataset.k!==pgSub){S.dataset.k=pgSub;S.innerHTML=`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">${pgSub==="aura"?"발밑에 화려한 효과가 생겨요":"등 뒤에 날개가 달려요"} · 한 번 사면 계속 써요 · 🔒 누르고 한 번 더 누르면 구매 · 낀 걸 다시 누르면 해제</div><div id="shCos" class="cgrid" style="padding:0"></div>`;}renderCosGrid($("shCos"),pgSub,"shop");}}
 setInterval(()=>{if($("pgMod").style.display!=="flex")return;const ch=normCh(me&&me.ch);document.querySelectorAll("#pgBody canvas[data-cv]").forEach(cv=>{if(cv.offsetParent){const[k,id]=cv.dataset.cv.split("|");cosPreview(cv,k,id,ch);}});},60);
 function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodLv(),mine=(me&&me.fish)||{};
   enhMat=enhMat.filter((i,n)=>(mine[fKey(i)]||0)-1>=enhMat.slice(0,n+1).filter(j=>j===i).length);const used={};enhMat.forEach(i=>used[i]=(used[i]||0)+1);
   const mb=enhMat.reduce((a,i)=>a+matBonus(i,L),0),base=enhBase(L),tot=Math.min(100,base+mb),cost=enhCost(L);
   const fishes=FISH.map((f,i)=>[i,(mine[fKey(i)]||0)-1-(used[i]||0)]).filter(([i,c])=>FISH[i][1]>0&&c>0).sort((a,b)=>FISH[b[0]][1]-FISH[a[0]][1]);
   const pct=v=>(v>=10?v.toFixed(0):v.toFixed(1))+"%";
-  S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:40px">🎣</div><b style="font-size:20px">기본 낚싯대 <span style="color:var(--acc)">+${L}</span></b><div style="font-size:13px;color:var(--sub);margin-top:4px">좋은 물고기(10만 원↑) 확률 <b style="color:var(--tx)">+${(rodBonus(L)*100).toFixed(2)}%p</b>${L<50?` → <b style="color:var(--ok)">+${(rodBonus(L+1)*100).toFixed(2)}%p</b>`:""}</div>
-    <div style="height:6px;background:var(--card2);border-radius:3px;margin:10px 0 2px;overflow:hidden"><div style="height:100%;width:${L*2}%;background:var(--acc)"></div></div><div style="font-size:11px;color:var(--sub)">최대 +50</div></div>`+
+  S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:37px">🎣</div><b style="font-size:18.5px">기본 낚싯대 <span style="color:var(--acc)">+${L}</span></b><div style="font-size:12px;color:var(--sub);margin-top:4px">좋은 물고기(10만 원↑) 확률 <b style="color:var(--tx)">+${(rodBonus(L)*100).toFixed(2)}%p</b>${L<50?` → <b style="color:var(--ok)">+${(rodBonus(L+1)*100).toFixed(2)}%p</b>`:""}</div>
+    <div style="height:6px;background:var(--card2);border-radius:3px;margin:10px 0 2px;overflow:hidden"><div style="height:100%;width:${L*2}%;background:var(--acc)"></div></div><div style="font-size:10px;color:var(--sub)">최대 +50</div></div>`+
   (L>=50?`<div class="card" style="text-align:center;font-weight:900">👑 최대 강화 달성!</div>`:
-  `<div class="card"><div style="display:flex;justify-content:space-between;font-size:13px"><span>+${L} → +${L+1} 비용</span><b>${formatMoneyReadable(cost)}</b></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>기본 성공 확률</span><b>${pct(base)}</b></div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-top:6px"><span>재료 보너스</span><b style="color:var(--ok)">+${mb.toFixed(1)}%</b></div>
-    <div style="display:flex;justify-content:space-between;font-size:16px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)"><span style="font-weight:900">최종 성공 확률</span><b style="color:var(--acc)">${pct(tot)}</b></div>
-    <div style="font-size:12px;color:var(--sub);margin:12px 0 6px">재료 (최대 5마리 · 누르면 빼기)</div>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${[0,1,2,3,4].map(n=>{const i=enhMat[n];return i===undefined?`<div style="height:54px;border:1.5px dashed var(--line);border-radius:10px"></div>`:`<button data-mrm="${n}" style="height:54px;background:var(--card2);border-radius:10px;font-size:10px;line-height:1.25;padding:2px;overflow:hidden">${esc(FISH[i][2])}<br><b style="color:var(--ok)">+${matBonus(i,L).toFixed(1)}%</b></button>`;}).join("")}</div>
+  `<div class="card"><div style="display:flex;justify-content:space-between;font-size:12px"><span>+${L} → +${L+1} 비용</span><b>${formatMoneyReadable(cost)}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px"><span>기본 성공 확률</span><b>${pct(base)}</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px"><span>재료 보너스</span><b style="color:var(--ok)">+${mb.toFixed(1)}%</b></div>
+    <div style="display:flex;justify-content:space-between;font-size:14.5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)"><span style="font-weight:900">최종 성공 확률</span><b style="color:var(--acc)">${pct(tot)}</b></div>
+    <div style="font-size:11px;color:var(--sub);margin:12px 0 6px">재료 (최대 5마리 · 누르면 빼기)</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${[0,1,2,3,4].map(n=>{const i=enhMat[n];return i===undefined?`<div style="height:54px;border:1.5px dashed var(--line);border-radius:10px"></div>`:`<button data-mrm="${n}" style="height:54px;background:var(--card2);border-radius:10px;font-size:9px;line-height:1.25;padding:2px;overflow:hidden">${esc(FISH[i][2])}<br><b style="color:var(--ok)">+${matBonus(i,L).toFixed(1)}%</b></button>`;}).join("")}</div>
     <button class="go buy" id="enhGo" style="margin-top:12px;width:100%;border-radius:12px;padding:13px 0;font-weight:900;${enhBusy?"opacity:.6":""}">⚒️ 강화하기 · ${formatMoneyReadable(cost)}</button>
-    <div style="font-size:11px;color:${L>=ENH_DROP_LV?"var(--up)":"var(--sub)"};margin-top:6px;text-align:center">${L>=ENH_DROP_LV?"⚠️ +25부터는 실패하면 10% 확률로 레벨이 1 떨어져요":"실패하면 돈과 재료만 사라지고 레벨은 그대로예요 (+25부터는 10% 확률로 하락)"}</div></div>
-  <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:12px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 많이 올라요 · 레벨이 높아지면 싼 물고기는 거의 효과가 없어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">넣을 물고기가 없어요 · 종류마다 1마리는 도감용으로 남겨요</div>'}</div>`);
+    <div style="font-size:10px;color:${L>=ENH_DROP_LV?"var(--up)":"var(--sub)"};margin-top:6px;text-align:center">${L>=ENH_DROP_LV?"⚠️ +25부터는 실패하면 10% 확률로 레벨이 1 떨어져요":"실패하면 돈과 재료만 사라지고 레벨은 그대로예요 (+25부터는 10% 확률로 하락)"}</div></div>
+  <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 많이 올라요 · 레벨이 높아지면 싼 물고기는 거의 효과가 없어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">넣을 물고기가 없어요 · 종류마다 1마리는 도감용으로 남겨요</div>'}</div>`);
   S.querySelectorAll("[data-mrm]").forEach(b=>b.onclick=()=>{enhMat.splice(+b.dataset.mrm,1);renderEnh();});
   S.querySelectorAll("[data-madd]").forEach(b=>b.onclick=()=>{if(enhMat.length>=5)return toast("재료는 최대 5마리까지 넣을 수 있어요");enhMat.push(+b.dataset.madd);renderEnh();});
   if($("enhGo"))$("enhGo").onclick=enhDo;}
@@ -520,34 +520,37 @@ const achId=(k,i)=>k+i;
 function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.bestPR||0)*100);if(k==="money")return assetOf(p);return 0;}
 const titleOf=id=>{for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i][1];return "";};
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title):"";
-function achCheck(){if(!me||!me._loaded||sessBlocked)return;me.ach=me.ach||{};let got=0;const nw=[];
-  for(const a of ACH){const v=achVal(a.k);a.tiers.forEach(([need,nm,rw],i)=>{const id=achId(a.k,i);if(!me.ach[id]&&v>=need){me.ach[id]=Date.now();got+=rw;nw.push([nm,rw,i===a.tiers.length-1||rw>=10000000]);}});}
-  if(!nw.length)return;me.cash+=got;saveMe();renderHeader();toast(`🏅 업적 달성! 칭호 「${nw.map(x=>x[0]).join("」「")}」\n보상 +${formatMoneyReadable(got)}`);
-  nw.filter(x=>x[2]).forEach(x=>broadcast(`🏅 ${myName()}님이 업적 달성! 칭호 「${x[0]}」 획득 (+${formatMoneyReadable(x[1])})`));if(pgCur==="ach"||pgSub==="title")renderAch();}
+const achNoted={};
+function achNext(a){const v=achVal(a.k);const i=a.tiers.findIndex((t,j)=>!(me&&me.ach&&me.ach[achId(a.k,j)]));return i<0?null:{i,t:a.tiers[i],v,ready:v>=a.tiers[i][0]};}
+function achCheck(){if(!me||!me._loaded||sessBlocked)return;let n=0;const nw=[];for(const a of ACH){const x=achNext(a);if(x&&x.ready){n++;const id=achId(a.k,x.i);if(!achNoted[id]){achNoted[id]=1;nw.push(x.t[1]);}}}
+  const b=document.querySelector('#dock [data-pg="ach"]');if(b){let d=b.querySelector(".achDot");if(!d){d=document.createElement("span");d.className="achDot";d.style.cssText="position:absolute;top:2px;right:4px;min-width:15px;height:15px;border-radius:8px;background:var(--up);color:#fff;font-size:8.5px;font-weight:900;line-height:15px;padding:0 3px";b.style.position="relative";b.appendChild(d);}d.textContent=n;d.style.display=n?"block":"none";}
+  if(nw.length)toast(`🏅 업적 달성! 「${nw.join("」「")}」\n🏅 업적에서 보상을 받아 가세요`);if(pgCur==="ach")renderAch();}
+function achClaim(k){const a=ACH.find(x=>x.k===k);if(!a||!me||!me._loaded)return;const x=achNext(a);if(!x||!x.ready)return;me.ach=me.ach||{};const id=achId(a.k,x.i),[need,nm,rw]=x.t;me.ach[id]=Date.now();me.cash+=rw;saveMe();renderHeader();
+  toast(`🎁 「${nm}」 보상 +${formatMoneyReadable(rw)}\n칭호를 얻었어요!`);if(x.i===a.tiers.length-1||rw>=10000000)broadcast(`🏅 ${myName()}님이 업적 달성! 칭호 「${nm}」 획득 (+${formatMoneyReadable(rw)})`);achCheck();renderAch();}
 setInterval(achCheck,5000);
 function fmtNeed(a,need){return a.k==="money"?formatMoneyReadable(need):need+a.u;}
 function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach||{});const total=ACH.reduce((n,a)=>n+a.tiers.length,0),done=Object.keys((me&&me.ach)||{}).length;
-    S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:13px;color:var(--sub)">달성한 업적</div><b style="font-size:22px">${done} / ${total}</b><div style="font-size:12px;color:var(--sub);margin-top:4px">달성하면 보상이 바로 들어오고, 👤 마이 → 🎖️ 칭호에서 칭호를 달 수 있어요</div></div>`+
+    S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:12px;color:var(--sub)">달성한 업적</div><b style="font-size:20px">${done} / ${total}</b><div style="font-size:11px;color:var(--sub);margin-top:4px">목표를 달성하면 🎁 보상 받기를 눌러 받아요 · 받은 칭호는 👤 마이 → 🎖️ 칭호에서 달 수 있어요</div></div>`+
     ACH.map(a=>{const v=achVal(a.k),got=a.tiers.filter((t,i)=>me&&me.ach&&me.ach[achId(a.k,i)]),ni=a.tiers.findIndex((t,i)=>!(me&&me.ach&&me.ach[achId(a.k,i)])),nx=ni>=0?a.tiers[ni]:null;
       const pc=nx?Math.min(100,Math.floor(v/nx[0]*100)):100;const cur=a.k==="money"?formatMoneyReadable(v):v+a.u;
-      return `<div class="card"><h3>${a.c}</h3>${got.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">${got.map(t=>`<span style="font-size:11px;padding:3px 8px;border-radius:12px;background:var(--card2);color:var(--sub)">✅ 「${t[1]}」</span>`).join("")}</div>`:""}`+
-      (nx?`<div style="display:flex;justify-content:space-between;align-items:center;font-size:14px"><span>다음 목표 <b>「${nx[1]}」</b></span><b style="color:var(--acc);font-size:13px">+${formatMoneyReadable(nx[2])}</b></div>
-        <div style="font-size:12px;color:var(--sub);margin:4px 0 6px">${fmtNeed(a,nx[0])} 달성하기 · 지금 ${cur}</div>
-        <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--acc)"></div></div><b style="font-size:13px;min-width:38px;text-align:right">${pc}%</b></div>`
-        :`<div style="text-align:center;font-weight:900;padding:6px 0">👑 모두 달성!</div>`)+`</div>`;}).join("");}
+      return `<div class="card"><h3>${a.c}</h3>${got.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">${got.map(t=>`<span style="font-size:10px;padding:3px 8px;border-radius:12px;background:var(--card2);color:var(--sub)">✅ 「${t[1]}」</span>`).join("")}</div>`:""}`+
+      (nx?`<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>다음 목표 <b>「${nx[1]}」</b></span><b style="color:var(--acc);font-size:12px">+${formatMoneyReadable(nx[2])}</b></div>${v>=nx[0]?`<button data-achc="${a.k}" style="width:100%;margin-top:8px;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">🎁 보상 받기 +${formatMoneyReadable(nx[2])}</button>`:""}
+        <div style="font-size:11px;color:var(--sub);margin:4px 0 6px">${fmtNeed(a,nx[0])} 달성하기 · 지금 ${cur}</div>
+        <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--acc)"></div></div><b style="font-size:12px;min-width:38px;text-align:right">${pc}%</b></div>`
+        :`<div style="text-align:center;font-weight:900;padding:6px 0">👑 모두 달성!</div>`)+`</div>`;}).join("");S.querySelectorAll("[data-achc]").forEach(b=>b.onclick=()=>achClaim(b.dataset.achc));}
   const T=$("s-title");if(T&&pgCur==="my"&&pgSub==="title"){const own=[];for(const a of ACH)a.tiers.forEach(([need,nm],i)=>{const id=achId(a.k,i);if(me&&me.ach&&me.ach[id])own.push([id,nm,a.c]);});const cur=(me&&me.title&&me.ach&&me.ach[me.title])?me.title:"";
-    T.innerHTML=`<div class="card"><h3>🎖️ 칭호</h3><div style="font-size:12px;color:var(--sub);margin-bottom:8px">단 칭호는 광장에서 이름 위에 보여요 · 업적을 달성하면 늘어나요</div><div style="display:flex;flex-wrap:wrap;gap:6px">`+
-      [["","없음",""]].concat(own).map(([id,nm,c])=>`<button data-tt="${id}" style="padding:8px 12px;border-radius:20px;font-size:13px;font-weight:700;background:${cur===id?"var(--acc)":"var(--card2)"};color:${cur===id?"#111":"var(--tx)"}" title="${c}">${id?"「"+esc(nm)+"」":"칭호 없음"}</button>`).join("")+`</div>${own.length?"":'<div style="color:var(--sub);font-size:13px;margin-top:10px">아직 칭호가 없어요 · 🏅 업적을 달성해 보세요</div>'}</div>`;
+    T.innerHTML=`<div class="card"><h3>🎖️ 칭호</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">단 칭호는 광장에서 이름 위에 보여요 · 업적을 달성하면 늘어나요</div><div style="display:flex;flex-wrap:wrap;gap:6px">`+
+      [["","없음",""]].concat(own).map(([id,nm,c])=>`<button data-tt="${id}" style="padding:8px 12px;border-radius:20px;font-size:12px;font-weight:700;background:${cur===id?"var(--acc)":"var(--card2)"};color:${cur===id?"#111":"var(--tx)"}" title="${c}">${id?"「"+esc(nm)+"」":"칭호 없음"}</button>`).join("")+`</div>${own.length?"":'<div style="color:var(--sub);font-size:12px;margin-top:10px">아직 칭호가 없어요 · 🏅 업적을 달성해 보세요</div>'}</div>`;
     T.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{me.title=b.dataset.tt;saveMe();lastPres="";pushPresence();renderAch();toast(me.title?`🎖️ 칭호 「${titleOf(me.title)}」 장착!`:"칭호를 뺐어요");});}}
 
 const PG_G={my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"]]},rank:{t:"🏆 순위"},enh:{t:"⚒️ 강화"},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
 let pgCur="my",pgSub="wallet";
-function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;if(pgSub==="ch"){if(!$("shGrid"))S.innerHTML=`<div style="font-size:12px;color:var(--sub);margin-bottom:8px">기본 남자·여자는 무료예요. 🔒 누르고 한 번 더 누르면 구매하고 바로 입어요.</div><div id="shGrid" class="cgrid" style="padding:0"></div>`;renderCharPick();}
+function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;if(pgSub==="ch"){if(!$("shGrid"))S.innerHTML=`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">기본 남자·여자는 무료예요. 🔒 누르고 한 번 더 누르면 구매하고 바로 입어요.</div><div id="shGrid" class="cgrid" style="padding:0"></div>`;renderCharPick();}
   else if(pgSub==="bait")renderGear();
   else if(pgSub==="aura"||pgSub==="wing")renderCos();
-  else{const n={rod:"🎣 낚싯대",aura:"✨ 오라",wing:"🪽 날개"}[pgSub];S.innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div style="font-size:40px">🚧</div><b style="font-size:16px">${n}</b><div style="color:var(--sub);font-size:13px;margin-top:6px">준비 중이에요. 곧 열려요!</div></div>`;}}
+  else{const n={rod:"🎣 낚싯대",aura:"✨ 오라",wing:"🪽 날개"}[pgSub];S.innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div style="font-size:37px">🚧</div><b style="font-size:14.5px">${n}</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div></div>`;}}
 function openPg(p,sub){if(p==="wallet"){p="my";sub="wallet";}if(p==="dex"){p="my";sub="dex";}const G=PG_G[p];pgCur=p;pgSub=sub||(G.tabs?G.tabs[0][0]:p);fKeys={};
-  const T=$("pgTabs");T.style.display=G.tabs?"flex":"none";T.innerHTML=G.tabs?G.tabs.map(([k,n])=>`<button data-pt="${k}" class="${k===pgSub?"on":""}" style="font-size:12px">${n}</button>`).join(""):"";T.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>openPg(p,b.dataset.pt));
+  const T=$("pgTabs");T.style.display=G.tabs?"flex":"none";T.innerHTML=G.tabs?G.tabs.map(([k,n])=>`<button data-pt="${k}" class="${k===pgSub?"on":""}" style="font-size:11px">${n}</button>`).join(""):"";T.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>openPg(p,b.dataset.pt));
   const sec=p==="my"?pgSub:p;["wallet","dex","equip","title","shop","enh","ach","rank","admin"].forEach(x=>$("s-"+x).classList.toggle("on",x===sec));
   $("pgTitle").textContent=G.t;$("pgMod").style.display="flex";$("pgBody").scrollTop=0;if(sec==="dex"){fTab="dex";}if(sec!=="dex")fDexOf=null;renderAll();renderShop();renderCharPick();renderGear();renderCos();renderEnh();renderAch();renderFishInfo();if(p==="admin")renderAccLog();}
 function closePg(){$("pgMod").style.display="none";}
@@ -568,19 +571,19 @@ function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=
 function openNts(){fKeys={};let d=$("ntsMod");if(!d){d=document.createElement("div");d.id="ntsMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
     if(fdb){fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/taxPre").on("value",s=>{taxPre=s.val()||{};if(d.style.display==="flex")renderNts();});}}d.style.display="flex";renderNts();}
 function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(me&&myId)all[myId]=me;const top=Object.entries(all).map(([id,p])=>({id,n:(p&&p.name)||"?",v:((p&&p.taxPaid)||0)+(taxPre[id]||0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
-  const row=(a,b,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:14px"><span style="color:var(--sub)">${a}</span><b${c?` style="color:${c}"`:""}>${b}</b></div>`;
-  d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:17px">🏛️ 국세청</b><button id="ntsX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div>
-    <div style="text-align:center;margin:8px 0 12px"><div style="font-size:12px;color:var(--sub)">지금까지 걷힌 세금 총합</div><div style="font-size:26px;font-weight:900;color:var(--acc)">${formatMoneyReadable(taxAll.total||0)}</div></div>`+
+  const row=(a,b,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--sub)">${a}</span><b${c?` style="color:${c}"`:""}>${b}</b></div>`;
+  d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">🏛️ 국세청</b><button id="ntsX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
+    <div style="text-align:center;margin:8px 0 12px"><div style="font-size:11px;color:var(--sub)">지금까지 걷힌 세금 총합</div><div style="font-size:24px;font-weight:900;color:var(--acc)">${formatMoneyReadable(taxAll.total||0)}</div></div>`+
     Object.keys(TAX_K).map(k=>row(TAX_K[k],formatMoneyReadable(taxAll[k]||0))).join("")+
     `<div style="margin-top:12px">`+row("🧾 내가 낸 세금",formatMoneyReadable(((me&&me.taxPaid)||0)+(taxPre[myId]||0)),"var(--acc)")+`</div>`+
-    `<div style="font-size:13px;font-weight:900;margin:14px 0 4px">🏅 성실 납세자 TOP 5</div>`+(top.length?top.map((x,i)=>row(`${["🥇","🥈","🥉","4","5"][i]} ${esc(x.n)}`,formatMoneyReadable(x.v))).join(""):'<div style="color:var(--sub);font-size:13px">아직 없어요</div>')+
-    `<div style="font-size:11px;color:var(--sub);margin-top:10px;text-align:center">${taxAll.backfilled?"이전 세금은 남아 있는 거래 기록으로 추정해서 합쳤어요":"이번 업데이트부터 걷힌 세금이 집계돼요"}</div></div>`;
+    `<div style="font-size:12px;font-weight:900;margin:14px 0 4px">🏅 성실 납세자 TOP 5</div>`+(top.length?top.map((x,i)=>row(`${["🥇","🥈","🥉","4","5"][i]} ${esc(x.n)}`,formatMoneyReadable(x.v))).join(""):'<div style="color:var(--sub);font-size:12px">아직 없어요</div>')+
+    `<div style="font-size:10px;color:var(--sub);margin-top:10px;text-align:center">${taxAll.backfilled?"이전 세금은 남아 있는 거래 기록으로 추정해서 합쳤어요":"이번 업데이트부터 걷힌 세금이 집계돼요"}</div></div>`;
   $("ntsX").onclick=()=>d.style.display="none";}
 function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,name:"25% + 복권·로또 각 10조"};if(asset>=1e14)return{fee:Math.round(raw*.25),name:"25%"};if(asset>=1e13)return{fee:Math.round(raw*.2),name:"20%"};if(asset>=1e12)return{fee:Math.round(raw*.15),name:"15%"};return{fee:Math.round(raw*.1),name:"10%"};}
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
   $("shName").innerHTML=esc(n)+badges(ci);$("shPrice").textContent=c.delisted?"거래 정지":formatCoinPrice(p);$("shPrice").className="big "+(c.rate>0?"up":c.rate<0?"down":"");
   $("shRate").innerHTML=c.delisted?'<span class="flat">상장폐지 · '+Math.ceil((RELIST-(M.k-c.delistK))*TICK/60000)+'분 뒤 재상장</span>':(c.rate>0?'<span class="up">+'+c.rate+'% ▲</span>':c.rate<0?'<span class="down">'+c.rate+'% ▼</span>':'<span class="flat">0% -</span>')+' <span class="flat" style="font-weight:400">직전 10초</span>';
-  {const d=c.hist.slice(-1080).filter(v=>v>0);$("shRange").innerHTML=d.length?`<span style="font-size:11px">최근 3시간</span><br>고가 <span class="up">${formatCoinPrice(Math.max(...d))}</span><br>저가 <span class="down">${formatCoinPrice(Math.min(...d))}</span>`:"";}
+  {const d=c.hist.slice(-1080).filter(v=>v>0);$("shRange").innerHTML=d.length?`<span style="font-size:10px">최근 3시간</span><br>고가 <span class="up">${formatCoinPrice(Math.max(...d))}</span><br>저가 <span class="down">${formatCoinPrice(Math.min(...d))}</span>`:"";}
   drawChart(c.hist.slice(-chartN-1),chartHover);
   const h=me.coins[n]||{count:0,cost:0};$("shHold").innerHTML=h.count>0?`보유 <b style="color:var(--tx)">${formatCoinReadable(h.count)}</b> · 평단가 ${formatCoinPrice(Math.round(h.cost/h.count))}`:"보유 없음";
   const q=parseInt(($("qty").value||"").replace(/,/g,""),10)||0,g=$("goBtn");let html="",ok=false;
@@ -684,7 +687,7 @@ function renderAdmPlayers(){const box=$("admPlayers");if(!box)return;const all={
   const cnt={};for(const p of Object.values(all)){const n=(p&&p.name)||"이름없음";cnt[n]=(cnt[n]||0)+1;}
   const list=Object.entries(all).filter(([,p])=>p).sort((a,b)=>((a[1].name||"")+"").localeCompare(b[1].name||"")||(b[1].t||0)-(a[1].t||0));
   box.innerHTML=list.length?list.map(([id,p])=>{const n=p.name||"이름없음",dup=cnt[n]>1,on=!!onlineMap[id],armed=delArm[id]&&Date.now()-delArm[id]<4000;
-    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)"><div style="flex:1;min-width:0"><div style="font-weight:700">${on?'🟢 ':''}${esc(n)}${id===myId?' (나)':''}${dup?' <small style="color:#ffb020">중복</small>':''}</div><div style="font-size:11px;color:var(--sub)">Lv.${lvOf(p)} · ${formatMoneyReadable(Math.round(assetOf(p)))} · 마지막 활동 ${agoTxt(p.t)}</div></div>${id===myId?'':`<button class="a ${armed?'r':''}" data-del="${id}" style="padding:6px 10px;font-size:12px">${armed?'정말 삭제':'삭제'}</button>`}</div>`;}).join(""):'<div style="color:var(--sub)">플레이어가 없어요</div>';
+    return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)"><div style="flex:1;min-width:0"><div style="font-weight:700">${on?'🟢 ':''}${esc(n)}${id===myId?' (나)':''}${dup?' <small style="color:#ffb020">중복</small>':''}</div><div style="font-size:10px;color:var(--sub)">Lv.${lvOf(p)} · ${formatMoneyReadable(Math.round(assetOf(p)))} · 마지막 활동 ${agoTxt(p.t)}</div></div>${id===myId?'':`<button class="a ${armed?'r':''}" data-del="${id}" style="padding:6px 10px;font-size:11px">${armed?'정말 삭제':'삭제'}</button>`}</div>`;}).join(""):'<div style="color:var(--sub)">플레이어가 없어요</div>';
   box.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{const id=b.dataset.del;if(!(delArm[id]&&Date.now()-delArm[id]<4000)){delArm[id]=Date.now();renderAdmPlayers();setTimeout(renderAdmPlayers,4100);return;}
     delete delArm[id];const nm=(players[id]&&players[id].name)||"";try{await fdb.ref("market/kicked/"+id).set(Date.now());await fdb.ref("players/"+id).remove();await fdb.ref("online/"+id).remove();toast(`${nm}님 삭제 완료`);}catch(e){toast("삭제 실패");}});}
 
@@ -712,20 +715,20 @@ let accDone=false;function accLogIn(){if(accDone||!fdb||!myId)return;accDone=tru
 let accLog=[],accOn=false;function accListen(){if(accOn||!fdb||!isOwner)return;accOn=true;fdb.ref("market/accLog").limitToLast(300).on("value",s=>{const v=s.val()||{};accLog=Object.values(v).filter(x=>x&&x.t).sort((a,b)=>b.t-a.t);renderAccLog();});}
 function renderAccLog(){accListen();const B=$("accLogBox");if(!B)return;const f=($("accQ")&&$("accQ").value||"").trim();const L=accLog.filter(x=>!f||String(x.name||"").includes(f)).slice(0,150);
   const day=t=>{const d=new Date(t);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;};
-  B.innerHTML=L.length?L.map(x=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="width:44px;font-weight:900;color:${x.k==="in"?"var(--ok)":"var(--up)"}">${x.k==="in"?"🟢 입장":"🔴 퇴장"}</span><b style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.name||"?")}</b><span style="color:var(--sub);font-size:12px">${day(x.t)}</span></div>`).join(""):'<div style="color:var(--sub);font-size:13px;padding:8px 0">아직 기록이 없어요</div>';}
+  B.innerHTML=L.length?L.map(x=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 2px;border-bottom:1px solid var(--line);font-size:12px"><span style="width:44px;font-weight:900;color:${x.k==="in"?"var(--ok)":"var(--up)"}">${x.k==="in"?"🟢 입장":"🔴 퇴장"}</span><b style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.name||"?")}</b><span style="color:var(--sub);font-size:11px">${day(x.t)}</span></div>`).join(""):'<div style="color:var(--sub);font-size:12px;padding:8px 0">아직 기록이 없어요</div>';}
 function onlinePeople(){const out=[];for(const[id,v]of Object.entries(onlineMap)){if(!v)continue;out.push({id,name:id===myId?myName():(String(v.name||(players[id]&&players[id].name)||"접속자").slice(0,12)),lv:v.lv|0,me:id===myId});}return out.sort((a,b)=>b.me-a.me);}
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-bt]");if(!el)return;const id=el.dataset.bt;if(!id||id===myId)return;e.stopPropagation();e.preventDefault();openPMenu(id,e.clientX,e.clientY);},true);
 function openPMenu(id,cx,cy){closePMenu();const p=players[id]||{},o=onlineMap[id]||{},nm=esc(String(o.name||p.name||"?").slice(0,12));const d=document.createElement("div");d.id="pMenu";
   d.style.cssText=`position:fixed;z-index:60;left:${Math.min(innerWidth-170,Math.max(8,cx-80))}px;top:${Math.min(innerHeight-130,Math.max(8,cy+8))}px;width:160px;background:var(--card);border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.55);padding:8px`;
-  d.innerHTML=`<div style="font-weight:900;font-size:14px;padding:4px 6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm} <small style="color:var(--sub);font-weight:500">Lv.${lvOf(p)}</small></div><button data-pm="info" style="width:100%;text-align:left;padding:9px 10px;border-radius:9px;background:var(--card2);font-weight:700;margin-bottom:6px">👤 정보</button><button data-pm="bt" style="width:100%;text-align:left;padding:9px 10px;border-radius:9px;background:var(--acc);color:#111;font-weight:900">⚔️ 배틀</button>`;
+  d.innerHTML=`<div style="font-weight:900;font-size:13px;padding:4px 6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${nm} <small style="color:var(--sub);font-weight:500">Lv.${lvOf(p)}</small></div><button data-pm="info" style="width:100%;text-align:left;padding:9px 10px;border-radius:9px;background:var(--card2);font-weight:700;margin-bottom:6px">👤 정보</button><button data-pm="bt" style="width:100%;text-align:left;padding:9px 10px;border-radius:9px;background:var(--acc);color:#111;font-weight:900">⚔️ 배틀</button>`;
   document.body.appendChild(d);d.querySelector('[data-pm=info]').onclick=()=>{closePMenu();openPInfo(id);};d.querySelector('[data-pm=bt]').onclick=()=>{closePMenu();openBtWith(id);};
   setTimeout(()=>document.addEventListener("pointerdown",pmOut,true),0);}
 function pmOut(e){const m=$("pMenu");if(m&&!m.contains(e.target))closePMenu();}
 function closePMenu(){const m=$("pMenu");if(m)m.remove();document.removeEventListener("pointerdown",pmOut,true);}
 function openPInfo(id){const p=players[id]||{},o=onlineMap[id]||{},nm=esc(String(o.name||p.name||"?"));const L=Math.min(50,p.rodLv|0);const au=o.au||((p.eq&&p.cos&&p.cos["aura_"+p.eq.aura])?p.eq.aura:""),wg=o.wg||((p.eq&&p.cos&&p.cos["wing_"+p.eq.wing])?p.eq.wing:"");
-  const cn=(k,v)=>{const it=COS[k].list.find(x=>x[0]===v);return it?it[1]:"없음";};const row=(a,b)=>`<div style="display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px"><span style="color:var(--sub)">${a}</span><b>${b}</b></div>`;
+  const cn=(k,v)=>{const it=COS[k].list.find(x=>x[0]===v);return it?it[1]:"없음";};const row=(a,b)=>`<div style="display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--sub)">${a}</span><b>${b}</b></div>`;
   const d=document.createElement("div");d.id="pInfo";d.className="btBg";d.style.cssText="display:flex;z-index:58";
-  d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b style="font-size:17px">👤 ${nm}</b><button id="pInfoX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div><div style="display:flex;justify-content:center;margin:2px 0 8px"><canvas id="pInfoCv" width="150" height="150" style="width:100px;height:100px"></canvas></div>`+
+  d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b style="font-size:15.5px">👤 ${nm}</b><button id="pInfoX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div><div style="display:flex;justify-content:center;margin:2px 0 8px"><canvas id="pInfoCv" width="150" height="150" style="width:100px;height:100px"></canvas></div>`+
     row("🎖️ 칭호",(p.title&&p.ach&&p.ach[p.title])?"「"+esc(titleOf(p.title))+"」":"없음")+row("레벨",`Lv.${lvOf(p)}`)+row("🎣 낚싯대",`기본 낚싯대 +${L}`)+row("📖 도감",`${fishCountOf(p)} / ${FISH.length}종`)+row("낚시 횟수",`${(p.fishN||0).toLocaleString()}회`)+row("✨ 오라",cn("aura",au))+row("🪽 날개",cn("wing",wg))+row("⚔️ 배틀 전적",`${p.bw||0}승 ${p.bl||0}패 ${p.bd||0}무`)+row("상태",onlineMap[id]?(o.fs==="away"?"🟢 접속 중 · 📈 코인":"🟢 접속 중 · 🏞️ 광장"):"⚪ 오프라인")+
     `<div style="display:flex;gap:8px;margin-top:12px"><button class="go" id="pInfoDex" style="flex:1;background:var(--card2)">📖 도감 보기</button>${id!==myId?`<button class="go" id="pInfoBt" style="flex:1;background:var(--acc);color:#111">⚔️ 배틀</button>`:""}</div></div>`;
   document.body.appendChild(d);const close=()=>{clearInterval(tm);d.remove();};$("pInfoX").onclick=close;d.onclick=e=>{if(e.target===d)close();};$("pInfoDex").onclick=()=>{close();openPg("my","dex");fDexOf=id===myId?null:id;renderFishInfo();};if($("pInfoBt"))$("pInfoBt").onclick=()=>{close();openBtWith(id);};
@@ -903,9 +906,9 @@ function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
   drawAura(c,x,y,H.au,t,0);c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,y+2,9,3.5,0,0,7);c.fill();
   drawWing(c,x,y,dir,H.wg,t,bob);drawChar(c,x,y,H.ch,hue,dir,bob,lg);drawAura(c,x,y,H.au,t,1);
   if(rod){c.strokeStyle="#8a5a2b";c.lineWidth=2;c.beginPath();c.moveTo(x+dir*5,y-16);c.lineTo(rod.x0,rod.y0);c.stroke();}
-  c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(name).width+8;
-  c.fillStyle=isMe?"rgba(245,180,0,.9)":"rgba(0,0,0,.55)";c.beginPath();c.roundRect(x-w/2,y-52,w,14,7);c.fill();c.fillStyle=isMe?"#1a1300":"#fff";c.fillText(name,x,y-41.5);if(H.tt){c.font="bold 8.5px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8);}
-  if(state==="bite"){c.font="bold 16px sans-serif";c.fillStyle="#ff4757";c.fillText("!",x+12,y-34);}}
+  c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(name).width+8;
+  c.fillStyle=isMe?"rgba(245,180,0,.9)":"rgba(0,0,0,.55)";c.beginPath();c.roundRect(x-w/2,y-52,w,14,7);c.fill();c.fillStyle=isMe?"#1a1300":"#fff";c.fillText(name,x,y-41.5);if(H.tt){c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8);}
+  if(state==="bite"){c.font="bold 14.5px sans-serif";c.fillStyle="#ff4757";c.fillText("!",x+12,y-34);}}
 function drawLine(c,x0,y0,bx,by,dip,t){c.strokeStyle="rgba(255,255,255,.7)";c.lineWidth=.8;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo((x0+bx)/2,Math.min(y0,by)-14,bx,by);c.stroke();
   const d=dip?3+Math.sin(t/40)*2:Math.sin(t/300)*1.2;c.fillStyle="rgba(255,255,255,.35)";c.beginPath();c.ellipse(bx,by+3,6+(dip?Math.sin(t/60)*2:0),2,0,0,7);c.fill();
   c.fillStyle="#ff4757";c.beginPath();c.arc(bx,by+d,3.2,Math.PI,0);c.fill();c.fillStyle="#fff";c.beginPath();c.arc(bx,by+d,3.2,0,Math.PI);c.fill();}
@@ -918,45 +921,45 @@ function fishDraw(t){const c=fCtx;
   c.strokeStyle="#4f8a3a";c.lineWidth=2;for(let x=6;x<FW;x+=17){if(x>DOCK.x-8&&x<DOCK.x+DOCK.w+8)continue;const s=Math.sin(t/700+x)*2;c.beginPath();c.moveTo(x,RIVER+16);c.lineTo(x+s,RIVER+2);c.stroke();}
   c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
   c.fillStyle="#4a301b";for(const py of[DOCK.y,DOCK.y+40,DOCK.y+80]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}
-  c.font="bold 11px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(255,255,255,.85)";c.fillStyle="rgba(0,0,0,.35)";c.beginPath();c.roundRect(FW/2-48,FH-26,96,20,10);c.fill();c.fillStyle="#fff";c.fillText("🏞️ 주로 광장",FW/2,FH-12);
+  c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(255,255,255,.85)";c.fillStyle="rgba(0,0,0,.35)";c.beginPath();c.roundRect(FW/2-48,FH-26,96,20,10);c.fill();c.fillStyle="#fff";c.fillText("🏞️ 주로 광장",FW/2,FH-12);
   {c.fillStyle="rgba(0,0,0,.12)";c.beginPath();c.roundRect(RZ.x+2,RZ.y+4,RZ.w,RZ.h,14);c.fill();c.save();c.beginPath();c.roundRect(RZ.x,RZ.y,RZ.w,RZ.h,10);c.clip();c.fillStyle="#e8d59a";c.fillRect(RZ.x,RZ.y,RZ.w,RZ.h);
     for(let yy=RZ.y+3;yy<RZ.y+RZ.h;yy+=4){c.fillStyle=(yy-RZ.y)%8<4?"rgba(176,140,62,.22)":"rgba(255,255,255,.18)";c.fillRect(RZ.x,yy,RZ.w,1.5);}
     for(const[o,col]of[[10,"#c0392b"],[15,"#2e7d4f"],[RZ.h-17,"#2e7d4f"],[RZ.h-12,"#c0392b"]]){c.fillStyle=col;c.fillRect(RZ.x,RZ.y+o,RZ.w,3);}
     c.fillStyle="#7a4a1f";c.fillRect(RZ.x,RZ.y,RZ.w,4);c.fillRect(RZ.x,RZ.y+RZ.h-4,RZ.w,4);c.restore();
     c.strokeStyle="rgba(110,74,30,.55)";c.lineWidth=1.5;c.beginPath();c.roundRect(RZ.x,RZ.y,RZ.w,RZ.h,10);c.stroke();
     {const mx=RPS_NPC.x+18,my=RPS_NPC.y+2;c.strokeStyle="#374151";c.lineWidth=1.6;c.beginPath();c.moveTo(mx,my);c.lineTo(mx,my-24);c.moveTo(mx-5,my);c.lineTo(mx+5,my);c.stroke();c.fillStyle="#111827";c.beginPath();c.ellipse(mx,my-27,3,4,0,0,7);c.fill();c.fillStyle="#9ca3af";c.fillRect(mx-2.5,my-29,5,1.2);}
-    const mine=onPad(fp.x,fp.y);for(const[cc,cx]of RPS_PADS){const on=mine===cc,X=cx-PAD_W/2;c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.roundRect(X,PAD_Y+4,PAD_W,PAD_H,10);c.fill();c.fillStyle=on?"#fde68a":({s:"#93c5fd",r:"#fca5a5",p:"#86efac"})[cc];c.beginPath();c.roundRect(X,PAD_Y,PAD_W,PAD_H,10);c.fill();c.strokeStyle="rgba(255,255,255,.8)";c.lineWidth=1.5;c.stroke();c.font="18px sans-serif";c.textAlign="center";c.fillText(BT_EMO[cc],cx,PAD_Y+42);c.font="bold 8px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(0,0,0,.6)";c.fillText(RPS_NAME[cc],cx,PAD_Y+58);}}
+    const mine=onPad(fp.x,fp.y);for(const[cc,cx]of RPS_PADS){const on=mine===cc,X=cx-PAD_W/2;c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.roundRect(X,PAD_Y+4,PAD_W,PAD_H,10);c.fill();c.fillStyle=on?"#fde68a":({s:"#93c5fd",r:"#fca5a5",p:"#86efac"})[cc];c.beginPath();c.roundRect(X,PAD_Y,PAD_W,PAD_H,10);c.fill();c.strokeStyle="rgba(255,255,255,.8)";c.lineWidth=1.5;c.stroke();c.font="16.5px sans-serif";c.textAlign="center";c.fillText(BT_EMO[cc],cx,PAD_Y+42);c.font="bold 7.5px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(0,0,0,.6)";c.fillText(RPS_NAME[cc],cx,PAD_Y+58);}}
   // 사람과 장식은 y순서로
-  const people=[{y:RPS_NPC.y,f:()=>{human(c,RPS_NPC.x,RPS_NPC.y,-1,0,0,{shirt:"#b91c1c",pants:"#111827",hair:"#1f1410",hs:"side"});c.fillStyle="#fde047";c.beginPath();c.moveTo(RPS_NPC.x-4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x-4,RPS_NPC.y-23);c.fill();c.beginPath();c.moveTo(RPS_NPC.x+4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x+4,RPS_NPC.y-23);c.fill();c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(RPS_HOST).width+12;c.fillStyle="rgba(185,28,28,.9)";c.beginPath();c.roundRect(RPS_NPC.x-w/2,RPS_NPC.y-58,w,13,6);c.fill();c.fillStyle="#fff";c.fillText(RPS_HOST,RPS_NPC.x,RPS_NPC.y-48.5);}}];for(const id in fOthers){const o=fOthers[id];people.push({y:o.y,f:()=>{if(o.fs==="away"){c.globalAlpha=.55;drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);c.globalAlpha=1;c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(0,0,0,.5)";c.beginPath();c.roundRect(o.x-24,o.y+4,48,13,6);c.fill();c.fillStyle="#cbd5e1";c.fillText("📈 코인",o.x,o.y+13.5);return;}if(o.fs&&o.fs!=="idle"){const bx=fishBobX(o.x,o.y,o.dir||1),by=fishBobY(o.x,o.y);drawLine(c,o.x+(o.dir||1)*18,o.y-36,bx,by,o.fs==="bite",t);drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,false,{x0:o.x+(o.dir||1)*18,y0:o.y-36},o.fs,false,t);}else drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);}});}
+  const people=[{y:RPS_NPC.y,f:()=>{human(c,RPS_NPC.x,RPS_NPC.y,-1,0,0,{shirt:"#b91c1c",pants:"#111827",hair:"#1f1410",hs:"side"});c.fillStyle="#fde047";c.beginPath();c.moveTo(RPS_NPC.x-4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x-4,RPS_NPC.y-23);c.fill();c.beginPath();c.moveTo(RPS_NPC.x+4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x+4,RPS_NPC.y-23);c.fill();c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(RPS_HOST).width+12;c.fillStyle="rgba(185,28,28,.9)";c.beginPath();c.roundRect(RPS_NPC.x-w/2,RPS_NPC.y-58,w,13,6);c.fill();c.fillStyle="#fff";c.fillText(RPS_HOST,RPS_NPC.x,RPS_NPC.y-48.5);}}];for(const id in fOthers){const o=fOthers[id];people.push({y:o.y,f:()=>{if(o.fs==="away"){c.globalAlpha=.55;drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);c.globalAlpha=1;c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(0,0,0,.5)";c.beginPath();c.roundRect(o.x-24,o.y+4,48,13,6);c.fill();c.fillStyle="#cbd5e1";c.fillText("📈 코인",o.x,o.y+13.5);return;}if(o.fs&&o.fs!=="idle"){const bx=fishBobX(o.x,o.y,o.dir||1),by=fishBobY(o.x,o.y);drawLine(c,o.x+(o.dir||1)*18,o.y-36,bx,by,o.fs==="bite",t);drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,false,{x0:o.x+(o.dir||1)*18,y0:o.y-36},o.fs,false,t);}else drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);}});}
   people.push({y:fp.y,f:()=>{const fishing=fstate!=="idle";const rx=fp.x+fp.dir*18,ry=fp.y-36;if(fishing&&fstate!=="cast")drawLine(c,rx,ry,fBob.x,fBob.y,fstate==="bite",t);
     if(fstate==="cast"){const k=Math.min(1,(t-fT)/500);drawLine(c,rx,ry,rx+(fBob.x-rx)*k,ry+(fBob.y-ry)*k,false,t);}
     drawPerson(c,fp.x,fp.y,myName(),chOf(myId),fp.dir,fp.tx!=null||fKeysOn()||!!fJoyV,fishing?{x0:rx,y0:ry}:null,fstate,true,t);}});
   for(const d of DECOR)people.push({y:d.y,f:()=>{if(d.t==="tree"){c.fillStyle="rgba(0,0,0,.22)";c.beginPath();c.ellipse(d.x,d.y+2,14,5,0,0,7);c.fill();c.fillStyle="#6b4423";c.fillRect(d.x-3,d.y-14,6,16);c.fillStyle=`hsl(${110+d.c*30},45%,${30+d.c*8}%)`;c.beginPath();c.arc(d.x,d.y-26,15,0,7);c.arc(d.x-9,d.y-18,10,0,7);c.arc(d.x+9,d.y-18,10,0,7);c.fill();}
     else if(d.t==="shop"||d.t==="fmk"){const S=d.t==="shop"?SHOP:FMK,fm=d.t==="fmk",X=S.x,Y=S.y,W=S.w,H=S.h;c.fillStyle="rgba(0,0,0,.25)";c.fillRect(X+4,Y+H-4,W,8);c.fillStyle="#8b5a2b";c.fillRect(X+4,Y+14,W-8,H-14);c.fillStyle="#6b4423";c.fillRect(X+8,Y+H-16,W-16,12);
       for(let i=0;i<6;i++){c.fillStyle=i%2?"#f2f2f2":(fm?"#2563eb":"#e63946");c.beginPath();c.moveTo(X+i*W/6,Y+4);c.lineTo(X+(i+1)*W/6,Y+4);c.lineTo(X+(i+1)*W/6,Y+18);c.arc(X+(i+.5)*W/6,Y+18,W/12,0,Math.PI);c.fill();}
-      c.fillStyle="#5c3d22";c.fillRect(X,Y,W,5);c.font="13px sans-serif";c.textAlign="center";c.fillText(fm?"🐟💰🐠":"🐟🦀🦑",X+W/2,Y+H-6);
-      c.fillStyle="rgba(0,0,0,.55)";c.beginPath();c.roundRect(X+W/2-26,Y-16,52,16,8);c.fill();c.fillStyle="#ffcf4d";c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillText(fm?"어시장":"거래소",X+W/2,Y-4.5);}
+      c.fillStyle="#5c3d22";c.fillRect(X,Y,W,5);c.font="12px sans-serif";c.textAlign="center";c.fillText(fm?"🐟💰🐠":"🐟🦀🦑",X+W/2,Y+H-6);
+      c.fillStyle="rgba(0,0,0,.55)";c.beginPath();c.roundRect(X+W/2-26,Y-16,52,16,8);c.fill();c.fillStyle="#ffcf4d";c.font="bold 9px 'Noto Sans KR',sans-serif";c.fillText(fm?"어시장":"거래소",X+W/2,Y-4.5);}
     else if(d.t==="nts"){const X=NTS.x,Y=NTS.y,W=NTS.w,H=NTS.h;c.fillStyle="rgba(0,0,0,.25)";c.fillRect(X+4,Y+H-4,W,8);
       c.fillStyle="#cbd5e1";c.fillRect(X+2,Y+H-6,W-4,6);c.fillStyle="#e2e8f0";c.fillRect(X+5,Y+12,W-10,H-18);c.fillStyle="#f8fafc";c.beginPath();c.moveTo(X,Y+13);c.lineTo(X+W/2,Y);c.lineTo(X+W,Y+13);c.closePath();c.fill();c.strokeStyle="#94a3b8";c.lineWidth=1;c.stroke();
       c.fillStyle="#cbd5e1";for(let k=0;k<5;k++)c.fillRect(X+9+k*12.5,Y+15,4,H-21);c.fillStyle="#475569";c.fillRect(X+W/2-5,Y+H-15,10,9);
       c.fillStyle="#1e3a8a";c.beginPath();c.arc(X+W/2,Y+8,2.6,0,7);c.fill();c.strokeStyle="#64748b";c.lineWidth=1;c.beginPath();c.moveTo(X+W-8,Y+12);c.lineTo(X+W-8,Y-10);c.stroke();c.fillStyle="#ef4444";c.fillRect(X+W-8,Y-10,9,6);c.fillStyle="#fff";c.fillRect(X+W-8,Y-7,9,1.2);
-      c.fillStyle="rgba(0,0,0,.6)";c.beginPath();c.roundRect(X+W/2-26,Y-19,52,16,8);c.fill();c.fillStyle="#93c5fd";c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText("🏛️ 국세청",X+W/2,Y-7.5);}
+      c.fillStyle="rgba(0,0,0,.6)";c.beginPath();c.roundRect(X+W/2-26,Y-19,52,16,8);c.fill();c.fillStyle="#93c5fd";c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText("🏛️ 국세청",X+W/2,Y-7.5);}
     else if(d.t==="bush"){c.fillStyle=`hsl(${100+d.c*30},40%,32%)`;c.beginPath();c.arc(d.x,d.y-5,7,0,7);c.arc(d.x+7,d.y-3,6,0,7);c.arc(d.x-7,d.y-3,6,0,7);c.fill();}
     else{c.fillStyle=["#ffd166","#ef476f","#ffffff","#c77dff"][Math.floor(d.c*4)];c.beginPath();c.arc(d.x,d.y-2,2.2,0,7);c.fill();}}});
   people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
-  {const st=rpsState();c.font="bold 11px 'Noto Sans KR',sans-serif";const tw=c.measureText(st.text).width+14,bx=RPS_NPC.x-tw/2,by=RPS_NPC.y-84;c.fillStyle=st.hot?"#fde047":"rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,tw,20,9);c.fill();c.beginPath();c.moveTo(RPS_NPC.x-4,by+20);c.lineTo(RPS_NPC.x+4,by+20);c.lineTo(RPS_NPC.x,by+26);c.fill();c.fillStyle="#111";c.textAlign="center";c.fillText(st.text,RPS_NPC.x,by+14);}
-  const skL=(x,y,n)=>{if(!(n>0))return;c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
-  skL(fp.x,fp.y,me&&me.rps);for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk);}
+  {const st=rpsState();c.font="bold 10px 'Noto Sans KR',sans-serif";const tw=c.measureText(st.text).width+14,bx=RPS_NPC.x-tw/2,by=RPS_NPC.y-84;c.fillStyle=st.hot?"#fde047":"rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,tw,20,9);c.fill();c.beginPath();c.moveTo(RPS_NPC.x-4,by+20);c.lineTo(RPS_NPC.x+4,by+20);c.lineTo(RPS_NPC.x,by+26);c.fill();c.fillStyle="#111";c.textAlign="center";c.fillText(st.text,RPS_NPC.x,by+14);}
+  const skL=(x,y,n,tt)=>{if(!(n>0))return;if(tt)y-=12;c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
+  skL(fp.x,fp.y,me&&me.rps,myTitle());for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt);}
   const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p)drawBubble(c,p.x,p.y,b.text);}
-  for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 11px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
+  for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);
-  if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🏪 버튼으로 거래소 열기":"스페이스: 거래소 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 11px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
-  if(fstate==="bite"&&!TOUCH){c.font="bold 13px 'Noto Sans KR',sans-serif";c.fillStyle="#ff4757";c.textAlign="center";c.fillText("스페이스!",fp.x,fp.y+18);}}
+  if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🏪 버튼으로 거래소 열기":"스페이스: 거래소 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
+  if(fstate==="bite"&&!TOUCH){c.font="bold 12px 'Noto Sans KR',sans-serif";c.fillStyle="#ff4757";c.textAlign="center";c.fillText("스페이스!",fp.x,fp.y+18);}}
 const TOUCH=matchMedia("(hover:none),(pointer:coarse)").matches;
 const fishBobY=(x,y)=>inDock(x,y)?Math.max(14,y-10):Math.max(14,RIVER-48);
 const fishBobX=(x,y,dir)=>inDock(x,y)?(x<DOCK.x+DOCK.w/2?DOCK.x-34:DOCK.x+DOCK.w+34):x+dir*4;
 let fBubbles={};function fishBubble(id,text){if(!id)return;fBubbles[id]={text:String(text).slice(0,60),t:Date.now()};}
-function drawBubble(c,x,y,text){c.font="9.5px 'Noto Sans KR',sans-serif";const words=[...text],lines=[];let cur="";for(const ch of words){if(c.measureText(cur+ch).width>110){lines.push(cur);cur=ch;}else cur+=ch;}if(cur)lines.push(cur);const ls=lines.slice(0,3),w=Math.max(...ls.map(l=>c.measureText(l).width))+10,h=ls.length*12+6,bx=Math.max(4,Math.min(FW-w-4,x-w/2)),by=y-58-h;
+function drawBubble(c,x,y,text){c.font="8.5px 'Noto Sans KR',sans-serif";const words=[...text],lines=[];let cur="";for(const ch of words){if(c.measureText(cur+ch).width>110){lines.push(cur);cur=ch;}else cur+=ch;}if(cur)lines.push(cur);const ls=lines.slice(0,3),w=Math.max(...ls.map(l=>c.measureText(l).width))+10,h=ls.length*12+6,bx=Math.max(4,Math.min(FW-w-4,x-w/2)),by=y-58-h;
   c.fillStyle="rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,w,h,8);c.fill();c.beginPath();c.moveTo(x-5,by+h);c.lineTo(x+5,by+h);c.lineTo(x,by+h+6);c.fill();c.fillStyle="#111";c.textAlign="left";ls.forEach((l,i)=>c.fillText(l,bx+5,by+12.5+i*12));c.textAlign="center";}
 const fKeysOn=()=>fKeys.ArrowUp||fKeys.ArrowDown||fKeys.ArrowLeft||fKeys.ArrowRight||fKeys.w||fKeys.a||fKeys.s||fKeys.d;
 function fishStep(dt,t){
@@ -1001,7 +1004,7 @@ function landFish(t){const i=rollFish(),[,base,name]=FISH[i];const tax=base>0?Ma
   saveMe();renderHeader();
   fFloat.push({x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":""),t,c:base>=10000000?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
   fishFeed(myName(),name,base,i);if(fdb&&myId)fdb.ref("online/"+myId+"/fc").set({n:name,v:base,i,t:Date.now()}).catch(()=>{});
-  const r=$("fishRes");r.innerHTML=`<div style="font-size:12px;color:var(--sub)">도감 ${dexNo(i)}번${first?' · <b style="color:#ffcf4d">✨ 신규 도감 등록!</b>':''}</div><div style="font-size:20px;font-weight:900;margin:4px 0">${esc(name)}</div><div class="${base<0?'down':'up'}" style="font-weight:700">${base<0?formatMoneyReadable(base)+" 손해... 💸":"시세 "+formatMoneyReadable(base)}</div>${base>0?`<div style="font-size:11px;color:var(--sub)">🐟 어시장에 팔면 ${formatMoneyReadable(got)} (수수료 10%)</div>`:''}${bonus?`<div style="color:#ffcf4d;font-weight:700;margin-top:4px;white-space:pre-line">${bonus.trim()}</div>`:''}`;
+  const r=$("fishRes");r.innerHTML=`<div style="font-size:11px;color:var(--sub)">도감 ${dexNo(i)}번${first?' · <b style="color:#ffcf4d">✨ 신규 도감 등록!</b>':''}</div><div style="font-size:18.5px;font-weight:900;margin:4px 0">${esc(name)}</div><div class="${base<0?'down':'up'}" style="font-weight:700">${base<0?formatMoneyReadable(base)+" 손해... 💸":"시세 "+formatMoneyReadable(base)}</div>${base>0?`<div style="font-size:10px;color:var(--sub)">🐟 어시장에 팔면 ${formatMoneyReadable(got)} (수수료 10%)</div>`:''}${bonus?`<div style="color:#ffcf4d;font-weight:700;margin-top:4px;white-space:pre-line">${bonus.trim()}</div>`:''}`;
   r.classList.add("on");clearTimeout(landFish.t);landFish.t=setTimeout(()=>r.classList.remove("on"),2600);
   if(base>=10000000){broadcast(`🏆 [대어 포착!] ${myName()}님이 낚시로 ${name}을(를) 잡았어요! (+${formatMoneyReadable(base)})`);if(fdb)fdb.ref("market/fishHof").push({name:myName(),fish:name,v:base,t:Date.now()}).catch(()=>{});}
   renderFishInfo();}
@@ -1009,14 +1012,14 @@ let fHof=[];
 let fDexOf=null;
 function renderFishInfo(){const box=$("fishInfo");if(!box||!($("pgMod").style.display==="flex"&&pgCur==="my"&&pgSub==="dex"))return;const subj=(fDexOf&&players[fDexOf])?players[fDexOf]:me;const other=subj!==me;const mine=subj&&subj.fish||{};
   document.querySelectorAll("#fishTabs button").forEach(b=>b.classList.toggle("on",b.dataset.f===fTab));$("fInfoT").textContent=fTab==="hof"?"🐋 명예의 전당":fTab==="rank"?"🎣 낚시 순위":"📖 도감";
-  if(fTab==="dex"){const n=fishCountOf(subj);let h=(other?`<button id="fDexBack" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:12px;font-weight:700;margin-bottom:8px">← 내 도감으로</button>`:"")+`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:16px">📖 ${other?esc(subj.name||"?")+"님의 도감":"내 도감"} ${n} / ${FISH.length}종</b><div style="font-size:12px;color:var(--sub);margin-top:2px">낚시 ${(subj.fishN||0).toLocaleString()}회 · 총 수익 ${formatMoneyReadable(subj.fishEarn||0)}</div></div><div style="font-size:12px;color:var(--sub);text-align:right">다 모으면<br><b style="color:#ffcf4d">1억 원</b></div></div><div style="height:6px;background:var(--line);border-radius:3px;margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:${n/FISH.length*100}%;background:var(--acc)"></i></div></div><div class="card" style="padding:6px 10px">`;
-    DEX_ORDER.forEach(i=>{const[,v,nm]=FISH[i];const c=mine[fKey(i)]||0,seen=typeof mine[fKey(i)]==="number";h+=`<div class="rk" data-fi="${i}" style="padding:8px 2px;cursor:pointer"><div class="n" style="width:30px;font-size:12px">${dexNo(i)}</div><div class="w">${seen?esc(nm):'<span style="color:var(--sub)">???</span>'}</div><div class="v" style="font-size:12px">${seen?`<span class="${v<0?'down':'up'}">${formatMoneyReadable(v)}</span> · ${c}개`:''}</div></div>`;});
+  if(fTab==="dex"){const n=fishCountOf(subj);let h=(other?`<button id="fDexBack" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:11px;font-weight:700;margin-bottom:8px">← 내 도감으로</button>`:"")+`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><div><b style="font-size:14.5px">📖 ${other?esc(subj.name||"?")+"님의 도감":"내 도감"} ${n} / ${FISH.length}종</b><div style="font-size:11px;color:var(--sub);margin-top:2px">낚시 ${(subj.fishN||0).toLocaleString()}회 · 총 수익 ${formatMoneyReadable(subj.fishEarn||0)}</div></div><div style="font-size:11px;color:var(--sub);text-align:right">다 모으면<br><b style="color:#ffcf4d">1억 원</b></div></div><div style="height:6px;background:var(--line);border-radius:3px;margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:${n/FISH.length*100}%;background:var(--acc)"></i></div></div><div class="card" style="padding:6px 10px">`;
+    DEX_ORDER.forEach(i=>{const[,v,nm]=FISH[i];const c=mine[fKey(i)]||0,seen=typeof mine[fKey(i)]==="number";h+=`<div class="rk" data-fi="${i}" style="padding:8px 2px;cursor:pointer"><div class="n" style="width:30px;font-size:11px">${dexNo(i)}</div><div class="w">${seen?esc(nm):'<span style="color:var(--sub)">???</span>'}</div><div class="v" style="font-size:11px">${seen?`<span class="${v<0?'down':'up'}">${formatMoneyReadable(v)}</span> · ${c}개`:''}</div></div>`;});
     box.innerHTML=h+"</div>";if($("fDexBack"))$("fDexBack").onclick=()=>{fDexOf=null;renderFishInfo();$("pgBody").scrollTop=0;};box.querySelectorAll("[data-fi]").forEach(e=>e.onclick=()=>{const i=+e.dataset.fi;if(!(mine[fKey(i)]>0))return toast("아직 못 잡은 물고기예요");const own=[];const all={...players};all[myId]=me;for(const id in all){const c=((all[id]||{}).fish||{})[fKey(i)];if(c>0)own.push(`${(all[id].name||"?")} ${c}개`);}toast(`🔍 ${FISH[i][2]} 소유자\n${own.join(", ")}`);});}
   else if(fTab==="rank"){const all={...players};if(me&&myId)all[myId]=me;const L=Object.entries(all).filter(([,p])=>p&&(p.fishN||0)>0).map(([id,p])=>({id,name:p.name||"?",dex:fishCountOf(p),n:p.fishN||0,e:p.fishEarn||0}));
-    const sec=(title,key,fmt)=>{const s=L.slice().sort((a,b)=>b[key]-a[key]).slice(0,10);return `<div class="card"><h3>${title}</h3>${s.length?s.map((x,i)=>`<div class="rk${x.id===myId?' me':''}" data-pid="${x.id}" style="cursor:pointer"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i+1}</div><div class="w">${esc(x.name)}</div><div class="v">${fmt(x)}</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">아직 낚시한 사람이 없어요</div>'}</div>`;};
-    box.innerHTML=sec("📖 도감 수집 순위","dex",x=>`${x.dex}종 <small style="color:var(--sub)">(${(x.dex/FISH.length*100).toFixed(1)}%)</small>`)+sec("📊 낚시 횟수 순위","n",x=>x.n.toLocaleString()+"회")+sec("💰 낚시 수익 순위","e",x=>formatMoneyReadable(x.e))+'<div style="font-size:11px;color:var(--sub);text-align:center">이름을 누르면 그 사람 도감을 볼 수 있어요</div>';box.querySelectorAll("[data-pid]").forEach(e=>e.onclick=()=>{const id=e.dataset.pid;fDexOf=id===myId?null:id;fTab="dex";renderFishInfo();$("fishInfo").scrollTop=0;});}
+    const sec=(title,key,fmt)=>{const s=L.slice().sort((a,b)=>b[key]-a[key]).slice(0,10);return `<div class="card"><h3>${title}</h3>${s.length?s.map((x,i)=>`<div class="rk${x.id===myId?' me':''}" data-pid="${x.id}" style="cursor:pointer"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i+1}</div><div class="w">${esc(x.name)}</div><div class="v">${fmt(x)}</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">아직 낚시한 사람이 없어요</div>'}</div>`;};
+    box.innerHTML=sec("📖 도감 수집 순위","dex",x=>`${x.dex}종 <small style="color:var(--sub)">(${(x.dex/FISH.length*100).toFixed(1)}%)</small>`)+sec("📊 낚시 횟수 순위","n",x=>x.n.toLocaleString()+"회")+sec("💰 낚시 수익 순위","e",x=>formatMoneyReadable(x.e))+'<div style="font-size:10px;color:var(--sub);text-align:center">이름을 누르면 그 사람 도감을 볼 수 있어요</div>';box.querySelectorAll("[data-pid]").forEach(e=>e.onclick=()=>{const id=e.dataset.pid;fDexOf=id===myId?null:id;fTab="dex";renderFishInfo();$("fishInfo").scrollTop=0;});}
   else{box.innerHTML=hofHtml();}}
-function hofHtml(){return `<div class="card"><h3>🏆 대어 명예의 전당 (1,000만 원 이상)</h3>${fHof.length?fHof.slice().reverse().map(h=>{const d=new Date(h.t);return `<div class="rk"><div class="w"><b>${esc(h.fish)}</b><small>${esc(h.name)} · ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}</small></div><div class="v up">${formatMoneyReadable(h.v)}</div></div>`;}).join(""):'<div style="color:var(--sub);font-size:13px">아직 대어를 낚은 사람이 없어요</div>'}</div>`;}
+function hofHtml(){return `<div class="card"><h3>🏆 대어 명예의 전당 (1,000만 원 이상)</h3>${fHof.length?fHof.slice().reverse().map(h=>{const d=new Date(h.t);return `<div class="rk"><div class="w"><b>${esc(h.fish)}</b><small>${esc(h.name)} · ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}</small></div><div class="v up">${formatMoneyReadable(h.v)}</div></div>`;}).join(""):'<div style="color:var(--sub);font-size:12px">아직 대어를 낚은 사람이 없어요</div>'}</div>`;}
 function fishInit(){if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCv=$("fishCv");fCtx=fCv.getContext("2d");fishResize();window.addEventListener("resize",fishResize);
   const pt=e=>{const r=fCv.getBoundingClientRect();return{x:(e.clientX-r.left)/fScale,y:(e.clientY-r.top)/fScale};};let down=false;
   const go=e=>{if(fstate!=="idle")return;let{x,y}=pt(e);if(!walkable(x,y)&&!inDock(x,y))y=Math.max(y,RIVER+16);fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.min(FH-12,y);fp.via=null;if(inDock(fp.tx,fp.ty)&&!inDock(fp.x,fp.y))fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+18};else if(!inDock(fp.tx,fp.ty)&&inDock(fp.x,fp.y)&&fp.ty>RIVER+18)fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+20};};
@@ -1038,8 +1041,8 @@ const fmkUnit=i=>FISH[i][1]-Math.round(FISH[i][1]*.1);
 function renderFmk(){if($("fSell").style.display!=="flex")return;const m=(me&&me.fish)||{};const L=DEX_ORDER.map(i=>[i,m[fKey(i)]||0]).filter(x=>x[1]>0);const pos=L.filter(([i])=>FISH[i][1]>0).map(([i,c])=>[i,c-1,c]),neg=L.filter(([i])=>FISH[i][1]<0);const posS=pos.filter(x=>x[1]>0);
   const tot=posS.reduce((s,[i,c])=>s+fmkUnit(i)*c,0);
   $("fSellTop").innerHTML=posS.length?`<button id="fSellAll" style="width:100%;background:var(--up);color:#fff;font-weight:900;border-radius:12px;padding:11px 0">전부 팔기 · +${formatMoneyReadable(tot)}</button>`:"";
-  $("fSellBody").innerHTML=L.length?`<div style="font-size:12px;color:var(--sub);margin-bottom:6px">📖 도감 유지를 위해 종류마다 1마리는 남겨둬요</div>`+pos.map(([i,c,all])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${all}개 (팔 수 있는 건 ${c}개) · 1개 ${formatMoneyReadable(fmkUnit(i))}</small></div>${c>0?`<input type="number" inputmode="numeric" min="1" max="${c}" value="${c}" data-qi="${i}" style="width:58px;text-align:center"><button class="buy" data-sq="${i}">팔기</button>`:`<span style="font-size:12px;color:var(--sub)">도감용 1마리</span>`}</div>`).join("")+
-    (neg.length?`<div style="font-size:12px;color:var(--sub);margin:12px 0 4px">🗑️ 쓰레기 (팔 수 없어요 · 버리기만 가능)</div>`+neg.map(([i,c])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${c}개</small></div><button data-dump="${i}">버리기</button></div>`).join(""):"")
+  $("fSellBody").innerHTML=L.length?`<div style="font-size:11px;color:var(--sub);margin-bottom:6px">📖 도감 유지를 위해 종류마다 1마리는 남겨둬요</div>`+pos.map(([i,c,all])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${all}개 (팔 수 있는 건 ${c}개) · 1개 ${formatMoneyReadable(fmkUnit(i))}</small></div>${c>0?`<input type="number" inputmode="numeric" min="1" max="${c}" value="${c}" data-qi="${i}" style="width:58px;text-align:center"><button class="buy" data-sq="${i}">팔기</button>`:`<span style="font-size:11px;color:var(--sub)">도감용 1마리</span>`}</div>`).join("")+
+    (neg.length?`<div style="font-size:11px;color:var(--sub);margin:12px 0 4px">🗑️ 쓰레기 (팔 수 없어요 · 버리기만 가능)</div>`+neg.map(([i,c])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${c}개</small></div><button data-dump="${i}">버리기</button></div>`).join(""):"")
     :'<div style="color:var(--sub);padding:30px 0;text-align:center">팔 물고기가 없어요. 낚시부터 해 보세요!</div>';
   const B=$("fSellBody");B.querySelectorAll("[data-sq]").forEach(b=>{const i=+b.dataset.sq,inp=B.querySelector(`[data-qi="${i}"]`);b.onclick=()=>{const q=parseInt(inp.value,10);if(!(q>0))return toast("⚠️ 개수를 입력해 주세요");fmkSell(i,q);};inp.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")b.click();});});
   B.querySelectorAll("[data-dump]").forEach(b=>b.onclick=()=>{const k=fKey(+b.dataset.dump);me.fish[k]=0;saveMe();renderFmk();renderFishInfo();toast("🗑️ 버렸어요");});
@@ -1068,15 +1071,15 @@ function renderMarketUI(){if($("fMk").style.display!=="flex")return;document.que
   if(fMkTab==="list"){const L=Object.entries(fMarket).filter(([,v])=>v&&FISH[v.fi]&&(v.want==null||FISH[v.want])).sort((a,b)=>b[1].t-a[1].t);
     B.innerHTML=L.length?L.map(([id,v])=>{const mine=v.seller===myId,tr=v.want!=null;const have=tr&&(m[fKey(v.want)]||0)>0;
       return `<div class="mki"><div class="w"><b>${esc(FISH[v.fi][2])}</b><small>${tr?"🔄 교환":"💰 판매"} · 도감 ${dexNo(v.fi)}번 · ${esc(v.sellerName||"?")}${mine?" (나)":""}</small></div>`+
-        (tr?`<div style="text-align:right;font-size:12px;line-height:1.3"><span style="color:var(--sub)">원하는 것</span><br><b style="color:#7dd3fc">${esc(FISH[v.want][2])}</b>${!mine?`<br><small style="color:${have?'var(--ok)':'var(--sub)'}">${have?'보유 중':'없음'}</small>`:''}</div>`:`<b class="up" style="font-size:14px">${formatMoneyReadable(v.price)}</b>`)+
+        (tr?`<div style="text-align:right;font-size:11px;line-height:1.3"><span style="color:var(--sub)">원하는 것</span><br><b style="color:#7dd3fc">${esc(FISH[v.want][2])}</b>${!mine?`<br><small style="color:${have?'var(--ok)':'var(--sub)'}">${have?'보유 중':'없음'}</small>`:''}</div>`:`<b class="up" style="font-size:13px">${formatMoneyReadable(v.price)}</b>`)+
         (mine?`<button data-cancel="${id}">회수</button>`:(tr?`<button class="buy" data-trade="${id}" ${have?'':'style="opacity:.45"'}>교환</button>`:`<button class="buy" data-buy="${id}">구매</button>`))+`</div>`;}).join(""):'<div style="color:var(--sub);padding:30px 0;text-align:center">아직 올라온 물건이 없어요<br>"올리기"에서 먼저 올려 보세요!</div>';
     B.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>buyFish(b.dataset.buy));B.querySelectorAll("[data-trade]").forEach(b=>b.onclick=()=>tradeFish(b.dataset.trade));B.querySelectorAll("[data-cancel]").forEach(b=>b.onclick=()=>cancelFish(b.dataset.cancel));}
   else{const q=(fSellQ||"").trim().toLowerCase();const all=DEX_ORDER.map(i=>[i,m[fKey(i)]||0]).filter(x=>x[1]>0);const L=all.filter(([i])=>!q||FISH[i][2].toLowerCase().includes(q)||String(i+1)===q);
     if(fSellSel!=null&&!(m[fKey(fSellSel)]>0))fSellSel=null;
     const form=i=>{const opts=DEX_ORDER.map(k=>k===i?"":`<option value="${k}">${dexNo(k)}. ${esc(FISH[k][2])}</option>`).join("");return `<div class="sellForm"><div class="tabs2" style="margin:0 0 8px"><button data-smode="sell" class="${fSellMode==="sell"?"on":""}">💰 판매</button><button data-smode="swap" class="${fSellMode==="swap"?"on":""}">🔄 교환</button></div>`+
       (fSellMode==="sell"?`<div style="display:flex;gap:6px"><input id="sfPrice" inputmode="numeric" placeholder="판매가(원) · 시세 ${formatMoneyReadable(FISH[i][1])}" style="flex:1;width:auto"><button class="buy" id="sfGo">등록</button></div>`
-      :`<div style="display:flex;gap:6px"><select id="sfWant" style="flex:1;padding:8px 9px;font-size:13px"><option value="">원하는 물건 고르기</option>${opts}</select><button class="buy" id="sfGo">등록</button></div>`)+`</div>`;};
-    B.innerHTML=`<input id="sfQ" placeholder="🔍 내 물건 검색 (이름 또는 도감번호)" value="${esc(fSellQ||"")}" style="margin:2px 0 8px">`+(all.length?(L.length?L.map(([i,c])=>`<div class="mki sRow${fSellSel===i?' sel':''}" data-si="${i}" style="cursor:pointer"><div class="w"><b>${esc(FISH[i][2])}</b><small>도감 ${dexNo(i)}번 · 시세 ${formatMoneyReadable(FISH[i][1])}</small></div><span style="color:var(--sub);font-size:12px">${c}개</span><button>${fSellSel===i?"닫기":"올리기"}</button></div>${fSellSel===i?form(i):""}`).join(""):'<div style="color:var(--sub);padding:20px 0;text-align:center">검색 결과가 없어요</div>'):'<div style="color:var(--sub);padding:30px 0;text-align:center">올릴 물건이 없어요. 낚시부터 해 보세요!</div>');
+      :`<div style="display:flex;gap:6px"><select id="sfWant" style="flex:1;padding:8px 9px;font-size:12px"><option value="">원하는 물건 고르기</option>${opts}</select><button class="buy" id="sfGo">등록</button></div>`)+`</div>`;};
+    B.innerHTML=`<input id="sfQ" placeholder="🔍 내 물건 검색 (이름 또는 도감번호)" value="${esc(fSellQ||"")}" style="margin:2px 0 8px">`+(all.length?(L.length?L.map(([i,c])=>`<div class="mki sRow${fSellSel===i?' sel':''}" data-si="${i}" style="cursor:pointer"><div class="w"><b>${esc(FISH[i][2])}</b><small>도감 ${dexNo(i)}번 · 시세 ${formatMoneyReadable(FISH[i][1])}</small></div><span style="color:var(--sub);font-size:11px">${c}개</span><button>${fSellSel===i?"닫기":"올리기"}</button></div>${fSellSel===i?form(i):""}`).join(""):'<div style="color:var(--sub);padding:20px 0;text-align:center">검색 결과가 없어요</div>'):'<div style="color:var(--sub);padding:30px 0;text-align:center">올릴 물건이 없어요. 낚시부터 해 보세요!</div>');
     const qi=$("sfQ");qi.oninput=()=>{fSellQ=qi.value;const p=qi.selectionStart;renderMarketUI();const n=$("sfQ");n.focus();try{n.setSelectionRange(p,p);}catch(e){}};qi.addEventListener("keydown",e=>e.stopPropagation());
     B.querySelectorAll(".sRow").forEach(r=>r.onclick=()=>{const i=+r.dataset.si;fSellSel=fSellSel===i?null:i;renderMarketUI();if(fSellSel!=null&&fSellMode==="sell"){const p=$("sfPrice");if(p)p.focus();}});
     B.querySelectorAll("[data-smode]").forEach(b=>b.onclick=e=>{e.stopPropagation();fSellMode=b.dataset.smode;renderMarketUI();});
@@ -1103,7 +1106,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-230000";
+const APP_VERSION="20261124-231000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
@@ -1234,7 +1237,7 @@ function btRenderPlay(id){
   if(r){const mp=mine?r.pa:r.pb,op=mine?r.pb:r.pa,win=r.w===myId,draw=r.w==="draw";
     $("btpBig").textContent=draw?"🤝 무승부":win?"🎉 승리!":"😭 패배";$("btpBig").style.color=draw?"var(--tx)":win?"var(--up)":"var(--down)";
     $("btpMsg").innerHTML=draw?"판돈이 돌아와요":win?`<b class="up">+${esc(btStakeTxt(b))}</b> 가져갔어요!`:`<b class="down">-${esc(btStakeTxt(b))}</b>`+(!mp?" · 선택 안 해서 기권패":"");
-    res.innerHTML=`<div style="font-size:44px;margin:6px 0">${mp?BT_EMO[mp]:"❓"} <span style="font-size:16px;color:var(--sub)">vs</span> ${op?BT_EMO[op]:"❓"}</div><div style="font-size:12px;color:var(--sub)">나 · ${esc(opn)}</div>`;ok.style.display="block";}
+    res.innerHTML=`<div style="font-size:40.5px;margin:6px 0">${mp?BT_EMO[mp]:"❓"} <span style="font-size:14.5px;color:var(--sub)">vs</span> ${op?BT_EMO[op]:"❓"}</div><div style="font-size:11px;color:var(--sub)">나 · ${esc(opn)}</div>`;ok.style.display="block";}
   else{ok.style.display="none";res.innerHTML="";$("btpBig").style.color="var(--acc)";
     if(L>0){$("btpBig").textContent=Math.min(5,Math.ceil(L/1000));$("btpMsg").textContent=my?"선택 완료! 바꿀 수도 있어요 (결과는 5초 뒤)":"5초 안에 고르세요! 안 고르면 패배";}
     else{$("btpBig").textContent="🥁";$("btpMsg").textContent="결과 공개!";}}}
@@ -1315,17 +1318,17 @@ function nameTaken(nm,exceptId){nm=nm.trim().toLowerCase();for(const[id,p]of Obj
 const pinOk=v=>/^\d{4}$/.test(v);
 function modal(html){const bg=document.createElement("div");bg.style.cssText="position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:50;display:flex;align-items:center;justify-content:center;padding:20px";bg.innerHTML='<div style="background:var(--card);border-radius:16px;padding:20px;width:100%;max-width:360px">'+html+'</div>';document.body.appendChild(bg);return bg;}
 const PIN_IN=(id,ph)=>`<input id="${id}" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="${ph}" style="margin-top:8px;letter-spacing:6px">`;
-function showAuth(onNew,loginOnly){let mode="new";const bg=modal('<div style="font-size:18px;font-weight:900;margin-bottom:10px">🪙 주로 코인 거래소</div><div class="g" style="grid-template-columns:1fr 1fr;margin-bottom:12px"><button class="a r" id="auNew">처음이에요</button><button class="a" id="auLog">계정 있어요</button></div><div id="auDesc" style="font-size:13px;color:var(--sub);margin-bottom:10px;line-height:1.5"></div><input id="auName" maxlength="10" placeholder="닉네임 (최대 10자)">'+PIN_IN("auPin","비밀번호 숫자 4자리")+'<div id="auErr" style="color:#f04452;font-size:12px;min-height:16px;margin-top:6px"></div><button id="auOk" class="go buy" style="margin-top:6px"></button>');
+function showAuth(onNew,loginOnly){let mode="new";const bg=modal('<div style="font-size:16.5px;font-weight:900;margin-bottom:10px">🪙 주로 코인 거래소</div><div class="g" style="grid-template-columns:1fr 1fr;margin-bottom:12px"><button class="a r" id="auNew">처음이에요</button><button class="a" id="auLog">계정 있어요</button></div><div id="auDesc" style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.5"></div><input id="auName" maxlength="10" placeholder="닉네임 (최대 10자)">'+PIN_IN("auPin","비밀번호 숫자 4자리")+'<div id="auErr" style="color:#f04452;font-size:11px;min-height:16px;margin-top:6px"></div><button id="auOk" class="go buy" style="margin-top:6px"></button>');
   const set=m=>{mode=m;$("auNew").className="a"+(m==="new"?" r":"");$("auLog").className="a"+(m==="log"?" r":"");$("auErr").textContent="";
     $("auDesc").innerHTML=m==="new"?"닉네임과 숫자 4자리 비밀번호를 정해 주세요.<br>다른 폰에서도 이걸로 로그인하면 이어서 할 수 있어요. 현금 1000만 원으로 시작!":"다른 기기에서 쓰던 닉네임과 비밀번호를 입력하세요.";$("auOk").textContent=m==="new"?"시작하기":"로그인";};
-  if(loginOnly){$("auNew").parentNode.style.display="none";const c=document.createElement("button");c.textContent="취소";c.style.cssText="width:100%;margin-top:8px;color:var(--sub);font-size:13px";c.onclick=()=>bg.remove();$("auOk").after(c);}
+  if(loginOnly){$("auNew").parentNode.style.display="none";const c=document.createElement("button");c.textContent="취소";c.style.cssText="width:100%;margin-top:8px;color:var(--sub);font-size:12px";c.onclick=()=>bg.remove();$("auOk").after(c);}
   set(loginOnly?"log":"new");$("auNew").onclick=()=>set("new");$("auLog").onclick=()=>set("log");
   const go=async()=>{const nm=$("auName").value.trim().slice(0,10),pin=$("auPin").value.trim();if(!nm)return $("auErr").textContent="닉네임을 입력하세요";if(!pinOk(pin))return $("auErr").textContent="비밀번호는 숫자 4자리예요";
     if(mode==="new"){if(nameTaken(nm,myId))return $("auErr").textContent="이미 있는 닉네임이에요. 내 계정이면 '계정 있어요'로 로그인하세요";bg.remove();onNew(nm,await sha(myId+":"+pin));}
     else{const low=nm.toLowerCase();let found=null;for(const[id,p]of Object.entries(players)){if(p&&String(p.name||"").trim().toLowerCase()===low&&p.pinH&&p.pinH===await sha(id+":"+pin)){found=id;break;}}
       if(!found)return $("auErr").textContent="닉네임이나 비밀번호가 맞지 않아요";try{localStorage.setItem("jc_id",found);}catch(e){}fdb.ref("online/"+myId).remove().catch(()=>{});if(sessActive)try{sessRef().remove();}catch(e){}location.reload();}};
   $("auOk").onclick=go;["auName","auPin"].forEach(x=>$(x).addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing)go();}));setTimeout(()=>$("auName").focus(),50);}
-function askSetPin(){const bg=modal(`<div style="font-size:17px;font-weight:900;margin-bottom:6px">🔐 비밀번호 만들기</div><div style="font-size:13px;color:var(--sub);margin-bottom:10px;line-height:1.5"><b style="color:#fff">${esc(myName())}</b>님, 숫자 4자리 비밀번호를 정해 주세요.<br>다른 폰에서 닉네임과 이 비밀번호로 로그인하면 지금 계정을 그대로 쓸 수 있어요.</div>`+PIN_IN("spPin","숫자 4자리")+PIN_IN("spPin2","한 번 더")+'<div id="spErr" style="color:#f04452;font-size:12px;min-height:16px;margin-top:6px"></div><button id="spOk" class="go buy" style="margin-top:6px">저장</button>');
+function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:900;margin-bottom:6px">🔐 비밀번호 만들기</div><div style="font-size:12px;color:var(--sub);margin-bottom:10px;line-height:1.5"><b style="color:#fff">${esc(myName())}</b>님, 숫자 4자리 비밀번호를 정해 주세요.<br>다른 폰에서 닉네임과 이 비밀번호로 로그인하면 지금 계정을 그대로 쓸 수 있어요.</div>`+PIN_IN("spPin","숫자 4자리")+PIN_IN("spPin2","한 번 더")+'<div id="spErr" style="color:#f04452;font-size:11px;min-height:16px;margin-top:6px"></div><button id="spOk" class="go buy" style="margin-top:6px">저장</button>');
   $("spOk").onclick=async()=>{const a=$("spPin").value.trim(),b=$("spPin2").value.trim();if(!pinOk(a))return $("spErr").textContent="숫자 4자리로 입력하세요";if(a!==b)return $("spErr").textContent="두 번 입력한 게 달라요";
     me.pinH=await sha(myId+":"+a);saveMe();bg.remove();toast("🔐 비밀번호 저장 완료!\n다른 폰에서도 로그인할 수 있어요");};setTimeout(()=>$("spPin").focus(),50);}
 (function(){try{
