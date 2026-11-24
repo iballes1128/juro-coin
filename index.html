@@ -533,18 +533,18 @@ function setMode(m){mode=m;document.querySelectorAll(".bs button").forEach(b=>b.
 document.querySelectorAll(".bs button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 $("qty").oninput=()=>renderSheet();
 document.querySelectorAll("#ranges button").forEach(b=>b.onclick=()=>{chartN=+b.dataset.n;document.querySelectorAll("#ranges button").forEach(x=>x.classList.toggle("on",x===b));renderSheet();});
-const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",mkt:"🏪 거래소 판매 수수료"};let taxAll={};
+const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",mkt:"🏪 거래소 판매 수수료"};let taxAll={},taxPre={};
 function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=(me.taxPaid||0)+amt;}if(fdb)fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+amt;c[k]=(c[k]||0)+amt;return c;}).catch(()=>{});}
 function openNts(){fKeys={};let d=$("ntsMod");if(!d){d=document.createElement("div");d.id="ntsMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
-    if(fdb)fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});}d.style.display="flex";renderNts();}
-function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(me&&myId)all[myId]=me;const top=Object.entries(all).map(([id,p])=>({id,n:(p&&p.name)||"?",v:(p&&p.taxPaid)||0})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
+    if(fdb){fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/taxPre").on("value",s=>{taxPre=s.val()||{};if(d.style.display==="flex")renderNts();});}}d.style.display="flex";renderNts();}
+function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(me&&myId)all[myId]=me;const top=Object.entries(all).map(([id,p])=>({id,n:(p&&p.name)||"?",v:((p&&p.taxPaid)||0)+(taxPre[id]||0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
   const row=(a,b,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:14px"><span style="color:var(--sub)">${a}</span><b${c?` style="color:${c}"`:""}>${b}</b></div>`;
   d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:17px">🏛️ 국세청</b><button id="ntsX" style="font-size:22px;color:var(--sub);width:36px;height:36px">✕</button></div>
     <div style="text-align:center;margin:8px 0 12px"><div style="font-size:12px;color:var(--sub)">지금까지 걷힌 세금 총합</div><div style="font-size:26px;font-weight:900;color:var(--acc)">${formatMoneyReadable(taxAll.total||0)}</div></div>`+
     Object.keys(TAX_K).map(k=>row(TAX_K[k],formatMoneyReadable(taxAll[k]||0))).join("")+
-    `<div style="margin-top:12px">`+row("🧾 내가 낸 세금",formatMoneyReadable((me&&me.taxPaid)||0),"var(--acc)")+`</div>`+
+    `<div style="margin-top:12px">`+row("🧾 내가 낸 세금",formatMoneyReadable(((me&&me.taxPaid)||0)+(taxPre[myId]||0)),"var(--acc)")+`</div>`+
     `<div style="font-size:13px;font-weight:900;margin:14px 0 4px">🏅 성실 납세자 TOP 5</div>`+(top.length?top.map((x,i)=>row(`${["🥇","🥈","🥉","4","5"][i]} ${esc(x.n)}`,formatMoneyReadable(x.v))).join(""):'<div style="color:var(--sub);font-size:13px">아직 없어요</div>')+
-    `<div style="font-size:11px;color:var(--sub);margin-top:10px;text-align:center">이번 업데이트부터 걷힌 세금이 집계돼요</div></div>`;
+    `<div style="font-size:11px;color:var(--sub);margin-top:10px;text-align:center">${taxAll.backfilled?"이전 세금은 남아 있는 거래 기록으로 추정해서 합쳤어요":"이번 업데이트부터 걷힌 세금이 집계돼요"}</div></div>`;
   $("ntsX").onclick=()=>d.style.display="none";}
 function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,name:"25% + 복권·로또 각 10조"};if(asset>=1e14)return{fee:Math.round(raw*.25),name:"25%"};if(asset>=1e13)return{fee:Math.round(raw*.2),name:"20%"};if(asset>=1e12)return{fee:Math.round(raw*.15),name:"15%"};return{fee:Math.round(raw*.1),name:"10%"};}
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
@@ -787,8 +787,8 @@ const hasSeen=(p,i)=>{const m=(p&&p.fish)||{};return typeof m[fKey(i)]==="number
 
 /* 월드: 360 x 440, 위쪽은 강, 오른쪽에 나무 선착장 */
 const FW=360,FH=440,RIVER=112,DOCK={x:238,y:26,w:50,h:RIVER-26};
-const SHOP={x:16,y:166,w:58,h:34};const nearB=(B,x,y)=>x>B.x-26&&x<B.x+B.w+26&&y>B.y+4&&y<B.y+B.h+34;const nearShop=(x,y)=>nearB(SHOP,x,y);
-const FMK={x:16,y:238,w:58,h:34};const NTS={x:140,y:322,w:70,h:40};
+const SHOP={x:16,y:150,w:58,h:34};const nearB=(B,x,y)=>x>B.x-26&&x<B.x+B.w+26&&y>B.y+4&&y<B.y+B.h+34;const nearShop=(x,y)=>nearB(SHOP,x,y);
+const FMK={x:16,y:214,w:58,h:34};const NTS={x:12,y:282,w:66,h:38};
 const RPS_NPC={x:262,y:198},RPS_PADS=[["s",204],["r",262],["p",320]],PAD_Y=206,PAD_H=78,PAD_W=50,RZ={x:174,y:174,w:180,h:126};
 const onPad=(x,y)=>{if(y<PAD_Y||y>PAD_Y+PAD_H)return null;for(const[c,cx]of RPS_PADS)if(Math.abs(x-cx)<=PAD_W/2)return c;return null;};
 const nearNpc=(x,y)=>Math.hypot(x-RPS_NPC.x,y-RPS_NPC.y)<30&&!onPad(x,y);const nearFmk=(x,y)=>nearB(FMK,x,y);const nearNts=(x,y)=>nearB(NTS,x,y);
@@ -1073,7 +1073,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-221000";
+const APP_VERSION="20261124-222000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
