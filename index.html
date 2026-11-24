@@ -866,7 +866,7 @@ const LOAD_T=Date.now();{const w=setInterval(()=>{if(!fdb)return;clearInterval(w
 $("admFab").onclick=()=>openPg("admin");setInterval(()=>{const f=$("admFab");if(f)f.style.display=isOwner?"":"none";},800);
 $("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload").set(Date.now()).then(()=>toast("🔄 모두에게 새로고침을 보냈어요")).catch(()=>toast("실패"));};
 /* BT-BEGIN ===================== ⚔️ 배틀 (가위바위보) ===================== */
-const BT_REQ_MS=60000,BT_PICK_MS=5000,BT_GRACE=800,BT_PATH="market/battles";
+const BT_REQ_MS=60000,BT_PICK_MS=5000,BT_GRACE=1000,BT_PATH="market/battles";
 const BT_EMO={r:"✊",s:"✌️",p:"🖐️"},BT_BEATS={r:"s",s:"p",p:"r"};
 let srvOff=0,bFrom={},bTo={},battles={},btClosed={},btDismiss={},btMy={},btResolving={},btIncId=null,btWaitId=null,btPlayId=null,btKind="cash";
 const nowS=()=>Date.now()+srvOff;
@@ -962,7 +962,7 @@ function btRenderPlay(id){
     res.innerHTML=`<div style="font-size:44px;margin:6px 0">${mp?BT_EMO[mp]:"❓"} <span style="font-size:16px;color:var(--sub)">vs</span> ${op?BT_EMO[op]:"❓"}</div><div style="font-size:12px;color:var(--sub)">나 · ${esc(opn)}</div>`;ok.style.display="block";}
   else{ok.style.display="none";res.innerHTML="";$("btpBig").style.color="var(--acc)";
     if(L>0){$("btpBig").textContent=Math.min(5,Math.ceil(L/1000));$("btpMsg").textContent=my?"선택 완료! 바꿀 수도 있어요 (결과는 5초 뒤)":"5초 안에 고르세요! 안 고르면 패배";}
-    else{$("btpBig").textContent="⏳";$("btpMsg").textContent="결과 집계 중…";}}}
+    else{$("btpBig").textContent="🥁";$("btpMsg").textContent="결과 공개!";}}}
 function btRender(){
   if(!me||!me._loaded||!fdb)return;const now=nowS();let playId=null,inc=null,wait=null;
   for(const id in battles){const b=battles[id];if(!b)continue;
