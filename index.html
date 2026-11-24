@@ -322,7 +322,7 @@ nav button.on{color:var(--tx);font-weight:700}
 const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",1000000,333000,3000000,"#d4af37"],["이더리움",300000,100000,900000,"#627eea"],["페페",100000,33000,300000,"#3d9a3d"],
   ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
 const NEWCOINS=["테더골드","플라즈마","페페"];
-const K_V2_T=Date.parse("2026-11-24T12:25:00Z");const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
+const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z");const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
 const DEFAULT_EPOCH=1795440000000;
 const MIG_T=1795503651243,MIG_F={"시바이누":10/3,"리플":10};/* 시바이누 300→1000, 리플 30→300 개편: 이전에 내린 가격지정 이벤트는 같은 비율로 환산 */
 
@@ -356,18 +356,18 @@ function stepTo(K){const m=M,E=EVENTS;
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
-        const v2=k>=K_V2;if(v2){/* 큰 흐름: 30분~3시간 동안 오름/유지/내림 국면이 이어짐 */if((c.adk|0)<=0){const t=r();c.ad=t<.4?.00015*(.5+r()):(t<.8?-.00015*(.5+r()):0);c.adk=180+Math.floor(r()*900);}c.adk--;c.a+=c.ad;if(c.a>.8)c.a-=.002;if(c.a<-.9&&!(c.doom>0))c.a+=.002;}
+        const v2=k>=K_V2,v3=k>=K_V3;if(v3&&!c.v3){c.v3=1;c.adk=0;}if(v2){/* v2: 30분~3시간 국면 / v3: 4~16시간 국면, 대부분 횡보, 가끔 천천히 오르거나 내림 */if((c.adk|0)<=0){const t=r();if(v3){c.ad=t<.6?0:(t<.8?.00006*(.5+r()):-.00006*(.5+r()));c.adk=1440+Math.floor(r()*4320);}else{c.ad=t<.4?.00015*(.5+r()):(t<.8?-.00015*(.5+r()):0);c.adk=180+Math.floor(r()*900);}}c.adk--;c.a+=c.ad;if(c.a>.8)c.a-=.002;if(c.a<-.9&&!(c.doom>0))c.a+=.002;}
         if(c.a<-1.204&&!(c.doom>0))c.a+=.002;if(c.a>(v2?1:.642))c.a-=.002;
         let pct;
         if(c.wave>0){c.wave--;pct=c.wdir*(.012+r()*.012);}
         else if(r()<.0004){c.wave=6+Math.floor(r()*14);c.wdir=r()<.5?1:-1;if(c.price>base*2)c.wdir=-1;pct=0;}
         else{if(c.trendCount<=0){const t=r();c.trend=t<.45?1:(t<.9?-1:0);c.trendCount=6+Math.floor(r()*25);c.s=.002*(.3+r()*1.2);}
           c.trendCount--;const dev=Math.log(c.price/base)-c.a;
-          pct=c.trend*c.s+(r()+r()+r()-1.5)*.006-(v2?.008:.01)*dev;}
+          pct=c.trend*c.s+(r()+r()+r()-1.5)*.006-(v3?.01:v2?.008:.01)*dev;}
         applyPct(c,ci,pct);}
       if(c.price<=mn*1.05){c.delisted=true;c.delistK=k;c.rate=0;c.dl.push({k,price:c.price});}
       c.hist.push(c.delisted?0:c.price);if(c.hist.length>8700)c.hist.shift();}}}
-const K_V2=Math.floor((K_V2_T-EPOCH)/TICK);
+const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK);
 const nowK=()=>Math.max(0,Math.floor((Date.now()-EPOCH)/TICK));
 function rebuild(){M=newMarket();stepTo(nowK());}
 const priceOf=ci=>M.coins[ci].delisted?0:M.coins[ci].price;
@@ -456,7 +456,7 @@ $("s-enh").innerHTML=`<div class="card" style="text-align:center;padding:36px 10
 $("s-dex").appendChild($("fishInfo"));$("fishInfo").style.padding="0";$("fishInfo").style.overflowY="visible";
 $("s-equip").innerHTML=`<div class="card"><h3>🧑 캐릭터</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">가지고 있는 캐릭터 중에서 골라 입어요. 새 캐릭터는 🛍️ 상점에서 살 수 있어요.</div><div id="eqGrid" class="cgrid" style="padding:4px 0 0"></div></div>`+`<div class="card"><h3>🎣 낚싯대</h3><div id="eq_rod"></div></div><div class="card"><h3>🪱 미끼</h3><div id="eq_bait"></div></div>`+`<div class="card"><h3>✨ 오라</h3><div id="eq_aura" class="cgrid" style="padding:4px 0 0"></div></div><div class="card"><h3>🪽 날개</h3><div id="eq_wing" class="cgrid" style="padding:4px 0 0"></div></div>`;
 let gearArm=null;
-function gearRow(k,[id,nm,pr,desc,pack],mode){if(k==="rod"){nm=`기본 낚싯대 +${rodLv()}`;desc=`좋은 물고기 확률 +${(rodBonus(rodLv())*100).toFixed(2)}%p · ⚒️ 강화에서 올려요`;}const own=ownsGear(k,id)&&!pack,on=eqOf(k)===id,arm=gearArm===k+id;
+function gearRow(k,[id,nm,pr,desc,pack],mode){if(k==="rod"){nm=`${rodSkin(rodLv())} +${rodLv()}`;desc=`좋은 물고기 확률 +${(rodBonus(rodLv())*100).toFixed(2)}%p · ⚒️ 강화에서 올려요`;}const own=ownsGear(k,id)&&!pack,on=eqOf(k)===id,arm=gearArm===k+id;
   const btn=mode==="eq"?(on?`<span style="font-size:11px;color:var(--acc);font-weight:900">장착 중</span>`:`<button data-geq="${k}|${id}" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:11px;font-weight:700">장착</button>`)
     :(own?`<span style="font-size:11px;color:var(--sub);font-weight:700">${on?"장착 중":"보유"}</span>`:`<button data-gbuy="${k}|${id}" style="background:${arm?"var(--up)":"var(--acc)"};color:${arm?"#fff":"#111"};border-radius:9px;padding:7px 12px;font-size:11px;font-weight:900">${arm?"한 번 더 눌러 구매":formatMoneyReadable(pr)}</button>`);
   const cnt=k==="bait"&&id!=="basic"?` <span style="color:var(--acc);font-size:11px">남은 ${(me&&me[baitKey(id)])|0}개</span>`:"";return `<div class="rk" style="padding:10px 2px"><div style="font-size:22px;width:34px;text-align:center">${GEAR[k].i}</div><div class="w"><b>${nm}${cnt}</b><small>${desc}</small></div><div class="v">${btn}</div></div>`;}
@@ -488,7 +488,7 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodL
   const mb=enhMat.reduce((a,i)=>a+matBonus(i,L),0),base=enhBase(L),tot=Math.min(100,base+mb),cost=enhCost(L);
   const fishes=FISH.map((f,i)=>[i,(mine[fKey(i)]||0)-1-(used[i]||0)]).filter(([i,c])=>FISH[i][1]>0&&c>0).sort((a,b)=>FISH[b[0]][1]-FISH[a[0]][1]);
   const pct=v=>(v>=10?v.toFixed(0):v.toFixed(1))+"%";
-  S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:37px">🎣</div><b style="font-size:18.5px">기본 낚싯대 <span style="color:var(--acc)">+${L}</span></b><div style="font-size:12px;color:var(--sub);margin-top:4px">좋은 물고기(10만 원↑) 확률 <b style="color:var(--tx)">+${(rodBonus(L)*100).toFixed(2)}%p</b>${L<50?` → <b style="color:var(--ok)">+${(rodBonus(L+1)*100).toFixed(2)}%p</b>`:""}</div>
+  S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:37px">🎣</div><b style="font-size:18.5px">${rodSkin(L)} <span style="color:var(--acc)">+${L}</span></b><canvas id="enhRodCv" width="240" height="60" style="display:block;margin:6px auto 0;width:160px;height:40px"></canvas><div style="font-size:11px;color:var(--sub)">${L<50?`외형은 5강마다 바뀌어요 · 다음 외형: +${Math.floor(L/5)*5+5} 「${rodSkin(Math.floor(L/5)*5+5)}」`:"👑 최고 외형"}</div><div style="font-size:12px;color:var(--sub);margin-top:4px">좋은 물고기(10만 원↑) 확률 <b style="color:var(--tx)">+${(rodBonus(L)*100).toFixed(2)}%p</b>${L<50?` → <b style="color:var(--ok)">+${(rodBonus(L+1)*100).toFixed(2)}%p</b>`:""}</div>
     <div style="height:6px;background:var(--card2);border-radius:3px;margin:10px 0 2px;overflow:hidden"><div style="height:100%;width:${L*2}%;background:var(--acc)"></div></div><div style="font-size:10px;color:var(--sub)">최대 +50</div></div>`+
   (L>=50?`<div class="card" style="text-align:center;font-weight:900">👑 최대 강화 달성!</div>`:
   `<div class="card"><div style="display:flex;justify-content:space-between;font-size:12px"><span>+${L} → +${L+1} 비용</span><b>${formatMoneyReadable(cost)}</b></div>
@@ -500,6 +500,7 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodL
     <button class="go buy" id="enhGo" style="margin-top:12px;width:100%;border-radius:12px;padding:13px 0;font-weight:900;${enhBusy?"opacity:.6":""}">⚒️ 강화하기 · ${formatMoneyReadable(cost)}</button>
     <div style="font-size:10px;color:${L>=ENH_DROP_LV?"var(--up)":"var(--sub)"};margin-top:6px;text-align:center">${L>=ENH_DROP_LV?"⚠️ +25부터는 실패하면 10% 확률로 레벨이 1 떨어져요":"실패하면 돈과 재료만 사라지고 레벨은 그대로예요 (+25부터는 10% 확률로 하락)"}</div></div>
   <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 많이 올라요 · 레벨이 높아지면 싼 물고기는 거의 효과가 없어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">넣을 물고기가 없어요 · 종류마다 1마리는 도감용으로 남겨요</div>'}</div>`);
+  {const cv=$("enhRodCv");if(cv){clearInterval(renderEnh.tm);renderEnh.tm=setInterval(()=>{if(!document.body.contains(cv))return clearInterval(renderEnh.tm);const g=cv.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,240,60);g.scale(1.5,1.5);drawRod(g,14,34,146,8,rodLv(),performance.now());},60);}}
   S.querySelectorAll("[data-mrm]").forEach(b=>b.onclick=()=>{enhMat.splice(+b.dataset.mrm,1);renderEnh();});
   S.querySelectorAll("[data-madd]").forEach(b=>b.onclick=()=>{if(enhMat.length>=5)return toast("재료는 최대 5마리까지 넣을 수 있어요");enhMat.push(+b.dataset.madd);renderEnh();});
   if($("enhGo"))$("enhGo").onclick=enhDo;}
@@ -760,7 +761,7 @@ const eqOf=k=>{const v=me&&me.eq&&me.eq[k];return v&&ownsGear(k,v)?v:"basic";};
 const gearName=k=>GEAR[k].list.find(x=>x[0]===eqOf(k))[1];
 const COS={aura:{n:"오라",i:"✨",list:[["star","별빛 오라",10000000],["fire","불꽃 오라",20000000],["ice","얼음 오라",30000000],["rainbow","무지개 오라",60000000],["gold","황금 오라",150000000]]},
   wing:{n:"날개",i:"🪽",list:[["angel","천사 날개",10000000],["butterfly","나비 날개",20000000],["devil","악마 날개",30000000],["fairy","요정 날개",60000000],["phoenix","불사조 날개",150000000]]}};
-const ownsCos=(k,id)=>!!(me&&me.cos&&me.cos[k+"_"+id]);
+const ownsCos=(k,id)=>!!(isOwner||(me&&me.cos&&me.cos[k+"_"+id]));
 const eqCos=k=>{const v=me&&me.eq&&me.eq[k];return v&&ownsCos(k,v)?v:"";};
 function sparkle(c,x,y,r,col){c.fillStyle=col;c.beginPath();c.moveTo(x,y-r);c.lineTo(x+r*.3,y-r*.3);c.lineTo(x+r,y);c.lineTo(x+r*.3,y+r*.3);c.lineTo(x,y+r);c.lineTo(x-r*.3,y+r*.3);c.lineTo(x-r,y);c.lineTo(x-r*.3,y-r*.3);c.closePath();c.fill();}
 function drawAura(c,x,y,id,t,front){if(!id||!isFinite(x)||!isFinite(y))return;const gy=y+1;c.save();
@@ -807,6 +808,18 @@ function drawWing(c,x,y,dir,id,t,bob){if(!id||!isFinite(x)||!isFinite(y))return;
       for(let k=0;k<5;k++){const ph=(t/650+k/5)%1;c.fillStyle=`rgba(253,224,71,${1-ph})`;c.beginPath();c.arc(14+ph*16+k*2,-22+k*6-ph*10,1.6*(1-ph)+.4,0,7);c.fill();}}
     c.restore();};
   one(true);one(false);c.restore();}
+const ROD_SKIN=["기본 낚싯대","대나무 낚싯대","카본 낚싯대","은빛 낚싯대","청강 낚싯대","황금 낚싯대","빛나는 황금 낚싯대","신비의 낚싯대","루비 낚싯대","무지개 낚싯대","전설의 낚싯대"];
+const rodSkin=L=>ROD_SKIN[Math.min(10,Math.floor((L|0)/5))];
+function drawRod(c,hx,hy,x0,y0,L,t){const T=Math.min(10,Math.floor((L|0)/5));c.save();c.lineCap="round";
+  const cols=[["#8a5a2b","#8a5a2b"],["#c8b06a","#7a8f3a"],["#1f2937","#4b5563"],["#e5e7eb","#9ca3af"],["#60a5fa","#1e3a8a"],["#fde047","#b45309"],["#fef08a","#d97706"],["#c4b5fd","#6d28d9"],["#fca5a5","#b91c1c"],null,null][T];
+  let st=c.createLinearGradient(hx,hy,x0,y0);if(T>=9){for(let i=0;i<=6;i++)st.addColorStop(i/6,`hsl(${(t/8+i*55)%360},95%,${T===10?70:62}%)`);}else{st.addColorStop(0,cols[1]);st.addColorStop(1,cols[0]);}
+  if(T>=7){c.shadowColor=T>=9?"#fff":cols[0];c.shadowBlur=T===10?10:6;}
+  c.strokeStyle=st;c.lineWidth=T>=5?2.6:T>=2?2.3:2;c.beginPath();c.moveTo(hx,hy);c.lineTo(x0,y0);c.stroke();c.shadowBlur=0;
+  if(T===1){c.strokeStyle="#5b6b2a";c.lineWidth=2.8;for(let k=1;k<4;k++){const px=hx+(x0-hx)*k/4,py=hy+(y0-hy)*k/4,dx=(x0-hx)*.03,dy=(y0-hy)*.03;c.beginPath();c.moveTo(px-dx,py-dy);c.lineTo(px+dx,py+dy);c.stroke();}}
+  if(T>=2){const rx=hx+(x0-hx)*.18,ry=hy+(y0-hy)*.18;c.fillStyle=T>=5?"#fbbf24":"#9ca3af";c.beginPath();c.arc(rx,ry+2,2.2,0,7);c.fill();c.fillStyle="#111827";c.beginPath();c.arc(rx,ry+2,.8,0,7);c.fill();}
+  if(T>=6){const tw=1.8+Math.sin(t/150)*.8;sparkle(c,x0,y0,tw+(T===10?1.2:0),T>=9?`hsl(${(t/4)%360},100%,85%)`:"#fff");}
+  if(T===10){for(let k=0;k<3;k++){const ph=(t/700+k/3)%1,px=hx+(x0-hx)*(.3+ph*.7),py=hy+(y0-hy)*(.3+ph*.7)-ph*4;c.fillStyle=`rgba(255,255,255,${1-ph})`;c.beginPath();c.arc(px,py,1.1,0,7);c.fill();}}
+  c.restore();}
 const rodLv=()=>Math.min(50,(me&&me.rodLv)|0);
 const rodBonus=L=>.006*Math.pow(Math.min(50,L)/50,1.5);
 const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
@@ -890,7 +903,7 @@ function drawChar(c,x,y,ch,hue,dir,bob,lg){switch(ch){
   case 14:return human(c,x,y,dir,bob,lg,{shirt:"#fde047",pants:"#3b82f6",hair:"#7c2d12",hs:"pony",fem:1});
   case 15:return animal(c,x,y,dir,bob,lg,{body:"#fde047",head:"#fde047",beak:"#f97316",feet:"#f97316",belly:"#fef9c3",duck:1});
   default:return human(c,x,y,dir,bob,lg,{shirt:`hsl(${hue},65%,52%)`,hair:`hsl(${hue},30%,22%)`});}}
-const chOf=id=>({hue:hueOf(id),ch:id===myId?normCh(me&&me.ch):normCh(fOthers[id]&&fOthers[id].ch),au:id===myId?eqCos("aura"):(fOthers[id]&&fOthers[id].au)||"",wg:id===myId?eqCos("wing"):(fOthers[id]&&fOthers[id].wg)||"",tt:id===myId?myTitle():(fOthers[id]&&fOthers[id].tt)||""});
+const chOf=id=>({hue:hueOf(id),ch:id===myId?normCh(me&&me.ch):normCh(fOthers[id]&&fOthers[id].ch),au:id===myId?eqCos("aura"):(fOthers[id]&&fOthers[id].au)||"",wg:id===myId?eqCos("wing"):(fOthers[id]&&fOthers[id].wg)||"",tt:id===myId?myTitle():(fOthers[id]&&fOthers[id].tt)||"",rl:id===myId?rodLv():(fOthers[id]&&fOthers[id].rl)|0});
 function openChar(){fKeys={};$("fChar").style.display="flex";renderCharPick();}
 let skinArm=null;
 function renderCharPick(){for(const[gid,eq]of[["fCharGrid",0],["shGrid",0],["eqGrid",1]]){const G=$(gid);if(G)renderCharGrid(G,eq);}}
@@ -907,7 +920,7 @@ function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
   const bob=walk?Math.sin(t/90)*1.5:0;const lg=walk?Math.sin(t/90)*3:0;
   drawAura(c,x,y,H.au,t,0);c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,y+2,9,3.5,0,0,7);c.fill();
   drawWing(c,x,y,dir,H.wg,t,bob);drawChar(c,x,y,H.ch,hue,dir,bob,lg);drawAura(c,x,y,H.au,t,1);
-  if(rod){c.strokeStyle="#8a5a2b";c.lineWidth=2;c.beginPath();c.moveTo(x+dir*5,y-16);c.lineTo(rod.x0,rod.y0);c.stroke();}
+  if(rod)drawRod(c,x+dir*5,y-16,rod.x0,rod.y0,H.rl|0,t);
   c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(name).width+8;
   c.fillStyle=isMe?"rgba(245,180,0,.9)":"rgba(0,0,0,.55)";c.beginPath();c.roundRect(x-w/2,y-52,w,14,7);c.fill();c.fillStyle=isMe?"#1a1300":"#fff";c.fillText(name,x,y-41.5);if(H.tt){c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8);}
   if(state==="bite"){c.font="bold 14.5px sans-serif";c.fillStyle="#ff4757";c.fillText("!",x+12,y-34);}}
@@ -972,14 +985,14 @@ function fishStep(dt,t){
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;o.x+=dx*Math.min(1,dt/120);o.y+=dy*Math.min(1,dt/120);}
-  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),name:myName(),sk:(me&&me.rps)|0,fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
+  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),rl:rodLv(),name:myName(),sk:(me&&me.rps)|0,fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${dexNo(idx)}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=10000000?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
 function fTapOther(x,y){let best=null,bd=1e9;for(const id in fOthers){const o=fOthers[id];if(!o||o.fs==="away")continue;const hw=Math.max(15,String(o.name||"").length*5+6);if((Math.abs(x-o.x)<15&&y>o.y-40&&y<o.y+6)||(Math.abs(x-o.x)<hw&&y>o.y-55&&y<o.y-36)){const d=Math.abs(x-o.x)+Math.abs(y-(o.y-20));if(d<bd){bd=d;best=id;}}}return best;}
 function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id===myId)continue;const v=onlineMap[id];if(!v||now-(v.t||0)>180000){delete fOthers[id];continue;}
     const has=typeof v.fx==="number",sp=has?{x:v.fx,y:v.fy}:spawnOf(id);
-    const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
+    const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.rl=Math.min(50,v.rl|0);o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
     if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if(o.fct||Date.now()-v.fc.t<8000)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=10000000?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
 function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
@@ -1108,7 +1121,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-232000";
+const APP_VERSION="20261124-235000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
@@ -1138,7 +1151,8 @@ function rpsClaim(){const n=(me&&me.rps)||0;if(!n)return toast("🎤 MC 가바�
   rpsArm=0;me.cash+=r;me.rps=0;saveMe();renderHeader();fLastSent="";toast(`🎁 ${n}연승 보상 +${formatMoneyReadable(r)}!`);}
 /* ---------- 📢 전체 공지 ---------- */
 {let q=[],busy=false,lastK="";const show=()=>{if(busy||!q.length)return;busy=true;const n=$("gNotice");n.textContent=q.shift();n.classList.add("on");setTimeout(()=>{n.classList.remove("on");setTimeout(()=>{busy=false;show();},450);},4500);};
- const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/notice").on("value",s=>{const v=s.val();if(!v||!v.text||v.k===lastK)return;lastK=v.k;if(Date.now()-(v.t||0)>20000)return;q.push(String(v.text).slice(0,120));show();});},300);}
+ const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/notice").on("value",s=>{const v=s.val();if(!v||!v.text||v.k===lastK)return;lastK=v.k;if(Date.now()-(v.t||0)>20000)return;q.push(String(v.text).slice(0,120));show();});
+  const t0=Date.now(),seen={};fdb.ref("market/accLog").limitToLast(5).on("child_added",s=>{const v=s.val();if(!v||v.k!=="in"||!v.t||v.id===myId)return;if(v.t<t0+(typeof srvOff==="number"?srvOff:0)-3000)return;if(seen[v.id]&&Date.now()-seen[v.id]<120000)return;seen[v.id]=Date.now();q.push(`👋 ${String(v.name||"누군가").slice(0,12)}님이 입장했어요`);show();});},300);}
 /* ---------- ⭐ 접속 경험치 (10분마다) ---------- */
 {let last=Date.now(),sv=0;setInterval(()=>{const now=Date.now(),d=Math.min(30000,Math.max(0,now-last));last=now;if(!me||!me._loaded||sessBlocked)return;me.onAcc=(me.onAcc||0)+d;if(me.onAcc>=600000){me.onAcc-=600000;addExp(ONLINE_EXP,"접속 10분");toast(`⭐ 접속 10분 보상 +${ONLINE_EXP} 경험치`);sv=now;return;}if(now-sv>60000){sv=now;saveMe();}renderAttBar&&renderAttBar();},15000);}
 $("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload").set(Date.now()).then(()=>toast("🔄 모두에게 새로고침을 보냈어요")).catch(()=>toast("실패"));};
