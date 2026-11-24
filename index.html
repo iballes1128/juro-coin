@@ -302,6 +302,8 @@ nav button.on{color:var(--tx);font-weight:700}
   <div id="btpBig" class="btBig"></div><div id="btpMsg" style="font-size:13px;min-height:20px"></div>
   <div class="rps" id="btpRps"><button data-c="s">✌️<small>가위</small></button><button data-c="r">✊<small>바위</small></button><button data-c="p">🖐️<small>보</small></button></div>
   <div id="btpRes"></div><button class="go" id="btpOk" style="display:none;background:var(--acc);color:#111">확인</button></div></div>
+<div id="sessMod" class="btBg" style="z-index:90;background:rgba(14,16,20,.97)"><div class="btBox" style="text-align:center"><div style="font-size:34px">🔒</div><div id="sessT" style="font-weight:900;font-size:17px;margin:6px 0"></div><div id="sessD" style="font-size:13px;color:var(--sub);line-height:1.7;margin-bottom:14px;white-space:pre-line"></div>
+  <button class="go" id="sessYes" style="background:var(--acc);color:#111"></button><button class="go" id="sessNo" style="background:var(--card2);margin-top:8px"></button></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -368,20 +370,20 @@ const $=id=>document.getElementById(id);
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2600);}
 const myName=()=>(me&&me.name)||"나";
 function assetOf(p){let s=p.cash||0;for(const n in(p.coins||{})){const ci=COINS.findIndex(c=>c[0]===n);if(ci>=0)s+=(p.coins[n].count||0)*priceOf(ci);}return s;}
-async function saveMe(){if(localMode){try{const{_loaded,...o}=me;localStorage.setItem(LKEY,JSON.stringify(o));}catch(e){}return;}if(!fdb||!myId||!me||!me._loaded){return;}if(saving){dirty=true;return;}saving=true;
+async function saveMe(){if(sessBlocked)return;if(localMode){try{const{_loaded,...o}=me;localStorage.setItem(LKEY,JSON.stringify(o));}catch(e){}return;}if(!fdb||!myId||!me||!me._loaded){return;}if(saving){dirty=true;return;}saving=true;
   try{const{_loaded,...o}=me;await fdb.ref("players/"+myId).set(JSON.parse(JSON.stringify({...o,t:Date.now()})));}catch(e){toast("저장 실패: 인터넷 연결을 확인해 주세요");}
   saving=false;if(dirty){dirty=false;saveMe();}}
 
 /* ===================== 시바이누·리플 개편: 보유 수량 병합 (가치 유지) ===================== */
 let cfgReady=false,evReady=false;
 const MIG_FR={"시바이누":[3,10],"리플":[1,10]};
-function migrateMe(){if(!me||!me._loaded||me.mig===1||localMode||!cfgReady||!evReady)return;let any=false;const msgs=[];
+function migrateMe(){if(sessBlocked||!me||!me._loaded||me.mig===1||localMode||!cfgReady||!evReady)return;let any=false;const msgs=[];
   for(const n in MIG_FR){const h=me.coins&&me.coins[n];if(!h||!(h.count>0))continue;const[mul,div]=MIG_FR[n],ci=COINS.findIndex(c=>c[0]===n),tot=h.count*mul,nc=Math.floor(tot/div),exact=tot/div,cs=Math.round(((tot%div)/div)*priceOf(ci));
     h.cost=nc>0?Math.round(h.cost*nc/exact):0;msgs.push(`${n} ${formatCoinReadable(h.count)} → ${formatCoinReadable(nc)}`+(cs>0?` (끝수 현금 +${formatMoneyReadable(cs)})`:""));h.count=nc;me.cash+=cs;any=true;}
   me.mig=1;saveMe();if(any){toast("🔀 시바이누·리플 시세 개편\n보유 수량이 시세에 맞게 병합됐어요 (평가금액 동일)\n"+msgs.join("\n"));renderAll();}}
 
 /* ===================== 상장폐지 환불 (5%) =====================
-function checkDelist(){if(!me)return;let changed=false;const msgs=[];
+function checkDelist(){if(!me||sessBlocked)return;let changed=false;const msgs=[];
   for(const n in me.coins){const h=me.coins[n];if(!h||h.count<=0)continue;const ci=COINS.findIndex(c=>c[0]===n);if(ci<0)continue;
     const ev=M.coins[ci].dl.find(d=>d.k>(h.since||0));if(ev){const refund=Math.round(h.count*ev.price*.05);me.cash+=refund;msgs.push(`${n} ${formatCoinReadable(h.count)} → 환불 ${formatMoneyReadable(refund)}`);h.count=0;h.cost=0;changed=true;}}
   if(changed){saveMe();toast("🚨 보유 코인 상장폐지\n"+msgs.join("\n"));broadcast(`🚨 ${myName()}님 보유 코인 상장폐지 (5% 환불)\n`+msgs.join("\n"));}}
@@ -501,7 +503,7 @@ $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)ret
 function hhmm(t){const d=new Date(t||Date.now());return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
 function addMsg(o){if(!o.me&&window._chatNote)window._chatNote();const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small>${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🎣 낚시터":"📈 코인방"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
   const atB=L.scrollHeight-L.scrollTop-L.clientHeight<60;L.appendChild(d);while(L.children.length>120)L.firstChild.remove();if(atB||o.me)L.scrollTop=L.scrollHeight;}
-function chatPush(o){if(!o.sys)o.loc=(typeof fishActive==="function"&&fishActive())?"fish":"coin";if(!fdb)return addMsg(o);fdb.ref("chat").push({...o,t:Date.now(),from:myId}).catch(()=>{});}
+function chatPush(o){if(sessBlocked)return;if(!o.sys)o.loc=(typeof fishActive==="function"&&fishActive())?"fish":"coin";if(!fdb)return addMsg(o);fdb.ref("chat").push({...o,t:Date.now(),from:myId}).catch(()=>{});}
 function broadcast(text,kind){chatPush({sys:true,text,kind:kind||""});}
 function sendChat(){const v=$("chatIn").value.trim().slice(0,80);if(!v||!me)return;$("chatIn").value="";if(typeof fishActive==="function"&&fishActive())setTimeout(()=>$("chatIn").blur(),0);
   chatPush({name:myName(),lv:lvOf(me),text:v});}
@@ -570,7 +572,7 @@ function renderAll(){renderAttBar();renderHeader();renderMarket();renderWallet()
 function renderFTicker(){const T=$("fTicker");if(!T||!$("s-fish").classList.contains("on"))return;T.innerHTML=COINS.map(([n],ci)=>{const c=M.coins[ci];if(c.delisted)return `<span>${n}<b>상폐</b></span>`;const r=c.rate||0;return `<span><small>${n}<em class="${r>0?"up":r<0?"down":"flat"}">${r>0?"▲":r<0?"▼":""}${Math.abs(r)}%</em></small><b>${formatCoinPrice(c.price).replace("원","")}</b></span>`;}).join("");}
 
 /* ===================== 접속자 ===================== */
-let lastPres="",onlineMap={};function pushPresence(){if(!fdb||!myId||!me||!me._loaded||!me.name)return;const o={name:myName(),lv:lvOf(me),ch:normCh(me.ch),t:Date.now()};const j=o.name+"|"+o.lv;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();}
+let lastPres="",onlineMap={};function pushPresence(){if(sessBlocked||!fdb||!myId||!me||!me._loaded||!me.name)return;const o={name:myName(),lv:lvOf(me),ch:normCh(me.ch),t:Date.now()};const j=o.name+"|"+o.lv;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();}
 function onlinePeople(){const out=[];for(const[id,v]of Object.entries(onlineMap)){if(!v)continue;out.push({name:id===myId?myName():(String(v.name||(players[id]&&players[id].name)||"접속자").slice(0,12)),lv:v.lv|0,me:id===myId});}return out.sort((a,b)=>b.me-a.me);}
 let fbConnected=false;function updOnline(){const L=onlinePeople(),n=Math.max(1,L.length);$("dot").classList.toggle("on",fbConnected);
   $("online").innerHTML=fbConnected?`<b>${n}명</b> 접속 중 ▾`:"연결 중…";
@@ -724,7 +726,7 @@ function fishStep(dt,t){
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;o.x+=dx*Math.min(1,dt/120);o.y+=dy*Math.min(1,dt/120);}
-  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
+  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${idx+1}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=10000000?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
@@ -742,7 +744,7 @@ function setFishBtn(){setFishAct();const b=$("fishBtn");if(!b)return;const can=f
   else if(fstate==="idle"){b.textContent=can?"🎣 낚싯대 던지기":"🚶 강가로 가세요";b.disabled=!can;b.className="fbtn";}
   else if(fstate==="cast"||fstate==="wait"){b.textContent="… 입질 기다리는 중";b.disabled=false;b.className="fbtn wait";}
   else{b.textContent="❗ 지금 당겨!";b.disabled=false;b.className="fbtn bite";}}
-function fishAction(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const t=performance.now();
+function fishAction(){if(sessBlocked)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const t=performance.now();
   if(fstate==="idle"&&nearFmk(fp.x,fp.y)){fp.tx=null;return openFmk();}
   if(fstate==="idle"&&nearShop(fp.x,fp.y)){fp.tx=null;return openMarket();}
   if(fstate==="idle"){if(!fishSpot(fp.x,fp.y))return;fp.tx=null;fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};setFishBtn();}
@@ -929,7 +931,7 @@ function btPick(id,c){const b=battles[id];if(!b||b.st!=="play"||nowS()>=b.startT
 
 /* 돈 정산: 신청 취소·거절 환불, 결과 지급 (사람마다 자기 몫만, 한 번만) */
 function btProcess(){
-  if(!me||!me._loaded||localMode||!fdb)return;const now=nowS();let changed=false;
+  if(sessBlocked||!me||!me._loaded||localMode||!fdb)return;const now=nowS();let changed=false;
   for(const id in battles){const b=battles[id];if(!b||btDone(id))continue;const mine=b.from===myId;
     if(b.st==="declined"||b.st==="cancel"||b.st==="expired"){
       if(mine&&b.esc){btGive(b,1,b.costA||0);toast(`⚔️ 배틀이 성사되지 않았어요 (${b.st==="declined"?(b.why==="poor"?"상대 판돈 부족":"상대가 거절"):b.st==="cancel"?"신청 취소":"응답 없음"})\n판돈 ${btStakeTxt(b)}이(가) 돌아왔어요`);}
@@ -994,6 +996,39 @@ function btInit(){
  g("btpOk").onclick=()=>{if(btPlayId)btClosed[btPlayId]=1;btRender();};}
 /* BT-END */
 
+/* SESS-BEGIN ===================== 한 계정은 한 기기에서만 ===================== */
+const SESS_PATH="market/sessions",SESS_TTL=60000;
+var sessBlocked=false;
+let sessActive=false,sessVal=null,sessMode="";
+const mySid=(()=>{try{let v=sessionStorage.getItem("jc_sid");if(!v){v="s"+Date.now().toString(36)+Math.random().toString(36).slice(2,8);sessionStorage.setItem("jc_sid",v);}return v;}catch(e){return"s"+Math.random().toString(36).slice(2,10);}})();
+const myDev=matchMedia("(hover:none),(pointer:coarse)").matches?"📱 폰":"💻 컴퓨터";
+const sessRef=()=>fdb.ref(SESS_PATH+"/"+myId);
+const sessMine=()=>({sid:mySid,dev:myDev,t:nowS()});
+async function sessClaim(force){
+  const r=await sessRef().transaction(cur=>{if(!force&&cur&&cur.sid!==mySid&&nowS()-(cur.t||0)<SESS_TTL)return;return sessMine();});
+  return{ok:!!r.committed,other:r.snapshot.val()};}
+function sessShow(mode,dev){
+  sessMode=mode;sessBlocked=true;const Y=$("sessYes"),N=$("sessNo");$("sessMod").style.display="flex";N.style.display="block";
+  if(mode==="ask"){$("sessT").textContent="다른 기기에서 접속 중이에요";$("sessD").textContent=(dev||"다른 기기")+"에서 이 계정을 쓰고 있어요.\n한 계정은 한 기기에서만 쓸 수 있어요.\n그 기기의 접속을 끊고 여기서 접속할까요?";Y.textContent="다른 기기 끊고 여기서 접속";N.textContent="취소";}
+  else if(mode==="kicked"){$("sessT").textContent="다른 기기에서 접속했어요";$("sessD").textContent=(dev||"다른 기기")+"에서 접속해서 이 기기는 연결이 끊겼어요.\n다시 쓰려면 아래 버튼을 눌러 주세요.\n(그러면 그 기기가 끊겨요)";Y.textContent="여기서 다시 접속";N.style.display="none";}
+  else{$("sessT").textContent="접속하지 않았어요";$("sessD").textContent="다른 기기에서 사용 중이에요.\n여기서 쓰려면 아래 버튼을 눌러 주세요.";Y.textContent="다시 묻기";N.style.display="none";}}
+function sessHide(){$("sessMod").style.display="none";}
+function sessKicked(v){sessActive=false;sessBlocked=true;try{sessRef().onDisconnect().cancel();}catch(e){}sessShow("kicked",v&&v.dev);}
+function sessActivate(){
+  sessActive=true;sessBlocked=false;sessHide();try{sessRef().onDisconnect().remove();}catch(e){}
+  sessRef().on("value",s=>{sessVal=s.val();if(!sessActive||isOwner)return;
+    if(sessVal===null){sessClaim(false).then(r=>{if(r.ok){try{sessRef().onDisconnect().remove();}catch(e){}}}).catch(()=>{});}
+    else if(sessVal.sid!==mySid)sessKicked(sessVal);});
+  setInterval(()=>{if(sessActive&&!isOwner&&sessVal&&sessVal.sid===mySid)sessRef().transaction(cur=>cur&&cur.sid===mySid?Object.assign(cur,{t:nowS()}):undefined).catch(()=>{});},20000);}
+async function sessStart(){
+  if(isOwner)return;sessBlocked=true;
+  try{const r=await sessClaim(false);if(r.ok)sessActivate();else sessShow("ask",(r.other||{}).dev);}catch(e){sessBlocked=false;}}
+function sessOwnerOn(){sessActive=false;sessBlocked=false;sessHide();try{sessRef().onDisconnect().cancel();sessRef().remove();}catch(e){}}
+{const g=id=>document.getElementById(id);
+ g("sessYes").onclick=async()=>{if(sessMode==="ask"||sessMode==="kicked"){try{await sessClaim(true);}catch(e){}}location.reload();};
+ g("sessNo").onclick=()=>sessShow("cancel");}
+/* SESS-END */
+
 /* ===================== 틱 루프 ===================== */
 rebuild();me=JSON.parse(JSON.stringify(local));renderAll();
 setInterval(()=>{const K=nowK();const left=TICK-((Date.now()-EPOCH)%TICK);$("tickFill").style.width=(100-left/TICK*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";
@@ -1015,7 +1050,7 @@ function showAuth(onNew,loginOnly){let mode="new";const bg=modal('<div style="fo
   const go=async()=>{const nm=$("auName").value.trim().slice(0,10),pin=$("auPin").value.trim();if(!nm)return $("auErr").textContent="닉네임을 입력하세요";if(!pinOk(pin))return $("auErr").textContent="비밀번호는 숫자 4자리예요";
     if(mode==="new"){if(nameTaken(nm,myId))return $("auErr").textContent="이미 있는 닉네임이에요. 내 계정이면 '계정 있어요'로 로그인하세요";bg.remove();onNew(nm,await sha(myId+":"+pin));}
     else{const low=nm.toLowerCase();let found=null;for(const[id,p]of Object.entries(players)){if(p&&String(p.name||"").trim().toLowerCase()===low&&p.pinH&&p.pinH===await sha(id+":"+pin)){found=id;break;}}
-      if(!found)return $("auErr").textContent="닉네임이나 비밀번호가 맞지 않아요";try{localStorage.setItem("jc_id",found);}catch(e){}fdb.ref("online/"+myId).remove().catch(()=>{});location.reload();}};
+      if(!found)return $("auErr").textContent="닉네임이나 비밀번호가 맞지 않아요";try{localStorage.setItem("jc_id",found);}catch(e){}fdb.ref("online/"+myId).remove().catch(()=>{});if(sessActive)try{sessRef().remove();}catch(e){}location.reload();}};
   $("auOk").onclick=go;["auName","auPin"].forEach(x=>$(x).addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing)go();}));setTimeout(()=>$("auName").focus(),50);}
 function askSetPin(){const bg=modal(`<div style="font-size:17px;font-weight:900;margin-bottom:6px">🔐 비밀번호 만들기</div><div style="font-size:13px;color:var(--sub);margin-bottom:10px;line-height:1.5"><b style="color:#fff">${esc(myName())}</b>님, 숫자 4자리 비밀번호를 정해 주세요.<br>다른 폰에서 닉네임과 이 비밀번호로 로그인하면 지금 계정을 그대로 쓸 수 있어요.</div>`+PIN_IN("spPin","숫자 4자리")+PIN_IN("spPin2","한 번 더")+'<div id="spErr" style="color:#f04452;font-size:12px;min-height:16px;margin-top:6px"></div><button id="spOk" class="go buy" style="margin-top:6px">저장</button>');
   $("spOk").onclick=async()=>{const a=$("spPin").value.trim(),b=$("spPin2").value.trim();if(!pinOk(a))return $("spErr").textContent="숫자 4자리로 입력하세요";if(a!==b)return $("spErr").textContent="두 번 입력한 게 달라요";
@@ -1040,6 +1075,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:17px;font-weight:900;
   fdb.ref("transfers").orderByChild("to").equalTo(myId).on("value",s=>{if(!me._loaded)return;const v=s.val()||{};let got=0;const names=[],notes=[];
     let gotFish=0;for(const id in v){const x=v[id];if(me.claimed.includes(id))continue;if(typeof x.fish==="number"&&FISH[x.fish]){me.fish=me.fish||{};me.fish[fKey(x.fish)]=(me.fish[fKey(x.fish)]||0)+1;gotFish++;}else if(!(x.net>0))continue;me.cash+=x.net||0;got+=x.net||0;if(x.note)notes.push(x.note);else names.push(x.fromName||"누군가");me.claimed.push(id);fdb.ref("transfers/"+id).remove().catch(()=>{});}
     if(got||gotFish){me.claimed=me.claimed.slice(-100);saveMe();toast(notes.length?notes.join("\n"):`💸 ${names.join(", ")}님에게서 ${formatMoneyReadable(got)} 받았어요!`);renderAll();}});
+  sessStart();
   btInit();
   const L=$("chatLog");
   fdb.ref("chat").limitToLast(60).on("child_added",s=>{const m=s.val()||{};if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300)});else{addMsg({me:m.from===myId,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}});
@@ -1047,7 +1083,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:17px;font-weight:900;
   showNotices();renderAll();
 }catch(e){console.error(e);toast("서버 연결 실패: 새로고침해 주세요");}})();
 $("admLogin").onclick=async()=>{if(isOwner){isOwner=false;try{localStorage.removeItem("jc_admin");}catch(e){}$("navAdmin").style.display="none";$("admLogin").textContent="🔑 관리자 로그인";return toast("관리자 로그아웃");}
-  const pw=prompt("관리자 비밀번호");if(!pw)return;if(await sha(pw)!==ADMIN_HASH)return toast("비밀번호가 달라요");isOwner=true;try{localStorage.setItem("jc_admin","1");}catch(e){}$("navAdmin").style.display="";$("admLogin").textContent="🔓 관리자 로그아웃";renderAll();toast("관리자 모드 켜짐");};
+  const pw=prompt("관리자 비밀번호");if(!pw)return;if(await sha(pw)!==ADMIN_HASH)return toast("비밀번호가 달라요");isOwner=true;sessOwnerOn();try{localStorage.setItem("jc_admin","1");}catch(e){}$("navAdmin").style.display="";$("admLogin").textContent="🔓 관리자 로그아웃";renderAll();toast("관리자 모드 켜짐");};
 if(isOwner)$("admLogin").textContent="🔓 관리자 로그아웃";
 $("pinChange").onclick=()=>{if(me&&me._loaded)askSetPin();};
 $("accSwitch").onclick=()=>{if(!me||!me._loaded)return;if(!me.pinH){toast("먼저 이 계정의 비밀번호를 만들어 두세요\n(안 그러면 이 계정으로 돌아올 수 없어요)");return askSetPin();}showAuth(()=>{},true);};
