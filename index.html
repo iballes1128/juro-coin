@@ -72,6 +72,8 @@ nav button.on{color:var(--tx);font-weight:700}
 #chatLog{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding:4px 0 10px}
 .msg{max-width:88%;background:var(--card);border-radius:11px 11px 11px 4px;padding:6px 10px;font-size:12.5px;line-height:1.4;word-break:break-all}
 .msg small{display:block;font-size:10px;color:var(--sub);margin-bottom:1px}
+#admFab{position:fixed;left:14px;bottom:calc(60px + env(safe-area-inset-bottom));width:44px;height:44px;border-radius:50%;background:var(--card2);border:1px solid var(--line);font-size:19px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+@media (min-width:940px){#admFab{left:calc(var(--cl) + 12px)}}
 #chatFab{position:fixed;right:14px;bottom:calc(60px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:var(--acc);color:#111;font-size:22px;z-index:20;box-shadow:0 4px 14px rgba(0,0,0,.4)}
 #chatBadge{position:absolute;top:-2px;right:-2px;background:var(--up);color:#fff;font-size:11px;font-weight:700;border-radius:9px;padding:1px 6px;display:none}
 @media (max-width:939px){#chatSide{left:0;right:0;bottom:0;height:72vh;border-radius:18px 18px 0 0;border-top:1px solid var(--line);box-shadow:0 -8px 30px rgba(0,0,0,.5);display:none}#chatSide.open{display:flex}}
@@ -267,6 +269,7 @@ nav button.on{color:var(--tx);font-weight:700}
 <aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><button id="chatClose">✕</button></div>
   <div id="chatOn"></div><div id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
+<button id="admFab" title="관리" style="display:none">🛠️</button>
 <button id="chatFab">💬<span id="chatBadge"></span></button>
 <div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:30px">✨</div><div style="font-size:17px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:13px;color:var(--sub);margin-bottom:14px"></div><button onclick="location.reload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:15px">지금 새로고침</button></div></div>
 <div id="updBar" style="display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;background:#1e3a5f;border:1px solid #3b82f6;color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:10px;white-space:nowrap">✨ 새 버전이 나왔어요<button onclick="location.reload()" style="background:var(--acc);color:#111;font-weight:800;border-radius:9px;padding:6px 12px">새로고침</button><button onclick="this.parentNode.style.display='none'" style="color:#9fb3c8;font-size:15px">✕</button></div>
@@ -794,15 +797,16 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-145520";
+const APP_VERSION="20261124-145725";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
   try{document.activeElement&&document.activeElement.blur();}catch(e){}const tick=()=>{$("updCnt").textContent="새로고침해야 계속할 수 있어요 · "+n+"초 뒤 자동 새로고침";if(n--<=0){location.reload();return;}updT=setTimeout(tick,1000);};tick();}
-setInterval(checkUpdate,20000);
+
 const LOAD_T=Date.now();{const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/forceReload").on("value",s=>{const v=s.val();if(typeof v==="number"&&v>LOAD_T&&Date.now()-v<120000)showUpdate("관리자가 새로고침을 요청했어요");});},300);}
 {const R=$("fRow");try{if(localStorage.getItem("jc_tk")==="0")R.classList.add("tkoff");}catch(e){}
   const set=on=>{R.classList.toggle("tkoff",!on);try{localStorage.setItem("jc_tk",on?"1":"0");}catch(e){}fishResize.w=0;fishResize();};$("fTkHide").onclick=()=>set(false);$("fTkShow").onclick=()=>set(true);}
-$("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload").set(Date.now()).then(()=>toast("🔄 모두에게 새로고침을 보냈어요")).catch(()=>toast("실패"));};document.addEventListener("visibilitychange",()=>{if(!document.hidden)checkUpdate();});
+$("admFab").onclick=()=>openPg("admin");setInterval(()=>{const f=$("admFab");if(f)f.style.display=isOwner?"":"none";},800);
+$("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload").set(Date.now()).then(()=>toast("🔄 모두에게 새로고침을 보냈어요")).catch(()=>toast("실패"));};
 /* ===================== 틱 루프 ===================== */
 rebuild();me=JSON.parse(JSON.stringify(local));renderAll();
 setInterval(()=>{const K=nowK();const left=TICK-((Date.now()-EPOCH)%TICK);$("tickFill").style.width=(100-left/TICK*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";
