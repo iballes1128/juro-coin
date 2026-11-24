@@ -997,14 +997,14 @@ function animal(c,x,y,dir,bob,lg,o){c.fillStyle=o.feet||o.body;c.fillRect(x-6,y-
   c.fillStyle="#111";c.fillRect(x+dir*3-1,hy-2,2,2);c.fillRect(x+dir*3-5,hy-2,2,2);
   if(o.beak){c.fillStyle=o.beak;c.beginPath();c.moveTo(x+dir*6,hy+1);c.lineTo(x+dir*11,hy+2);c.lineTo(x+dir*6,hy+4);c.fill();}
   if(o.whisker){c.strokeStyle="rgba(0,0,0,.5)";c.lineWidth=.7;c.beginPath();c.moveTo(x+dir*4,hy+2);c.lineTo(x+dir*10,hy+1);c.moveTo(x+dir*4,hy+3);c.lineTo(x+dir*10,hy+4);c.stroke();}}
-const AWK_COST=[30000000,100000000,300000000],AWK_COL=[null,"#22d3ee","#a855f7","#facc15"],AWK_NAME=["","1각성","2각성","3각성"];
+const AWK_COST=[10000000,50000000,100000000],AWK_COL=[null,"#22d3ee","#a855f7","#facc15"],AWK_NAME=["","1각성","2각성","3각성"];
 const awkOf=(p,ch)=>Math.min(3,(p&&p.awk&&p.awk[ch])|0);
 const myAwk=()=>awkOf(me,normCh(me&&me.ch));
 const awkLift=ak=>[0,3,6,19][ak|0];
-function drawCharAwk(c,x,y,ch,hue,dir,bob,lg,ak,t){if(!ak||!isFinite(x)||!isFinite(y))return drawChar(c,x,y,ch,hue,dir,bob,lg);
+function drawCharAwk(c,x,y,ch,hue,dir,bob,lg,ak,t,noCape){if(!ak||!isFinite(x)||!isFinite(y))return drawChar(c,x,y,ch,hue,dir,bob,lg);
   const s=[1,1.08,1.15,1.22][ak],col=AWK_COL[ak],pul=.5+Math.sin(t/260)*.5;c.save();
   {const g=c.createRadialGradient(x,y+1,0,x,y+1,14+ak*4);g.addColorStop(0,col+"99");g.addColorStop(1,col+"00");c.fillStyle=g;c.beginPath();c.ellipse(x,y+1,14+ak*4,4.5+ak,0,0,7);c.fill();}
-  if(ak>=2){const sh=y-24*s+bob,wv=Math.sin(t/220)*2;const cg=c.createLinearGradient(x,sh,x,y);cg.addColorStop(0,ak===3?"#991b1b":"#6d28d9");cg.addColorStop(1,ak===3?"#450a0a":"#2e1065");c.fillStyle=cg;c.beginPath();c.moveTo(x+dir*1*s,sh);c.lineTo(x-dir*5*s,sh+1);c.quadraticCurveTo(x-dir*(9*s)+wv*.5,y-12*s,x-dir*(13*s)+wv,y-1);c.lineTo(x-dir*2*s,y-2);c.closePath();c.fill();c.strokeStyle=ak===3?"#facc15":"#c4b5fd";c.lineWidth=1;c.stroke();}
+  if(ak>=2&&!noCape){const sh=y-24*s+bob,wv=Math.sin(t/220)*2;const cg=c.createLinearGradient(x,sh,x,y);cg.addColorStop(0,ak===3?"#991b1b":"#6d28d9");cg.addColorStop(1,ak===3?"#450a0a":"#2e1065");c.fillStyle=cg;c.beginPath();c.moveTo(x+dir*1*s,sh);c.lineTo(x-dir*5*s,sh+1);c.quadraticCurveTo(x-dir*(9*s)+wv*.5,y-12*s,x-dir*(13*s)+wv,y-1);c.lineTo(x-dir*2*s,y-2);c.closePath();c.fill();c.strokeStyle=ak===3?"#facc15":"#c4b5fd";c.lineWidth=1;c.stroke();}
   c.translate(x,y);c.scale(s,s);c.shadowColor=col;c.shadowBlur=(ak===3?12:ak===2?9:6)+pul*5;drawChar(c,0,0,ch,hue,dir,bob,lg);c.shadowBlur=0;c.restore();
   if(ak>=3){const hy=y-39.5*s+bob;c.save();c.shadowColor="#fde047";c.shadowBlur=8;const g=c.createLinearGradient(x,hy-7,x,hy);g.addColorStop(0,"#fef08a");g.addColorStop(1,"#d97706");c.fillStyle=g;c.beginPath();c.moveTo(x-6,hy);c.lineTo(x-6,hy-4);c.lineTo(x-3,hy-2);c.lineTo(x,hy-7);c.lineTo(x+3,hy-2);c.lineTo(x+6,hy-4);c.lineTo(x+6,hy);c.closePath();c.fill();c.shadowBlur=0;c.fillStyle="#ef4444";c.beginPath();c.arc(x,hy-2,1.1,0,7);c.fill();c.restore();}
   for(let k=0;k<ak*2;k++){const ph=(t/(1500-ak*200)+k/(ak*2))%1;const px=x+Math.sin(k*2.3+t/400)*9*s,py=y-4-ph*34*s;c.fillStyle=col;c.globalAlpha=1-ph;c.beginPath();c.arc(px,py,1.2+(ak===3?.4:0),0,7);c.fill();c.globalAlpha=1;}
@@ -1013,7 +1013,7 @@ function renderAwk(S){const ch=normCh(me&&me.ch),ak=myAwk(),nm=(CHARS[ch]||["?"]
   S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:12px;color:var(--sub)">지금 입은 캐릭터를 각성시켜요 (캐릭터마다 따로, 최대 3각성)</div>
     <div style="display:flex;justify-content:center;align-items:flex-end;gap:14px;margin:10px 0 4px"><div><canvas id="awkCv0" width="150" height="170" style="width:100px;height:113px"></canvas><div style="font-size:12px;color:var(--sub)">지금 ${ak?AWK_NAME[ak]:"각성 전"}</div></div>${ak<3?`<div style="font-size:20px;padding-bottom:40px">➜</div><div><canvas id="awkCv1" width="150" height="170" style="width:100px;height:113px"></canvas><div style="font-size:12px;color:var(--acc);font-weight:900">${AWK_NAME[ak+1]}</div></div>`:""}</div>
     <b style="font-size:16px">${esc(nm)} ${"⭐".repeat(ak)}${"☆".repeat(3-ak)}</b></div>`+
-    (ak<3?`<div class="card"><div style="font-size:13px;color:var(--sub);line-height:1.6">${["1각성: 몸이 살짝 커지고 하늘색 빛이 감싸요","2각성: 더 커지고 보라빛 기운 + 망토가 생겨요","3각성: 가장 크고 황금빛 + 붉은 망토 + 왕관이 생겨요"][ak]}</div>
+    (ak<3?`<div class="card"><div style="font-size:13px;color:var(--sub);line-height:1.6">${["1각성: 몸이 살짝 커지고 하늘색 빛이 감싸요","2각성: 더 커지고 보라빛 기운 + 망토가 생겨요 (날개를 끼면 망토 대신 날개가 보여요)","3각성: 가장 크고 황금빛 + 붉은 망토 + 왕관이 생겨요 (날개를 끼면 망토 대신 날개가 보여요)"][ak]}</div>
       <button class="go buy" id="awkGo" style="margin-top:12px;width:100%;border-radius:12px;padding:13px 0;font-weight:900">🌟 ${AWK_NAME[ak+1]} · ${formatMoneyReadable(AWK_COST[ak])}</button><div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">각성은 실패 없이 바로 돼요 · 다른 캐릭터로 갈아입으면 그 캐릭터는 따로 각성해야 해요</div></div>`
       :`<div class="card" style="text-align:center;font-weight:900">👑 최대 각성 달성!</div>`);
   const draw=()=>{for(const[id,l]of[["awkCv0",ak],["awkCv1",ak+1]]){const cv=$(id);if(!cv)continue;const g=cv.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,150,170);g.scale(2.3,2.3);drawCharAwk(g,33,62,ch,0,1,0,0,l,performance.now());}};
@@ -1058,7 +1058,7 @@ function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
   const H=typeof hue==="object"?hue:{hue,ch:-1};hue=H.hue;
   const bob=walk?Math.sin(t/90)*1.5:0;const lg=walk?Math.sin(t/90)*3:0;
   drawAura(c,x,y,H.au,t,0);c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,y+2,9,3.5,0,0,7);c.fill();
-  drawWing(c,x,y,dir,H.wg,t,bob);drawCharAwk(c,x,y,H.ch,hue,dir,bob,lg,H.ak|0,t);drawAura(c,x,y,H.au,t,1);const ex=awkLift(H.ak);
+  drawWing(c,x,y,dir,H.wg,t,bob);drawCharAwk(c,x,y,H.ch,hue,dir,bob,lg,H.ak|0,t,!!H.wg);drawAura(c,x,y,H.au,t,1);const ex=awkLift(H.ak);
   if(rod)drawRod(c,x+dir*5,y-16,rod.x0,rod.y0,H.rl|0,t);
   drawPlate(c,x,y-ex,name,H.np||"",t,isMe);if(H.tt){c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;const ty=H.np==="royal"?8:H.np==="legend"?16:H.np==="diamond"?7:0;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64-ty-ex,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8-ty-ex);}
   if(state==="bite"){c.font="bold 14.5px sans-serif";c.fillStyle="#ff4757";c.fillText("!",x+12,y-34);}}
@@ -1259,7 +1259,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261125-014000";
+const APP_VERSION="20261125-014500";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
