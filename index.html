@@ -215,7 +215,7 @@ nav button.on{color:var(--tx);font-weight:700}
     </div>
   </section>
   <section class="sec" id="s-rank">
-    <div class="tabs2" id="rankTabs"><button data-k="rich" class="on">💰 부자</button><button data-k="profit">📈 수익률</button><button data-k="att">⭐ 레벨</button><button data-k="fish">🎣 낚시</button><button data-k="hof">🐋 명예</button></div>
+    <div class="tabs2" id="rankTabs"><button data-k="rich" class="on">💰 부자</button><button data-k="profit">📈 수익률</button><button data-k="att">⭐ 레벨</button><button data-k="fish">🎣 낚시</button><button data-k="enh">⚒️ 강화</button><button data-k="hof">🐋 명예</button></div>
     <div class="chips" id="profitChips"></div>
     <div id="rankList"></div>
   </section>
@@ -428,6 +428,7 @@ function fishRankHtml(){const all={...players};if(me&&myId)all[myId]=me;const L=
   const sec=(title,key,fmt)=>{const s=L.slice().sort((a,b)=>b[key]-a[key]).slice(0,10);return `<div class="card"><h3>${title}</h3>${s.length?s.map((x,i)=>`<div class="rk${x.id===myId?' me':''}" data-fpid="${x.id}" style="cursor:pointer"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i+1}</div><div class="w">${esc(x.name)}</div><div class="v">${fmt(x)}</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">아직 낚시한 사람이 없어요</div>'}</div>`;};
   return sec("📖 도감 수집 순위","dex",x=>`${x.dex}종 <small style="color:var(--sub)">(${(x.dex/FISH.length*100).toFixed(1)}%)</small>`)+sec("📊 낚시 횟수 순위","n",x=>x.n.toLocaleString()+"회")+sec("💰 낚시 수익 순위","e",x=>formatMoneyReadable(x.e))+'<div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">이름을 누르면 그 사람 도감을 볼 수 있어요</div>';}
 function renderRank(){const all={...players};if(me&&myId)all[myId]=me;const L=$("rankList");let list=[];
+  if(rankKey==="enh"){$("profitChips").style.display="none";const R=Object.entries(all).map(([id,p])=>({id,name:p.name||"?",lv:Math.min(50,(p&&p.rodLv)|0)})).filter(x=>x.lv>0).sort((a,b)=>b.lv-a.lv).slice(0,30);L.innerHTML=R.length?R.map((x,i)=>`<div class="rk${x.id===myId?" me":""}"${x.id!==myId&&onlineMap[x.id]?` data-bt="${x.id}" style="cursor:pointer"`:""}><div class="n ${i===0?"g":i===1?"s":i===2?"b":""}">${i===0?"👑":i===1?"🥈":i===2?"🥉":i+1}</div><div class="w"><b>${esc(x.name)}</b><small>좋은 물고기 +${(rodBonus(x.lv)*100).toFixed(2)}%p</small></div><div class="v" style="color:var(--acc);font-weight:900">🎣 +${x.lv}</div></div>`).join(""):'<div class="card" style="color:var(--sub);font-size:13px;text-align:center">아직 강화한 사람이 없어요</div>';return;}
   if(rankKey==="hof"){$("profitChips").style.display="none";L.innerHTML=hofHtml();return;}
   if(rankKey==="fish"){$("profitChips").style.display="none";L.innerHTML=fishRankHtml();L.querySelectorAll("[data-fpid]").forEach(e=>e.onclick=()=>{const id=e.dataset.fpid;openPg("my","dex");fDexOf=id===myId?null:id;renderFishInfo();$("pgBody").scrollTop=0;});return;}
   const ch=$("profitChips");ch.style.display=rankKey==="profit"?"flex":"none";if(!ch.children.length){["전체",...COINS.map(c=>c[0])].forEach(n=>{const b=document.createElement("button");b.textContent=n==="전체"?"전체 합산":n;b.dataset.c=n;b.onclick=()=>{profitCoin=n;renderRank();};ch.appendChild(b);});}
@@ -442,7 +443,7 @@ function renderRank(){const all={...players};if(me&&myId)all[myId]=me;const L=$(
     list.sort((a,b)=>b.v-a.v);}
   else list=Object.entries(all).map(([id,p])=>({id,name:p.name,v:expOf(p),sub:"누적 경험치 "+expOf(p).toLocaleString()+(p.lastAtt===todayKey()?" · 오늘 출석 ✅":""),vs:"Lv."+lvOf(p)})).sort((a,b)=>b.v-a.v);
   if(!list.length){L.innerHTML='<div class="muted">'+(rankKey==="profit"?(profitCoin==="전체"?"코인을 보유한 사람이 없어요.":profitCoin+"을(를) 보유한 사람이 없어요."):"아직 기록이 없어요.")+'</div>';return;}
-  L.innerHTML=list.slice(0,30).map((x,i)=>`<div class="rk${x.id===myId?' me':''}"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i===1?'🥈':i===2?'🥉':i+1}</div><div class="w"><b>${esc(x.name||'이름없음')}</b><small>${esc(x.sub)}</small></div><div class="v ${x.cls||''}">${x.vs}</div></div>`).join("");}
+  L.innerHTML=list.slice(0,30).map((x,i)=>`<div class="rk${x.id===myId?' me':''}"${x.id!==myId&&onlineMap[x.id]?` data-bt="${x.id}" style="cursor:pointer"`:""}><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i===1?'🥈':i===2?'🥉':i+1}</div><div class="w"><b>${esc(x.name||'이름없음')}</b><small>${esc(x.sub)}</small></div><div class="v ${x.cls||''}">${x.vs}</div></div>`).join("");}
 
 /* ===================== 거래 시트 ===================== */
 function openSheet(ci){if($("pgMod"))$("pgMod").style.display="none";curCoin=ci;$("qty").value="";setMode(M.coins[ci].delisted?"sell":"buy");$("sheetBg").style.display="block";requestAnimationFrame(()=>$("sheet").classList.add("on"));renderSheet();}
@@ -481,9 +482,9 @@ function renderCos(){for(const k of["aura","wing"]){const E=$("eq_"+k);if(E)rend
   if(pgCur==="shop"&&(pgSub==="aura"||pgSub==="wing")){const S=$("s-shop");if(!$("shCos")||S.dataset.k!==pgSub){S.dataset.k=pgSub;S.innerHTML=`<div style="font-size:12px;color:var(--sub);margin-bottom:8px">${pgSub==="aura"?"발밑에 화려한 효과가 생겨요":"등 뒤에 날개가 달려요"} · 한 번 사면 계속 써요 · 🔒 누르고 한 번 더 누르면 구매 · 낀 걸 다시 누르면 해제</div><div id="shCos" class="cgrid" style="padding:0"></div>`;}renderCosGrid($("shCos"),pgSub,"shop");}}
 setInterval(()=>{if($("pgMod").style.display!=="flex")return;const ch=normCh(me&&me.ch);document.querySelectorAll("#pgBody canvas[data-cv]").forEach(cv=>{if(cv.offsetParent){const[k,id]=cv.dataset.cv.split("|");cosPreview(cv,k,id,ch);}});},60);
 function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodLv(),mine=(me&&me.fish)||{};
-  enhMat=enhMat.filter((i,n)=>(mine[fKey(i)]||0)>=enhMat.slice(0,n+1).filter(j=>j===i).length);const used={};enhMat.forEach(i=>used[i]=(used[i]||0)+1);
+  enhMat=enhMat.filter((i,n)=>(mine[fKey(i)]||0)-1>=enhMat.slice(0,n+1).filter(j=>j===i).length);const used={};enhMat.forEach(i=>used[i]=(used[i]||0)+1);
   const mb=enhMat.reduce((a,i)=>a+matBonus(i,L),0),base=enhBase(L),tot=Math.min(100,base+mb),cost=enhCost(L);
-  const fishes=FISH.map((f,i)=>[i,(mine[fKey(i)]||0)-(used[i]||0)]).filter(([i,c])=>FISH[i][1]>0&&c>0).sort((a,b)=>FISH[b[0]][1]-FISH[a[0]][1]);
+  const fishes=FISH.map((f,i)=>[i,(mine[fKey(i)]||0)-1-(used[i]||0)]).filter(([i,c])=>FISH[i][1]>0&&c>0).sort((a,b)=>FISH[b[0]][1]-FISH[a[0]][1]);
   const pct=v=>(v>=10?v.toFixed(0):v.toFixed(1))+"%";
   S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:40px">🎣</div><b style="font-size:20px">기본 낚싯대 <span style="color:var(--acc)">+${L}</span></b><div style="font-size:13px;color:var(--sub);margin-top:4px">좋은 물고기(10만 원↑) 확률 <b style="color:var(--tx)">+${(rodBonus(L)*100).toFixed(2)}%p</b>${L<50?` → <b style="color:var(--ok)">+${(rodBonus(L+1)*100).toFixed(2)}%p</b>`:""}</div>
     <div style="height:6px;background:var(--card2);border-radius:3px;margin:10px 0 2px;overflow:hidden"><div style="height:100%;width:${L*2}%;background:var(--acc)"></div></div><div style="font-size:11px;color:var(--sub)">최대 +50</div></div>`+
@@ -495,18 +496,19 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodL
     <div style="font-size:12px;color:var(--sub);margin:12px 0 6px">재료 (최대 5마리 · 누르면 빼기)</div>
     <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">${[0,1,2,3,4].map(n=>{const i=enhMat[n];return i===undefined?`<div style="height:54px;border:1.5px dashed var(--line);border-radius:10px"></div>`:`<button data-mrm="${n}" style="height:54px;background:var(--card2);border-radius:10px;font-size:10px;line-height:1.25;padding:2px;overflow:hidden">${esc(FISH[i][2])}<br><b style="color:var(--ok)">+${matBonus(i,L).toFixed(1)}%</b></button>`;}).join("")}</div>
     <button class="go buy" id="enhGo" style="margin-top:12px;width:100%;border-radius:12px;padding:13px 0;font-weight:900;${enhBusy?"opacity:.6":""}">⚒️ 강화하기 · ${formatMoneyReadable(cost)}</button>
-    <div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">실패하면 돈과 재료만 사라지고 레벨은 그대로예요</div></div>
-  <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:12px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 많이 올라요 · 레벨이 높아지면 싼 물고기는 거의 효과가 없어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">넣을 물고기가 없어요 · 광장에서 낚아 오세요</div>'}</div>`);
+    <div style="font-size:11px;color:${L>=ENH_DROP_LV?"var(--up)":"var(--sub)"};margin-top:6px;text-align:center">${L>=ENH_DROP_LV?"⚠️ +25부터는 실패하면 10% 확률로 레벨이 1 떨어져요":"실패하면 돈과 재료만 사라지고 레벨은 그대로예요 (+25부터는 10% 확률로 하락)"}</div></div>
+  <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:12px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 많이 올라요 · 레벨이 높아지면 싼 물고기는 거의 효과가 없어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:13px">넣을 물고기가 없어요 · 종류마다 1마리는 도감용으로 남겨요</div>'}</div>`);
   S.querySelectorAll("[data-mrm]").forEach(b=>b.onclick=()=>{enhMat.splice(+b.dataset.mrm,1);renderEnh();});
   S.querySelectorAll("[data-madd]").forEach(b=>b.onclick=()=>{if(enhMat.length>=5)return toast("재료는 최대 5마리까지 넣을 수 있어요");enhMat.push(+b.dataset.madd);renderEnh();});
   if($("enhGo"))$("enhGo").onclick=enhDo;}
 function enhDo(){if(enhBusy)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const L=rodLv();if(L>=50)return;const cost=enhCost(L);if(me.cash<cost)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);
-  const mine=me.fish||{};for(const i of enhMat){const k=fKey(i);if(!(mine[k]>0))return toast("재료 물고기가 부족해요"),renderEnh();}
+  const mine=me.fish||{};for(const i of enhMat){const k=fKey(i);if(!((mine[k]||0)-1>=enhMat.filter(j=>j===i).length))return toast("재료 물고기가 부족해요 (1마리는 도감용)"),renderEnh();}
   const tot=Math.min(100,enhBase(L)+enhMat.reduce((a,i)=>a+matBonus(i,L),0));enhBusy=true;
   me.cash-=cost;for(const i of enhMat){const k=fKey(i);me.fish[k]=(me.fish[k]||0)-1;}enhMat=[];const ok=Math.random()*100<tot;
+  let drop=false;if(!ok&&L>=ENH_DROP_LV&&Math.random()<ENH_DROP_P){drop=true;me.rodLv=L-1;}
   if(ok){me.rodLv=L+1;if(me.rodLv%10===0||me.rodLv>=30)broadcast(`⚒️ ${myName()}님이 낚싯대를 +${me.rodLv}강으로 강화했어요!`);}
   saveMe();renderHeader();renderFishInfo();renderEnh();
-  toast(ok?`✨ 강화 성공! 낚싯대 +${L+1}\n좋은 물고기 확률 +${(rodBonus(L+1)*100).toFixed(2)}%p`:`💥 강화 실패… (+${L} 유지)\n성공 확률 ${tot.toFixed(1)}%였어요`);setTimeout(()=>{enhBusy=false;renderEnh();},600);}
+  toast(ok?`✨ 강화 성공! 낚싯대 +${L+1}\n좋은 물고기 확률 +${(rodBonus(L+1)*100).toFixed(2)}%p`:(drop?`💔 강화 실패… 레벨 하락! +${L} → +${L-1}`:`💥 강화 실패… (+${L} 유지)`)+`\n성공 확률 ${tot.toFixed(1)}%였어요`);setTimeout(()=>{enhBusy=false;renderEnh();},600);}
 
 const PG_G={my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"]]},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"]]},rank:{t:"🏆 순위"},enh:{t:"⚒️ 강화"},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
 let pgCur="my",pgSub="wallet";
@@ -668,7 +670,7 @@ function renderAccLog(){accListen();const B=$("accLogBox");if(!B)return;const f=
   const day=t=>{const d=new Date(t);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}:${String(d.getSeconds()).padStart(2,"0")}`;};
   B.innerHTML=L.length?L.map(x=>`<div style="display:flex;gap:8px;align-items:center;padding:6px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="width:44px;font-weight:900;color:${x.k==="in"?"var(--ok)":"var(--up)"}">${x.k==="in"?"🟢 입장":"🔴 퇴장"}</span><b style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.name||"?")}</b><span style="color:var(--sub);font-size:12px">${day(x.t)}</span></div>`).join(""):'<div style="color:var(--sub);font-size:13px;padding:8px 0">아직 기록이 없어요</div>';}
 function onlinePeople(){const out=[];for(const[id,v]of Object.entries(onlineMap)){if(!v)continue;out.push({id,name:id===myId?myName():(String(v.name||(players[id]&&players[id].name)||"접속자").slice(0,12)),lv:v.lv|0,me:id===myId});}return out.sort((a,b)=>b.me-a.me);}
-document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-bt]");if(!el)return;const id=el.dataset.bt;if(!id||id===myId)return;e.stopPropagation();openBtWith(id);});
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-bt]");if(!el)return;const id=el.dataset.bt;if(!id||id===myId)return;e.stopPropagation();e.preventDefault();openBtWith(id);},true);
 function openBtWith(id){if(!onlineMap[id])return toast("지금 접속 중인 사람에게만 배틀을 신청할 수 있어요");if(typeof setChatOpen==="function"&&innerWidth<940)setChatOpen(false);openBtMod();const sel=$("btTo");if([...sel.options].some(o=>o.value===id))sel.value=id;toast(`⚔️ ${(players[id]&&players[id].name)||"상대"}님에게 배틀 신청`);}
 let fbConnected=false;function updOnline(){const L=onlinePeople(),n=Math.max(1,L.length);$("dot").classList.toggle("on",fbConnected);
   $("online").innerHTML=fbConnected?`<b>${n}명</b> 접속 중 ▾`:"연결 중…";
@@ -739,10 +741,11 @@ function drawWing(c,x,y,dir,id,t,bob){if(!id)return;const f=Math.sin(t/(id==="fa
   one(true);one(false);c.restore();}
 const rodLv=()=>Math.min(50,(me&&me.rodLv)|0);
 const rodBonus=L=>L*.0003;
-const enhCost=L=>Math.round(500000*Math.pow(1.1,L)/10000)*10000;
-const enhBase=L=>Math.max(5,90-L*1.85);
+const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
+const enhBase=L=>L<10?95-L*1.5:Math.max(5,80-(L-10)*1.9);
+const ENH_DROP_LV=25,ENH_DROP_P=.1;
 const matTier=v=>v<=0?0:Math.max(1,Math.log10(v));
-const matBonus=(i,L)=>{const t=matTier(FISH[i][1]);return t?.35*Math.pow(1.6,t)*Math.exp(-L/(2*t)):0;};
+const matBonus=(i,L)=>{const t=matTier(FISH[i][1]);return t?.5*Math.pow(1.6,t)*Math.exp(-L/(2.5*t)):0;};
 let fBaitPro=false;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FISH.reduce((a,f)=>a+f[0],0);
 function rollFish(){const add=(fBaitPro?.003:0)+rodBonus(rodLv()),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);const W=i=>FISH[i][0]*(FISH[i][1]>=100000?kR:kN);let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
 const fKey=i=>"f"+i;
@@ -900,6 +903,7 @@ function fishStep(dt,t){
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${idx+1}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=10000000?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
+function fTapOther(x,y){let best=null,bd=1e9;for(const id in fOthers){const o=fOthers[id];if(!o||o.fs==="away")continue;if(Math.abs(x-o.x)<15&&y>o.y-56&&y<o.y+6){const d=Math.abs(x-o.x)+Math.abs(y-(o.y-20));if(d<bd){bd=d;best=id;}}}if(best){openBtWith(best);return true;}return false;}
 function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id===myId)continue;const v=onlineMap[id];if(!v||now-(v.t||0)>180000){delete fOthers[id];continue;}
     const has=typeof v.fx==="number",sp=has?{x:v.fx,y:v.fy}:spawnOf(id);
     const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
@@ -946,7 +950,7 @@ function hofHtml(){return `<div class="card"><h3>🏆 대어 명예의 전당 (1
 function fishInit(){if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCv=$("fishCv");fCtx=fCv.getContext("2d");fishResize();window.addEventListener("resize",fishResize);
   const pt=e=>{const r=fCv.getBoundingClientRect();return{x:(e.clientX-r.left)/fScale,y:(e.clientY-r.top)/fScale};};let down=false;
   const go=e=>{if(fstate!=="idle")return;let{x,y}=pt(e);if(!walkable(x,y)&&!inDock(x,y))y=Math.max(y,RIVER+16);fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.min(FH-12,y);fp.via=null;if(inDock(fp.tx,fp.ty)&&!inDock(fp.x,fp.y))fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+18};else if(!inDock(fp.tx,fp.ty)&&inDock(fp.x,fp.y)&&fp.ty>RIVER+18)fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+20};};
-  fCv.addEventListener("pointerdown",e=>{if(TOUCH)return;down=true;go(e);});fCv.addEventListener("pointermove",e=>{if(down)go(e);});window.addEventListener("pointerup",()=>down=false);
+  fCv.addEventListener("pointerdown",e=>{if(TOUCH)return;const p0=pt(e);if(fTapOther(p0.x,p0.y))return;down=true;go(e);});fCv.addEventListener("click",e=>{if(!TOUCH)return;const p0=pt(e);fTapOther(p0.x,p0.y);});fCv.addEventListener("pointermove",e=>{if(down)go(e);});window.addEventListener("pointerup",()=>down=false);
   window.addEventListener("keydown",e=>{if(!fishActive()||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if($("fMk").style.display==="flex"){if(e.key==="Escape")closeMarket();return;}if(e.key===" "){e.preventDefault();if(!e.repeat)fishAction();return;}if(e.key==="Enter"){e.preventDefault();openFChat();return;}if(e.key==="e"||e.key==="E"){if(nearShop(fp.x,fp.y))openMarket();return;}const k=e.key.length===1?e.key.toLowerCase():e.key;if(k in{ArrowUp:1,ArrowDown:1,ArrowLeft:1,ArrowRight:1,w:1,a:1,s:1,d:1}){fKeys[k]=true;e.preventDefault();}});
   window.addEventListener("keyup",e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;fKeys[k]=false;});
   $("fishBtn").onclick=fishAction;document.querySelectorAll("#fishTabs button").forEach(b=>b.onclick=()=>{fTab=b.dataset.f;if(fTab!=="dex")fDexOf=null;renderFishInfo();});
@@ -960,16 +964,16 @@ function openFmk(){fKeys={};$("fSell").style.display="flex";renderFmk();}
 function closeFmk(){$("fSell").style.display="none";}
 $("fSellX").onclick=closeFmk;$("fSell").onclick=e=>{if(e.target.id==="fSell")closeFmk();};window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("fSell").style.display==="flex")closeFmk();});
 const fmkUnit=i=>FISH[i][1]-Math.round(FISH[i][1]*.1);
-function renderFmk(){if($("fSell").style.display!=="flex")return;const m=(me&&me.fish)||{};const L=FISH.map((f,i)=>[i,m[fKey(i)]||0]).filter(x=>x[1]>0);const pos=L.filter(([i])=>FISH[i][1]>0),neg=L.filter(([i])=>FISH[i][1]<0);
-  const tot=pos.reduce((s,[i,c])=>s+fmkUnit(i)*c,0);
-  $("fSellTop").innerHTML=pos.length?`<button id="fSellAll" style="width:100%;background:var(--up);color:#fff;font-weight:900;border-radius:12px;padding:11px 0">전부 팔기 · +${formatMoneyReadable(tot)}</button>`:"";
-  $("fSellBody").innerHTML=L.length?pos.map(([i,c])=>`<div class="mki"><div class="w"><b>${i+1}. ${esc(FISH[i][2])}</b><small>${c}개 · 1개 ${formatMoneyReadable(fmkUnit(i))}</small></div><input type="number" inputmode="numeric" min="1" max="${c}" value="${c}" data-qi="${i}" style="width:58px;text-align:center"><button class="buy" data-sq="${i}">팔기</button></div>`).join("")+
+function renderFmk(){if($("fSell").style.display!=="flex")return;const m=(me&&me.fish)||{};const L=FISH.map((f,i)=>[i,m[fKey(i)]||0]).filter(x=>x[1]>0);const pos=L.filter(([i])=>FISH[i][1]>0).map(([i,c])=>[i,c-1,c]),neg=L.filter(([i])=>FISH[i][1]<0);const posS=pos.filter(x=>x[1]>0);
+  const tot=posS.reduce((s,[i,c])=>s+fmkUnit(i)*c,0);
+  $("fSellTop").innerHTML=posS.length?`<button id="fSellAll" style="width:100%;background:var(--up);color:#fff;font-weight:900;border-radius:12px;padding:11px 0">전부 팔기 · +${formatMoneyReadable(tot)}</button>`:"";
+  $("fSellBody").innerHTML=L.length?`<div style="font-size:12px;color:var(--sub);margin-bottom:6px">📖 도감 유지를 위해 종류마다 1마리는 남겨둬요</div>`+pos.map(([i,c,all])=>`<div class="mki"><div class="w"><b>${i+1}. ${esc(FISH[i][2])}</b><small>${all}개 (팔 수 있는 건 ${c}개) · 1개 ${formatMoneyReadable(fmkUnit(i))}</small></div>${c>0?`<input type="number" inputmode="numeric" min="1" max="${c}" value="${c}" data-qi="${i}" style="width:58px;text-align:center"><button class="buy" data-sq="${i}">팔기</button>`:`<span style="font-size:12px;color:var(--sub)">도감용 1마리</span>`}</div>`).join("")+
     (neg.length?`<div style="font-size:12px;color:var(--sub);margin:12px 0 4px">🗑️ 쓰레기 (팔 수 없어요 · 버리기만 가능)</div>`+neg.map(([i,c])=>`<div class="mki"><div class="w"><b>${i+1}. ${esc(FISH[i][2])}</b><small>${c}개</small></div><button data-dump="${i}">버리기</button></div>`).join(""):"")
     :'<div style="color:var(--sub);padding:30px 0;text-align:center">팔 물고기가 없어요. 낚시부터 해 보세요!</div>';
   const B=$("fSellBody");B.querySelectorAll("[data-sq]").forEach(b=>{const i=+b.dataset.sq,inp=B.querySelector(`[data-qi="${i}"]`);b.onclick=()=>{const q=parseInt(inp.value,10);if(!(q>0))return toast("⚠️ 개수를 입력해 주세요");fmkSell(i,q);};inp.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")b.click();});});
   B.querySelectorAll("[data-dump]").forEach(b=>b.onclick=()=>{const k=fKey(+b.dataset.dump);me.fish[k]=0;saveMe();renderFmk();renderFishInfo();toast("🗑️ 버렸어요");});
-  if($("fSellAll"))$("fSellAll").onclick=()=>{let got=0,n=0;for(const[i,c]of pos){got+=fmkUnit(i)*c;n+=c;me.fish[fKey(i)]=0;}me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${n}마리 전부 팔았어요!\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 물고기를 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();};}
-function fmkSell(i,q){const k=fKey(i),have=me.fish[k]||0;if(have<=0)return;if(!q||q>have)q=have;const got=fmkUnit(i)*q;me.fish[k]=have-q;me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${FISH[i][2]} ${q}개 판매\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 ${FISH[i][2]}을(를) 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();}$("fCharX").onclick=()=>$("fChar").style.display="none";$("fChar").onclick=e=>{if(e.target.id==="fChar")$("fChar").style.display="none";};
+  if($("fSellAll"))$("fSellAll").onclick=()=>{let got=0,n=0;for(const[i,c]of posS){got+=fmkUnit(i)*c;n+=c;me.fish[fKey(i)]=1;}me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${n}마리 전부 팔았어요!\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 물고기를 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();};}
+function fmkSell(i,q){const k=fKey(i),have=(me.fish[k]||0)-1;if(have<=0)return toast("📖 마지막 1마리는 도감용이라 팔 수 없어요");if(!q||q>have)q=have;const all=have+1;const got=fmkUnit(i)*q;me.fish[k]=all-q;me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${FISH[i][2]} ${q}개 판매\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 ${FISH[i][2]}을(를) 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();}$("fCharX").onclick=()=>$("fChar").style.display="none";$("fChar").onclick=e=>{if(e.target.id==="fChar")$("fChar").style.display="none";};
 window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("fChar").style.display==="flex")$("fChar").style.display="none";});
 function openFInfo(t){fTab=t;fDexOf=null;fKeys={};$("fInfo").style.display="flex";renderFishInfo();$("fishInfo").scrollTop=0;}
 function closeFInfo(){$("fInfo").style.display="none";}
@@ -1007,16 +1011,16 @@ function renderMarketUI(){if($("fMk").style.display!=="flex")return;document.que
     B.querySelectorAll("[data-smode]").forEach(b=>b.onclick=e=>{e.stopPropagation();fSellMode=b.dataset.smode;renderMarketUI();});
     const go=$("sfGo");if(go)go.onclick=()=>{const i=fSellSel;if(fSellMode==="sell")sellFish(i,$("sfPrice").value);else listTrade(i,$("sfWant").value);fSellSel=null;};
     const pr=$("sfPrice");if(pr)pr.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")go.click();});}}
-async function listTrade(i,w){if(w==="")return toast("⚠️ 원하는 물건을 골라 주세요");w=+w;if(w===i)return toast("⚠️ 같은 물건끼리는 교환할 수 없어요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물건이 없어요");
+async function listTrade(i,w){if(w==="")return toast("⚠️ 원하는 물건을 골라 주세요");w=+w;if(w===i)return toast("⚠️ 같은 물건끼리는 교환할 수 없어요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물건이 없어요");if(FISH[i][1]>0&&!(me.fish[k]>1))return toast("📖 마지막 1마리는 도감용이라 올릴 수 없어요");
   me.fish[k]--;saveMe();try{await fdb.ref("market/fishMarket").push({seller:myId,sellerName:myName(),fi:i,want:w,t:Date.now()});}catch(e){me.fish[k]++;saveMe();return toast("등록 실패");}
   toast(`🔄 교환 등록!\n${FISH[i][2]} ↔ ${FISH[w][2]}`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${FISH[w][2]}(으)로 교환하자고 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
-async function tradeFish(id){const v=fMarket[id];if(!v||v.want==null||v.seller===myId)return;const wk=fKey(v.want);if(!(me.fish&&me.fish[wk]>0))return toast(`⚠️ 교환하려면 ${FISH[v.want][2]}이(가) 있어야 해요`);
+async function tradeFish(id){const v=fMarket[id];if(!v||v.want==null||v.seller===myId)return;const wk=fKey(v.want);if(FISH[v.want][1]>0&&me.fish&&me.fish[wk]===1)return toast("📖 마지막 1마리는 도감용이라 교환할 수 없어요");if(!(me.fish&&me.fish[wk]>0))return toast(`⚠️ 교환하려면 ${FISH[v.want][2]}이(가) 있어야 해요`);
   const got=await takeListing(id,c=>c.seller!==myId&&c.want!=null).catch(()=>null);if(!got)return toast("이미 교환됐거나 내려간 매물이에요");
   if(!(me.fish[fKey(got.want)]>0)){await fdb.ref("market/fishMarket/"+id).set(got).catch(()=>{});return toast("교환할 물건이 없어요");}
   me.fish[fKey(got.want)]--;const k=fKey(got.fi);const first=!(me.fish[k]>0);me.fish[k]=(me.fish[k]||0)+1;saveMe();
   fdb.ref("transfers").push({from:myId,fromName:myName(),to:got.seller,amount:0,net:0,fish:got.want,note:`🔄 거래소 교환 완료! ${myName()}님과 교환했어요\n(내준 것: ${FISH[got.fi][2]} ↔ 받은 것: ${FISH[got.want][2]})`,t:Date.now()}).catch(()=>{});
   toast(`🤝 교환 완료!\n${FISH[got.want][2]} → ${FISH[got.fi][2]}${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🤝 [거래소] ${myName()}님과 ${got.sellerName||"?"}님이 교환했어요 (${FISH[got.fi][2]} ↔ ${FISH[got.want][2]})`);renderMarketUI();renderFishInfo();}
-async function sellFish(i,raw){const price=parseInt(String(raw||"").replace(/[^0-9]/g,""),10);if(!(price>0))return toast("⚠️ 판매가를 입력해 주세요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물고기가 없어요");
+async function sellFish(i,raw){const price=parseInt(String(raw||"").replace(/[^0-9]/g,""),10);if(!(price>0))return toast("⚠️ 판매가를 입력해 주세요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물고기가 없어요");if(!(me.fish[k]>1))return toast("📖 마지막 1마리는 도감용이라 팔 수 없어요");
   me.fish[k]--;saveMe();try{await fdb.ref("market/fishMarket").push({seller:myId,sellerName:myName(),fi:i,price,t:Date.now()});}catch(e){me.fish[k]++;saveMe();return toast("등록 실패");}
   toast(`📤 ${FISH[i][2]} ${formatMoneyReadable(price)}에 등록!`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${formatMoneyReadable(price)}에 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
 async function takeListing(id,check){let got=null;const r=await fdb.ref("market/fishMarket/"+id).transaction(cur=>{if(!cur||!check(cur))return;got=cur;return null;});return r.committed&&got?got:null;}
@@ -1028,7 +1032,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-200500";
+const APP_VERSION="20261124-204000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
