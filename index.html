@@ -284,10 +284,11 @@ nav button.on{color:var(--tx);font-weight:700}
 <script>
 /* ===================== 코인 규칙 (봇 코드 그대로) ===================== */
 const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",1000000,333000,3000000,"#d4af37"],["이더리움",300000,100000,900000,"#627eea"],["페페",100000,33000,300000,"#3d9a3d"],
-  ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",300,100,900,"#e5502e"],["리플",30,10,90,"#23292f"]];
+  ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
 const NEWCOINS=["테더골드","플라즈마","페페"];
 const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
 const DEFAULT_EPOCH=1795440000000;
+const MIG_T=1795503651243,MIG_F={"시바이누":10/3,"리플":10};/* 시바이누 300→1000, 리플 30→300 개편: 이전에 내린 가격지정 이벤트는 같은 비율로 환산 */
 
 function formatMoneyReadable(v){if(v===0)return"0원";const neg=v<0,a=Math.abs(Math.round(v));const jo=Math.floor(a/1e12),eok=Math.floor((a%1e12)/1e8),man=Math.floor((a%1e8)/1e4),rem=a%1e4;
   let s="";if(jo>0)s+=jo+"조 ";if(eok>0)s+=eok+"억 ";if(man>0)s+=man+"만 ";if(rem>0&&jo===0&&eok===0)s+=rem+"원";else if(jo===0&&eok===0&&man===0)s+=a+"원";else s+="원";s=s.trim();return neg?"-"+s:s;}
@@ -306,7 +307,7 @@ function applyPct(c,ci,pct){const[,,mn,mx]=COINS[ci];const old=c.price;const f0=
 function manualPct(mode,r){if(mode==="down")return-((3+r()*7)/100);if(mode==="crash")return-((10+r()*5)/100);if(mode==="up")return(3+r()*7)/100;if(mode==="surge")return(10+r()*5)/100;return 0;}
 function stepTo(K){const m=M,E=EVENTS;
   while(m.k<K){const k=++m.k,T=EPOCH+k*TICK;
-    while(m.ev.hi<E.length&&E[m.ev.hi].t<=T){const e=E[m.ev.hi++];if(e.m==="set"){const ci=COINS.findIndex(c=>c[0]===e.c);if(ci>=0&&!m.coins[ci].delisted){const c=m.coins[ci],old=c.price;c.price=e.p;c.rate=parseFloat((((e.p-old)/old)*100).toFixed(1));}}}
+    while(m.ev.hi<E.length&&E[m.ev.hi].t<=T){const e=E[m.ev.hi++];if(e.m==="set"){const ci=COINS.findIndex(c=>c[0]===e.c);if(ci>=0&&!m.coins[ci].delisted){const c=m.coins[ci],old=c.price,pp=(e.t<MIG_T&&MIG_F[e.c])?Math.round(e.p*MIG_F[e.c]):e.p;c.price=pp;c.rate=parseFloat((((pp-old)/old)*100).toFixed(1));}}}
     while(m.ev.lo<m.ev.hi&&E[m.ev.lo].t<=T-MANUAL)m.ev.lo++;
     let gMode=null;const cMode={};
     for(let i=m.ev.lo;i<m.ev.hi;i++){const e=E[i];if(e.m==="set")continue;if(e.c==="*"){gMode=e.m;if(e.m==="auto")for(const x in cMode)delete cMode[x];}else cMode[e.c]=e.m;}
@@ -348,7 +349,15 @@ async function saveMe(){if(localMode){try{const{_loaded,...o}=me;localStorage.se
   try{const{_loaded,...o}=me;await fdb.ref("players/"+myId).set(JSON.parse(JSON.stringify({...o,t:Date.now()})));}catch(e){toast("저장 실패: 인터넷 연결을 확인해 주세요");}
   saving=false;if(dirty){dirty=false;saveMe();}}
 
-/* ===================== 상장폐지 환불 (5%) ===================== */
+/* ===================== 시바이누·리플 개편: 보유 수량 병합 (가치 유지) ===================== */
+let cfgReady=false,evReady=false;
+const MIG_FR={"시바이누":[3,10],"리플":[1,10]};
+function migrateMe(){if(!me||!me._loaded||me.mig===1||localMode||!cfgReady||!evReady)return;let any=false;const msgs=[];
+  for(const n in MIG_FR){const h=me.coins&&me.coins[n];if(!h||!(h.count>0))continue;const[mul,div]=MIG_FR[n],ci=COINS.findIndex(c=>c[0]===n),tot=h.count*mul,nc=Math.floor(tot/div),exact=tot/div,cs=Math.round(((tot%div)/div)*priceOf(ci));
+    h.cost=nc>0?Math.round(h.cost*nc/exact):0;msgs.push(`${n} ${formatCoinReadable(h.count)} → ${formatCoinReadable(nc)}`+(cs>0?` (끝수 현금 +${formatMoneyReadable(cs)})`:""));h.count=nc;me.cash+=cs;any=true;}
+  me.mig=1;saveMe();if(any){toast("🔀 시바이누·리플 시세 개편\n보유 수량이 시세에 맞게 병합됐어요 (평가금액 동일)\n"+msgs.join("\n"));renderAll();}}
+
+/* ===================== 상장폐지 환불 (5%) =====================
 function checkDelist(){if(!me)return;let changed=false;const msgs=[];
   for(const n in me.coins){const h=me.coins[n];if(!h||h.count<=0)continue;const ci=COINS.findIndex(c=>c[0]===n);if(ci<0)continue;
     const ev=M.coins[ci].dl.find(d=>d.k>(h.since||0));if(ev){const refund=Math.round(h.count*ev.price*.05);me.cash+=refund;msgs.push(`${n} ${formatCoinReadable(h.count)} → 환불 ${formatMoneyReadable(refund)}`);h.count=0;h.cost=0;changed=true;}}
@@ -823,7 +832,7 @@ async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId)
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
 const APP_VERSION="20261124-150959";
-function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="20261124-150959"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
+function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
   try{document.activeElement&&document.activeElement.blur();}catch(e){}const tick=()=>{$("updCnt").textContent="새로고침해야 계속할 수 있어요 · "+n+"초 뒤 자동 새로고침";if(n--<=0){hardReload();return;}updT=setTimeout(tick,1000);};tick();}
@@ -836,7 +845,7 @@ $("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload
 /* ===================== 틱 루프 ===================== */
 rebuild();me=JSON.parse(JSON.stringify(local));renderAll();
 setInterval(()=>{const K=nowK();const left=TICK-((Date.now()-EPOCH)%TICK);$("tickFill").style.width=(100-left/TICK*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";
-  if(K>M.k){stepTo(K);checkDelist();renderAll();}},250);
+  if(K>M.k){stepTo(K);checkDelist();renderAll();}migrateMe();},250);
 
 /* ===================== Firebase 연결 ===================== */
 const firebaseConfig={apiKey:"AIzaSyA_pAOrECvY-WCkbOaqZEQtI_LXvUbeUGc",authDomain:"juro-coin.firebaseapp.com",databaseURL:"https://juro-coin-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"juro-coin",storageBucket:"juro-coin.firebasestorage.app",messagingSenderId:"661254337078",appId:"1:661254337078:web:9857a6bc73e208c4749e97"};
@@ -866,15 +875,15 @@ function askSetPin(){const bg=modal(`<div style="font-size:17px;font-weight:900;
   fdb.ref(".info/connected").on("value",s=>{fbConnected=!!s.val();if(fbConnected){lastPres="";pushPresence();}updOnline();});
   fdb.ref("online").on("value",s=>{onlineMap=s.val()||{};const now=Date.now();for(const k in onlineMap){if(!onlineMap[k]||now-(onlineMap[k].t||0)>180000)delete onlineMap[k];}updOnline();fishSyncOthers();});
   setInterval(()=>{pushPresence.t=0;pushPresence();},60000);
-  fdb.ref("market/config").on("value",s=>{const v=s.val();const n=v&&typeof v.epoch==="number"?v.epoch:DEFAULT_EPOCH;if(n!==EPOCH){EPOCH=n;rebuild();renderAll();}});
-  fdb.ref("market/events").on("value",s=>{let l=[];try{const v=s.val();l=v&&v.list?JSON.parse(v.list):[];}catch(e){}EVENTS=l.filter(e=>e&&typeof e.t==="number").sort((a,b)=>a.t-b.t);rebuild();checkDelist();renderAll();});
+  fdb.ref("market/config").on("value",s=>{cfgReady=true;const v=s.val();const n=v&&typeof v.epoch==="number"?v.epoch:DEFAULT_EPOCH;if(n!==EPOCH){EPOCH=n;rebuild();renderAll();}});
+  fdb.ref("market/events").on("value",s=>{evReady=true;let l=[];try{const v=s.val();l=v&&v.list?JSON.parse(v.list):[];}catch(e){}EVENTS=l.filter(e=>e&&typeof e.t==="number").sort((a,b)=>a.t-b.t);rebuild();checkDelist();renderAll();});
   fdb.ref("market/kicked/"+myId).on("value",s=>{if(!s.val())return;fdb.ref("market/kicked/"+myId).remove().catch(()=>{});me._loaded=false;try{localStorage.removeItem("jc_id");localStorage.removeItem("jc_admin");}catch(e){}alert("관리자가 이 계정을 정리했어요. 닉네임을 다시 정해 주세요.");location.reload();});
   let first=true;
   fdb.ref("players").on("value",s=>{const p=s.val()||{};
     if(p[myId]){if(!me._loaded||!saving){const mine=p[myId];me=JSON.parse(JSON.stringify(mine));me.coins=me.coins||{};me.claimed=me.claimed||[];me.log=me.log||[];me.att=me.att||0;me._loaded=true;
       if(me.skinRV!==1){me.skinRV=1;me.ch=11;me.skins={};setTimeout(()=>{saveMe();if(fdb)fdb.ref("online/"+myId).update({ch:11}).catch(()=>{});},500);}}}
     delete p[myId];players=p;if(me._loaded&&!pushPresence.ok){pushPresence.ok=1;lastPres="";pushPresence();}
-    if(first){first=false;if(me._loaded&&!me.pinH)askSetPin();if(!me._loaded){showAuth((nm,pinH)=>{me=JSON.parse(JSON.stringify(local));me.name=nm;me.pinH=pinH;me.skinRV=1;me.ch=11;me._loaded=true;saveMe();pushPresence();renderAll();broadcast(`👋 ${nm}님이 거래소에 처음 들어왔어요!`);});}}
+    if(first){first=false;if(me._loaded&&!me.pinH)askSetPin();if(!me._loaded){showAuth((nm,pinH)=>{me=JSON.parse(JSON.stringify(local));me.name=nm;me.pinH=pinH;me.mig=1;me.skinRV=1;me.ch=11;me._loaded=true;saveMe();pushPresence();renderAll();broadcast(`👋 ${nm}님이 거래소에 처음 들어왔어요!`);});}}
     checkDelist();renderAll();});
   fdb.ref("transfers").orderByChild("to").equalTo(myId).on("value",s=>{if(!me._loaded)return;const v=s.val()||{};let got=0;const names=[],notes=[];
     let gotFish=0;for(const id in v){const x=v[id];if(me.claimed.includes(id))continue;if(typeof x.fish==="number"&&FISH[x.fish]){me.fish=me.fish||{};me.fish[fKey(x.fish)]=(me.fish[fKey(x.fish)]||0)+1;gotFish++;}else if(!(x.net>0))continue;me.cash+=x.net||0;got+=x.net||0;if(x.note)notes.push(x.note);else names.push(x.fromName||"누군가");me.claimed.push(id);fdb.ref("transfers/"+id).remove().catch(()=>{});}
