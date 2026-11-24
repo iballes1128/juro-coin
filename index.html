@@ -652,7 +652,8 @@ function showNotices(){let html="";const recent=[];M.coins.forEach((c,ci)=>c.dl.
   if(recent.length)html+=`<div class="notice">🚨 상장폐지 공지 (최근 3시간)\n${recent.join("\n")}\n보유자에게는 잔여 가치의 5%가 현금 환불돼요.</div>`;
   if(!fdb)html+=`<div class="notice info">⏳ 서버에 연결하는 중이에요…</div>`;
   $("notices").innerHTML=html;}
-document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="s-"+b.dataset.s));renderAll();fishShow(b.dataset.s==="fish");});
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="s-"+b.dataset.s));renderAll();fishShow(b.dataset.s==="fish");try{localStorage.setItem("jc_tab",b.dataset.s);}catch(e){}});
+setInterval(()=>{if(fishActive&&fishActive())try{localStorage.setItem("jc_pos",JSON.stringify({x:Math.round(fp.x),y:Math.round(fp.y)}));}catch(e){}},2000);
 let chatUnread=0;const chatVisible=()=>innerWidth>=940||$("chatSide").classList.contains("open");
 function setChatOpen(o){$("chatSide").classList.toggle("open",o);if(o){chatUnread=0;$("chatBadge").style.display="none";const L=$("chatLog");L.scrollTop=L.scrollHeight;}}
 window._chatNote=()=>{if(chatVisible())return;chatUnread++;const e=$("chatBadge");e.textContent=chatUnread>99?"99+":chatUnread;e.style.display="block";};
@@ -758,7 +759,7 @@ function drawWing(c,x,y,dir,id,t,bob){if(!id||!isFinite(x)||!isFinite(y))return;
 const rodLv=()=>Math.min(50,(me&&me.rodLv)|0);
 const rodBonus=L=>L*.0003;
 const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
-const enhBase=L=>Math.max(15,90-L*1.85);
+const enhBase=L=>Math.max(5,90-L*1.85);
 const ENH_DROP_LV=25,ENH_DROP_P=.1;
 const matTier=v=>v<=0?0:Math.max(1,Math.log10(v));
 const matBonus=(i,L)=>{const t=matTier(FISH[i][1]);return t?.5*Math.pow(1.6,t)*Math.exp(-L/(2.5*t)):0;};
@@ -915,7 +916,7 @@ function fishStep(dt,t){
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;o.x+=dx*Math.min(1,dt/120);o.y+=dy*Math.min(1,dt/120);}
-  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({sk:(me&&me.rps)|0,fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
+  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),name:myName(),sk:(me&&me.rps)|0,fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${idx+1}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=10000000?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
@@ -972,9 +973,10 @@ function fishInit(){if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCv=$("
   $("fishBtn").onclick=fishAction;document.querySelectorAll("#fishTabs button").forEach(b=>b.onclick=()=>{fTab=b.dataset.f;if(fTab!=="dex")fDexOf=null;renderFishInfo();});
   setInterval(()=>{if(fishActive())setFishBtn();},300);
   const waitDb=setInterval(()=>{if(!fdb)return;clearInterval(waitDb);fdb.ref("market/fishHof").limitToLast(30).on("value",s=>{const v=s.val()||{};fHof=Object.values(v).filter(x=>x&&x.t).sort((a,b)=>a.t-b.t);if(rankKey==="hof")renderRank();});},300);}
-function fishShow(on){if(on){if(!fishShow.sp&&myId){fishShow.sp=1;const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fishResize();fishSyncOthers();setFishBtn();renderFishInfo();if(!fRaf){fPrev=0;fRaf=requestAnimationFrame(fishLoop);}fLastSent="";}
+function fishShow(on){if(on){if(!fishShow.sp&&myId){fishShow.sp=1;let sp=spawnOf(myId);try{const v=JSON.parse(localStorage.getItem("jc_pos")||"null");if(v&&isFinite(v.x)&&isFinite(v.y)&&walkable(v.x,v.y))sp=v;}catch(e){}fp.x=sp.x;fp.y=sp.y;}fishResize();fishSyncOthers();setFishBtn();renderFishInfo();if(!fRaf){fPrev=0;fRaf=requestAnimationFrame(fishLoop);}fLastSent="";}
   else if(fdb&&myId){fdb.ref("online/"+myId).update({fs:"away",t:Date.now()}).catch(()=>{});fstate="idle";}}
 fishInit();
+{const w=setInterval(()=>{if(!me||!me._loaded||!myId)return;clearInterval(w);let t0="";try{t0=localStorage.getItem("jc_tab")||"";}catch(e){}if(t0==="fish"){const b=document.querySelector('#nav button[data-s="fish"]');if(b&&!b.classList.contains("on"))b.click();}},200);}
 $("fChBtn").onclick=openChar;
 function openFmk(){fKeys={};$("fSell").style.display="flex";renderFmk();}
 function closeFmk(){$("fSell").style.display="none";}
@@ -1048,7 +1050,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261124-211500";
+const APP_VERSION="20261124-212500";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
