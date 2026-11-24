@@ -483,7 +483,7 @@ function renderCosGrid(G,k,mode){const list=COS[k].list.filter(x=>mode==="shop"|
 function renderCos(){for(const k of["aura","wing","plate"]){const E=$("eq_"+k);if(E)renderCosGrid(E,k,"eq");}
   if(pgCur==="shop"&&(pgSub==="aura"||pgSub==="wing"||pgSub==="plate")){const S=$("s-shop");if(!$("shCos")||S.dataset.k!==pgSub){S.dataset.k=pgSub;S.innerHTML=`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">${pgSub==="aura"?"발밑에 화려한 효과가 생겨요":pgSub==="wing"?"등 뒤에 날개가 달려요":"이름표 테두리가 멋있게 바뀌어요"} · 한 번 사면 계속 써요 · 🔒 누르고 한 번 더 누르면 구매 · 낀 걸 다시 누르면 해제</div><div id="shCos" class="cgrid" style="padding:0"></div>`;}renderCosGrid($("shCos"),pgSub,"shop");}}
 setInterval(()=>{if($("pgMod").style.display!=="flex")return;const ch=normCh(me&&me.ch);document.querySelectorAll("#pgBody canvas[data-cv]").forEach(cv=>{if(cv.offsetParent){const[k,id]=cv.dataset.cv.split("|");cosPreview(cv,k,id,ch);}});},60);
-function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;const L=rodLv(),mine=(me&&me.fish)||{};
+function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;if(pgSub==="awk")return renderAwk(S);const L=rodLv(),mine=(me&&me.fish)||{};
   enhMat=enhMat.filter((i,n)=>(mine[fKey(i)]||0)-1>=enhMat.slice(0,n+1).filter(j=>j===i).length);const used={};enhMat.forEach(i=>used[i]=(used[i]||0)+1);
   const mb=enhMat.reduce((a,i)=>a+matBonus(i,L),0),base=enhBase(L),pity=(me&&me.enhPity)||0,tot=Math.min(100,base+mb+pity),cost=enhCost(L);
   const fishes=FISH.map((f,i)=>[i,(mine[fKey(i)]||0)-1-(used[i]||0)]).filter(([i,c])=>FISH[i][1]>0&&c>0).sort((a,b)=>FISH[b[0]][1]-FISH[a[0]][1]);
@@ -547,7 +547,7 @@ function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach|
       [["","없음",""]].concat(own).map(([id,nm,c])=>`<button data-tt="${id}" style="padding:8px 12px;border-radius:20px;font-size:12px;font-weight:700;background:${cur===id?"var(--acc)":"var(--card2)"};color:${cur===id?"#111":"var(--tx)"}" title="${c}">${id?"「"+esc(nm)+"」":"칭호 없음"}</button>`).join("")+`</div>${own.length?"":'<div style="color:var(--sub);font-size:12px;margin-top:10px">아직 칭호가 없어요 · 🏅 업적을 달성해 보세요</div>'}</div>`;
     T.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{me.title=b.dataset.tt;saveMe();lastPres="";pushPresence();renderAch();toast(me.title?`🎖️ 칭호 「${titleOf(me.title)}」 장착!`:"칭호를 뺐어요");});}}
 
-const PG_G={my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"],["plate","🏷️ 명찰"]]},rank:{t:"🏆 순위"},enh:{t:"⚒️ 강화"},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
+const PG_G={my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"],["plate","🏷️ 명찰"]]},rank:{t:"🏆 순위"},enh:{t:"⚒️ 강화",tabs:[["rod","🎣 낚싯대"],["awk","🌟 각성"]]},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
 let pgCur="my",pgSub="wallet";
 function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;if(pgSub==="ch"){if(!$("shGrid"))S.innerHTML=`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">기본 남자·여자는 무료예요. 🔒 누르고 한 번 더 누르면 구매하고 바로 입어요.</div><div id="shGrid" class="cgrid" style="padding:0"></div>`;renderCharPick();}
   else if(pgSub==="bait")renderGear();
@@ -713,7 +713,7 @@ function renderAll(){renderAttBar();renderHeader();renderMarket();renderWallet()
 function renderFTicker(){const T=$("fTicker");if(!T||!$("s-fish").classList.contains("on"))return;T.innerHTML=COINS.map(([n],ci)=>{const c=M.coins[ci];if(c.delisted)return `<span>${n}<b>상폐</b></span>`;const r=c.rate||0;return `<span><small>${n}<em class="${r>0?"up":r<0?"down":"flat"}">${r>0?"▲":r<0?"▼":""}${Math.abs(r)}%</em></small><b>${formatCoinPrice(c.price).replace("원","")}</b></span>`;}).join("");}
 
 /* ===================== 접속자 ===================== */
-let lastPres="",onlineMap={};function pushPresence(){if(sessBlocked||!fdb||!myId||!me||!me._loaded||!me.name)return;const o={name:myName(),lv:lvOf(me),ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),np:eqCos("plate"),t:Date.now()};const j=o.name+"|"+o.lv+"|"+o.ch+"|"+o.au+"|"+o.wg+"|"+o.tt+"|"+o.np;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();accLogIn();rodRefund();}
+let lastPres="",onlineMap={};function pushPresence(){if(sessBlocked||!fdb||!myId||!me||!me._loaded||!me.name)return;const o={name:myName(),lv:lvOf(me),ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),np:eqCos("plate"),ak:myAwk(),t:Date.now()};const j=o.name+"|"+o.lv+"|"+o.ch+"|"+o.au+"|"+o.wg+"|"+o.tt+"|"+o.np+"|"+o.ak;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();accLogIn();rodRefund();removedSkinFix();}
 function rodRefund(){if(!me||!me._loaded||!me.gear||!me.gear.rod_pro)return;delete me.gear.rod_pro;if(me.eq)me.eq.rod="basic";me.cash+=3000000;saveMe();renderHeader();toast("🎣 고급 낚싯대가 상점에서 빠져서\n300만 원을 돌려드렸어요");}
 let accDone=false;function accLogIn(){if(accDone||!fdb||!myId)return;accDone=true;try{fdb.ref(".info/connected").on("value",c=>{if(!c.val()||sessBlocked)return;const nm=myName(),L=fdb.ref("market/accLog"),TS=firebase.database.ServerValue.TIMESTAMP;L.push({id:myId,name:nm,k:"in",t:TS}).catch(()=>{});L.push().onDisconnect().set({id:myId,name:nm,k:"out",t:TS});});}catch(e){}}
 let accLog=[],accOn=false;function accListen(){if(accOn||!fdb||!isOwner)return;accOn=true;fdb.ref("market/accLog").limitToLast(300).on("value",s=>{const v=s.val()||{};accLog=Object.values(v).filter(x=>x&&x.t).sort((a,b)=>b.t-a.t);renderAccLog();});}
@@ -733,7 +733,7 @@ function openPInfo(id){const p=players[id]||{},o=onlineMap[id]||{},nm=esc(String
   const cn=(k,v)=>{const it=COS[k].list.find(x=>x[0]===v);return it?it[1]:"없음";};const row=(a,b)=>`<div style="display:flex;justify-content:space-between;padding:9px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--sub)">${a}</span><b>${b}</b></div>`;
   const d=document.createElement("div");d.id="pInfo";d.className="btBg";d.style.cssText="display:flex;z-index:58";
   d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b style="font-size:15.5px">👤 ${nm}</b><button id="pInfoX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div><div style="display:flex;justify-content:center;margin:2px 0 8px"><canvas id="pInfoCv" width="150" height="150" style="width:100px;height:100px"></canvas></div>`+
-    row("🎖️ 칭호",(p.title&&p.ach&&p.ach[p.title])?"「"+esc(titleOf(p.title))+"」":"없음")+row("레벨",`Lv.${lvOf(p)}`)+row("🎣 낚싯대",`기본 낚싯대 +${L}`)+row("📖 도감",`${fishCountOf(p)} / ${FISH.length}종`)+row("낚시 횟수",`${(p.fishN||0).toLocaleString()}회`)+row("✨ 오라",cn("aura",au))+row("🪽 날개",cn("wing",wg))+row("⚔️ 배틀 전적",`${p.bw||0}승 ${p.bl||0}패 ${p.bd||0}무`)+row("상태",onlineMap[id]?(o.fs==="away"?"🟢 접속 중 · 📈 코인":"🟢 접속 중 · 🏞️ 광장"):"⚪ 오프라인")+
+    row("🎖️ 칭호",(p.title&&p.ach&&p.ach[p.title])?"「"+esc(titleOf(p.title))+"」":"없음")+row("레벨",`Lv.${lvOf(p)}`)+row("🌟 각성",(()=>{const a=awkOf(p,normCh(p.ch));return a?AWK_NAME[a]:"없음";})())+row("🎣 낚싯대",`기본 낚싯대 +${L}`)+row("📖 도감",`${fishCountOf(p)} / ${FISH.length}종`)+row("낚시 횟수",`${(p.fishN||0).toLocaleString()}회`)+row("✨ 오라",cn("aura",au))+row("🪽 날개",cn("wing",wg))+row("⚔️ 배틀 전적",`${p.bw||0}승 ${p.bl||0}패 ${p.bd||0}무`)+row("상태",onlineMap[id]?(o.fs==="away"?"🟢 접속 중 · 📈 코인":"🟢 접속 중 · 🏞️ 광장"):"⚪ 오프라인")+
     `<div style="display:flex;gap:8px;margin-top:12px"><button class="go" id="pInfoDex" style="flex:1;background:var(--card2)">📖 도감 보기</button>${id!==myId?`<button class="go" id="pInfoBt" style="flex:1;background:var(--acc);color:#111">⚔️ 배틀</button>`:""}</div></div>`;
   document.body.appendChild(d);const close=()=>{clearInterval(tm);d.remove();};$("pInfoX").onclick=close;d.onclick=e=>{if(e.target===d)close();};$("pInfoDex").onclick=()=>{close();openPg("my","dex");fDexOf=id===myId?null:id;renderFishInfo();};if($("pInfoBt"))$("pInfoBt").onclick=()=>{close();openBtWith(id);};
   const cv=$("pInfoCv"),g=cv.getContext("2d"),ch=normCh(id===myId?me.ch:(fOthers[id]&&fOthers[id].ch!=null&&fOthers[id].ch>=0?fOthers[id].ch:(typeof o.ch==="number"?o.ch:p.ch)));const tm=setInterval(()=>{if(!document.body.contains(cv))return clearInterval(tm);const t=performance.now();g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,150,150);g.scale(2.3,2.3);const x=34,y=55;drawAura(g,x,y,au,t,0);drawWing(g,x,y,1,wg,t,0);drawChar(g,x,y,ch,0,1,0,0);drawAura(g,x,y,au,t,1);},50);}
@@ -966,9 +966,9 @@ function hueOf(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;
 
 /* ---------- 🧑 캐릭터 ---------- */
 const CHARS=[["기본"],["낚시꾼"],["소녀"],["해적"],["닌자"],["곰"],["고양이"],["개구리"],["펭귄"],["로봇"],["유령"],["남자 (가르마)"],["남자 (뾰족머리)"],["여자 (긴생머리)"],["여자 (포니테일)"],["오리"]];
-const SKIN_PRICE={11:0,13:0,12:1e6,14:1e6,2:1e6,1:1e6,3:1e6,4:1e6,5:1e6,6:1e6,7:1e6,8:1e6,15:1e6,9:1e6,10:1e6};
-const CH_ORDER=[11,13,12,14,2,1,3,4,5,6,7,8,15,9,10];
-const normCh=ch=>(typeof ch==="number"&&ch in SKIN_PRICE)?ch:11;
+const SKIN_PRICE={11:0,13:0,1:1e6,3:1e6,4:1e6,5:1e6,6:1e6,7:1e6,8:1e6,15:1e6,9:1e6,10:1e6};
+const CH_ORDER=[11,13,1,3,4,5,6,7,8,15,9,10];
+const normCh=ch=>(ch===14||ch===2)?13:(typeof ch==="number"&&ch in SKIN_PRICE)?ch:11;
 const ownsSkin=(p,ch)=>SKIN_PRICE[ch]===0||!!(p&&p.skins&&p.skins["s"+ch]);
 function human(c,x,y,dir,bob,lg,o){
   if(o.hs==="long"||o.hs==="bob"){const L=o.hs==="long";c.fillStyle=o.hair;c.beginPath();c.moveTo(x-dir*1-8.2,y-29+bob);c.quadraticCurveTo(x-dir*2-9.5,y-(L?17:22)+bob,x-dir*3-5,y-(L?14:20)+bob);c.lineTo(x-dir*1+5,y-(L?15:21)+bob);c.quadraticCurveTo(x+7.5,y-(L?20:23)+bob,x+7.6,y-29+bob);c.closePath();c.fill();}
@@ -997,6 +997,31 @@ function animal(c,x,y,dir,bob,lg,o){c.fillStyle=o.feet||o.body;c.fillRect(x-6,y-
   c.fillStyle="#111";c.fillRect(x+dir*3-1,hy-2,2,2);c.fillRect(x+dir*3-5,hy-2,2,2);
   if(o.beak){c.fillStyle=o.beak;c.beginPath();c.moveTo(x+dir*6,hy+1);c.lineTo(x+dir*11,hy+2);c.lineTo(x+dir*6,hy+4);c.fill();}
   if(o.whisker){c.strokeStyle="rgba(0,0,0,.5)";c.lineWidth=.7;c.beginPath();c.moveTo(x+dir*4,hy+2);c.lineTo(x+dir*10,hy+1);c.moveTo(x+dir*4,hy+3);c.lineTo(x+dir*10,hy+4);c.stroke();}}
+const AWK_COST=[30000000,100000000,300000000],AWK_COL=[null,"#22d3ee","#a855f7","#facc15"],AWK_NAME=["","1각성","2각성","3각성"];
+const awkOf=(p,ch)=>Math.min(3,(p&&p.awk&&p.awk[ch])|0);
+const myAwk=()=>awkOf(me,normCh(me&&me.ch));
+const awkLift=ak=>[0,3,6,19][ak|0];
+function drawCharAwk(c,x,y,ch,hue,dir,bob,lg,ak,t){if(!ak||!isFinite(x)||!isFinite(y))return drawChar(c,x,y,ch,hue,dir,bob,lg);
+  const s=[1,1.08,1.15,1.22][ak],col=AWK_COL[ak],pul=.5+Math.sin(t/260)*.5;c.save();
+  {const g=c.createRadialGradient(x,y+1,0,x,y+1,14+ak*4);g.addColorStop(0,col+"99");g.addColorStop(1,col+"00");c.fillStyle=g;c.beginPath();c.ellipse(x,y+1,14+ak*4,4.5+ak,0,0,7);c.fill();}
+  if(ak>=2){const sh=y-24*s+bob,wv=Math.sin(t/220)*2;const cg=c.createLinearGradient(x,sh,x,y);cg.addColorStop(0,ak===3?"#991b1b":"#6d28d9");cg.addColorStop(1,ak===3?"#450a0a":"#2e1065");c.fillStyle=cg;c.beginPath();c.moveTo(x+dir*1*s,sh);c.lineTo(x-dir*5*s,sh+1);c.quadraticCurveTo(x-dir*(9*s)+wv*.5,y-12*s,x-dir*(13*s)+wv,y-1);c.lineTo(x-dir*2*s,y-2);c.closePath();c.fill();c.strokeStyle=ak===3?"#facc15":"#c4b5fd";c.lineWidth=1;c.stroke();}
+  c.translate(x,y);c.scale(s,s);c.shadowColor=col;c.shadowBlur=(ak===3?12:ak===2?9:6)+pul*5;drawChar(c,0,0,ch,hue,dir,bob,lg);c.shadowBlur=0;c.restore();
+  if(ak>=3){const hy=y-39.5*s+bob;c.save();c.shadowColor="#fde047";c.shadowBlur=8;const g=c.createLinearGradient(x,hy-7,x,hy);g.addColorStop(0,"#fef08a");g.addColorStop(1,"#d97706");c.fillStyle=g;c.beginPath();c.moveTo(x-6,hy);c.lineTo(x-6,hy-4);c.lineTo(x-3,hy-2);c.lineTo(x,hy-7);c.lineTo(x+3,hy-2);c.lineTo(x+6,hy-4);c.lineTo(x+6,hy);c.closePath();c.fill();c.shadowBlur=0;c.fillStyle="#ef4444";c.beginPath();c.arc(x,hy-2,1.1,0,7);c.fill();c.restore();}
+  for(let k=0;k<ak*2;k++){const ph=(t/(1500-ak*200)+k/(ak*2))%1;const px=x+Math.sin(k*2.3+t/400)*9*s,py=y-4-ph*34*s;c.fillStyle=col;c.globalAlpha=1-ph;c.beginPath();c.arc(px,py,1.2+(ak===3?.4:0),0,7);c.fill();c.globalAlpha=1;}
+  {const a=t/500;sparkle(c,x+Math.cos(a)*11*s,y-30*s+Math.sin(a)*3,1.4+ak*.3,"#fff");}}
+function renderAwk(S){const ch=normCh(me&&me.ch),ak=myAwk(),nm=(CHARS[ch]||["?"])[0];
+  S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:12px;color:var(--sub)">지금 입은 캐릭터를 각성시켜요 (캐릭터마다 따로, 최대 3각성)</div>
+    <div style="display:flex;justify-content:center;align-items:flex-end;gap:14px;margin:10px 0 4px"><div><canvas id="awkCv0" width="150" height="170" style="width:100px;height:113px"></canvas><div style="font-size:12px;color:var(--sub)">지금 ${ak?AWK_NAME[ak]:"각성 전"}</div></div>${ak<3?`<div style="font-size:20px;padding-bottom:40px">➜</div><div><canvas id="awkCv1" width="150" height="170" style="width:100px;height:113px"></canvas><div style="font-size:12px;color:var(--acc);font-weight:900">${AWK_NAME[ak+1]}</div></div>`:""}</div>
+    <b style="font-size:16px">${esc(nm)} ${"⭐".repeat(ak)}${"☆".repeat(3-ak)}</b></div>`+
+    (ak<3?`<div class="card"><div style="font-size:13px;color:var(--sub);line-height:1.6">${["1각성: 몸이 살짝 커지고 하늘색 빛이 감싸요","2각성: 더 커지고 보라빛 기운 + 망토가 생겨요","3각성: 가장 크고 황금빛 + 붉은 망토 + 왕관이 생겨요"][ak]}</div>
+      <button class="go buy" id="awkGo" style="margin-top:12px;width:100%;border-radius:12px;padding:13px 0;font-weight:900">🌟 ${AWK_NAME[ak+1]} · ${formatMoneyReadable(AWK_COST[ak])}</button><div style="font-size:11px;color:var(--sub);margin-top:6px;text-align:center">각성은 실패 없이 바로 돼요 · 다른 캐릭터로 갈아입으면 그 캐릭터는 따로 각성해야 해요</div></div>`
+      :`<div class="card" style="text-align:center;font-weight:900">👑 최대 각성 달성!</div>`);
+  const draw=()=>{for(const[id,l]of[["awkCv0",ak],["awkCv1",ak+1]]){const cv=$(id);if(!cv)continue;const g=cv.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,150,170);g.scale(2.3,2.3);drawCharAwk(g,33,62,ch,0,1,0,0,l,performance.now());}};
+  clearInterval(renderAwk.tm);renderAwk.tm=setInterval(()=>{if(!$("awkCv0"))return clearInterval(renderAwk.tm);draw();},60);draw();
+  if($("awkGo"))$("awkGo").onclick=()=>{if(!me||!me._loaded)return;const cur=myAwk();if(cur>=3)return;const cost=AWK_COST[cur];if(me.cash<cost)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);
+    if(renderAwk.arm!==cur||Date.now()-(renderAwk.at||0)>4000){renderAwk.arm=cur;renderAwk.at=Date.now();return toast(`한 번 더 누르면 ${formatMoneyReadable(cost)}으로 ${AWK_NAME[cur+1]}해요`);}renderAwk.arm=-1;
+    me.cash-=cost;me.awk=me.awk||{};me.awk[normCh(me.ch)]=cur+1;saveMe();renderHeader();lastPres="";pushPresence();toast(`🌟 ${AWK_NAME[cur+1]} 완료!`);if(cur+1>=2)broadcast(`🌟 ${myName()}님의 ${(CHARS[normCh(me.ch)]||["캐릭터"])[0]}이(가) ${AWK_NAME[cur+1]}했어요!`);renderAwk(S);};}
+function removedSkinFix(){if(!me||!me._loaded)return;let ref=0,ch=false;for(const k of[12,14,2]){if(me.skins&&me.skins["s"+k]){delete me.skins["s"+k];ref+=1000000;}}if([12,14,2].includes(me.ch)){me.ch=normCh(me.ch);ch=true;}if(ref||ch){me.cash+=ref;saveMe();renderHeader();lastPres="";pushPresence();if(ref)toast(`🧑 없어진 캐릭터 구매 금액 ${formatMoneyReadable(ref)}을 돌려드렸어요`);}}
 function drawChar(c,x,y,ch,hue,dir,bob,lg){switch(ch){
   case 1:return human(c,x,y,dir,bob,lg,{shirt:"#3a7bd5",pants:"#4b5563",hair:"#3b2a1a",hat:"#c9b27a"});
   case 2:return human(c,x,y,dir,bob,lg,{shirt:"#f472b6",dress:1,pants:"#f2c9a0",hair:"#6b3f1d",hs:"bob",fem:1});
@@ -1017,7 +1042,7 @@ function drawChar(c,x,y,ch,hue,dir,bob,lg){switch(ch){
   case 14:return human(c,x,y,dir,bob,lg,{shirt:"#fde047",pants:"#3b82f6",hair:"#7c2d12",hs:"pony",fem:1});
   case 15:return animal(c,x,y,dir,bob,lg,{body:"#fde047",head:"#fde047",beak:"#f97316",feet:"#f97316",belly:"#fef9c3",duck:1});
   default:return human(c,x,y,dir,bob,lg,{shirt:`hsl(${hue},65%,52%)`,hair:`hsl(${hue},30%,22%)`});}}
-const chOf=id=>({hue:hueOf(id),ch:id===myId?normCh(me&&me.ch):normCh(fOthers[id]&&fOthers[id].ch),au:id===myId?eqCos("aura"):(fOthers[id]&&fOthers[id].au)||"",wg:id===myId?eqCos("wing"):(fOthers[id]&&fOthers[id].wg)||"",tt:id===myId?myTitle():(fOthers[id]&&fOthers[id].tt)||"",rl:id===myId?rodLv():(fOthers[id]&&fOthers[id].rl)|0,np:id===myId?eqCos("plate"):(fOthers[id]&&fOthers[id].np)||""});
+const chOf=id=>({hue:hueOf(id),ch:id===myId?normCh(me&&me.ch):normCh(fOthers[id]&&fOthers[id].ch),au:id===myId?eqCos("aura"):(fOthers[id]&&fOthers[id].au)||"",wg:id===myId?eqCos("wing"):(fOthers[id]&&fOthers[id].wg)||"",tt:id===myId?myTitle():(fOthers[id]&&fOthers[id].tt)||"",rl:id===myId?rodLv():(fOthers[id]&&fOthers[id].rl)|0,np:id===myId?eqCos("plate"):(fOthers[id]&&fOthers[id].np)||"",ak:id===myId?myAwk():(fOthers[id]&&fOthers[id].ak)|0});
 function openChar(){fKeys={};$("fChar").style.display="flex";renderCharPick();}
 let skinArm=null;
 function renderCharPick(){for(const[gid,eq]of[["fCharGrid",0],["shGrid",0],["eqGrid",1]]){const G=$(gid);if(G)renderCharGrid(G,eq);}}
@@ -1033,9 +1058,9 @@ function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
   const H=typeof hue==="object"?hue:{hue,ch:-1};hue=H.hue;
   const bob=walk?Math.sin(t/90)*1.5:0;const lg=walk?Math.sin(t/90)*3:0;
   drawAura(c,x,y,H.au,t,0);c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,y+2,9,3.5,0,0,7);c.fill();
-  drawWing(c,x,y,dir,H.wg,t,bob);drawChar(c,x,y,H.ch,hue,dir,bob,lg);drawAura(c,x,y,H.au,t,1);
+  drawWing(c,x,y,dir,H.wg,t,bob);drawCharAwk(c,x,y,H.ch,hue,dir,bob,lg,H.ak|0,t);drawAura(c,x,y,H.au,t,1);const ex=awkLift(H.ak);
   if(rod)drawRod(c,x+dir*5,y-16,rod.x0,rod.y0,H.rl|0,t);
-  drawPlate(c,x,y,name,H.np||"",t,isMe);if(H.tt){c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;const ty=H.np==="royal"?8:H.np==="legend"?16:H.np==="diamond"?7:0;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64-ty,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8-ty);}
+  drawPlate(c,x,y-ex,name,H.np||"",t,isMe);if(H.tt){c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;const ty=H.np==="royal"?8:H.np==="legend"?16:H.np==="diamond"?7:0;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64-ty-ex,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8-ty-ex);}
   if(state==="bite"){c.font="bold 14.5px sans-serif";c.fillStyle="#ff4757";c.fillText("!",x+12,y-34);}}
 function drawLine(c,x0,y0,bx,by,dip,t){c.strokeStyle="rgba(255,255,255,.7)";c.lineWidth=.8;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo((x0+bx)/2,Math.min(y0,by)-14,bx,by);c.stroke();
   const d=dip?3+Math.sin(t/40)*2:Math.sin(t/300)*1.2;c.fillStyle="rgba(255,255,255,.35)";c.beginPath();c.ellipse(bx,by+3,6+(dip?Math.sin(t/60)*2:0),2,0,0,7);c.fill();
@@ -1076,8 +1101,8 @@ function fishDraw(t){const c=fCtx;
     else{c.fillStyle=["#ffd166","#ef476f","#ffffff","#c77dff"][Math.floor(d.c*4)];c.beginPath();c.arc(d.x,d.y-2,2.2,0,7);c.fill();}}});
   people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
   {const st=rpsState();c.font="bold 10px 'Noto Sans KR',sans-serif";const tw=c.measureText(st.text).width+14,bx=RPS_NPC.x-tw/2,by=RPS_NPC.y-84;c.fillStyle=st.hot?"#fde047":"rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,tw,20,9);c.fill();c.beginPath();c.moveTo(RPS_NPC.x-4,by+20);c.lineTo(RPS_NPC.x+4,by+20);c.lineTo(RPS_NPC.x,by+26);c.fill();c.fillStyle="#111";c.textAlign="center";c.fillText(st.text,RPS_NPC.x,by+14);}
-  const skL=(x,y,n,tt)=>{if(!(n>0))return;if(tt)y-=12;c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
-  skL(fp.x,fp.y,rpsN(),myTitle());for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt);}
+  const skL=(x,y,n,tt,ak)=>{if(!(n>0))return;if(tt)y-=12;y-=awkLift(ak);c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
+  skL(fp.x,fp.y,rpsN(),myTitle(),myAwk());for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt,o.ak);}
   const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p)drawBubble(c,p.x,p.y,b.text);}
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);
@@ -1098,14 +1123,14 @@ function fishStep(dt,t){
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;o.x+=dx*Math.min(1,dt/120);o.y+=dy*Math.min(1,dt/120);}
-  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),rl:rodLv(),np:eqCos("plate"),name:myName(),sk:rpsN(),fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
+  const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),rl:rodLv(),np:eqCos("plate"),ak:myAwk(),name:myName(),sk:rpsN(),fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${dexNo(idx)}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=10000000?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
 function fTapOther(x,y){let best=null,bd=1e9;for(const id in fOthers){const o=fOthers[id];if(!o||o.fs==="away")continue;const hw=Math.max(15,String(o.name||"").length*5+6);if((Math.abs(x-o.x)<15&&y>o.y-40&&y<o.y+6)||(Math.abs(x-o.x)<hw&&y>o.y-55&&y<o.y-36)){const d=Math.abs(x-o.x)+Math.abs(y-(o.y-20));if(d<bd){bd=d;best=id;}}}return best;}
 function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id===myId)continue;const v=onlineMap[id];if(!v||now-(v.t||0)>180000){delete fOthers[id];continue;}
     const has=typeof v.fx==="number",sp=has?{x:v.fx,y:v.fy}:spawnOf(id);
-    const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.rl=Math.min(50,v.rl|0);o.np=v.np||"";o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
+    const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.rl=Math.min(50,v.rl|0);o.np=v.np||"";o.ak=Math.min(3,v.ak|0);o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
     if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if(o.fct||Date.now()-v.fc.t<8000)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=10000000?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
 function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
@@ -1234,7 +1259,7 @@ async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)r
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
-const APP_VERSION="20261125-011000";
+const APP_VERSION="20261125-014000";
 function checkUpdate(){if(location.protocol==="file:")return;fetch(location.pathname+"?u="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const APP_VERSION="([^"]+)"/);if(m&&m[1]!==APP_VERSION)showUpdate();}).catch(()=>{});}
 function hardReload(){location.replace(location.pathname+"?r="+Date.now());}
 let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display==="flex")return;M.style.display="flex";if(msg)M.querySelector("div div:nth-child(2)").textContent=msg;let n=5;const busy=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.value;};
