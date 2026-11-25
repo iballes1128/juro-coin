@@ -285,7 +285,7 @@ nav button.on{color:var(--tx);font-weight:700}
   <div class="sh-top" style="padding-right:40px"><div><div id="shName" style="font-weight:700;font-size:14.5px"></div><div class="big" id="shPrice"></div><div id="shRate" style="font-size:12px;font-weight:700"></div></div>
     <div style="text-align:right;font-size:11px;color:var(--sub);line-height:1.7" id="shRange"></div></div>
   <canvas id="chart"></canvas>
-  <div class="ranges" id="ranges"><button data-n="30" class="on">5분</button><button data-n="180">30분</button><button data-n="360">1시간</button><button data-n="1080">3시간</button></div>
+  <div class="ranges" id="ranges"><button data-n="60" class="on">10분</button><button data-n="180">30분</button><button data-n="360">1시간</button><button data-n="1080">3시간</button></div>
   <div id="shHold" style="font-size:12px;color:var(--sub);margin-bottom:10px"></div>
   <div class="bs"><button class="buy on" data-m="buy">매수</button><button class="sell" data-m="sell">매도</button></div>
   <input id="qty" inputmode="numeric" placeholder="수량(개)">
@@ -343,7 +343,7 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=16;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=17;
 /* 11/25 16:50(KST)부터 v10: 기본가로 꼭 안 돌아옴, 폭락 후 바닥 횡보도 */const F10_T=Date.parse("2026-11-25T07:50:00Z");let K10=0;
 /* 11/25 16:36(KST)부터 v9: 15분마다 2개 코인 큰 코스 + 점프 뒤 모멘텀 */const F9_T=Date.parse("2026-11-25T07:36:00Z");let K9=0,LISTK=[];
 /* 11/25 16:22(KST)부터 v8: 매끈하게 흐르다 가끔 한 번에 2~6% 툭 */const F8_T=Date.parse("2026-11-25T07:22:00Z");let K8=0;
@@ -539,7 +539,7 @@ let fdb=null,db=null,user=null,room=null,myId=null,isOwner=false,canWrite=false,
 const canTrade=()=>canWrite||localMode;
 const LKEY='cau_coin_local_v1';
 function enterLocal(){if(localMode)return;localMode=true;try{const v=JSON.parse(localStorage.getItem(LKEY)||'null');if(v&&typeof v.cash==='number'){me={...local,...v};}}catch(e){}if(!me.name)me.name='나';me._loaded=true;showNotices();renderAll();}
-let profitCoin="전체",me=null,players={},saving=false,dirty=false,curCoin=-1,mode="buy",rankKey="rich",chartN=30;
+let profitCoin="전체",me=null,players={},saving=false,dirty=false,curCoin=-1,mode="buy",rankKey="rich",chartN=60;
 const local={cash:START_CASH,coins:{},name:"",att:0,lastAtt:"",claimed:[]};
 const $=id=>document.getElementById(id);
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2600);}
@@ -575,7 +575,7 @@ function renderMarket(){const L=$("coinList");if(!L.children.length){COINS.forEa
     const h=me&&me.coins[n];d.querySelector(".hd").textContent=h&&h.count>0?"보유 "+formatCoinReadable(h.count):"";
     d.querySelector(".pr b").textContent=c.pre?"상장 예정":c.delisted?"거래 정지":formatCoinPrice(c.price);d.querySelector(".pr b").className=c.rate>0?"up":c.rate<0?"down":"";
     d.querySelector(".rt").innerHTML=c.pre?'<small class="flat">상장 '+Math.max(1,Math.ceil((tickT(LISTK[ci])-tickT(M.k))/60000))+'분 전</small>':c.delisted?'<small class="flat">재상장 '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 후</small>':rateHtml(c.rate);
-    const hs=c.hist.slice(-kSpan(300000));spark(d.querySelector(".spark"),hs,hs[hs.length-1]>=hs[0]?"#f04452":"#3b82f6");});}
+    const hs=c.hist.slice(-kSpan(1800000));spark(d.querySelector(".spark"),hs,hs[hs.length-1]>=hs[0]?"#f04452":"#3b82f6");});}
 
 /* ===================== 화면: 상단 / 내 자산 ===================== */
 function renderHeader(){if(!me)return;$("hCash").textContent=formatMoneyReadable(me.cash);$("hTotal").textContent=formatMoneyReadable(assetOf(me));}
