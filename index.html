@@ -1510,7 +1510,8 @@ function boatFront(c,x,y,t,sk,tl){const G=sk===2,b=boatBob(t);c.save();c.transla
   c.fillStyle=G?"#fff7ae":"#dc2626";c.beginPath();c.moveTo(-23.5,0);c.quadraticCurveTo(0,7,23.5,0);c.lineTo(22.5,2.2);c.quadraticCurveTo(0,9.2,-22.5,2.2);c.closePath();c.fill();
   c.strokeStyle="rgba(0,0,0,.25)";c.lineWidth=.8;c.beginPath();c.moveTo(-25,-3);c.quadraticCurveTo(0,4,25,-3);c.stroke();if(G){c.fillStyle="#fff";for(let k=0;k<3;k++){const a=(t/260+k*2.1)%6.28,sx=-18+k*18+Math.sin(a)*3;c.globalAlpha=.5+.5*Math.sin(a);c.fillRect(sx,2+Math.cos(a),1.6,1.6);}c.globalAlpha=1;}c.restore();}
 const inShop=(x,y)=>(x>NTS.x-6&&x<NTS.x+NTS.w+6&&y>NTS.y-4&&y<NTS.y+NTS.h+4)||(x>CAS.x-6&&x<CAS.x+CAS.w+6&&y>CAS.y-4&&y<CAS.y+CAS.h+4)||(x>SHOP.x-6&&x<SHOP.x+SHOP.w+6&&y>SHOP.y-4&&y<SHOP.y+SHOP.h+4)||(x>CLB.x-6&&x<CLB.x+CLB.w+6&&y>CLB.y-4&&y<CLB.y+CLB.h+4)||(x>PHB.x-6&&x<PHB.x+PHB.w+6&&y>PHB.y-4&&y<PHB.y+PHB.h+4);
-const walk1=(x,y)=>x>=10&&x<=FW-10&&y>=76&&y<=FH-12;
+const RV1=58;/* 건너편: 아래쪽 강 높이 */
+const walk1=(x,y)=>x>=10&&x<=FW-10&&y>=76&&y<=FH-12&&(y<FH-RV1-2||(x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6));
 const inDock=(x,y)=>x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+(isOwner||bridgeAll?16:42)&&y<=RIVER+16;
 const walkable=(x,y)=>!inShop(x,y)&&x>=10&&x<=FW-10&&y<=FH-12&&(y>=RIVER+14||inDock(x,y));
 function fishSpot(x,y){if(fArea)return false;if(inDock(x,y))return y<RIVER-6;return y<=RIVER+34&&!(x>DOCK.x-12&&x<DOCK.x+DOCK.w+12);}
@@ -2210,19 +2211,24 @@ function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
 function drawLine(c,x0,y0,bx,by,dip,t){c.strokeStyle="rgba(255,255,255,.7)";c.lineWidth=.8;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo((x0+bx)/2,Math.min(y0,by)-14,bx,by);c.stroke();
   const d=dip?3+Math.sin(t/40)*2:Math.sin(t/300)*1.2;c.fillStyle="rgba(255,255,255,.35)";c.beginPath();c.ellipse(bx,by+3,6+(dip?Math.sin(t/60)*2:0),2,0,0,7);c.fill();
   c.fillStyle="#ff4757";c.beginPath();c.arc(bx,by+d,3.2,Math.PI,0);c.fill();c.fillStyle="#fff";c.beginPath();c.arc(bx,by+d,3.2,0,Math.PI);c.fill();}
-function fishDraw1(t){const c=fCtx;
-  const g=c.createLinearGradient(0,0,0,FH);g.addColorStop(0,"#2f6b3a");g.addColorStop(.35,"#5aa34a");g.addColorStop(1,"#4a8f3f");c.fillStyle=g;c.fillRect(0,0,FW,FH);
-  c.fillStyle="rgba(255,255,255,.06)";for(let i=0;i<34;i++){const r=mulberry(i*17)();c.fillRect((i*47)%FW,20+((i*89)%(FH-40)),2,4+r*3);}
-  c.fillStyle="#cdb27a";c.fillRect(DOCK.x+4,FH-250,DOCK.w-8,250);c.beginPath();c.ellipse(FW/2+40,150,86,44,0,0,7);c.fill();c.fillStyle="rgba(0,0,0,.06)";c.beginPath();c.ellipse(FW/2+40,154,86,44,0,0,7);c.fill();
-  /* 다리 (아래에서 올라오는 끝) */
-  c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,FH-124,DOCK.w,124);c.fillStyle="#7a5230";c.fillRect(DOCK.x,FH-130,DOCK.w,130);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,FH-130,3,130);c.fillRect(DOCK.x+DOCK.w-3,FH-130,3,130);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=FH-124;y<FH;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
-  c.fillStyle="#4a301b";for(const py of[FH-130,FH-90,FH-50]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}
-  const people=[];const tr=mulberry(4242);for(let i=0;i<16;i++){const tx=14+tr()*(FW-28),ty=90+tr()*(FH-260);if(Math.abs(tx-FW/2-40)<70&&Math.abs(ty-150)<60)continue;if(tx>DOCK.x-14&&tx<DOCK.x+DOCK.w+14)continue;people.push({y:ty,f:()=>{c.fillStyle="rgba(0,0,0,.2)";c.beginPath();c.ellipse(tx,ty+2,13,4.5,0,0,7);c.fill();c.fillStyle="#6b4423";c.fillRect(tx-3,ty-14,6,15);c.fillStyle="#2f8a45";c.beginPath();c.arc(tx,ty-22,14,0,7);c.fill();c.fillStyle="#3aa557";c.beginPath();c.arc(tx-4,ty-26,9,0,7);c.fill();}});}
+function fishDraw1(t){const c=fCtx,SH=FH-RV1;
+  const g=c.createLinearGradient(0,0,0,SH);g.addColorStop(0,"#2f6b3a");g.addColorStop(.4,"#5aa34a");g.addColorStop(1,"#4a8f3f");c.fillStyle=g;c.fillRect(0,0,FW,FH);
+  c.fillStyle="rgba(255,255,255,.06)";for(let i=0;i<34;i++){const r=mulberry(i*17)();c.fillRect((i*47)%FW,20+((i*89)%(SH-60)),2,4+r*3);}
+  /* 강 (원래 지역의 위아래 대칭: 아래쪽에 조금) */
+  const wg=c.createLinearGradient(0,SH,0,FH);wg.addColorStop(0,"#2f86b5");wg.addColorStop(1,"#1d5f8a");c.fillStyle=wg;c.fillRect(0,SH-4,FW,RV1+4);
+  c.strokeStyle="rgba(255,255,255,.16)";c.lineWidth=1.2;for(let i=0;i<6;i++){const y=SH+10+i*9,o=(t/40+i*37)%(FW+60)-30;c.beginPath();c.moveTo(o,y);c.quadraticCurveTo(o+8,y-3,o+16,y);c.stroke();c.beginPath();c.moveTo((o+170)%(FW+60)-30,y+5);c.quadraticCurveTo((o+178)%(FW+60)-30,y+2,(o+186)%(FW+60)-30,y+5);c.stroke();}
+  c.fillStyle="#d9c38a";c.beginPath();c.moveTo(0,SH-22);c.lineTo(FW,SH-22);c.lineTo(FW,SH-2);for(let x=FW;x>=0;x-=20)c.lineTo(x,SH-2+Math.sin(x/23)*3);c.closePath();c.fill();
+  /* 땅 위 길 + 광장 */
+  c.fillStyle="#cdb27a";c.fillRect(DOCK.x+4,SH-190,DOCK.w-8,190);c.beginPath();c.ellipse(FW/2+40,150,86,44,0,0,7);c.fill();c.fillStyle="rgba(0,0,0,.06)";c.beginPath();c.ellipse(FW/2+40,154,86,44,0,0,7);c.fill();
+  /* 다리: 땅에서 강을 건너 아래 끝까지 (조금만 건너면 땅) */
+  {const y0=SH-16,h=FH-y0;c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,y0+6,DOCK.w,h);c.fillStyle="#7a5230";c.fillRect(DOCK.x,y0,DOCK.w,h);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,y0,3,h);c.fillRect(DOCK.x+DOCK.w-3,y0,3,h);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=y0+6;y<FH;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
+    c.fillStyle="#4a301b";for(const py of[y0+2,y0+36,y0+70]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}}
+  const people=[];const tr=mulberry(4242);for(let i=0;i<16;i++){const tx=14+tr()*(FW-28),ty=90+tr()*(FH-RV1-170);if(Math.abs(tx-FW/2-40)<70&&Math.abs(ty-150)<60)continue;if(tx>DOCK.x-14&&tx<DOCK.x+DOCK.w+14)continue;people.push({y:ty,f:()=>{c.fillStyle="rgba(0,0,0,.2)";c.beginPath();c.ellipse(tx,ty+2,13,4.5,0,0,7);c.fill();c.fillStyle="#6b4423";c.fillRect(tx-3,ty-14,6,15);c.fillStyle="#2f8a45";c.beginPath();c.arc(tx,ty-22,14,0,7);c.fill();c.fillStyle="#3aa557";c.beginPath();c.arc(tx-4,ty-26,9,0,7);c.fill();}});}
   people.push({y:fp.y,f:()=>drawPerson(c,fp.x,fp.y,myName(),chOf(myId),fp.dir,fp.tx!=null||fKeysOn()||!!fJoyV,null,"idle",true,t)});
   for(const id in fOthers){const o=fOthers[id];if((o.fa|0)!==fArea||o.fs==="away")continue;people.push({y:o.y,f:()=>drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t)});}
   people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
   c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";emoSign(c,"🚧","공사 중 · 곧 열려요",FW/2+40,96,"bold 10px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.45)",20);
-  emoSign(c,"🌉","다리를 건너면 주로 광장",DOCK.x+DOCK.w/2,FH-142,"bold 9px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.4)",18);
+  emoSign(c,"🌉","다리를 건너면 주로 광장",DOCK.x+DOCK.w/2,SH-40,"bold 9px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.4)",18);
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1||(f.a|0)!==fArea)continue;c.globalAlpha=1-a*a;c.font="bold 11px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fff";c.fillText(f.s,f.x,f.y-a*24);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);}
 function fishFade(t){const c=fCtx,a=1-(t-fAreaT)/520;if(a>0&&a<=1){c.fillStyle=`rgba(0,0,0,${a.toFixed(3)})`;c.fillRect(0,0,FW,FH);}}
