@@ -193,6 +193,16 @@ nav button.on{color:var(--tx);font-weight:700}
 /* 낚시 결과창 작게 */
 #fishRes{min-width:180px;padding:9px 13px;transform:translate(-50%,-50%) scale(.7)}
 #fishRes.on{transform:translate(-50%,-50%) scale(.8)}
+
+/* 주사위 굴림·당첨 효과 */
+@keyframes dspin{0%{transform:rotate(0) scale(.92)}50%{transform:rotate(180deg) scale(1.05)}100%{transform:rotate(360deg) scale(.92)}}
+.dspin{animation:dspin .25s linear infinite}
+@keyframes dland{0%{transform:scale(1.35)}60%{transform:scale(.9)}100%{transform:scale(1)}}
+.dland{animation:dland .3s ease-out}
+@keyframes dwin{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+.dwin{animation:dwin .45s ease-out}
+@keyframes dlose{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.dlose{animation:dlose .3s ease-in-out 2}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -637,7 +647,7 @@ function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach|
     S.style.minHeight="86vh";/* 분류마다 업적 수가 달라도 창 크기·버튼 위치가 안 바뀌게 */
     S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:12px;color:var(--sub)">달성한 업적</div><b style="font-size:20px">${done} / ${total}</b><div style="font-size:11px;color:var(--sub);margin-top:4px">목표를 달성하면 🎁 보상 받기 · 받은 칭호는 👤 마이 → 🎖️ 칭호에서 달 수 있어요</div></div>`+
     `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${G.map(([gk,gn])=>{const n=rdy(gk),on=gk===achTab;return `<button data-achg="${gk}" style="position:relative;flex:1;min-width:64px;padding:10px 4px;border-radius:10px;font-weight:900;font-size:12.5px;background:${on?"var(--acc)":"var(--card2)"};color:${on?"#111":"var(--tx)"}">${gn}${n?`<span style="position:absolute;top:-5px;right:-3px;background:var(--up);color:#fff;font-size:9.5px;border-radius:9px;padding:1px 6px">${n}</span>`:""}</button>`;}).join("")}</div>`+
-    (L.length?L.map(achCard).join(""):`<div style="color:var(--sub);text-align:center;padding:40px 0;font-size:13px">아직 업적이 없어요</div>`);
+    (L.length?L.map((a,i)=>{const has=(me&&me.ach)||{},done=a.tiers.every((t,j)=>has[achId(a.k,j)]),x=achNext(a);return[a,done?2:(x&&x.ready?0:1),i];}).sort((p,q)=>p[1]-q[1]||p[2]-q[2]).map(p=>achCard(p[0])).join(""):`<div style="color:var(--sub);text-align:center;padding:40px 0;font-size:13px">아직 업적이 없어요</div>`);
     S.querySelectorAll("[data-achc]").forEach(b=>b.onclick=()=>achClaim(b.dataset.achc));
     S.querySelectorAll("[data-achg]").forEach(b=>b.onclick=()=>{achTab=b.dataset.achg;try{localStorage.setItem("jc_achTab",achTab);}catch(e){}renderAch();});}
   const T=$("s-title");if(T&&pgCur==="my"&&pgSub==="title"){const own=[];for(const id in((me&&me.ach)||{})){const nm=titleOf(id,me);if(nm)own.push([id,nm,""]);}const cur=(me&&me.title&&me.ach&&me.ach[me.title])?me.title:"";
@@ -1485,11 +1495,14 @@ function diceEval(d){const s=d[0]+d[1]+d[2],tri=d[0]===d[1]&&d[1]===d[2],sel=dic
   if(sel==="sum")return s===dice.sum?DICE_SUM[s]:0;if(sel==="any3")return tri?DICE_ANY3:0;if(sel==="sp3")return tri&&d[0]===dice.sp?DICE_SP3:0;return 0;}
 function diceSelName(){return{big:"대 (11~17)",small:"소 (4~10)",odd:"홀",even:"짝",sum:`합계 ${dice.sum}`,any3:"아무 트리플",sp3:`${dice.sp}-${dice.sp}-${dice.sp} 트리플`}[dice.sel];}
 function diceMult(){return dice.sel==="sum"?DICE_SUM[dice.sum]:dice.sel==="any3"?DICE_ANY3:dice.sel==="sp3"?DICE_SP3:DICE_EVEN;}
-function diceRoll(){if(casBusy)return;const stake=casBet;if(!casCanBet(stake))return;me.cash-=stake;saveMe();renderHeader();casBusy=true;dice.res=null;
-  const fin=[1,2,3].map(()=>1+Math.floor(Math.random()*6));const t0=performance.now();const tm=setInterval(()=>{dice.shown=[1,2,3].map(()=>1+Math.floor(Math.random()*6));drawDice();if(performance.now()-t0>1000){clearInterval(tm);dice.shown=fin;
+function diceRoll(){if(casBusy)return;const stake=casBet;if(!casCanBet(stake))return;me.cash-=stake;saveMe();renderHeader();casBusy=true;dice.res=null;dice.stop=0;
+  const fin=[1,2,3].map(()=>1+Math.floor(Math.random()*6));const t0=performance.now();const tm=setInterval(()=>{const el=performance.now()-t0;dice.stop=el>1900?3:el>1300?2:el>700?1:0;dice.shown=[0,1,2].map(i=>i<dice.stop?fin[i]:1+Math.floor(Math.random()*6));drawDice();if(el>1900){clearInterval(tm);dice.shown=fin;
     const m=diceEval(fin),pay=Math.round(stake*m),tri=fin[0]===fin[1]&&fin[1]===fin[2];if(pay)me.cash+=pay;casPay(stake,pay,"dice",m);if(tri)stAdd("diceTriple");if(tri&&fin[0]===6)stAdd("dice666");
     dice.res={fin,m,pay,stake,tri};casBusy=false;saveMe();renderHeader();renderCas();if(pay-stake>=10000000)broadcast(`🎲 ${myName()}님 주사위 ${diceSelName()} 적중! ${fin.join("-")} → +${casFmt(pay-stake)} (${m}배)`);}},70);renderCas();}
-function drawDice(){const b=$("diceBox");if(!b)return;b.innerHTML=dice.shown.map(v=>`<div style="width:58px;height:58px;border-radius:12px;background:#f8fafc;color:#111;display:flex;align-items:center;justify-content:center;font-size:46px;line-height:1;box-shadow:0 3px 10px rgba(0,0,0,.4)">${DFACE[v]}</div>`).join("");}
+function drawDice(){const b=$("diceBox");if(!b)return;const R=dice.res,rolling=casBusy&&casTab==="dice",st=dice.stop||0;
+  if(b.children.length!==3)b.innerHTML=[0,1,2].map(()=>`<div style="width:58px;height:58px;border-radius:12px;background:#f8fafc;color:#111;display:flex;align-items:center;justify-content:center;font-size:46px;line-height:1;box-shadow:0 3px 10px rgba(0,0,0,.4);transition:background .2s,box-shadow .2s"></div>`).join("");
+  [...b.children].forEach((e,i)=>{const t=DFACE[dice.shown[i]];if(e.textContent!==t)e.textContent=t;const cls=rolling&&i>=st?"dspin":(rolling&&i<st?"dland":"");if(e.className!==cls)e.className=cls;e.style.background=R&&!R.pay?"#cbd5e1":"#f8fafc";e.style.boxShadow=R&&R.pay?"0 0 0 3px #fbbf24,0 0 18px #fbbf24":"0 3px 10px rgba(0,0,0,.4)";});
+  const r=$("diceRes");if(r)r.innerHTML=R?`<div class="${R.pay?"dwin":"dlose"}" style="text-align:center;padding:8px 6px;border-radius:12px;margin:-2px 0 10px;background:${R.pay?"linear-gradient(90deg,#78350f,#b45309,#78350f)":"rgba(30,41,59,.9)"};border:1px solid ${R.pay?"#fbbf24":"var(--line)"}"><div style="font-size:${R.pay?20:16}px;font-weight:900;color:${R.pay?"#fde047":"#93c5fd"}">${R.pay?`🎉 당첨! ${R.m}배`:"😢 꽝"}</div><div style="font-size:12px;margin-top:2px;color:${R.pay?"#fff":"var(--sub)"}">${R.fin.join(" - ")} · 합 ${R.fin[0]+R.fin[1]+R.fin[2]}${R.tri?" · 트리플!":""} → ${R.pay?`+${casFmt(R.pay-R.stake)}`:`-${casFmt(R.stake)}`}</div></div>`:(rolling?`<div style="text-align:center;font-size:12px;color:var(--sub);margin:-2px 0 10px">🎲 굴리는 중… ${diceSelName()}에 ${casFmt(casBet)}</div>`:"");}
 /* ---------- 화면 ---------- */
 function renderCas(){const d=$("casMod");if(!d||d.style.display!=="flex")return;const cash=me?me.cash:0;
   const tabs=`<div style="display:flex;gap:6px;margin-bottom:10px">${[["lad","🪜 사다리"],["dice","🎲 주사위"]].map(([k,n])=>`<button data-cast="${k}" style="flex:1;padding:9px 0;border-radius:10px;font-weight:900;background:${casTab===k?"var(--acc)":"var(--card2)"};color:${casTab===k?"#111":"var(--tx)"}">${n}</button>`).join("")}</div>`;
@@ -1506,14 +1519,14 @@ function renderCas(){const d=$("casMod");if(!d||d.style.display!=="flex")return;
       (lad.stage==="won"?`<div style="text-align:center;margin-top:10px"><div style="font-size:15px;font-weight:900;color:#fbbf24">🎉 ${lad.streak>1?lad.streak+"연속 ":""}성공! ${casFmt(lad.pot)}</div><div style="display:flex;gap:8px;margin-top:8px"><button id="ladTake" style="flex:1;padding:11px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">💰 받기</button>${lad.streak<LAD_MAXSTREAK?`<button id="ladMore" style="flex:1;padding:11px 0;border-radius:10px;background:var(--up);color:#fff;font-weight:900">🔥 한 번 더<br><small style="font-weight:400">맞히면 ${casFmt(lad.pot*m)}</small></button>`:""}</div></div>`:"")+
       (lad.stage==="lost"?`<div style="text-align:center;margin-top:10px"><div style="font-size:15px;font-weight:900;color:#93c5fd">😢 꽝… ${casFmt(lad.stake)} 잃었어요</div><button id="ladRe" style="margin-top:8px;width:100%;padding:11px 0;border-radius:10px;background:var(--card2);font-weight:900">🪜 새 사다리</button></div>`:"");}
   else{const opt=(k,n,m)=>`<button data-dsel="${k}" style="padding:8px 4px;border-radius:9px;font-size:12px;font-weight:700;background:${dice.sel===k?"#fbbf24":"var(--card2)"};color:${dice.sel===k?"#111":"var(--tx)"}">${n}<br><small style="font-weight:400">${m}</small></button>`;
-    body=`<div id="diceBox" style="display:flex;gap:10px;justify-content:center;margin:4px 0 10px"></div>
+    body=`<div id="diceBox" style="display:flex;gap:10px;justify-content:center;margin:4px 0 10px"></div><div id="diceRes"></div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px">${opt("big","대 11~17",DICE_EVEN+"배")}${opt("small","소 4~10",DICE_EVEN+"배")}${opt("odd","홀",DICE_EVEN+"배")}${opt("even","짝",DICE_EVEN+"배")}</div>
       <div style="font-size:10.5px;color:var(--sub);margin:4px 0 8px">대·소·홀·짝은 트리플(세 개 같은 숫자)이 나오면 져요</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:5px">${opt("sum","합계 맞히기",DICE_SUM[dice.sum]+"배")}${opt("any3","아무 트리플",DICE_ANY3+"배")}${opt("sp3","숫자 트리플",DICE_SP3+"배")}</div>`+
       (dice.sel==="sum"?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px">${Object.keys(DICE_SUM).map(Number).sort((a,b)=>a-b).map(v=>`<button data-dsum="${v}" style="flex:1 0 13%;padding:5px 0;border-radius:7px;font-size:11px;background:${dice.sum===v?"#fbbf24":"var(--card2)"};color:${dice.sum===v?"#111":"var(--tx)"}">${v}<br><small>${DICE_SUM[v]}배</small></button>`).join("")}</div>`:"")+
       (dice.sel==="sp3"?`<div style="display:flex;gap:4px;margin-top:6px">${[1,2,3,4,5,6].map(v=>`<button data-dsp="${v}" style="flex:1;padding:4px 0;border-radius:7px;font-size:22px;background:${dice.sp===v?"#fbbf24":"var(--card2)"};color:${dice.sp===v?"#111":"var(--tx)"}">${DFACE[v]}</button>`).join("")}</div>`:"")+
       `<button id="diceGo" style="margin-top:10px;width:100%;padding:12px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:14px;${casBusy?"opacity:.5":""}">🎲 굴리기 · ${diceSelName()} (${diceMult()}배)</button>`+
-      (dice.res?`<div style="text-align:center;margin-top:8px;font-size:14px;font-weight:900;color:${dice.res.pay?"#fbbf24":"#93c5fd"}">${dice.res.fin.join(" - ")} (합 ${dice.res.fin[0]+dice.res.fin[1]+dice.res.fin[2]})${dice.res.tri?" · 트리플!":""} → ${dice.res.pay?`🎉 ${dice.res.m}배! +${casFmt(dice.res.pay-dice.res.stake)}`:`😢 꽝 -${casFmt(dice.res.stake)}`}</div>`:"");}
+"";}
   d.innerHTML=`<div class="btBox" style="max-width:380px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><b style="font-size:15.5px">🎰 도박장</b><button id="casX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>${tabs}${bet}${body}<div style="font-size:10px;color:var(--sub);text-align:center;margin-top:10px">판돈의 10%는 도박장 몫으로 국세청에 쌓여요 · 판돈 ${casFmt(CAS_MIN)}~${casFmt(CAS_MAX)}</div></div>`;
   $("casX").onclick=()=>{if(!casBusy)casClose();};
   d.querySelectorAll("[data-cast]").forEach(b=>b.onclick=()=>{if(casBusy||lad.stage==="won")return toast(lad.stage==="won"?"먼저 받거나 한 번 더 해 주세요":"잠시만요");casTab=b.dataset.cast;renderCas();});
