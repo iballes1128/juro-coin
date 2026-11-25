@@ -3085,20 +3085,20 @@ function openArcade(){if(!me||!me._loaded)return toast("닉네임부터 정해 �
   if(!d){d=document.createElement("div");d.id="arcMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
     d.innerHTML=`<div class="btBox" style="max-width:380px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:15.5px">🕹️ 오락실</b><button id="arcX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
       <button id="arcClw" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">🔑</span><span style="flex:1"><b style="font-size:14.5px">열쇠 뽑기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">집게로 열쇠를 집어 상품 받기 · 10만원</div></span><b style="color:var(--acc)">›</b></button>
-      <button id="arcTm" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">⏱️</span><span style="flex:1"><b style="font-size:14.5px">시간 맞추기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">딱 10초에 멈추면 보상 · 20만원</div></span><b style="color:var(--acc)">›</b></button><button id="arcBb" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);text-align:left"><span style="font-size:32px">🏀</span><span style="flex:1"><b style="font-size:14.5px">농구</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">3라운드 슛 대결 · 주간 순위 · 20만원</div></span><b style="color:var(--acc)">›</b></button></div>`;
-    $("arcX").onclick=()=>{d.style.display="none";};$("arcClw").onclick=()=>{d.style.display="none";openClw();};$("arcTm").onclick=()=>{d.style.display="none";openTm();};$("arcBb").onclick=()=>{d.style.display="none";openBb();};}
-  d.style.display="flex";}
+      <button id="arcTm" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">⏱️</span><span style="flex:1"><b style="font-size:14.5px">시간 맞추기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">딱 10초에 멈추면 보상 · 주간 순위 · 20만원</div></span><b style="color:var(--acc)">›</b></button><button id="arcBb" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);text-align:left"><span style="font-size:32px">🏀</span><span style="flex:1"><b style="font-size:14.5px">농구</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">3라운드 슛 대결 · 주간 순위 · 20만원</div></span><b style="color:var(--acc)">›</b></button><div id="arcLive"></div></div>`;
+    $("arcX").onclick=()=>{d.style.display="none";};$("arcClw").onclick=()=>{d.style.display="none";openClw();};$("arcTm").onclick=()=>{d.style.display="none";openTm();};$("arcBb").onclick=()=>{d.style.display="none";openBb();};$("arcLive").onclick=e=>{const b=e.target.closest("[data-lv]");if(b){d.style.display="none";openLive(b.dataset.lv);}};}
+  d.style.display="flex";liveListen();arcLiveRender();}
 /* ---------- ⏱️ 시간 맞추기 ---------- */
 function openTm(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stVisit("visitTm");let d=$("tmMod");
   if(!d){d=document.createElement("div");d.id="tmMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)tmClose();};d.addEventListener("keydown",e=>e.stopPropagation());
     d.innerHTML=`<div class="btBox" style="max-width:380px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b style="font-size:15.5px">⏱️ 시간 맞추기</b><div style="display:flex;gap:6px"><button id="tmBack" style="padding:7px 11px;border-radius:10px;background:var(--card2);font-size:12px;font-weight:800">🕹️ 오락실</button><button id="tmX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div></div>
       <div id="tmDisp" style="margin:6px 0;padding:22px 0 16px;border-radius:16px;background:#0f172a;text-align:center;border:2px solid var(--line)"><div id="tmBig" style="font-size:56px;font-weight:900;font-variant-numeric:tabular-nums;color:#fde047;letter-spacing:1px;line-height:1.1">0.00</div><div id="tmSub" style="font-size:12px;color:var(--sub);margin-top:6px;min-height:34px;line-height:1.5"></div></div>
       <button id="tmBtn" style="width:100%;margin-top:6px;padding:20px 0;border-radius:16px;background:var(--acc);color:#111;font-weight:900;font-size:19px;touch-action:manipulation"></button>
-      <div style="margin-top:10px;padding:10px;border-radius:12px;background:var(--card2);font-size:11.5px;line-height:1.7"><b>💰 보상표 (낸 돈 20만원 기준)</b><br>${TM_TIERS.map(t=>`${t[2]} 오차 ±${(t[0]/1000).toFixed(2)}초 이내 → <b style="color:var(--acc)">${t[1]}배</b> (${formatMoneyReadable(Math.round(TM_COST*t[1]))})`).join("<br>")}<br><span style="color:var(--sub)">그 밖에는 꽝 · ${TM_HIDE/1000}초 뒤부터 숫자가 사라져요 · 시작하면 도중에 나갈 수 없어요</span></div></div>`;
+      <div style="margin-top:10px;padding:10px;border-radius:12px;background:var(--card2);font-size:11.5px;line-height:1.7"><b>💰 보상표 (낸 돈 20만원 기준)</b><br>${TM_TIERS.map(t=>`${t[2]} 오차 ±${(t[0]/1000).toFixed(2)}초 이내 → <b style="color:var(--acc)">${t[1]}배</b> (${formatMoneyReadable(Math.round(TM_COST*t[1]))})`).join("<br>")}<br><span style="color:var(--sub)">그 밖에는 꽝 · ${TM_HIDE/1000}초 뒤부터 숫자가 사라져요 · 시작하면 도중에 나갈 수 없어요</span></div><div id="tmRank" style="margin-top:10px;padding:10px;border-radius:12px;background:var(--card2)"></div></div>`;
     $("tmX").onclick=tmClose;$("tmBack").onclick=()=>{if(tm.on)return toast("⏱️ 도전 중에는 나갈 수 없어요");d.style.display="none";openArcade();};
     $("tmBtn").addEventListener("pointerdown",e=>{e.preventDefault();tm.on?tmStop():tmStart();});
     window.addEventListener("keydown",e=>{if(!tmOpen()||e.code!=="Space"||e.repeat)return;e.preventDefault();tm.on?tmStop():tmStart();});}
-  d.style.display="flex";tmRender();}
+  d.style.display="flex";tmRender();tmListen();tmPanel();}
 function tmClose(){if(tm.on)return toast("⏱️ 도전 중에는 나갈 수 없어요");const d=$("tmMod");if(d)d.style.display="none";}
 function tmRender(){const B=$("tmBtn"),big=$("tmBig"),sub=$("tmSub");if(!B)return;
   if(tm.on)return;B.textContent=`⏱️ 시작 · ${formatMoneyReadable(TM_COST)} (스페이스)`;B.style.background="var(--acc)";B.style.color="#111";
@@ -3106,7 +3106,7 @@ function tmRender(){const B=$("tmBtn"),big=$("tmBig"),sub=$("tmSub");if(!B)retur
     sub.innerHTML=`<b>${r.tier?r.tier[2]:"😢 꽝"}</b> · 목표 10.00초 ${r.ms>=TM_TARGET?"+":"-"}${(Math.abs(r.ms-TM_TARGET)/1000).toFixed(2)}초<br>${r.pay>0?`<b style="color:#4ade80">+${formatMoneyReadable(r.pay-TM_COST)}</b> (${r.tier[1]}배 ${formatMoneyReadable(r.pay)})`:`<span style="color:#f87171">-${formatMoneyReadable(TM_COST)}</span>`}${tm.best!=null?` · 오늘 최고 오차 ${(tm.best/1000).toFixed(2)}초`:""}`;}
   else{big.textContent="0.00";big.style.color="#fde047";sub.innerHTML="시작을 누르고, 딱 <b>10초</b>가 됐다고 느껴질 때 멈춤!<br>숫자는 잠깐만 보여요";}}
 function tmStart(){if(tm.on)return;if(!me||!me._loaded||sessBlocked)return toast("지금은 할 수 없어요");if(typeof casCanBet==="function"&&!casCanBet(TM_COST))return;if((me.cash|0)<TM_COST)return toast("돈이 모자라요");
-  me.cash-=TM_COST;saveMe();renderHeader();tm.on=true;tm.res=null;tm.t0=performance.now();const B=$("tmBtn");B.textContent="🛑 멈춰! (스페이스)";B.style.background="#ef4444";B.style.color="#fff";
+  me.cash-=TM_COST;saveMe();renderHeader();tm.on=true;tm.res=null;tm.t0=performance.now();liveSet({g:"tm",n:myName().slice(0,10),st:"run",t0:nowS()},1);const B=$("tmBtn");B.textContent="🛑 멈춰! (스페이스)";B.style.background="#ef4444";B.style.color="#fff";
   const big=$("tmBig"),sub=$("tmSub");big.style.color="#fde047";sub.textContent="속으로 세어 보세요… 🤫";
   const loop=()=>{if(!tm.on)return;const el=performance.now()-tm.t0;
     if(el>=TM_MAX){tmStop();return;}
@@ -3114,8 +3114,74 @@ function tmStart(){if(tm.on)return;if(!me||!me._loaded||sessBlocked)return toast
     tm.raf=requestAnimationFrame(loop);};loop();}
 function tmStop(){if(!tm.on)return;tm.on=false;cancelAnimationFrame(tm.raf);const ms=Math.min(TM_MAX,performance.now()-tm.t0),err=Math.abs(ms-TM_TARGET),tier=tmTier(err),pay=tier?Math.round(TM_COST*tier[1]):0;
   casPay(TM_COST,pay,"tm",tier?tier[1]:0);stAdd("tmN");if(tier&&tier[1]>=8)stAdd("tmPerfect");if(pay){me.cash+=pay;stAdd("tmWinN");}
-  tm.best=tm.best==null?err:Math.min(tm.best,err);tm.res={ms,pay,tier};saveMe();renderHeader();tmRender();
+  tm.best=tm.best==null?err:Math.min(tm.best,err);tm.res={ms,pay,tier};liveSet({st:"done",ms:Math.round(ms),pay:pay-TM_COST,tn:tier?tier[2]:"😢 꽝"});liveEnd(10000);tmSubmit(err,ms);saveMe();renderHeader();tmRender();
   if(tier&&tier[1]>=2.5)broadcast(`⏱️ ${myName()}님이 시간 맞추기에서 ${(ms/1000).toFixed(2)}초! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-TM_COST)}`);}
+/* ---------- 🏅 시간 맞추기 주간 순위 (오차가 작은 순 TOP3) ---------- */
+const tmT={top:[],best:null,q:null,wk:0};
+function tmSubmit(err,ms){if(!fdb||!myId)return;const wk=bbWk(nowS()),e=Math.round(err*1000);
+  fdb.ref(`market/tm/w/${wk}/${myId}`).transaction(c=>{if(c&&c.e<=e)return;return{n:myName().slice(0,10),e,ms:Math.round(ms*1000),k:(2e7-e)*1e6+(1e6-Math.floor(nowS()/1000)%1e6),t:nowS()};}).catch(()=>{});}
+function tmListen(){if(!fdb)return;const wk=bbWk(nowS());if(tmT.q&&tmT.wk===wk)return;if(tmT.q){try{tmT.q.off();}catch(e){}}tmT.wk=wk;tmT.q=fdb.ref("market/tm/w/"+wk).orderByChild("k").limitToLast(3);
+  tmT.q.on("value",s=>{const v=s.val()||{};tmT.top=Object.keys(v).map(k=>({id:k,...v[k]})).sort((x,y)=>y.k-x.k);tmPanel();});
+  fdb.ref(`market/tm/w/${wk}/${myId}`).on("value",s=>{const v=s.val();tmT.best=v?v.e:null;tmPanel();});}
+function tmPanel(){const el=$("tmRank");if(!el)return;const med=["🥇","🥈","🥉"];let h=`<b style="font-size:12.5px">🏅 이번 주 순위 <span style="font-weight:600;color:var(--sub);font-size:11px">(10초에 가장 가까운 순)</span></b>`;
+  for(let i=0;i<3;i++){const r=tmT.top[i];h+=`<div style="display:flex;justify-content:space-between;gap:6px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span>${med[i]} ${r?esc(r.n||"?"):"-"}</span><b style="color:${r&&r.id===myId?"var(--acc)":"inherit"}">${r?`${(r.ms/1e6).toFixed(3)}초 <span style="font-weight:600;color:var(--sub)">(±${(r.e/1e6).toFixed(3)})</span>`:""}</b></div>`;}
+  const ms=Math.max(0,bbWkEnd(bbWk(nowS()))-nowS()),d=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5);
+  h+=`<div style="font-size:11.5px;margin-top:8px;line-height:1.6">내 최고 오차: <b>${tmT.best==null?"-":"±"+(tmT.best/1e6).toFixed(3)+"초"}</b><br><span style="color:var(--sub)">월요일 0시에 초기화 · ${d}일 ${hh}시간 남음</span></div>`;
+  el.innerHTML=h;}
+/* ---------- 👀 실시간 관전 (시간 맞추기 · 농구) ---------- */
+let bbSN=0,bbHN=0,liveOn=false,liveTok=0,liveMap={},liveQ=null,liveTm=0;
+const liveH=()=>{const H=chOf(myId)||{};return{hue:H.hue|0,ch:H.ch||0,au:H.au||"",wg:H.wg||"",np:H.np||"",ak:H.ak|0,ac:H.ac||""};};
+function liveSet(o,rep){if(!fdb||!myId||!me||sessBlocked)return;const r=fdb.ref("market/live/"+myId);o.t=nowS();if(rep){liveTok++;o.H=liveH();}
+  try{if(!liveOn){liveOn=true;r.onDisconnect().remove();}(rep?r.set(o):r.update(o)).catch(()=>{});}catch(e){}}
+function liveEnd(delay){const tok=liveTok,f=()=>{if(tok!==liveTok||!fdb||!myId)return;try{fdb.ref("market/live/"+myId).remove();}catch(e){}};delay?setTimeout(f,delay):f();}
+function liveListen(){if(liveQ||!fdb)return;liveQ=fdb.ref("market/live");liveQ.on("value",s=>{liveMap=s.val()||{};arcLiveRender();if(lvOpen())lvApply(liveMap[lv.id]);});
+  liveTm=setInterval(()=>{if(arcOpen())arcLiveRender();},4000);}
+function liveRows(){const now=nowS(),a=[];for(const id in liveMap){const v=liveMap[id];if(!v||!v.g||id===myId)continue;const age=now-(v.t||0);
+  if(v.g==="tm"){if(v.st!=="run"||age>25000)continue;a.push({id,n:v.n,txt:"⏱️ 시간 맞추기 도전 중"});}
+  else{if(v.ph==="end"||age>150000)continue;a.push({id,n:v.n,txt:`🏀 농구 ${v.r||1}라운드 · ${(v.tot||0)+(v.ph==="play"?(v.rs||0):0)}점`});}}return a;}
+function arcLiveRender(){const el=$("arcLive");if(!el)return;const a=liveRows();
+  el.innerHTML=`<div style="margin:14px 0 6px;font-size:12.5px"><b>👀 지금 플레이 중</b> <span style="color:var(--sub);font-size:11px">누르면 구경할 수 있어요</span></div>`+(a.length?a.map(x=>`<button data-lv="${esc(x.id)}" style="display:flex;align-items:center;gap:8px;width:100%;padding:11px 12px;border-radius:12px;background:var(--card2);margin-bottom:6px;text-align:left;font-size:12.5px"><span style="flex:1;min-width:0"><b>${esc(x.n||"?")}</b><div style="font-size:11px;color:var(--sub);margin-top:1px">${x.txt}</div></span><b style="color:var(--acc)">구경 ›</b></button>`).join(""):`<div style="padding:8px 2px;font-size:11.5px;color:var(--sub)">지금 플레이 중인 사람이 없어요</div>`);}
+const lv={id:"",raf:0,S:null,game:"",v:null,over:false};
+const lvOpen=()=>{const d=$("lvMod");return !!d&&d.style.display==="flex";};
+function openLive(id){fKeys={};let d=$("lvMod");
+  if(!d){d=document.createElement("div");d.id="lvMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)lvClose();};d.addEventListener("keydown",e=>e.stopPropagation());
+    d.innerHTML=`<div class="btBox" style="max-width:380px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b id="lvTitle" style="font-size:15.5px">👀 관전</b><div style="display:flex;gap:6px"><button id="lvBack" style="padding:7px 11px;border-radius:10px;background:var(--card2);font-size:12px;font-weight:800">🕹️ 오락실</button><button id="lvX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div></div>
+      <div id="lvTm" style="display:none"><div style="margin:6px 0;padding:22px 0 16px;border-radius:16px;background:#0f172a;text-align:center;border:2px solid var(--line)"><div id="lvBig" style="font-size:56px;font-weight:900;font-variant-numeric:tabular-nums;color:#fde047;line-height:1.1">0.00</div><div id="lvTmSub" style="font-size:12px;color:var(--sub);margin-top:6px;min-height:34px;line-height:1.5"></div></div></div>
+      <div id="lvBb" style="display:none"><canvas id="lvCv" width="720" height="840" style="width:100%;max-width:360px;display:block;margin:0 auto;border-radius:14px;background:#0f172a"></canvas><div id="lvBbSub" style="text-align:center;font-size:12px;line-height:1.6;margin:8px 0 4px;min-height:38px"></div></div>
+      <div id="lvGone" style="display:none;padding:30px 0;text-align:center;font-size:13px;color:var(--sub)">플레이가 끝났어요</div>
+      <div style="font-size:11px;color:var(--sub);text-align:center;margin-top:6px">구경만 할 수 있어요 · 약간의 지연이 있을 수 있어요</div></div>`;
+    $("lvX").onclick=lvClose;$("lvBack").onclick=()=>{lvClose();openArcade();};}
+  lv.id=id;lv.game="";lv.S=null;lv.v=null;lv.over=false;d.style.display="flex";
+  ["lvTm","lvBb","lvGone"].forEach(k=>$(k).style.display="none");lvApply(liveMap[id]);cancelAnimationFrame(lv.raf);lvLoop();}
+function lvClose(){const d=$("lvMod");if(d)d.style.display="none";cancelAnimationFrame(lv.raf);lv.id="";}
+function lvApply(v){if(!lvOpen())return;
+  if(!v||!v.g){lv.over=true;if(!lv.game){["lvTm","lvBb"].forEach(k=>$(k).style.display="none");$("lvGone").style.display="block";}return;}
+  lv.over=false;$("lvGone").style.display="none";lv.v=v;
+  if(v.g==="tm"){lv.game="tm";$("lvTm").style.display="block";$("lvBb").style.display="none";$("lvTitle").textContent="👀 "+(v.n||"?")+" · ⏱️ 시간 맞추기";}
+  else{lv.game="bb";$("lvTm").style.display="none";$("lvBb").style.display="block";$("lvTitle").textContent="👀 "+(v.n||"?")+" · 🏀 농구";lvBbApply(v);}}
+function lvBbApply(v){const pf=performance.now(),ns=nowS();let S=lv.S,first=false;
+  if(!S){first=true;S=lv.S={phase:"idle",round:1,total:0,rs:0,ball:null,ch:{on:false,t0:0},bon:0,cs:0,ms:0,pop:[],top:[],hx:BB_HX,hx0:BB_HX,hx1:BB_HX,sl:0,t0:0,cd:0,battle:null,len:BB_LEN,lr:0};}
+  S.n=v.n;S.H=v.H||S.H;S.round=v.r||1;S.total=v.tot||0;S.rs=v.rs||0;S.bon=v.bon||0;S.cs=v.cs||0;S.ms=v.ms||0;
+  if(first){const h=v.hx1||v.sx||BB_HX;S.hx=S.hx0=S.hx1=h;S.phase=v.ph;S.lr=v.r;S.hn=v.hn;S.sn=v.sn;if(v.ph==="count")S.cd=pf+(v.ts-ns);if(v.ph==="play")S.t0=pf-(ns-v.ts);}
+  else{
+    if(v.ph!==S.phase||v.r!==S.lr){S.phase=v.ph;S.lr=v.r;if(v.ph==="count"){S.cd=pf+(v.ts-ns);S.hx=S.hx0=S.hx1=BB_HX;S.ball=null;S.pop=[];}else if(v.ph==="play"){S.t0=pf-(ns-v.ts);}}
+    if(v.hn!==S.hn){S.hn=v.hn;if(v.hx1){S.hx0=S.hx;S.hx1=v.hx1;S.sl=pf+(v.hs-ns);}}
+    if(v.sn!==S.sn){S.sn=v.sn;const age=ns-(v.st||0);if(v.sp!=null&&age<4000){const el=v.el||0,r=bbSim(v.sp,(v.r||1)===3?(t=>bbHoop3(el+t)):v.sx);S.ball={...r,t0:pf-Math.max(0,age),got:false,fin:0,fire:!!v.f};}}}
+  const sub=$("lvBbSub");if(v.ph==="end")sub.innerHTML=`🏁 <b>최종 ${v.tot||0}점</b> ${esc(v.tn||"")}${v.pay>0?`<br><b style="color:#4ade80">+${formatMoneyReadable(v.pay)}</b>`:""}`;
+  else if(v.ph==="between")sub.innerHTML=`✅ <b>${v.r}라운드 통과</b> · 누적 ${v.tot||0}점<br><span style="color:var(--sub)">다음 라운드를 준비하는 중…</span>`;
+  else sub.innerHTML=`<b>${esc(v.n||"?")}</b>님이 <b>${v.r||1}라운드</b>를 하는 중${v.bon>0?`<br><b style="color:#fb923c">🔥 5점 찬스! 남은 ${v.bon}번</b>`:""}`;}
+function lvBbUpdate(S,now){if(S.phase==="play"){const el=(now-S.t0)/1000;if(S.round===3)S.hx=bbHoop3(el);else{const u=Math.min(1,Math.max(0,(now-S.sl)/600));S.hx=S.hx0+(S.hx1-S.hx0)*(u*u*(3-2*u));}}
+  const b=S.ball;if(b){const i=Math.floor((now-b.t0)/1000*240);
+    if(!b.got&&b.pts&&i>=b.si){b.got=true;let pt=b.pts,tx=pt===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col=pt===3?"#4ade80":"#fde047";if(b.fire){pt=5;tx="+5 🔥 불꽃슛!";col="#fb923c";}S.pop.push({t:now,txt:tx,col,x:S.hx,y:BBP.HY-30});}
+    if(i>=b.path.length-1){if(!b.fin)b.fin=now;if(now-b.fin>260)S.ball=null;}}}
+function lvLoop(){if(!lvOpen())return;const now=performance.now(),v=lv.v;
+  if(lv.game==="tm"&&v){const big=$("lvBig"),sub=$("lvTmSub");
+    if(v.st==="run"){const el=Math.min(TM_MAX,Math.max(0,nowS()-v.t0));big.textContent=(el/1000).toFixed(2);big.style.color="#fde047";sub.innerHTML=lv.over?"플레이가 끝났어요":`<b>${esc(v.n||"?")}</b>님이 도전 중 · 목표 <b>10.00초</b><br>구경하는 사람에게는 숫자가 계속 보여요`;}
+    else{const err=Math.abs((v.ms||0)-TM_TARGET),net=v.pay||0;big.textContent=((v.ms||0)/1000).toFixed(2);big.style.color=net>-TM_COST?"#4ade80":"#f87171";
+      sub.innerHTML=`<b>${esc(v.tn||"")}</b> · 목표 10.00초 ${v.ms>=TM_TARGET?"+":"-"}${(err/1000).toFixed(2)}초<br><b style="color:${net>=0?"#4ade80":"#f87171"}">${net>=0?"+":"-"}${formatMoneyReadable(Math.abs(net))}</b>`;}}
+  else if(lv.game==="bb"&&lv.S){const S=lv.S;S.top=bb.top||[];lvBbUpdate(S,now);bbDraw(now,S,"lvCv");if(lv.over&&S.phase!=="end")$("lvBbSub").innerHTML="플레이가 끝났어요";}
+  lv.raf=requestAnimationFrame(lvLoop);}
+
 /* ---------- 🏀 농구 : 3라운드 누적 · 꾹 눌러 힘 조절 · 백보드 2점 / 클린 3점 · 주간 순위 ---------- */
 const BB_COST=200000,BB_LEN=30,BB_NEED=[20,50],BB_FILL=1400,BB_PRIZE=5000000,BB_MIN=75,BB_HX=270,BB_CD=3000,BB_FIRE=3;
 /* [누적 점수 이상, 배수, 이름] — 3라운드 모두 통과했을 때만 */
@@ -3136,6 +3202,7 @@ function bbSim(p,hxa){const B=BBP,th=B.ANG,v=B.VMIN+p*(B.VMAX-B.VMIN),hy=B.HY,H=
   return{pts,board,rim,path,si,hx:H(0),hs:hx};}
 const bbHoop3=el=>BB_HX+26*Math.sin(el*1.2);
 const bb={hx0:BB_HX,hx1:BB_HX,sl:0,on:false,phase:"idle",round:0,total:0,rs:0,t0:0,hx:BB_HX,ch:{on:false,t0:0},ball:null,cool:0,pop:[],raf:0,top:[],best:0,last:null,prev:null,q:null,wk:0,msg:"",cd:0,cs:0,ms:0,bon:0};
+const bbLeftS=(S,now)=>(S.len||BB_LEN)-(now-S.t0)/1000;
 const bbOpen=()=>{const d=$("bbMod");return !!d&&d.style.display==="flex";};
 function bbClaim(){if(!fdb||!myId)return;const wp=bbWk(nowS())-1;if(wp<0)return;
   fdb.ref("market/bball/w/"+wp).orderByChild("k").limitToLast(1).once("value").then(s=>{const v=s.val();if(!v)return;const id=Object.keys(v)[0],r=v[id];bb.prev=r;bbPanel();
@@ -3207,37 +3274,37 @@ function bbDown(){const ph=bb.phase;
   if(ph==="play"&&!bb.ball&&!bb.ch.on&&performance.now()>=bb.cool&&bbLeft()>0){bb.ch={on:true,t0:performance.now()};}}
 function bbUp(){if(!bb.ch.on)return;const p=Math.min(1,(performance.now()-bb.ch.t0)/BB_FILL);bb.ch.on=false;if(bb.phase!=="play"||bb.ball)return;
   const t0=performance.now(),r=bbSim(p,bb.round===3?(t=>bbHoop3((t0-bb.t0)/1000+t)):bb.hx),fire=bb.bon>0;if(fire)bb.bon--;bb.ball={...r,t0:performance.now(),got:false,fin:0,fire};stAdd("bbShots");
-  if(fire){if(bb.bon===0){bb.cs=0;bb.ms=0;}}else{if(r.pts>0)bb.ms++;else bb.ms=0;if(r.pts===3)bb.cs++;else bb.cs=0;if(bb.cs>=5||bb.ms>=10){bb.bon=BB_FIRE;bb.cs=0;bb.ms=0;bb.fireAt=performance.now();}}}
+  if(fire){if(bb.bon===0){bb.cs=0;bb.ms=0;}}else{if(r.pts>0)bb.ms++;else bb.ms=0;if(r.pts===3)bb.cs++;else bb.cs=0;if(bb.cs>=5||bb.ms>=10){bb.bon=BB_FIRE;bb.cs=0;bb.ms=0;bb.fireAt=performance.now();}}if(!bb.battle){bbSN++;liveSet({sn:bbSN,sp:p,sx:bb.hx,el:(t0-bb.t0)/1000,st:nowS(),f:fire?1:0,bon:bb.bon,cs:bb.cs,ms:bb.ms});}}
 const bbLeft=()=>(bb.len||BB_LEN)-(performance.now()-bb.t0)/1000;
 function bbStart(){if(bbBusy())return;if(!me||!me._loaded||sessBlocked)return toast("지금은 할 수 없어요");if(typeof casCanBet==="function"&&!casCanBet(BB_COST))return;if((me.cash|0)<BB_COST)return toast("돈이 모자라요");
   me.cash-=BB_COST;saveMe();renderHeader();bb.round=0;bb.total=0;bb.last=null;bbRound();}
-function bbRound(){bb.round++;bb.rs=0;bb.phase="count";bb.cd=performance.now()+BB_CD;bb.hx=BB_HX;bb.hx0=BB_HX;bb.hx1=BB_HX;bb.sl=0;bb.ball=null;bb.ch.on=false;bb.cool=0;bb.pop=[];bb.cs=0;bb.ms=0;bb.bon=0;bbRender();}
+function bbRound(){bb.round++;bb.rs=0;bb.phase="count";bb.cd=performance.now()+BB_CD;bb.hx=BB_HX;bb.hx0=BB_HX;bb.hx1=BB_HX;bb.sl=0;bb.ball=null;bb.ch.on=false;bb.cool=0;bb.pop=[];bb.cs=0;bb.ms=0;bb.bon=0;liveSet({g:"bb",n:myName().slice(0,10),ph:"count",r:bb.round,ts:nowS()+BB_CD,tot:bb.total,rs:0,bon:0,cs:0,ms:0},bb.round===1);bbRender();}
 function bbEndRound(){bb.ch.on=false;bb.ball=null;
   if(bb.battle){bb.phase="end";const r=BT_PATH+"/"+bb.battle;fdb.ref(r+"/fin/"+myId).set(bb.rs).catch(()=>{});fdb.ref(r+"/bs/"+myId).set(bb.rs).catch(()=>{});bb.msg=`🏁 내 점수 <b>${bb.rs}점</b><br>상대가 끝나길 기다리는 중…`;bbRender();return;}
   bb.total+=bb.rs;const need=BB_NEED[bb.round-1];
   if(bb.round>=3)return bbFinish(true);
-  if(bb.total>=need){bb.phase="between";bb.msg=`✅ <b>${bb.round}라운드 통과!</b> 이번 ${bb.rs}점 · 누적 <b>${bb.total}점</b><br>다음 목표: 누적 ${BB_NEED[bb.round]}점 ${bb.round===2?"· 골대가 움직여요!":""}`;bbRender();}
+  if(bb.total>=need){bb.phase="between";bb.msg=`✅ <b>${bb.round}라운드 통과!</b> 이번 ${bb.rs}점 · 누적 <b>${bb.total}점</b><br>다음 목표: 누적 ${BB_NEED[bb.round]}점 ${bb.round===2?"· 골대가 움직여요!":""}`;liveSet({ph:"between",r:bb.round,tot:bb.total,rs:0});bbRender();}
   else bbFinish(false);}
 function bbFinish(passed){bb.phase="end";const need=BB_NEED[bb.round-1],tier=passed?bbTier(bb.total):null,pay=tier?Math.round(BB_COST*tier[1]):0;
   casPay(BB_COST,pay,"bb",tier?tier[1]:0);stAdd("bbN");stMax("bbBest",bb.total);if(pay){me.cash+=pay;stAdd("bbWinN");}saveMe();renderHeader();bbSubmit(bb.total);
   bb.last={total:bb.total,pay,tier,passed};
   bb.msg=!passed?`😢 <b>${bb.round}라운드 탈락</b> (누적 ${bb.total}점 / 목표 ${need}점)<br><span style="color:#f87171">-${formatMoneyReadable(BB_COST)}</span>`
     :`🏁 <b>최종 ${bb.total}점</b> ${tier?tier[2]:"😢 보상 없음 (${BB_MIN}점 미만)"}<br>${pay>0?`<b style="color:#4ade80">${pay>BB_COST?"+":""}${formatMoneyReadable(pay-BB_COST)}</b> (${tier[1]}배 ${formatMoneyReadable(pay)})`:`<span style="color:#f87171">-${formatMoneyReadable(BB_COST)}</span>`}`;
-  bbRender();if(tier&&tier[1]>=2)broadcast(`🏀 ${myName()}님이 농구 ${bb.total}점! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-BB_COST)}`);}
+  liveSet({ph:"end",tot:bb.total,rs:0,tn:passed?(tier?tier[2]:"보상 없음"):"탈락",pay:pay-BB_COST});liveEnd(15000);bbRender();if(tier&&tier[1]>=2)broadcast(`🏀 ${myName()}님이 농구 ${bb.total}점! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-BB_COST)}`);}
 function bbLoop(){if(!bbOpen())return;const now=performance.now();bbUpdate(now);bbDraw(now);bb.raf=requestAnimationFrame(bbLoop);}
-function bbUpdate(now){if(bb.phase==="count"){if(now>=bb.cd){bb.phase="play";bb.t0=now;bbRender();}return;}if(bb.phase!=="play")return;const el=(now-bb.t0)/1000;
+function bbUpdate(now){if(bb.phase==="count"){if(now>=bb.cd){bb.phase="play";bb.t0=now;if(!bb.battle)liveSet({ph:"play",ts:nowS()});bbRender();}return;}if(bb.phase!=="play")return;const el=(now-bb.t0)/1000;
   if(bb.round===3)bb.hx=bbHoop3(el);else{const u=Math.min(1,(now-bb.sl)/600);bb.hx=bb.hx0+(bb.hx1-bb.hx0)*(u*u*(3-2*u));}
   const b=bb.ball;
   if(b){const i=Math.floor((now-b.t0)/1000*240);
-    if(!b.got&&b.pts&&i>=b.si){b.got=true;let pt=b.pts,tx=pt===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col=pt===3?"#4ade80":"#fde047";if(b.fire){pt=5;tx="+5 🔥 불꽃슛!";col="#fb923c";}bb.rs+=pt;bb.pop.push({t:now,txt:tx,col,x:bb.hx,y:BBP.HY-30});stAdd(b.pts===3?"bbClean":"bbBank");if(b.fire)stAdd("bbFire");if(bb.battle)fdb.ref(BT_PATH+"/"+bb.battle+"/bs/"+myId).set(bb.rs).catch(()=>{});}
-    if(i>=b.path.length-1){if(!b.fin)b.fin=now;if(now-b.fin>260){bb.ball=null;if(bb.round===3)bb.cool=now+150;else{bb.hx0=bb.hx;bb.hx1=250+Math.random()*40;bb.sl=now+100;bb.cool=now+800;}}}}
+    if(!b.got&&b.pts&&i>=b.si){b.got=true;let pt=b.pts,tx=pt===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col=pt===3?"#4ade80":"#fde047";if(b.fire){pt=5;tx="+5 🔥 불꽃슛!";col="#fb923c";}bb.rs+=pt;if(!bb.battle)liveSet({rs:bb.rs});bb.pop.push({t:now,txt:tx,col,x:bb.hx,y:BBP.HY-30});stAdd(b.pts===3?"bbClean":"bbBank");if(b.fire)stAdd("bbFire");if(bb.battle)fdb.ref(BT_PATH+"/"+bb.battle+"/bs/"+myId).set(bb.rs).catch(()=>{});}
+    if(i>=b.path.length-1){if(!b.fin)b.fin=now;if(now-b.fin>260){bb.ball=null;if(bb.round===3)bb.cool=now+150;else{bb.hx0=bb.hx;bb.hx1=250+Math.random()*40;bb.sl=now+100;bb.cool=now+800;if(!bb.battle)liveSet({hn:++bbHN,hx1:bb.hx1,hs:nowS()+100});}}}}
   if(bb.ch.on&&bbLeft()<=0)bb.ch.on=false;
   if(bbLeft()<=0&&!bb.ball)bbEndRound();}
-function bbDraw(now){const cv=$("bbCv");if(!cv)return;const c=cv.getContext("2d"),B=BBP;c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,B.W,B.H);
+function bbDraw(now,S,cvId){S=S||bb;const cv=$(cvId||"bbCv");if(!cv)return;const c=cv.getContext("2d"),B=BBP;c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,B.W,B.H);
   let g=c.createLinearGradient(0,0,0,B.H);g.addColorStop(0,"#1e293b");g.addColorStop(1,"#0f172a");c.fillStyle=g;c.fillRect(0,0,B.W,B.H);
   c.fillStyle="rgba(250,204,21,.06)";for(let i=0;i<6;i++)c.fillRect(10+i*60,0,26,B.FLOOR);
   c.fillStyle="#b45309";c.fillRect(0,B.FLOOR,B.W,B.H-B.FLOOR);c.fillStyle="#d97706";c.fillRect(0,B.FLOOR,B.W,4);c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=2;c.beginPath();c.moveTo(0,B.FLOOR+22);c.lineTo(B.W,B.FLOOR+22);c.stroke();
-  const play=bb.phase==="play",hx=bb.hx,hy=B.HY,bx=hx+B.RIMW+3;
+  const play=S.phase==="play",hx=S.hx,hy=B.HY,bx=hx+B.RIMW+3;
   /* 골대 */
   c.strokeStyle="#64748b";c.lineWidth=5;c.beginPath();c.moveTo(bx+8,hy+B.BOARDB);c.lineTo(bx+8,B.FLOOR);c.stroke();
   c.fillStyle="rgba(241,245,249,.92)";c.fillRect(bx,hy+B.BOARDT,6,B.BOARDB-B.BOARDT);c.strokeStyle="#ef4444";c.lineWidth=2;c.strokeRect(bx+.5,hy-26,5,22);
@@ -3245,33 +3312,33 @@ function bbDraw(now){const cv=$("bbCv");if(!cv)return;const c=cv.getContext("2d"
   c.beginPath();c.moveTo(hx-B.RIMW*.6,hy+26);c.lineTo(hx+B.RIMW*.6,hy+26);c.stroke();
   c.strokeStyle="#f97316";c.lineWidth=4;c.lineCap="round";c.beginPath();c.moveTo(hx-B.RIMW,hy);c.lineTo(hx+B.RIMW,hy);c.stroke();
   /* 캐릭터 */
-  const H=phSelf().H;phPerson(c,H,myName().slice(0,8),B.PX,B.FLOOR+4,1.7,now,bb.ch.on?"up":"base",1);
+  const H=S.H||phSelf().H;phPerson(c,H,(S.n||myName()).slice(0,8),B.PX,B.FLOOR+4,1.7,now,S.ch.on?"up":"base",1);
   /* 공 */
   const ball=(x,y,rot,fire)=>{c.save();c.translate(x,y);if(fire){c.fillStyle="rgba(251,146,60,.35)";c.beginPath();c.arc(0,0,13+Math.sin(now/60)*2,0,7);c.fill();c.fillStyle="rgba(253,224,71,.5)";c.beginPath();c.arc(0,0,10,0,7);c.fill();}c.rotate(rot);c.fillStyle=fire?"#fb923c":"#f97316";c.beginPath();c.arc(0,0,9,0,7);c.fill();c.strokeStyle="#7c2d12";c.lineWidth=1.1;c.beginPath();c.arc(0,0,9,0,7);c.moveTo(-9,0);c.lineTo(9,0);c.moveTo(0,-9);c.lineTo(0,9);c.stroke();c.restore();};
-  if(bb.ball){const b=bb.ball,i=Math.min(b.path.length-1,Math.floor((now-b.t0)/1000*240)),pt=b.path[i]||b.path[b.path.length-1];ball(pt[0],pt[1],i/18,b.fire);}
-  else if(play||bb.phase==="idle")ball(B.PX+14,B.FLOOR-62-(bb.ch.on?Math.sin(now/90)*1.5:0),0,bb.bon>0);
+  if(S.ball){const b=S.ball,i=Math.min(b.path.length-1,Math.floor((now-b.t0)/1000*240)),pt=b.path[i]||b.path[b.path.length-1];ball(pt[0],pt[1],i/18,b.fire);}
+  else if(play||S.phase==="idle")ball(B.PX+14,B.FLOOR-62-(S.ch.on?Math.sin(now/90)*1.5:0),0,S.bon>0);
   /* 게이지 */
-  const gx=20,gy=396,gw=320,gh=12,p=bb.ch.on?Math.min(1,(now-bb.ch.t0)/BB_FILL):0;
+  const gx=20,gy=396,gw=320,gh=12,p=S.ch.on?Math.min(1,(now-S.ch.t0)/BB_FILL):0;
   c.fillStyle="rgba(255,255,255,.12)";c.fillRect(gx,gy,gw,gh);
   if(p>0){const gg=c.createLinearGradient(gx,0,gx+gw,0);gg.addColorStop(0,"#4ade80");gg.addColorStop(.6,"#fde047");gg.addColorStop(1,"#ef4444");c.fillStyle=gg;c.fillRect(gx,gy,gw*p,gh);}
   c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=1;for(let k=1;k<10;k++){c.beginPath();c.moveTo(gx+gw*k/10,gy);c.lineTo(gx+gw*k/10,gy+gh);c.stroke();}c.strokeRect(gx,gy,gw,gh);
   /* HUD */
   c.textAlign="left";c.fillStyle="#fff";c.font="900 15px 'Noto Sans KR',sans-serif";
-  if(bb.battle){c.fillStyle="#fb923c";c.font="900 14px 'Noto Sans KR',sans-serif";c.fillText(`⚔️ ${String(bb.opN||"?").slice(0,6)} ${bb.opS|0}점`,12,24);c.font="700 11px 'Noto Sans KR',sans-serif";c.fillStyle="#cbd5e1";c.fillText(bb.rs>bb.opS?"내가 앞서는 중!":bb.rs<bb.opS?"뒤지는 중!":"동점",12,42);
-    c.textAlign="right";c.fillStyle="#fde047";c.font="900 20px 'Noto Sans KR',sans-serif";c.fillText(`나 ${bb.rs}점`,B.W-12,26);
-    if(play){const left=Math.max(0,bbLeft());c.font="900 24px 'Noto Sans KR',sans-serif";c.fillStyle=left<10?"#f87171":"#fff";c.textAlign="center";c.fillText(left.toFixed(1),B.W/2,28);c.font="700 10px 'Noto Sans KR',sans-serif";c.fillStyle="#94a3b8";c.fillText("남은 시간(초)",B.W/2,41);}}
-  else if(bb.phase==="idle"){c.fillText("🏀 농구",12,24);}
-  else{const need=BB_NEED[Math.min(2,Math.max(0,bb.round-1))],cum=bb.total+(play?bb.rs:0);c.fillText(`R${bb.round}/3`,12,24);c.font="700 12px 'Noto Sans KR',sans-serif";c.fillStyle="#cbd5e1";c.fillText(bb.round<3?`목표 누적 ${need}점`:"골대가 움직여요!",12,42);
+  if(S.battle){c.fillStyle="#fb923c";c.font="900 14px 'Noto Sans KR',sans-serif";c.fillText(`⚔️ ${String(S.opN||"?").slice(0,6)} ${S.opS|0}점`,12,24);c.font="700 11px 'Noto Sans KR',sans-serif";c.fillStyle="#cbd5e1";c.fillText(S.rs>S.opS?"내가 앞서는 중!":S.rs<S.opS?"뒤지는 중!":"동점",12,42);
+    c.textAlign="right";c.fillStyle="#fde047";c.font="900 20px 'Noto Sans KR',sans-serif";c.fillText(`나 ${S.rs}점`,B.W-12,26);
+    if(play){const left=Math.max(0,bbLeftS(S,now));c.font="900 24px 'Noto Sans KR',sans-serif";c.fillStyle=left<10?"#f87171":"#fff";c.textAlign="center";c.fillText(left.toFixed(1),B.W/2,28);c.font="700 10px 'Noto Sans KR',sans-serif";c.fillStyle="#94a3b8";c.fillText("남은 시간(초)",B.W/2,41);}}
+  else if(S.phase==="idle"){c.fillText("🏀 농구",12,24);}
+  else{const need=BB_NEED[Math.min(2,Math.max(0,S.round-1))],cum=S.total+(play?S.rs:0);c.fillText(`R${S.round}/3`,12,24);c.font="700 12px 'Noto Sans KR',sans-serif";c.fillStyle="#cbd5e1";c.fillText(S.round<3?`목표 누적 ${need}점`:"골대가 움직여요!",12,42);
     c.textAlign="right";c.fillStyle="#fde047";c.font="900 20px 'Noto Sans KR',sans-serif";c.fillText(`${cum}점`,B.W-12,26);
-    if(play){const left=Math.max(0,bbLeft());c.font="900 24px 'Noto Sans KR',sans-serif";c.fillStyle=left<10?"#f87171":"#fff";c.textAlign="center";c.fillText(left.toFixed(1),B.W/2,28);c.font="700 10px 'Noto Sans KR',sans-serif";c.fillStyle="#94a3b8";c.fillText("남은 시간(초)",B.W/2,41);}}
+    if(play){const left=Math.max(0,bbLeftS(S,now));c.font="900 24px 'Noto Sans KR',sans-serif";c.fillStyle=left<10?"#f87171":"#fff";c.textAlign="center";c.fillText(left.toFixed(1),B.W/2,28);c.font="700 10px 'Noto Sans KR',sans-serif";c.fillStyle="#94a3b8";c.fillText("남은 시간(초)",B.W/2,41);}}
   /* 순위 (게임 화면 안) */
-  if(!bb.battle&&bb.phase!=="idle"){c.textAlign="left";c.font="700 11px 'Noto Sans KR',sans-serif";const med=["🥇","🥈","🥉"];for(let i=0;i<3;i++){const r=bb.top[i];c.fillStyle=r&&r.id===myId?"#fde047":"#e2e8f0";c.fillText(`${med[i]} ${r?String(r.n||"?").slice(0,6)+" "+r.s:"-"}`,12,62+i*15);}}
+  if(!S.battle&&S.phase!=="idle"){c.textAlign="left";c.font="700 11px 'Noto Sans KR',sans-serif";const med=["🥇","🥈","🥉"];for(let i=0;i<3;i++){const r=S.top[i];c.fillStyle=r&&r.id===myId?"#fde047":"#e2e8f0";c.fillText(`${med[i]} ${r?String(r.n||"?").slice(0,6)+" "+r.s:"-"}`,12,62+i*15);}}
   /* 연속 / 불꽃 상태 */
-  if(play||bb.phase==="count"){c.textAlign="right";c.font="700 11px 'Noto Sans KR',sans-serif";if(bb.bon>0){c.fillStyle="#fb923c";c.font="900 13px 'Noto Sans KR',sans-serif";c.fillText(`🔥 5점 찬스! 남은 ${bb.bon}번`,B.W-12,48);}else{c.fillStyle="#cbd5e1";c.fillText(`클린 ${bb.cs}/5 · 연속 ${bb.ms}/10`,B.W-12,48);}}
+  if(play||S.phase==="count"){c.textAlign="right";c.font="700 11px 'Noto Sans KR',sans-serif";if(S.bon>0){c.fillStyle="#fb923c";c.font="900 13px 'Noto Sans KR',sans-serif";c.fillText(`🔥 5점 찬스! 남은 ${S.bon}번`,B.W-12,48);}else{c.fillStyle="#cbd5e1";c.fillText(`클린 ${S.cs}/5 · 연속 ${S.ms}/10`,B.W-12,48);}}
   /* 시작 전 카운트다운 */
-  if(bb.phase==="count"){const n=Math.max(1,Math.ceil((bb.cd-now)/1000)),f=((bb.cd-now)%1000)/1000;c.fillStyle="rgba(15,23,42,.55)";c.fillRect(0,0,B.W,B.H);c.textAlign="center";c.save();c.globalAlpha=.4+.6*f;c.fillStyle="#fde047";c.font=`900 ${90+40*(1-f)*0}px 'Noto Sans KR',sans-serif`;c.fillText(String(n),B.W/2,B.H/2+16);c.restore();c.fillStyle="#fff";c.font="900 14px 'Noto Sans KR',sans-serif";c.fillText(`${bb.battle?"⚔️ 배틀":bb.round+"라운드"} · 준비!`,B.W/2,B.H/2-60);}
+  if(S.phase==="count"){const n=Math.max(1,Math.ceil((S.cd-now)/1000)),f=((S.cd-now)%1000)/1000;c.fillStyle="rgba(15,23,42,.55)";c.fillRect(0,0,B.W,B.H);c.textAlign="center";c.save();c.globalAlpha=.4+.6*f;c.fillStyle="#fde047";c.font=`900 ${90+40*(1-f)*0}px 'Noto Sans KR',sans-serif`;c.fillText(String(n),B.W/2,B.H/2+16);c.restore();c.fillStyle="#fff";c.font="900 14px 'Noto Sans KR',sans-serif";c.fillText(`${S.battle?"⚔️ 배틀":S.round+"라운드"} · 준비!`,B.W/2,B.H/2-60);}
   /* 점수 팝업 */
-  bb.pop=bb.pop.filter(q=>now-q.t<1100);for(const q of bb.pop){const a=1-(now-q.t)/1100;c.globalAlpha=a;c.fillStyle=q.col;c.font="900 16px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText(q.txt,q.x,q.y-(1-a)*30);c.globalAlpha=1;}}
+  S.pop=S.pop.filter(q=>now-q.t<1100);for(const q of S.pop){const a=1-(now-q.t)/1100;c.globalAlpha=a;c.fillStyle=q.col;c.font="900 16px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText(q.txt,q.x,q.y-(1-a)*30);c.globalAlpha=1;}}
 /* ===== 📸 인생네컷 : 방(최대 6명) → 방장이 시작 → 10초마다 한 컷씩 4컷 → 2x2 사진 ===== */
 const PH_BG=[["heart","하트 핑크"],["sky","하늘 구름"],["night","별 밤하늘"],["sunset","노을"],["sakura","벚꽃"],["neon","네온 그리드"],["check","체크"],["beach","해변"]];
 const PH_FR=[["white","흰색","#ffffff","#334155"],["black","검정","#111827","#f8fafc"],["pink","핑크","#fbcfe8","#9d174d"],["yellow","노랑","#fef08a","#854d0e"],["sky","하늘색","#bae6fd","#075985"]];
