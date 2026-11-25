@@ -1457,7 +1457,7 @@ function fishCountOf(p){let n=0;const m=(p&&p.fish)||{};for(const k in m)if(type
 const hasSeen=(p,i)=>{const m=(p&&p.fish)||{};return typeof m[fKey(i)]==="number";};
 
 /* 월드: 360 x 440, 위쪽은 강, 오른쪽에 나무 선착장 */
-const FW=360,FH=440,RIVER=112,DOCK={x:150,y:26,w:50,h:RIVER-26};
+const FW=360,FH=440,RIVER=112,DOCK={x:84,y:26,w:50,h:RIVER-26};
 const SHOP={x:16,y:150,w:58,h:34};const nearB=(B,x,y)=>x>B.x-26&&x<B.x+B.w+26&&y>B.y+4&&y<B.y+B.h+34;const nearShop=(x,y)=>nearB(SHOP,x,y);
 const FMK={x:16,y:214,w:58,h:34};const CLB={x:12,y:214,w:66,h:38};const NTS={x:12,y:362,w:66,h:38},CAS={x:12,y:282,w:66,h:38},PHB={x:262,y:346,w:66,h:42};
 const RPS_NPC={x:262,y:168},RPS_PADS=[["s",208],["r",262],["p",316]],PAD_Y=176,PAD_H=68,PAD_W=44,RZ={x:182,y:146,w:160,h:112};
