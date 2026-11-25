@@ -589,7 +589,7 @@ const ACH=[
  {g:"play",c:"✊ 가위바위보 최고 연승 (무승부는 연승 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000,1],[3,"3연승",500000],[5,"눈치 백단",1000000,1],[7,"7연승",3000000],[10,"예언자",10000000,1],[15,"가위바위보의 신",30000000,1]]},
  {g:"play",c:"🏆 가위바위보 누적 승리",k:"bwn",u:"승",tiers:[[10,"배틀 새싹",300000,1],[50,"50승",1000000],[100,"결투의 달인",3000000,1],[300,"백전백승",10000000,1],[1000,"전설의 승부사",30000000,1]]},
  {g:"play",c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",300000,1],[50,"50%",1000000],[75,"베테랑 낚시꾼",3000000,1],[100,"바다의 지배자",10000000,1]]},
- {g:"play",c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000,1],[5,"대어 5마리",1000000],[10,"심해의 제왕",3000000,1],[30,"포세이돈",10000000,1]]},
+ {g:"play",c:"🐋 대어 (710만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000,1],[5,"대어 5마리",1000000],[10,"심해의 제왕",3000000,1],[30,"포세이돈",10000000,1]]},
  {g:"play",c:"📈 코인 누적 수익률 (시작 자금 1000만 원 대비)",k:"pr",u:"%",tiers:[[50,"개미 투자자",300000,1],[100,"+100%",1000000],[300,"차트 도사",3000000,1],[1000,"워렌 버핏",10000000,1],[3000,"월가의 전설",30000000,1]]},
  /* 🌱 성장 */
  {g:"grow",c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",100000,1],[7,"7일 출석",1000000],[30,"단골손님",3000000,1],[100,"개근왕",10000000,1],[365,"전설의 출석러",30000000,1]]},
@@ -857,6 +857,9 @@ const FISH=[
 [5,10000000,"꼴바오의 잃어버린 방탄모🪖"],[4,20000000,"가을이🐶"],[3.5,30000000,"씨몽키🐒"],[3,40000000,"츄파츄가 먹다남긴 참이슬🍾"],[2,50000000,"짜흐으으으으으으응👨🏽‍🦲"],[2.5,70000000,"쮸빠찌예~!ㅋ"],[1.75,100000000,"글꼴의 다이아몬드 엠블럼💎"],[1.5,300000000,"눈댕의 아이패드"],[1.25,500000000,"주로월드"],[1,1000000000,"로또 1등 종이"],[4.5,15000000,"귀요븟"],[7,7000000,"민하의 건축학개론 책"],[6.5,8000000,"외딴섬의 스위치"]];
 FISH.forEach(f=>{f[0]*=f[1]>=1e8?.4:f[1]>=1e7?.5:f[1]>=1e6?.35:1;}); // 밸런스 A안: 비싼 물고기 확률 조정
 {const G=FISH.map((f,i)=>i).filter(i=>FISH[i][1]>0),ws=G.map(i=>FISH[i][0]).sort((a,b)=>b-a),byP=G.slice().sort((a,b)=>FISH[a][1]-FISH[b][1]||a-b);byP.forEach((i,k)=>FISH[i][0]=ws[k]);const grp={};byP.forEach(i=>(grp[FISH[i][1]]=grp[FISH[i][1]]||[]).push(i));for(const v in grp){const g=grp[v],av=g.reduce((a,i)=>a+FISH[i][0],0)/g.length;g.forEach(i=>FISH[i][0]=av);}} // 비쌀수록 드물게
+/* 대어 시세 하향 (11/25): 100만 넘는 물고기는 비쌀수록 더 깎음 (1천만→710만, 1억→5010만, 10억→3.5억). 확률은 그대로, f[3]=원래 시세 */
+FISH.forEach(f=>{if(f[1]>1e6){f[3]=f[1];f[1]=Math.round(1e6*Math.pow(f[1]/1e6,.85)/1e5)*1e5;}});
+const BIG_V=7000000; // 대어 기준 (예전 1천만 원 이상 물고기 = 지금 710만 원 이상)
 const DEX_ORDER=FISH.map((f,i)=>i).sort((a,b)=>FISH[a][1]-FISH[b][1]||a-b),DEXNO=[];DEX_ORDER.forEach((i,k)=>DEXNO[i]=k+1);const dexNo=i=>DEXNO[i]; // 도감 번호 = 가격순
 const FISH_TOTAL=FISH.reduce((s,f)=>s+f[0],0);
 const GEAR={rod:{n:"낚싯대",i:"🎣",list:[["basic","기본 낚싯대",0,"기본으로 지급돼요"]]},bait:{n:"미끼",i:"🪱",list:[["basic","기본 미끼",0,"입질까지 1.5~5.5초"],["mid","중급 미끼",500000,"입질 20% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.3%p · 100개 묶음",100],["pro","고급 미끼",1000000,"입질 30% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.5%p · 100개 묶음",100],["max","최고급 미끼",1500000,"입질 40% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.7%p · 100개 묶음",100]]}};
@@ -1044,7 +1047,7 @@ const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
 const enhBase=L=>Math.max(5,90-L*1.85);
 const ENH_DROP_LV=25,ENH_DROP_P=.1;
 const matTier=v=>v<=0?0:Math.max(1,Math.log10(v));
-const matBonus=(i,L)=>{const t=matTier(FISH[i][1]);return t?.5*Math.pow(1.6,t)*Math.exp(-L/(2.5*t)):0;};
+const matBonus=(i,L)=>{const t=matTier(FISH[i][3]||FISH[i][1]);return t?.5*Math.pow(1.6,t)*Math.exp(-L/(2.5*t)):0;};
 let fBaitPro=0;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FISH.reduce((a,f)=>a+f[0],0);
 function rollFish(){const add=FISH_RARE*.2+(fBaitPro||0)+rodBonus(rodLv()),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);const W=i=>FISH[i][0]*(FISH[i][1]>=100000?kR:kN);let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
 const fKey=i=>"f"+i;
@@ -1253,13 +1256,13 @@ function fishStep(dt,t){
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;o.x+=dx*Math.min(1,dt/120);o.y+=dy*Math.min(1,dt/120);}
   const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${fstate}`;if(s!==fLastSent&&t-fLastSend>180&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),rl:rodLv(),np:eqCos("plate"),ak:myAwk(),name:myName(),sk:rpsN(),fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:fstate,t:Date.now()}).catch(()=>{});}}
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fRaf=requestAnimationFrame(fishLoop);}
-function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${dexNo(idx)}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=10000000?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
+function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${dexNo(idx)}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=BIG_V?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
 function fTapOther(x,y){let best=null,bd=1e9;for(const id in fOthers){const o=fOthers[id];if(!o||o.fs==="away")continue;const hw=Math.max(15,String(o.name||"").length*5+6);if((Math.abs(x-o.x)<15&&y>o.y-40&&y<o.y+6)||(Math.abs(x-o.x)<hw&&y>o.y-55&&y<o.y-36)){const d=Math.abs(x-o.x)+Math.abs(y-(o.y-20));if(d<bd){bd=d;best=id;}}}return best;}
 function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id===myId)continue;const v=onlineMap[id];if(!v||now-(v.t||0)>180000){delete fOthers[id];continue;}
     const has=typeof v.fx==="number",sp=has?{x:v.fx,y:v.fy}:spawnOf(id);
     const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.rl=Math.min(50,v.rl|0);o.np=v.np||"";o.ak=Math.min(3,v.ak|0);o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
-    if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if(o.fct||Date.now()-v.fc.t<8000)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=10000000?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
+    if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if(o.fct||Date.now()-v.fc.t<8000)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=BIG_V?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
 function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
   if(fstate==="idle"&&nearNpc(fp.x,fp.y)){ic="🎁";tx="보상";}else if(fstate==="idle"&&nearFmk(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearShop(fp.x,fp.y)){ic="🏪";tx="거래소";}else if(fstate==="idle"&&nearNts(fp.x,fp.y)){ic="🏛️";tx="국세청";}else if(fstate==="idle"){ic="🎣";tx=can?"던지기":"강가로";cl=can?"":"off";}else if(fstate==="bite"){ic="❗";tx="당겨!";cl="bite";}else{ic="⏳";tx="기다려";cl="wait";}
@@ -1285,14 +1288,14 @@ const fishExp=i=>FISH[i][1]>0?Math.max(5,Math.round(FISH_TOTW/FISH[i][0]/51)):0;
 /* 이모지+글자 간판: 폰마다 이모지 폭이 달라 깨지지 않게 따로 그리고 가운데 맞춤 */
 function emoSign(c,emo,txt,cx,cy,font,col,bg,h){c.save();c.font=font;const tw=c.measureText(txt).width,ew=h*.72,gap=3,cw=ew+gap+tw,bw=cw+14,x0=cx-cw/2;c.fillStyle=bg;c.beginPath();c.roundRect(cx-bw/2,cy-h/2,bw,h,h/2);c.fill();c.textBaseline="middle";c.textAlign="center";c.font=`${Math.round(h*.58)}px sans-serif`;c.fillStyle="#fff";c.fillText(emo,x0+ew/2,cy+.5);c.font=font;c.fillStyle=col;c.textAlign="left";c.fillText(txt,x0+ew+gap,cy+.5);c.restore();}
 function landFish(t){const i=rollFish(),[,base,name]=FISH[i];const tax=base>0?Math.round(base*.1):0,got=base-tax;
-  me.fish=me.fish||{};const first=!hasSeen(me,i);me.fish[fKey(i)]=(me.fish[fKey(i)]||0)+1;me.fishN=(me.fishN||0)+1;if(base>=1e7)me.bigN=(me.bigN|0)+1;if(base<0){me.cash+=base;me.fishEarn=(me.fishEarn||0)+base;}
+  me.fish=me.fish||{};const first=!hasSeen(me,i);me.fish[fKey(i)]=(me.fish[fKey(i)]||0)+1;me.fishN=(me.fishN||0)+1;if(base>=BIG_V)me.bigN=(me.bigN|0)+1;if(base<0){me.cash+=base;me.fishEarn=(me.fishEarn||0)+base;}
   let bonus="";if(!me.fishDone&&fishCountOf(me)===FISH.length){me.fishDone=true;me.cash+=100000000;bonus="\n🎉 도감 115종 완성! 보상 1억 원 지급!";broadcast(`🎉 ${myName()}님이 낚시 도감 115종을 모두 모았어요! (보상 1억 원)`);}
   const fx=fishExp(i);stAdd(base>0?"fishGoodN":"fishTrashN");if(base>0)stAdd("fishValue",base);stMax("fishBest",base);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
-  fFloat.push({x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":"")+(fx>0?` ⭐+${fx}`:""),t,c:base>=10000000?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
+  fFloat.push({x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":"")+(fx>0?` ⭐+${fx}`:""),t,c:base>=BIG_V?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
   fishFeed(myName(),name,base,i);if(fdb&&myId)fdb.ref("online/"+myId+"/fc").set({n:name,v:base,i,t:Date.now()}).catch(()=>{});
   const r=$("fishRes");r.innerHTML=`<div style="font-size:11px;color:var(--sub)">도감 ${dexNo(i)}번${first?' · <b style="color:#ffcf4d">✨ 신규 도감 등록!</b>':''}</div><div style="font-size:18.5px;font-weight:900;margin:4px 0">${esc(name)}</div><div class="${base<0?'down':'up'}" style="font-weight:700">${base<0?formatMoneyReadable(base)+" 손해... 💸":"시세 "+formatMoneyReadable(base)}</div>${base>0?`<div style="font-size:10px;color:var(--sub)">🐟 어시장에 팔면 ${formatMoneyReadable(got)} (수수료 10%) · <b style="color:#ffcf4d">⭐ +${fx} 경험치</b></div>`:''}${bonus?`<div style="color:#ffcf4d;font-weight:700;margin-top:4px;white-space:pre-line">${bonus.trim()}</div>`:''}`;
   r.classList.add("on");clearTimeout(landFish.t);landFish.t=setTimeout(()=>r.classList.remove("on"),2000);
-  if(base>=10000000){broadcast(`🏆 [대어 포착!] ${myName()}님이 낚시로 ${name}을(를) 잡았어요! (+${formatMoneyReadable(base)})`);if(fdb)fdb.ref("market/fishHof").push({name:myName(),fish:name,v:base,t:Date.now()}).catch(()=>{});}
+  if(base>=BIG_V){broadcast(`🏆 [대어 포착!] ${myName()}님이 낚시로 ${name}을(를) 잡았어요! (+${formatMoneyReadable(base)})`);if(fdb)fdb.ref("market/fishHof").push({name:myName(),fish:name,v:base,t:Date.now()}).catch(()=>{});}
   renderFishInfo();}
 let fHof=[];
 let fDexOf=null;
