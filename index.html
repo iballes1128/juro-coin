@@ -2876,9 +2876,11 @@ const clwNext=()=>(clwRid()+1)*1800000-nowS();
 function clwNewRound(rid){const P=CLW.POOL,idx=t=>P.map((p,i)=>[p,i]).filter(([p])=>p.t===t).map(([,i])=>i),pick=(a,n)=>a.slice().sort(()=>Math.random()-.5).slice(0,n);
   const L2=idx(2),big=L2.filter(i=>P[i].k==="cash"),box=[...pick(idx(0),14),...pick(idx(1),8),...big,...pick(L2.filter(i=>!big.includes(i)),3-big.length)].sort(()=>Math.random()-.5);
   return{r:rid,v:1,keys:CLW.newGame().keys.map(clwPlain),box,taken:{},pity:{}};}
+/* 상품이 20개 뽑히면 시간과 상관없이 바로 새 판 */
+const CLW_FULL=20,clwFull=m=>!!(m&&Object.keys(m.taken||{}).length>=CLW_FULL);
 /* 30분마다(정각·30분) 열쇠와 상품이 새로 바뀜 · 누가 하는 중이면 끝난 뒤에 바꿈 */
-function clwEnsure(){if(!fdb||clw.initing||clw.play||clw.fin)return;const rid=clwRid();if(clw.m&&(clw.m.r|0)>=rid)return;if(clw.s&&!clwStale(clw.s))return;
-  clw.initing=true;fdb.ref("market/claw/m").transaction(c=>{if(c&&c.keys&&(c.r|0)>=clwRid())return;return clwNewRound(clwRid());}).catch(()=>{}).then(()=>{clw.initing=false;});}
+function clwEnsure(){if(!fdb||clw.initing||clw.play||clw.fin)return;const rid=clwRid();if(clw.m&&(clw.m.r|0)>=rid&&!clwFull(clw.m))return;if(clw.s&&!clwStale(clw.s))return;
+  clw.initing=true;fdb.ref("market/claw/m").transaction(c=>{if(c&&c.keys&&(c.r|0)>=clwRid()&&!clwFull(c))return;return clwNewRound(clwRid());}).catch(()=>{}).then(()=>{clw.initing=false;});}
 function clwSetBox(m){if(m&&m.box&&m.box.length===25)CLW.setBox(m.box.map(i=>CLW.POOL[i|0]||CLW.POOL[0]));}
 function clwListen(){if(clw.on||!fdb)return;clw.on=true;const r=fdb.ref("market/claw");
   clw.h1=r.child("m").on("value",sn=>{const m=sn.val();if(!m||!m.keys){clw.m=null;clwEnsure();clwUI();return;}const pt=clw.m&&clw.m.r===m.r&&!clw.fin?(clw.m.taken||{}):null;clw.m=m;clwSetBox(m);if(!clw.play){clwSyncView();clwEnsure();}clwUI();clwDraw();if(pt){const tk=m.taken||{};for(const k in tk){if(!pt[k]&&tk[k]&&tk[k].u&&tk[k].u!==myId&&nowS()-(tk[k].t||0)<20000)clwSeeWin(+k,tk[k]);}}});
@@ -2908,12 +2910,12 @@ function clwLoop(now){if(!clwOpen()){clw.raf=0;return;}const dt=Math.min(.05,(no
     if(G.st==="done"&&!clw.fin)clwFinish();
     if(clw._tl!==Math.ceil(clw.tl)||clw._st!==G.st){clw._tl=Math.ceil(clw.tl);clw._st=G.st;clwUI();}}
   else{clwViewTick(dt);const s=clw.s,k=(s&&s.uid&&!clwStale(s))?"1"+(s.uid)+(s.st||"")+Math.ceil(s.tl||0):"0";if(clw._vk!==k){clw._vk=k;clwUI();}}
-  {const e=$("clwCd");if(e){const ms=Math.max(0,clwNext()),mm=Math.floor(ms/60000),ss=Math.floor(ms/1000)%60;const tx=`${mm}:${String(ss).padStart(2,"0")}`;if(e.textContent!==tx)e.textContent=tx;}if(now-(clw._en||0)>2500){clw._en=now;clwEnsure();}}
+  {const e=$("clwCd");if(e){const ms=Math.max(0,clwNext()),mm=Math.floor(ms/60000),ss=Math.floor(ms/1000)%60;const tx=`${mm}:${String(ss).padStart(2,"0")}`;if(e.textContent!==tx)e.textContent=tx;}{const e2=$("clwTk");if(e2){const n=String(Object.keys((clw.m&&clw.m.taken)||{}).length);if(e2.textContent!==n)e2.textContent=n;}}if(now-(clw._en||0)>2500){clw._en=now;clwEnsure();}}
   clwDraw();clw.raf=requestAnimationFrame(clwLoop);}
 function openClw(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stVisit("visitClw");let d=$("clwMod");
   if(!d){d=document.createElement("div");d.id="clwMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)clwClose();};d.addEventListener("keydown",e=>e.stopPropagation());
     d.innerHTML=`<div class="btBox" style="max-width:400px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b style="font-size:15.5px">🔑 뽑기방</b><div style="display:flex;align-items:center;gap:6px"><button id="clwLst" style="padding:7px 11px;border-radius:10px;background:var(--card2);font-size:12px;font-weight:800">🎁 상품 목록</button><button id="clwX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div></div>
-      <div id="clwTop"></div><div style="text-align:center;font-size:11.5px;color:var(--sub);margin-top:6px">⏰ 열쇠·상품이 새로 바뀌기까지 <b id="clwCd" style="color:var(--acc)"></b> (매 정각·30분)</div><div style="text-align:center;font-size:10.5px;color:var(--sub);margin-top:2px">아래는 이번 판에 들어 있는 상품 25개예요 · 어떤 번호에 있는지는 몰라요</div><div id="clwShelf" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:6px 0"></div>
+      <div id="clwTop"></div><div style="text-align:center;font-size:11.5px;color:var(--sub);margin-top:6px">⏰ 열쇠·상품이 새로 바뀌기까지 <b id="clwCd" style="color:var(--acc)"></b> (매 정각·30분) · 뽑힌 상품 <b id="clwTk" style="color:var(--acc)">0</b>/20 (20개 뽑히면 바로 새 판)</div><div style="text-align:center;font-size:10.5px;color:var(--sub);margin-top:2px">아래는 이번 판에 들어 있는 상품 25개예요 · 어떤 번호에 있는지는 몰라요</div><div id="clwShelf" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:6px 0"></div>
       <canvas id="clwCv" width="${CLW.CW}" height="${CLW.CH}" style="width:100%;display:block;border-radius:14px;background:#000;touch-action:none"></canvas>
       <button id="clwStart" style="width:100%;margin-top:8px;padding:13px 0;border-radius:12px;background:var(--acc);color:#111;font-weight:900;font-size:15px"></button>
       <div style="display:flex;gap:10px;align-items:center;margin:10px 0 4px"><div style="display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,52px);gap:6px">${[["u","▲","2","1"],["l","◀","1","2"],["d","▼","2","2"],["r","▶","3","2"]].map(([k,ch,c,r])=>`<button data-clk="${k}" style="grid-column:${c};grid-row:${r};background:var(--card2);border-radius:14px;font-size:21px;font-weight:900;touch-action:none">${ch}</button>`).join("")}</div>
