@@ -518,10 +518,10 @@ const ACH=[
  {c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",100000],[7,"초심자",1000000],[30,"단골손님",3000000],[100,"개근왕",10000000],[365,"전설의 출석러",30000000]]},
  {c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",300000],[50,"숙련 낚시꾼",1000000],[75,"베테랑 낚시꾼",3000000],[100,"바다의 지배자",10000000]]},
  {c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000],[5,"월척 전문가",1000000],[10,"심해의 제왕",3000000],[30,"포세이돈",10000000]]},
- {c:"📈 코인 수익률 (한 번 팔 때)",k:"pr",u:"%",tiers:[[10,"개미 투자자",300000],[30,"단타의 고수",1000000],[50,"차트 도사",3000000],[100,"워렌 버핏",10000000]]},
+ {c:"📈 코인 누적 수익률 (시작 자금 1000만 원 대비)",k:"pr",u:"%",tiers:[[50,"개미 투자자",300000],[100,"단타의 고수",1000000],[300,"차트 도사",3000000],[1000,"워렌 버핏",10000000],[3000,"월가의 전설",30000000]]},
  {c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",1000000],[1e9,"십억 부자",5000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
 const achId=(k,i)=>k+i;
-function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.bestPR||0)*100);if(k==="money")return assetOf(p);return 0;}
+function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);if(k==="money")return assetOf(p);return 0;}
 const titleOf=id=>{for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i][1];return "";};
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title):"";
 const achNoted={};
@@ -533,11 +533,11 @@ function achClaim(k){const a=ACH.find(x=>x.k===k);if(!a||!me||!me._loaded)return
   toast(`🎁 「${nm}」 보상 +${formatMoneyReadable(rw)}\n칭호를 얻었어요!`);if(x.i===a.tiers.length-1||rw>=10000000)broadcast(`🏅 ${myName()}님이 업적 달성! 칭호 「${nm}」 획득 (+${formatMoneyReadable(rw)})`);achCheck();renderAch();}
 setInterval(achCheck,5000);
 function fmtNeed(a,need){return a.k==="money"?formatMoneyReadable(need):need+a.u;}
-function achLeft(a,v,need){if(a.k==="dex"){const c=fishCountOf(me),nc=Math.ceil(need*FISH.length/100-1e-9);return `${Math.max(0,nc-c)}종 남음 (${nc}종 모으면 달성)`;}if(a.k==="money")return formatMoneyReadable(need-v)+" 남음";if(a.k==="pr")return (need-v)+"%p 남음";return (need-v)+a.u+" 남음";}
+function achLeft(a,v,need){if(a.k==="dex"){const c=fishCountOf(me),nc=Math.ceil(need*FISH.length/100-1e-9);return `${Math.max(0,nc-c)}종 남음 (${nc}종 모으면 달성)`;}if(a.k==="money")return formatMoneyReadable(need-v)+" 남음";if(a.k==="pr")return `${formatMoneyReadable(need/100*START_CASH-((me&&me.coinPnL)||0))} 더 벌면 달성`;return (need-v)+a.u+" 남음";}
 function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach||{});const total=ACH.reduce((n,a)=>n+a.tiers.length,0),done=Object.keys((me&&me.ach)||{}).length;
     S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:12px;color:var(--sub)">달성한 업적</div><b style="font-size:20px">${done} / ${total}</b><div style="font-size:11px;color:var(--sub);margin-top:4px">목표를 달성하면 🎁 보상 받기를 눌러 받아요 · 받은 칭호는 👤 마이 → 🎖️ 칭호에서 달 수 있어요</div></div>`+
     ACH.map(a=>{const v=achVal(a.k),got=a.tiers.filter((t,i)=>me&&me.ach&&me.ach[achId(a.k,i)]),ni=a.tiers.findIndex((t,i)=>!(me&&me.ach&&me.ach[achId(a.k,i)])),nx=ni>=0?a.tiers[ni]:null;
-      const pc=nx?Math.min(100,Math.floor(v/nx[0]*100)):100;const cur=a.k==="money"?formatMoneyReadable(v):a.k==="dex"?`${fishCountOf(me)}/${FISH.length}종 (${v}%)`:a.k==="pr"?"최고 "+v+"%":v+a.u;
+      const pc=nx?Math.min(100,Math.floor(v/nx[0]*100)):100;const cur=a.k==="money"?formatMoneyReadable(v):a.k==="dex"?`${fishCountOf(me)}/${FISH.length}종 (${v}%)`:a.k==="pr"?`${v>=0?"+":""}${v}% (${formatMoneyReadable((me&&me.coinPnL)||0)})`:v+a.u;
       return `<div class="card"><h3>${a.c}</h3>${got.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">${got.map(t=>`<span style="font-size:10px;padding:3px 8px;border-radius:12px;background:var(--card2);color:var(--sub)">✅ 「${t[1]}」</span>`).join("")}</div>`:""}`+
       (nx?`<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>다음 목표 <b>「${nx[1]}」</b></span><b style="color:var(--acc);font-size:12px">+${formatMoneyReadable(nx[2])}</b></div>${v>=nx[0]?`<button data-achc="${a.k}" style="width:100%;margin-top:8px;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">🎁 보상 받기 +${formatMoneyReadable(nx[2])}</button>`:""}
         <div style="font-size:11px;color:var(--sub);margin:4px 0 6px">${fmtNeed(a,nx[0])} 달성하기 · 지금 ${cur}${v<nx[0]?` · <b style="color:var(--tx)">${achLeft(a,v,nx[0])}</b>`:""}</div>
@@ -622,7 +622,7 @@ $("goBtn").onclick=()=>{if(curCoin<0||!me||!canTrade())return;const ci=curCoin,n
   if(!me.coins[n])me.coins[n]={count:0,cost:0,since:0};const h=me.coins[n];
   if(mode==="buy"){const cost=q*p;if(cost>me.cash)return toast("💸 잔액이 부족합니다!");me.cash-=cost;h.count+=q;h.cost+=cost;h.since=M.k;addLog("buy",n,q,cost);
     toast(`📈 매수 완료\n${n} ${formatCoinReadable(q)} · 체결가 ${formatCoinPrice(p)}\n평단가 ${formatCoinPrice(Math.round(h.cost/h.count))}`);broadcast(`📈 ${myName()}님이 ${n} ${formatCoinReadable(q)} 매수 (${formatMoneyReadable(cost)})`,"buy");}
-  else{if(q>h.count)return toast("⚠️ 보유 수량을 넘었어요");const raw=q*p,tx=taxInfo(raw,assetOf(me)),fin=raw-tx.fee,_t=addTax("coin",tx.fee),avg=h.cost/h.count;h.count-=q;h.cost-=Math.round(avg*q);if(h.count===0)h.cost=0;me.cash+=fin;addLog("sell",n,q,fin);if(avg>0){const pr=(fin-avg*q)/(avg*q);if(pr>(me.bestPR||0))me.bestPR=pr;}
+  else{if(q>h.count)return toast("⚠️ 보유 수량을 넘었어요");const raw=q*p,tx=taxInfo(raw,assetOf(me)),fin=raw-tx.fee,_t=addTax("coin",tx.fee),avg=h.cost/h.count;h.count-=q;h.cost-=Math.round(avg*q);if(h.count===0)h.cost=0;me.cash+=fin;addLog("sell",n,q,fin);if(avg>0){const pr=(fin-avg*q)/(avg*q);if(pr>(me.bestPR||0))me.bestPR=pr;me.coinPnL=Math.round((me.coinPnL||0)+fin-avg*q);}
     toast(`📉 매도 완료\n${n} ${formatCoinReadable(q)} · 세금(${tx.name}) -${formatMoneyReadable(tx.fee)}\n입금 +${formatMoneyReadable(fin)}`);broadcast(`📉 ${myName()}님이 ${n} ${formatCoinReadable(q)} 매도 (+${formatMoneyReadable(fin)})`,"sell");}
   $("qty").value="";saveMe();renderAll();};
 
@@ -1176,12 +1176,13 @@ function fishAction(){if(sessBlocked)return;if(!me||!me._loaded)return toast("�
   if(fstate==="idle"){if(!fishSpot(fp.x,fp.y))return;fp.tx=null;fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};setFishBtn();}
   else if(fstate==="wait"){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"너무 빨리 당겼다! 🐟💨",t,c:"#9fb3c8"});setFishBtn();}
   else if(fstate==="bite"){fstate="idle";setFishBtn();landFish(t);}}
-/* 낚시 경험치: 시세가 높을수록 많이 (기본 5 · 100만 6 · 1천만 16 · 1억 40 · 10억 100), 쓰레기는 0 */
-const fishExp=v=>v>0?Math.max(5,Math.round(Math.pow(v/10000,.4))):0;
+/* 낚시 경험치: 잡힐 확률에 반비례 (1만 원 물고기 확률 기준 5, 2배 드물면 10 …), 최소 5, 쓰레기는 0 */
+const FISH_TOTW=FISH.reduce((a,f)=>a+f[0],0);
+const fishExp=i=>FISH[i][1]>0?Math.max(5,Math.round(FISH_TOTW/FISH[i][0]/51)):0;
 function landFish(t){const i=rollFish(),[,base,name]=FISH[i];const tax=base>0?Math.round(base*.1):0,got=base-tax;
   me.fish=me.fish||{};const first=!hasSeen(me,i);me.fish[fKey(i)]=(me.fish[fKey(i)]||0)+1;me.fishN=(me.fishN||0)+1;if(base>=1e7)me.bigN=(me.bigN|0)+1;if(base<0){me.cash+=base;me.fishEarn=(me.fishEarn||0)+base;}
   let bonus="";if(!me.fishDone&&fishCountOf(me)===FISH.length){me.fishDone=true;me.cash+=100000000;bonus="\n🎉 도감 115종 완성! 보상 1억 원 지급!";broadcast(`🎉 ${myName()}님이 낚시 도감 115종을 모두 모았어요! (보상 1억 원)`);}
-  const fx=fishExp(base);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
+  const fx=fishExp(i);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
   fFloat.push({x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":"")+(fx>0?` ⭐+${fx}`:""),t,c:base>=10000000?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
   fishFeed(myName(),name,base,i);if(fdb&&myId)fdb.ref("online/"+myId+"/fc").set({n:name,v:base,i,t:Date.now()}).catch(()=>{});
   const r=$("fishRes");r.innerHTML=`<div style="font-size:11px;color:var(--sub)">도감 ${dexNo(i)}번${first?' · <b style="color:#ffcf4d">✨ 신규 도감 등록!</b>':''}</div><div style="font-size:18.5px;font-weight:900;margin:4px 0">${esc(name)}</div><div class="${base<0?'down':'up'}" style="font-weight:700">${base<0?formatMoneyReadable(base)+" 손해... 💸":"시세 "+formatMoneyReadable(base)}</div>${base>0?`<div style="font-size:10px;color:var(--sub)">🐟 어시장에 팔면 ${formatMoneyReadable(got)} (수수료 10%) · <b style="color:#ffcf4d">⭐ +${fx} 경험치</b></div>`:''}${bonus?`<div style="color:#ffcf4d;font-weight:700;margin-top:4px;white-space:pre-line">${bonus.trim()}</div>`:''}`;
