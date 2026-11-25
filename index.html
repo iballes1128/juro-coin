@@ -343,7 +343,7 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=12;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=13;
 /* 11/25 16:36(KST)부터 v9: 15분마다 2개 코인 큰 코스 + 점프 뒤 모멘텀 */const F9_T=Date.parse("2026-11-25T07:36:00Z");let K9=0,LISTK=[];
 /* 11/25 16:22(KST)부터 v8: 매끈하게 흐르다 가끔 한 번에 2~6% 툭 */const F8_T=Date.parse("2026-11-25T07:22:00Z");let K8=0;
 /* 11/25 16:14(KST)부터 v7 변동폭 (단타용으로 더 크게) */const F7_T=Date.parse("2026-11-25T07:14:00Z");let K7=0;let KS=0,TSe=0;
@@ -1578,7 +1578,7 @@ function casPay(stake,payout,game,mult){addTax("casino",stake*CAS_EDGE);stAdd("c
 function casCanBet(v){if(!me||!me._loaded||!canTrade()||sessBlocked){toast("지금은 할 수 없어요");return false;}if(!(v>=CAS_MIN))return toast(`최소 ${casFmt(CAS_MIN)}부터 걸 수 있어요`),false;if(v>CAS_MAX)return toast(`최대 ${casFmt(CAS_MAX)}까지 걸 수 있어요`),false;if(v>me.cash)return toast("💸 잔액이 부족해요"),false;return true;}
 function openCasino(){fKeys={};stAdd("visitCas");let d=$("casMod");if(!d){d=document.createElement("div");d.id="casMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d&&!casBusy)casClose();};d.addEventListener("keydown",e=>e.stopPropagation());}d.style.display="flex";if(lad.stage!=="won")ladNew();renderCas();}
 function diceTake(silent){const v=(me&&me.casPend)|0;if(v>0){me.cash+=v;me.casPend=0;saveMe();renderHeader();if(!silent)toast(`💰 ${casFmt(v)} 받았어요!`);}dice.res=null;dice.shown=[1,1,1];if(!silent)renderCas();}
-function casClose(){if(casTab==="hr"&&hrLocked())return toast("내가 건 경주가 끝나야 나갈 수 있어요");{const R=hrRoomR();if(R&&!R.order&&!(R.bets&&R.bets[myId]))hrRoomLeave(true);}const d=$("casMod");if(d)d.style.display="none";if((me&&me.casPend)>0)diceTake(true);if(lad.streak>0){lad.stage="won";ladCollect(true);}}
+function casClose(){if(casTab==="hr"&&hrLocked())return toast("내가 건 경주가 끝나야 나갈 수 있어요");const d=$("casMod");if(d)d.style.display="none";if((me&&me.casPend)>0)diceTake(true);if(lad.streak>0){lad.stage="won";ladCollect(true);}}
 /* ---------- 🪜 사다리 ---------- */
 function ladNew(){const n=lad.n,R=[];for(let r=0;r<LAD_ROWS;r++){const row=[];for(let c=0;c<n-1;c++)row.push(!row[c-1]&&Math.random()<.5);R.push(row);}
   for(let c=0;c<n-1;c++)if(!R.some(row=>row[c])){const r=Math.floor(Math.random()*LAD_ROWS);if(!R[r][c-1]&&!R[r][c+1])R[r][c]=true;}
@@ -1687,7 +1687,7 @@ function hrRoomTick(){if(!fdb||!me||!myId)return;const now=nowS();
     if(!R.order&&R.members&&R.members[myId]&&!R.members[R.host]){const first=Object.entries(R.members).sort((a,b)=>(a[1].t||0)-(b[1].t||0))[0];if(first&&first[0]===myId&&hrRoomTick.h!==id){hrRoomTick.h=id;hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||(c.members&&c.members[c.host]))return;c.host=myId;c.hostName=myName();return c;}).catch(()=>{}).finally(()=>{hrRoomTick.h=null;});}}
     /* 정리: 빈 방, 오래된 방 */
     const mem=Object.keys(R.members||{}).length,bets=Object.keys(R.bets||{}).length,age=now-(R.created||0);
-    if(!R.horses||(!R.order&&!mem&&age>(bets?300000:30000))||(R.order&&now-R.t0>1800000)||(!R.order&&age>3*3600000))hrRoomRef(id).remove().catch(()=>{});}
+    if(!R.horses||(!R.order&&!mem&&age>(bets?300000:30000))||(R.order&&now-R.t0>1800000)||(!R.order&&age>3*3600000)||(!R.order&&!bets&&age>1200000))hrRoomRef(id).remove().catch(()=>{});}
   /* 내가 건 방 결과 정산 */
   const o=me.hrOpen;if(o){const R=hr.rooms[o.id];if(R&&R.order&&R.t0&&R.bets&&R.bets[myId]){const b=R.bets[myId],m=hrBetWin(b,R.order),pay=m?Math.round(b.stake*m):0;casPay(b.stake,pay,"hr",m);stAdd("hrRoomN");if(b.type==="ex")stAdd("hrExN");
       if(pay){stAdd(b.type==="win"?"hrWinHit":"hrExHit");me.hrPay={v:pay,at:R.t0+hrDur(R),txt:hrBetTxt2(b,R.horses),m:b.mult,stake:b.stake};}me.hrOpen=null;saveMe();}
