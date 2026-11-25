@@ -314,13 +314,14 @@ nav button.on{color:var(--tx);font-weight:700}
 <div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:27.5px">✨</div><div style="font-size:15.5px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:12px;color:var(--sub);margin-bottom:14px"></div><button onclick="hardReload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:14px">지금 새로고침</button></div></div>
 <div id="updBar" style="display:none;position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:60;background:#1e3a5f;border:1px solid #3b82f6;color:#fff;border-radius:14px;padding:10px 12px 10px 16px;font-size:12px;box-shadow:0 8px 24px rgba(0,0,0,.5);align-items:center;gap:10px;white-space:nowrap">✨ 새 버전이 나왔어요<button onclick="hardReload()" style="background:var(--acc);color:#111;font-weight:800;border-radius:9px;padding:6px 12px">새로고침</button><button onclick="this.parentNode.style.display='none'" style="color:#9fb3c8;font-size:14px">✕</button></div>
 <div id="btMod" class="btBg"><div class="btBox">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="font-size:15.5px">⚔️ 배틀 · 가위바위보</b><button id="btModX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="font-size:15.5px">⚔️ 배틀</b><button id="btModX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
   <div id="btStat" style="font-size:11px;color:var(--sub);margin-bottom:8px"></div>
+  <div class="tabs2" style="margin:8px 0 4px"><button data-bg="rps" class="on">✊ 가위바위보</button><button data-bg="bb">🏀 농구</button></div>
   <div class="lbl" style="margin-top:4px">상대 (접속 중인 사람)</div><select id="btTo"></select>
   <div class="tabs2" style="margin:12px 0 8px"><button data-bk="cash" class="on">💰 돈</button><button data-bk="coin">🪙 코인</button></div>
   <div id="btCashRow"><input id="btAmt" inputmode="numeric" placeholder="판돈 (원)"></div>
   <div id="btCoinRow" style="display:none"><select id="btCoin"></select><div class="nick"><input id="btCnt" inputmode="numeric" placeholder="코인 개수"><button id="btAll">전부</button></div></div>
-  <div style="font-size:11px;color:var(--sub);line-height:1.65;margin:12px 0 8px">· 상대도 똑같은 판돈을 걸어요<br>· 신청하면 내 판돈이 먼저 보관되고, 상대가 60초 안에 수락하면 시작해요<br>· 시작되면 5초 안에 가위·바위·보 중에 골라요 (안 고르면 패배)<br>· 이긴 사람이 판돈을 전부 가져가고, 비기면 돌려받아요<br>· 상대 돈·코인이 모자라거나 거절하면 성사되지 않고 판돈이 돌아와요</div>
+  <div style="font-size:11px;color:var(--sub);line-height:1.65;margin:12px 0 8px">· 상대도 똑같은 판돈을 걸어요<br>· 신청하면 내 판돈이 먼저 보관되고, 상대가 60초 안에 수락하면 시작해요<br>· ✊ 가위바위보: 시작되면 5초 안에 가위·바위·보 중에 골라요 (안 고르면 패배)<br>· 🏀 농구: 40초 동안 각자 슛을 던져서 점수가 높은 사람이 승리 (상대 점수는 화면 위에 실시간으로 떠요)<br>· 이긴 사람이 판돈을 전부 가져가고, 비기면 돌려받아요<br>· 상대 돈·코인이 모자라거나 거절하면 성사되지 않고 판돈이 돌아와요</div>
   <button class="go buy" id="btGo">⚔️ 배틀 신청</button>
 </div></div>
 <div id="btInc" class="btBg" style="z-index:46"><div class="btBox" style="text-align:center"><div style="font-size:31.5px">⚔️</div><div id="btIncT" style="font-weight:900;font-size:16.5px;margin:4px 0"></div><div id="btIncS" style="font-size:13px"></div><div id="btIncC" style="color:var(--sub);font-size:11px;margin:8px 0 12px"></div>
@@ -3075,13 +3076,13 @@ function bbPanel(){const el=$("bbRank");if(!el)return;const med=["🥇","🥈","
   h+=`<div style="font-size:11.5px;margin-top:8px;line-height:1.6">내 최고: <b>${bb.best||0}점</b><br><span style="color:var(--sub)">월요일 0시에 초기화 · ${d}일 ${hh}시간 남음<br>주간 1등(${BB_MIN}점 이상) 보상 <b style="color:var(--acc)">${formatMoneyReadable(BB_PRIZE)}</b></span></div>`;
   if(bb.prev)h+=`<div style="font-size:11px;color:var(--sub);margin-top:6px">지난주 1등: ${esc(bb.prev.n||"?")} ${bb.prev.s}점</div>`;
   el.innerHTML=h;}
-function openBb(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stVisit("visitBb");let d=$("bbMod");
+function openBb(bt){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stVisit("visitBb");let d=$("bbMod");
   if(!d){d=document.createElement("div");d.id="bbMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)bbClose();};d.addEventListener("keydown",e=>e.stopPropagation());
-    d.innerHTML=`<div class="btBox" style="max-width:580px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:15.5px">🏀 농구</b><div style="display:flex;gap:6px"><button id="bbBack" style="padding:7px 11px;border-radius:10px;background:var(--card2);font-size:12px;font-weight:800">🕹️ 오락실</button><button id="bbX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div></div>
+    d.innerHTML=`<div class="btBox" style="max-width:580px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b id="bbTitle" style="font-size:15.5px">🏀 농구</b><div style="display:flex;gap:6px"><button id="bbBack" style="padding:7px 11px;border-radius:10px;background:var(--card2);font-size:12px;font-weight:800">🕹️ 오락실</button><button id="bbX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start"><div style="flex:1 1 300px;min-width:0"><canvas id="bbCv" width="720" height="840" style="width:100%;max-width:360px;display:block;margin:0 auto;border-radius:14px;touch-action:none;background:#0f172a"></canvas>
       <div id="bbSub" style="text-align:center;font-size:12px;line-height:1.6;margin:8px 0 4px;min-height:38px"></div>
       <button id="bbBtn" style="width:100%;padding:18px 0;border-radius:16px;background:var(--acc);color:#111;font-weight:900;font-size:17px;touch-action:manipulation;user-select:none"></button></div>
-      <div style="flex:1 1 150px;min-width:140px"><div id="bbRank" style="padding:10px;border-radius:12px;background:var(--card2)"></div>
+      <div id="bbSide" style="flex:1 1 150px;min-width:140px"><div id="bbRank" style="padding:10px;border-radius:12px;background:var(--card2)"></div>
       <div style="margin-top:8px;padding:12px;border-radius:12px;background:var(--card2);font-size:12px;line-height:1.6">
         <b style="font-size:13px">📋 규칙</b>
         <div style="margin-top:6px">• 참가비 <b>${formatMoneyReadable(BB_COST)}</b></div>
@@ -3103,27 +3104,39 @@ function openBb(){if(!me||!me._loaded)return toast("닉네임부터 정해 주�
     const C=$("bbCv");C.addEventListener("pointerdown",e=>{e.preventDefault();if(bb.phase==="play")bbDown();});["pointerup","pointerleave","pointercancel"].forEach(n=>C.addEventListener(n,up));
     window.addEventListener("keydown",e=>{if(!bbOpen()||e.code!=="Space"||e.repeat)return;e.preventDefault();bbDown();});
     window.addEventListener("keyup",e=>{if(!bbOpen()||e.code!=="Space")return;e.preventDefault();bbUp();});}
-  d.style.display="flex";bbListen();bbPanel();bbClaim();bbRender();cancelAnimationFrame(bb.raf);bbLoop();}
+  bb.battle=bt||null;bb.len=BB_LEN;$("bbSide").style.display=bt?"none":"block";$("bbBack").style.display=bt?"none":"";$("bbTitle").textContent=bt?"⚔️ 농구 배틀":"🏀 농구";
+  if(bt){const b=battles[bt],mine=b.from===myId,now=nowS();bb.opId=mine?b.to:b.from;bb.opN=mine?b.toName:b.fromName;bb.opS=0;bb.res=0;bb.len=BBB_LEN;bb.round=3;bb.total=0;bb.rs=0;bb.ball=null;bb.ch.on=false;bb.cool=0;bb.pop=[];bb.cs=0;bb.ms=0;bb.bon=0;bb.hx=BB_HX;bb.hx0=BB_HX;bb.hx1=BB_HX;bb.sl=0;
+    if(now<b.startT-300){bb.phase="count";bb.cd=performance.now()+(b.startT-now);}else{bb.phase="end";bb.msg="⏱️ 시간이 지나서 참가하지 못했어요<br>결과를 기다리는 중…";}
+    if(bb.oq){try{bb.oq.off();}catch(e){}}bb.oq=fdb.ref(BT_PATH+"/"+bt+"/bs/"+bb.opId);bb.oq.on("value",s=>{bb.opS=s.val()||0;});}
+  d.style.display="flex";if(!bt){bbListen();bbPanel();bbClaim();}bbRender();cancelAnimationFrame(bb.raf);bbLoop();}
 const bbBusy=()=>bb.phase==="play"||bb.phase==="between"||bb.phase==="count";
-function bbClose(force){if(!force&&bbBusy())return toast("🏀 게임 중에는 나갈 수 없어요");const d=$("bbMod");if(d)d.style.display="none";cancelAnimationFrame(bb.raf);bbUnlisten();}
+function bbClose(force){if(!force&&bbBusy())return toast("🏀 게임 중에는 나갈 수 없어요");const d=$("bbMod");if(d)d.style.display="none";if(bb.battle){btClosed[bb.battle]=1;bb.battle=null;bb.len=BB_LEN;bb.phase="idle";if(bb.oq){try{bb.oq.off();}catch(e){}bb.oq=null;}}cancelAnimationFrame(bb.raf);bbUnlisten();}
 function bbRender(){const B=$("bbBtn"),s=$("bbSub");if(!B)return;const ph=bb.phase;B.style.background="var(--acc)";B.style.color="#111";
+  if(bb.battle){B.style.background="var(--card2)";B.style.color="var(--sub)";
+    if(ph==="play"){B.textContent="🏀 꾹 눌렀다 떼서 던지기 (스페이스)";B.style.background="#f97316";B.style.color="#fff";s.innerHTML=`⚔️ vs <b>${esc(bb.opN)}</b> · 점수가 높은 쪽이 판돈을 가져가요`;}
+    else if(ph==="count"){B.textContent="⏳ 곧 시작해요";s.innerHTML=`⚔️ vs <b>${esc(bb.opN)}</b> · 준비하세요!`;}
+    else{B.textContent=bb.res?"닫기":"결과 기다리는 중…";if(bb.res){B.style.background="var(--acc)";B.style.color="#111";}s.innerHTML=bb.msg||"";}
+    return;}
   if(ph==="play"){B.textContent="🏀 꾹 눌렀다 떼서 던지기 (스페이스)";B.style.background="#f97316";B.style.color="#fff";s.innerHTML=`<b>${bb.round}라운드</b> · 힘을 잘 맞춰서 골대에 넣으세요!`;}
   else if(ph==="count"){B.textContent="⏳ 준비하세요!";B.style.background="var(--card2)";B.style.color="var(--sub)";s.innerHTML=`<b>${bb.round}라운드</b> 곧 시작해요`;}
   else if(ph==="between"){B.textContent=`▶ ${bb.round+1}라운드 시작 (스페이스)`;s.innerHTML=bb.msg;}
   else if(ph==="end"){B.textContent=`🔁 다시 도전 · ${formatMoneyReadable(BB_COST)} (스페이스)`;s.innerHTML=bb.msg;}
   else{B.textContent=`🏀 시작 · ${formatMoneyReadable(BB_COST)} (스페이스)`;s.innerHTML="스페이스(또는 버튼)를 <b>꾹 눌러서</b> 힘을 모으고 <b>떼면</b> 던져요";}}
 function bbDown(){const ph=bb.phase;
+  if(bb.battle){if(ph==="end"){if(bb.res)bbClose(true);return;}if(ph==="play"&&!bb.ball&&!bb.ch.on&&performance.now()>=bb.cool&&bbLeft()>0)bb.ch={on:true,t0:performance.now()};return;}
   if(ph==="idle"||ph==="end")return bbStart();
   if(ph==="between")return bbRound();
   if(ph==="play"&&!bb.ball&&!bb.ch.on&&performance.now()>=bb.cool&&bbLeft()>0){bb.ch={on:true,t0:performance.now()};}}
 function bbUp(){if(!bb.ch.on)return;const p=Math.min(1,(performance.now()-bb.ch.t0)/BB_FILL);bb.ch.on=false;if(bb.phase!=="play"||bb.ball)return;
   const t0=performance.now(),r=bbSim(p,bb.round===3?(t=>bbHoop3((t0-bb.t0)/1000+t)):bb.hx),fire=bb.bon>0;if(fire)bb.bon--;bb.ball={...r,t0:performance.now(),got:false,fin:0,fire};stAdd("bbShots");
   if(fire){if(bb.bon===0){bb.cs=0;bb.ms=0;}}else{if(r.pts>0)bb.ms++;else bb.ms=0;if(r.pts===3)bb.cs++;else bb.cs=0;if(bb.cs>=5||bb.ms>=10){bb.bon=BB_FIRE;bb.cs=0;bb.ms=0;bb.fireAt=performance.now();}}}
-const bbLeft=()=>BB_LEN-(performance.now()-bb.t0)/1000;
+const bbLeft=()=>(bb.len||BB_LEN)-(performance.now()-bb.t0)/1000;
 function bbStart(){if(bbBusy())return;if(!me||!me._loaded||sessBlocked)return toast("지금은 할 수 없어요");if(typeof casCanBet==="function"&&!casCanBet(BB_COST))return;if((me.cash|0)<BB_COST)return toast("돈이 모자라요");
   me.cash-=BB_COST;saveMe();renderHeader();bb.round=0;bb.total=0;bb.last=null;bbRound();}
 function bbRound(){bb.round++;bb.rs=0;bb.phase="count";bb.cd=performance.now()+BB_CD;bb.hx=BB_HX;bb.hx0=BB_HX;bb.hx1=BB_HX;bb.sl=0;bb.ball=null;bb.ch.on=false;bb.cool=0;bb.pop=[];bb.cs=0;bb.ms=0;bb.bon=0;bbRender();}
-function bbEndRound(){bb.ch.on=false;bb.ball=null;bb.total+=bb.rs;const need=BB_NEED[bb.round-1];
+function bbEndRound(){bb.ch.on=false;bb.ball=null;
+  if(bb.battle){bb.phase="end";const r=BT_PATH+"/"+bb.battle;fdb.ref(r+"/fin/"+myId).set(bb.rs).catch(()=>{});fdb.ref(r+"/bs/"+myId).set(bb.rs).catch(()=>{});bb.msg=`🏁 내 점수 <b>${bb.rs}점</b><br>상대가 끝나길 기다리는 중…`;bbRender();return;}
+  bb.total+=bb.rs;const need=BB_NEED[bb.round-1];
   if(bb.round>=3)return bbFinish(true);
   if(bb.total>=need){bb.phase="between";bb.msg=`✅ <b>${bb.round}라운드 통과!</b> 이번 ${bb.rs}점 · 누적 <b>${bb.total}점</b><br>다음 목표: 누적 ${BB_NEED[bb.round]}점 ${bb.round===2?"· 골대가 움직여요!":""}`;bbRender();}
   else bbFinish(false);}
@@ -3138,7 +3151,7 @@ function bbUpdate(now){if(bb.phase==="count"){if(now>=bb.cd){bb.phase="play";bb.
   if(bb.round===3)bb.hx=bbHoop3(el);else{const u=Math.min(1,(now-bb.sl)/600);bb.hx=bb.hx0+(bb.hx1-bb.hx0)*(u*u*(3-2*u));}
   const b=bb.ball;
   if(b){const i=Math.floor((now-b.t0)/1000*240);
-    if(!b.got&&b.pts&&i>=b.si){b.got=true;let pt=b.pts,tx=pt===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col=pt===3?"#4ade80":"#fde047";if(b.fire){pt=5;tx="+5 🔥 불꽃슛!";col="#fb923c";}bb.rs+=pt;bb.pop.push({t:now,txt:tx,col,x:bb.hx,y:BBP.HY-30});stAdd(b.pts===3?"bbClean":"bbBank");if(b.fire)stAdd("bbFire");}
+    if(!b.got&&b.pts&&i>=b.si){b.got=true;let pt=b.pts,tx=pt===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col=pt===3?"#4ade80":"#fde047";if(b.fire){pt=5;tx="+5 🔥 불꽃슛!";col="#fb923c";}bb.rs+=pt;bb.pop.push({t:now,txt:tx,col,x:bb.hx,y:BBP.HY-30});stAdd(b.pts===3?"bbClean":"bbBank");if(b.fire)stAdd("bbFire");if(bb.battle)fdb.ref(BT_PATH+"/"+bb.battle+"/bs/"+myId).set(bb.rs).catch(()=>{});}
     if(i>=b.path.length-1){if(!b.fin)b.fin=now;if(now-b.fin>260){bb.ball=null;if(bb.round===3)bb.cool=now+150;else{bb.hx0=bb.hx;bb.hx1=250+Math.random()*40;bb.sl=now+100;bb.cool=now+800;}}}}
   if(bb.ch.on&&bbLeft()<=0)bb.ch.on=false;
   if(bbLeft()<=0&&!bb.ball)bbEndRound();}
@@ -3166,16 +3179,19 @@ function bbDraw(now){const cv=$("bbCv");if(!cv)return;const c=cv.getContext("2d"
   c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=1;for(let k=1;k<10;k++){c.beginPath();c.moveTo(gx+gw*k/10,gy);c.lineTo(gx+gw*k/10,gy+gh);c.stroke();}c.strokeRect(gx,gy,gw,gh);
   /* HUD */
   c.textAlign="left";c.fillStyle="#fff";c.font="900 15px 'Noto Sans KR',sans-serif";
-  if(bb.phase==="idle"){c.fillText("🏀 농구",12,24);}
+  if(bb.battle){c.fillStyle="#fb923c";c.font="900 14px 'Noto Sans KR',sans-serif";c.fillText(`⚔️ ${String(bb.opN||"?").slice(0,6)} ${bb.opS|0}점`,12,24);c.font="700 11px 'Noto Sans KR',sans-serif";c.fillStyle="#cbd5e1";c.fillText(bb.rs>bb.opS?"내가 앞서는 중!":bb.rs<bb.opS?"뒤지는 중!":"동점",12,42);
+    c.textAlign="right";c.fillStyle="#fde047";c.font="900 20px 'Noto Sans KR',sans-serif";c.fillText(`나 ${bb.rs}점`,B.W-12,26);
+    if(play){const left=Math.max(0,bbLeft());c.font="900 24px 'Noto Sans KR',sans-serif";c.fillStyle=left<10?"#f87171":"#fff";c.textAlign="center";c.fillText(left.toFixed(1),B.W/2,28);c.font="700 10px 'Noto Sans KR',sans-serif";c.fillStyle="#94a3b8";c.fillText("남은 시간(초)",B.W/2,41);}}
+  else if(bb.phase==="idle"){c.fillText("🏀 농구",12,24);}
   else{const need=BB_NEED[Math.min(2,Math.max(0,bb.round-1))],cum=bb.total+(play?bb.rs:0);c.fillText(`R${bb.round}/3`,12,24);c.font="700 12px 'Noto Sans KR',sans-serif";c.fillStyle="#cbd5e1";c.fillText(bb.round<3?`목표 누적 ${need}점`:"골대가 움직여요!",12,42);
     c.textAlign="right";c.fillStyle="#fde047";c.font="900 20px 'Noto Sans KR',sans-serif";c.fillText(`${cum}점`,B.W-12,26);
     if(play){const left=Math.max(0,bbLeft());c.font="900 24px 'Noto Sans KR',sans-serif";c.fillStyle=left<10?"#f87171":"#fff";c.textAlign="center";c.fillText(left.toFixed(1),B.W/2,28);c.font="700 10px 'Noto Sans KR',sans-serif";c.fillStyle="#94a3b8";c.fillText("남은 시간(초)",B.W/2,41);}}
   /* 순위 (게임 화면 안) */
-  if(bb.phase!=="idle"){c.textAlign="left";c.font="700 11px 'Noto Sans KR',sans-serif";const med=["🥇","🥈","🥉"];for(let i=0;i<3;i++){const r=bb.top[i];c.fillStyle=r&&r.id===myId?"#fde047":"#e2e8f0";c.fillText(`${med[i]} ${r?String(r.n||"?").slice(0,6)+" "+r.s:"-"}`,12,62+i*15);}}
+  if(!bb.battle&&bb.phase!=="idle"){c.textAlign="left";c.font="700 11px 'Noto Sans KR',sans-serif";const med=["🥇","🥈","🥉"];for(let i=0;i<3;i++){const r=bb.top[i];c.fillStyle=r&&r.id===myId?"#fde047":"#e2e8f0";c.fillText(`${med[i]} ${r?String(r.n||"?").slice(0,6)+" "+r.s:"-"}`,12,62+i*15);}}
   /* 연속 / 불꽃 상태 */
   if(play||bb.phase==="count"){c.textAlign="right";c.font="700 11px 'Noto Sans KR',sans-serif";if(bb.bon>0){c.fillStyle="#fb923c";c.font="900 13px 'Noto Sans KR',sans-serif";c.fillText(`🔥 5점 찬스! 남은 ${bb.bon}번`,B.W-12,48);}else{c.fillStyle="#cbd5e1";c.fillText(`클린 ${bb.cs}/5 · 연속 ${bb.ms}/10`,B.W-12,48);}}
   /* 시작 전 카운트다운 */
-  if(bb.phase==="count"){const n=Math.max(1,Math.ceil((bb.cd-now)/1000)),f=((bb.cd-now)%1000)/1000;c.fillStyle="rgba(15,23,42,.55)";c.fillRect(0,0,B.W,B.H);c.textAlign="center";c.save();c.globalAlpha=.4+.6*f;c.fillStyle="#fde047";c.font=`900 ${90+40*(1-f)*0}px 'Noto Sans KR',sans-serif`;c.fillText(String(n),B.W/2,B.H/2+16);c.restore();c.fillStyle="#fff";c.font="900 14px 'Noto Sans KR',sans-serif";c.fillText(`${bb.round}라운드 · 준비!`,B.W/2,B.H/2-60);}
+  if(bb.phase==="count"){const n=Math.max(1,Math.ceil((bb.cd-now)/1000)),f=((bb.cd-now)%1000)/1000;c.fillStyle="rgba(15,23,42,.55)";c.fillRect(0,0,B.W,B.H);c.textAlign="center";c.save();c.globalAlpha=.4+.6*f;c.fillStyle="#fde047";c.font=`900 ${90+40*(1-f)*0}px 'Noto Sans KR',sans-serif`;c.fillText(String(n),B.W/2,B.H/2+16);c.restore();c.fillStyle="#fff";c.font="900 14px 'Noto Sans KR',sans-serif";c.fillText(`${bb.battle?"⚔️ 배틀":bb.round+"라운드"} · 준비!`,B.W/2,B.H/2-60);}
   /* 점수 팝업 */
   bb.pop=bb.pop.filter(q=>now-q.t<1100);for(const q of bb.pop){const a=1-(now-q.t)/1100;c.globalAlpha=a;c.fillStyle=q.col;c.font="900 16px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText(q.txt,q.x,q.y-(1-a)*30);c.globalAlpha=1;}}
 /* ===== 📸 인생네컷 : 방(최대 6명) → 방장이 시작 → 10초마다 한 컷씩 4컷 → 2x2 사진 ===== */
@@ -3313,9 +3329,10 @@ window.addEventListener("keyup",e=>{const K={ArrowLeft:"l",a:"l",ArrowRight:"r",
 {let last=Date.now(),sv=0;setInterval(()=>{const now=Date.now(),d=Math.min(30000,Math.max(0,now-last));last=now;if(!me||!me._loaded||sessBlocked)return;me.onAcc=(me.onAcc||0)+d;if(me.onAcc>=ONLINE_MS){me.onAcc=Math.min(me.onAcc-ONLINE_MS,ONLINE_MS-1);addExp(ONLINE_EXP,"접속 5분");toast(`⭐ 접속 5분 보상 +${ONLINE_EXP} 경험치`);sv=now;return;}if(now-sv>60000&&!document.hidden){sv=now;saveMe();}renderAttBar&&renderAttBar();},15000);}
 $("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload").set(Date.now()).then(()=>toast("🔄 모두에게 새로고침을 보냈어요")).catch(()=>toast("실패"));};
 /* BT-BEGIN ===================== ⚔️ 배틀 (가위바위보) ===================== */
+const BBB_LEN=40,BBB_LEAD=6000;
 const BT_REQ_MS=60000,BT_PICK_MS=5000,BT_GRACE=1000,BT_PATH="market/battles";
 const BT_EMO={r:"✊",s:"✌️",p:"🖐️"},BT_BEATS={r:"s",s:"p",p:"r"};
-let srvOff=0,bFrom={},bTo={},battles={},btClosed={},btDismiss={},btMy={},btResolving={},btIncId=null,btWaitId=null,btPlayId=null,btKind="cash";
+let srvOff=0,bFrom={},bTo={},battles={},btClosed={},btDismiss={},btMy={},btResolving={},btIncId=null,btWaitId=null,btPlayId=null,btKind="cash",btGame="rps";
 const nowS=()=>Date.now()+srvOff;
 const btDone=id=>(me.bdone||[]).includes(id);
 function btMarkDone(id){me.bdone=(me.bdone||[]).concat(id).slice(-80);}
@@ -3331,6 +3348,7 @@ function btGive(b,n,cost){
   else me.cash+=b.amt*n;}
 function btActive(){const now=nowS();for(const id in battles){const b=battles[id];if(!b||btDone(id))continue;if(b.st==="play")return id;if(b.st==="pending"&&b.from===myId&&now-b.t<BT_REQ_MS+3000)return id;}return null;}
 
+const btReady=(b,now)=>b.game==="bb"?((Number.isFinite((b.fin||{})[b.from])&&Number.isFinite((b.fin||{})[b.to]))||now>=b.startT+BBB_LEN*1000+12000):now>=b.startT+BT_PICK_MS+BT_GRACE;
 /* 상태 바꾸기 (신청 중일 때만 가능한 트랜잭션) */
 async function btSetSt(id,st,why,extra,fresh){
   try{const r=await fdb.ref(BT_PATH+"/"+id).transaction(cur=>{if(cur===null)return cur;if(cur.st!=="pending")return;if(fresh&&nowS()-cur.t>BT_REQ_MS+2000)return;cur.st=st;cur.why=why||"";if(extra)Object.assign(cur,extra);return cur;});
@@ -3339,6 +3357,9 @@ async function btSetSt(id,st,why,extra,fresh){
 async function btResolve(id){
   if(Date.now()-(btResolving[id]||0)<3000)return;btResolving[id]=Date.now();
   try{const s=await fdb.ref(BT_PATH+"/"+id).once("value");const b=s.val();if(!b||b.result||b.st!=="play")return;
+    if(b.game==="bb"){const fin=b.fin||{},bs=b.bs||{},sc=u=>Number.isFinite(fin[u])?fin[u]:(Number.isFinite(bs[u])?bs[u]:0),pa=sc(b.from),pb=sc(b.to),w=pa===pb?"draw":(pa>pb?b.from:b.to);
+      const tr=await fdb.ref(BT_PATH+"/"+id+"/result").transaction(cur=>cur?undefined:{w,pa,pb});
+      if(tr&&tr.committed)pushNotice(w==="draw"?`🏀 ${b.fromName} ${pa} : ${pb} ${b.toName}\n🤝 무승부! 판돈은 돌려받아요`:`🏀 ${b.fromName} ${pa} : ${pb} ${b.toName}\n🏆 ${w===b.from?b.fromName:b.toName}님 승리! (+${btStakeTxt(b)})`);return;}
     const ok=x=>x==="r"||x==="s"||x==="p"?x:"";const pk=b.pick||{};const pa=ok(pk[b.from]),pb=ok(pk[b.to]);let w;
     if(!pa&&!pb)w="draw";else if(!pa)w=b.to;else if(!pb)w=b.from;else w=pa===pb?"draw":(BT_BEATS[pa]===pb?b.from:b.to);
     const tr=await fdb.ref(BT_PATH+"/"+id+"/result").transaction(cur=>cur?undefined:{w,pa,pb});
@@ -3357,7 +3378,7 @@ async function btCreate(){
     const oh=(op.coins||{})[coin];if(!oh||!(oh.count>=n))return toast("상대가 그 코인을 그만큼 갖고 있지 않아서 신청할 수 없어요");
     b={type:"coin",coin,amt:n,px:priceOf(ci)};}
   const tk=btTake(b);if(!tk)return toast("판돈이 부족해요");
-  Object.assign(b,{from:myId,fromName:myName(),to,toName:String(op.name||"?"),st:"pending",why:"",esc:true,costA:tk.cost,costB:0,t:nowS()});
+  Object.assign(b,{game:btGame,from:myId,fromName:myName(),to,toName:String(op.name||"?"),st:"pending",why:"",esc:true,costA:tk.cost,costB:0,t:nowS()});
   saveMe();renderHeader();
   try{await fdb.ref(BT_PATH).push().set(b);}catch(e){btGive(b,1,tk.cost);saveMe();renderAll();return toast("신청에 실패했어요 (판돈은 돌려받았어요)");}
   $("btMod").style.display="none";toast(`⚔️ ${b.toName}님에게 배틀을 신청했어요\n판돈 ${btStakeTxt(b)} · 60초 안에 수락하면 시작해요`);renderAll();}
@@ -3367,10 +3388,10 @@ async function btAccept(id){
   if(nowS()-b.t>BT_REQ_MS)return toast("시간이 지난 신청이에요");const act=btActive();if(act&&act!==id)return toast("⚠️ 이미 진행 중인 배틀이 있어요");
   btDismiss[id]=1;const tk=btTake(b);
   if(!tk){await btSetSt(id,"declined","poor");btRender();return toast("💸 판돈이 부족해서 성사되지 않았어요");}
-  saveMe();renderHeader();const startT=nowS()+300;
+  saveMe();renderHeader();const startT=nowS()+(b.game==="bb"?BBB_LEAD:300);
   const ok=await btSetSt(id,"play","",{startT,costB:tk.cost},true);
   if(!ok){btGive(b,1,tk.cost);saveMe();renderAll();return toast("이미 취소됐거나 시간이 지난 신청이에요 (판돈은 돌려받았어요)");}
-  pushNotice(`⚔️ 배틀 성사! ${b.fromName} vs ${b.toName}\n판돈 ${btStakeTxt(b)} · 가위바위보 시작!`);
+  pushNotice(`⚔️ 배틀 성사! ${b.fromName} vs ${b.toName}\n판돈 ${btStakeTxt(b)} · ${b.game==="bb"?"🏀 농구":"가위바위보"} 시작!`);
   renderAll();}
 /* 관리자가 돈을 주거나 회수하면 받는 사람 화면에 메시지가 떠요 */
 {let att="";setInterval(()=>{if(!fdb||!myId||att===myId)return;att=myId;const id=myId;fdb.ref("market/adminMsg/"+id).on("value",sn=>{const v=sn.val();if(!v||!v.k||!v.amt||id!==myId)return;let seen="";try{seen=localStorage.getItem("admMsgK_"+id)||"";}catch(e){}if(seen===v.k||Date.now()-(v.t||0)>6*3600000)return;try{localStorage.setItem("admMsgK_"+id,v.k);}catch(e){}
@@ -3390,14 +3411,18 @@ function btProcess(){
       btMarkDone(id);changed=true;continue;}
     if(b.st==="pending"){if(mine&&now-b.t>BT_REQ_MS+3000)btSetSt(id,"expired","timeout");continue;}
     if(b.st==="play"){
-      if(!b.result){if(now>=b.startT+BT_PICK_MS+BT_GRACE)btResolve(id);continue;}
+      if(!b.result){if(btReady(b,now))btResolve(id);continue;}
       const r=b.result,own=(mine?b.costA:b.costB)||0,opn=mine?b.toName:b.fromName;
       stAdd("btN");if(r.w==="draw"){btGive(b,1,own);me.bd=(me.bd||0)+1;}
-      else if(r.w===myId){btGive(b,2,own+Math.round(b.amt*(b.px||0)));me.bw=(me.bw||0)+1;me.bwStreak=(me.bwStreak||0)+1;if(me.bwStreak>(me.bwBest||0))me.bwBest=me.bwStreak;if(b.type!=="coin")stAdd("btWonAmt",Math.round(b.amt));broadcast(`⚔️ ${myName()}님이 ${opn}님과의 가위바위보 배틀에서 승리! (+${btStakeTxt(b)})`);}
-      else{me.bl=(me.bl||0)+1;me.bwStreak=0;if(b.type!=="coin")stAdd("btLostAmt",Math.round(b.amt));}
+      else if(r.w===myId){btGive(b,2,own+Math.round(b.amt*(b.px||0)));if(b.game==="bb")stAdd("bbBtWin");else{me.bw=(me.bw||0)+1;me.bwStreak=(me.bwStreak||0)+1;if(me.bwStreak>(me.bwBest||0))me.bwBest=me.bwStreak;}if(b.type!=="coin")stAdd("btWonAmt",Math.round(b.amt));broadcast(`⚔️ ${myName()}님이 ${opn}님과의 ${b.game==="bb"?"농구":"가위바위보"} 배틀에서 승리! (+${btStakeTxt(b)})`);}
+      else{if(b.game!=="bb"){me.bl=(me.bl||0)+1;me.bwStreak=0;}if(b.type!=="coin")stAdd("btLostAmt",Math.round(b.amt));}
       btMarkDone(id);changed=true;}}
   if(changed){saveMe();renderAll();}}
 
+function bbBattleSync(id){const b=battles[id];if(!b)return;
+  if(bb.battle!==id){if(btClosed[id]||bbBusy())return;openBb(id);}
+  if(b.result&&bb.battle===id&&!bb.res){const r=b.result,mine=b.from===myId,mp=mine?r.pa:r.pb,op=mine?r.pb:r.pa,win=r.w===myId,draw=r.w==="draw";
+    bb.res=1;bb.opS=op;bb.msg=`<b style="font-size:15px">${draw?"🤝 무승부":win?"🎉 승리!":"😭 패배"}</b><br>나 <b>${mp}</b> : <b>${op}</b> ${esc(bb.opN)}<br>${draw?"판돈이 돌아와요":win?`<b style="color:#4ade80">+${esc(btStakeTxt(b))}</b>`:`<span style="color:#f87171">-${esc(btStakeTxt(b))}</span>`}`;bbRender();}}
 /* ---------- 화면 ---------- */
 function openBtMod(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");
   const ids=Object.keys(onlineMap).filter(id=>id!==myId&&players[id]&&players[id].name);
@@ -3420,16 +3445,16 @@ function btRenderPlay(id){
 function btRender(){
   if(!me||!me._loaded||!fdb)return;const now=nowS();let playId=null,inc=null,wait=null;
   for(const id in battles){const b=battles[id];if(!b)continue;
-    if(b.st==="play"&&!btClosed[id]&&now<b.startT+25000){if(!playId||b.startT>battles[playId].startT)playId=id;}
+    if(b.st==="play"&&!btClosed[id]&&now<b.startT+(b.game==="bb"?BBB_LEN*1000+40000:25000)){if(!playId||b.startT>battles[playId].startT)playId=id;}
     else if(b.st==="pending"&&now-b.t<BT_REQ_MS){if(b.to===myId&&!btDismiss[id])inc=id;else if(b.from===myId)wait=id;}}
   if(inc){const b=battles[inc];if(!btCanPay(b)){btDismiss[inc]=1;btSetSt(inc,"declined","poor");toast(`💸 판돈이 부족해서 성사되지 않았어요\n(${b.fromName}님의 신청: ${btStakeTxt(b)})`);inc=null;}}
   btPlayId=playId;btIncId=inc;btWaitId=wait;
-  $("btPlay").style.display=playId?"flex":"none";if(playId)btRenderPlay(playId);
+  const pbb=!!(playId&&battles[playId].game==="bb");$("btPlay").style.display=playId&&!pbb?"flex":"none";if(playId&&!pbb)btRenderPlay(playId);if(pbb)bbBattleSync(playId);
   const showInc=!playId&&inc,showWait=!playId&&wait;
   $("btInc").style.display=showInc?"flex":"none";
-  if(showInc){const b=battles[inc];$("btIncT").textContent=`${b.fromName}님의 배틀 신청!`;$("btIncS").textContent=`가위바위보 · 판돈 각 ${btStakeTxt(b)} (이기면 전부)`;$("btIncC").textContent=`${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초 안에 답하세요`;}
+  if(showInc){const b=battles[inc];$("btIncT").textContent=`${b.fromName}님의 배틀 신청!`;$("btIncS").textContent=`${b.game==="bb"?"🏀 농구":"가위바위보"} · 판돈 각 ${btStakeTxt(b)} (이기면 전부)`;$("btIncC").textContent=`${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초 안에 답하세요`;}
   $("btWait").style.display=showWait?"flex":"none";
-  if(showWait){const b=battles[wait];$("btWaitS").textContent=`${b.toName}님 · 판돈 ${btStakeTxt(b)}`;$("btWaitC").textContent=`수락을 기다리는 중… ${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초`;}}
+  if(showWait){const b=battles[wait];$("btWaitS").textContent=`${b.toName}님 · ${b.game==="bb"?"🏀 농구 · ":""}판돈 ${btStakeTxt(b)}`;$("btWaitC").textContent=`수락을 기다리는 중… ${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초`;}}
 
 function btInit(){
   fdb.ref(".info/serverTimeOffset").on("value",s=>{srvOff=s.val()||0;SRV_OFF=srvOff;});
@@ -3443,6 +3468,7 @@ function btInit(){
  g("btOpen").onclick=openBtMod;g("btModX").onclick=()=>g("btMod").style.display="none";g("btMod").onclick=e=>{if(e.target.id==="btMod")g("btMod").style.display="none";};
  document.querySelectorAll("[data-bk]").forEach(b=>b.onclick=()=>{btKind=b.dataset.bk;document.querySelectorAll("[data-bk]").forEach(x=>x.classList.toggle("on",x===b));g("btCashRow").style.display=btKind==="cash"?"block":"none";g("btCoinRow").style.display=btKind==="coin"?"block":"none";});
  g("btAll").onclick=()=>{const n=g("btCoin").value,h=me&&me.coins&&me.coins[n];if(h)g("btCnt").value=h.count;};
+ document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{btGame=b.dataset.bg;document.querySelectorAll("[data-bg]").forEach(x=>x.classList.toggle("on",x===b));});
  g("btGo").onclick=btCreate;g("btIncYes").onclick=()=>btIncId&&btAccept(btIncId);g("btIncNo").onclick=()=>btIncId&&btDecline(btIncId);g("btWaitNo").onclick=()=>btWaitId&&btCancel(btWaitId);
  document.querySelectorAll("#btpRps button").forEach(x=>x.onclick=()=>btPlayId&&btPick(btPlayId,x.dataset.c));
  g("btpOk").onclick=()=>{if(btPlayId)btClosed[btPlayId]=1;btRender();};}
