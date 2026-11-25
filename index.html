@@ -2760,7 +2760,7 @@ const TIERS=[{n:"일반",col:"#94a3b8"},{n:"희귀",col:"#60a5fa"},{n:"전설",c
 const PRIZES=[];
 const A=(t,o)=>{PRIZES.push(Object.assign({t},o));};
 const cashTx=v=>"현금 "+(v/10000)+"만";
-/* 일반 15칸: 현금(3·5·7·10·15·20만) 최소 5칸 + 코인 최소 2칸은 항상 들어가고, 나머지 8칸은 아래 상품 중에서 랜덤 */
+/* 일반 15칸: 현금(3·5·7·10·15·20만) 최소 5칸 + 코인 최소 3칸은 항상 들어가고, 나머지 7칸은 아래 상품 중에서 랜덤 */
 [[30000,30],[50000,24],[70000,18],[100000,12],[150000,6],[200000,3]].forEach(([v,w])=>A(0,{k:"cash",v,fx:1,w,nm:cashTx(v),ic:"💵"}));
 ["도지코인","리플","시바이누","솔라나","페페","플라즈마"].forEach(c=>A(0,{k:"coin",c,v:100000,w:.6,nm:c+" 10만원어치",ic:"🪙"}));
 A(0,{k:"bait",id:"mid",cnt:30,eq:90000,w:.6,nm:"중급 미끼 30개",ic:"🪱"});A(0,{k:"bait",id:"pro",cnt:50,eq:250000,w:.3,nm:"고급 미끼 50개",ic:"🪱"});
@@ -2785,9 +2785,9 @@ function slotProbs(box){const tw=[0,0,0];box.forEach(i=>{tw[PRIZES[i].t]+=PRIZES
 /* 당첨된 칸에 들어올 새 상품: 같은 등급, 지금 판에 없는 것 (현금 칸은 다른 금액의 현금) */
 function refill(box,pos,rng){rng=rng||Math.random;const old=PRIZES[box[pos]],cur=new Set(box),pk=a=>a[Math.floor(rng()*a.length)],all=PRIZES.map((q,i)=>i);
   if(old.t!==0){const c=all.filter(i=>PRIZES[i].t===old.t&&!cur.has(i));return c.length?pk(c):box[pos];}
-  /* 일반 칸: 현금은 5칸, 코인은 2칸 밑으로 내려가지 않게. 넘는 칸은 다른 상품으로 바뀔 수 있음 */
+  /* 일반 칸: 현금은 5칸, 코인은 3칸 밑으로 내려가지 않게. 넘는 칸은 다른 상품으로 바뀔 수 있음 */
   const cnt=k=>box.filter(i=>PRIZES[i].t===0&&PRIZES[i].k===k).length,cc=cnt("cash"),cn=cnt("coin");
-  let c=all.filter(i=>{const q=PRIZES[i];if(q.t!==0||cur.has(i))return false;const nc=cc-(old.k==="cash"?1:0)+(q.k==="cash"?1:0),nn=cn-(old.k==="coin"?1:0)+(q.k==="coin"?1:0);return nc>=5&&nn>=2;});
+  let c=all.filter(i=>{const q=PRIZES[i];if(q.t!==0||cur.has(i))return false;const nc=cc-(old.k==="cash"?1:0)+(q.k==="cash"?1:0),nn=cn-(old.k==="coin"?1:0)+(q.k==="coin"?1:0);return nc>=5&&nn>=3;});
   if(!c.length)c=all.filter(i=>PRIZES[i].t===0&&PRIZES[i].k===old.k&&i!==box[pos]);
   return c.length?pk(c):box[pos];}
 function rollBox(box,rng){rng=rng||Math.random;const pr=slotProbs(box),tot=pr.reduce((a,b)=>a+b,0);let r=rng()*tot;for(let i=0;i<pr.length;i++){r-=pr[i];if(r<0)return i;}return pr.length-1;}/* 월드: x,z ∈ [0,1], z=0 뒤 / 1 앞 */
@@ -2912,7 +2912,7 @@ const clwT0=m=>m?(m.t0||((m.r|0)*CLW_LEN)):0;
 const clwNext=()=>(clwRid()+1)*CLW_LEN-nowS();
 const clwDue=m=>!m||!m.keys||m.dl!==2||!m.box||clwRid()>Math.floor(clwT0(m)/CLW_LEN);/* 정각·30분마다 룰렛 칸·인형이 새로 바뀜 (예전 판도 교체) */
 function clwNewRound(rid){const P=CLW.POOL,idx=f=>P.map((q,i)=>[q,i]).filter(([q])=>f(q)).map(([,i])=>i),pick=(a,n)=>a.slice().sort(()=>Math.random()-.5).slice(0,n);
-  const cs=pick(idx(q=>q.t===0&&q.k==="cash"),5),cn=pick(idx(q=>q.t===0&&q.k==="coin"),2),used=new Set([...cs,...cn]),rest=pick(idx(q=>q.t===0).filter(i=>!used.has(i)),8);
+  const cs=pick(idx(q=>q.t===0&&q.k==="cash"),5),cn=pick(idx(q=>q.t===0&&q.k==="coin"),3),used=new Set([...cs,...cn]),rest=pick(idx(q=>q.t===0).filter(i=>!used.has(i)),7);
   const box=[...cs,...cn,...rest,...pick(idx(q=>q.t===1),8),...pick(idx(q=>q.t===2),2)].sort(()=>Math.random()-.5);
   return{r:rid,t0:nowS(),v:1,dl:2,box,keys:CLW.newGame().keys.map(clwPlain)};}
 /* 정각·30분마다(또는 예전 판일 때) 새로 채움 · 누가 하는 중이면 끝난 뒤에 */
