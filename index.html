@@ -1377,7 +1377,11 @@ function rpsClaim(){const n=rpsN();if(!n)return toast("🎤 MC 가바보: 아직
 /* ---------- 📢 전체 공지 ---------- */
 {let q=[],busy=false,lastK="";const show=()=>{if(busy||!q.length)return;busy=true;const n=$("gNotice");n.textContent=q.shift();n.classList.add("on");setTimeout(()=>{n.classList.remove("on");setTimeout(()=>{busy=false;show();},450);},4500);};
  const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/notice").on("value",s=>{const v=s.val();if(!v||!v.text||v.k===lastK)return;lastK=v.k;if(Date.now()-(v.t||0)>20000)return;q.push(String(v.text).slice(0,120));show();});
-  const t0=Date.now(),seen={};fdb.ref("market/accLog").limitToLast(5).on("child_added",s=>{const v=s.val();if(!v||v.k!=="in"||!v.t||v.id===myId)return;if(v.t<t0+(typeof srvOff==="number"?srvOff:0)-3000)return;if(seen[v.id]&&Date.now()-seen[v.id]<120000)return;seen[v.id]=Date.now();q.push(`👋 ${String(v.name||"누군가").slice(0,12)}님이 입장했어요`);show();});},300);}
+  /* 입장·퇴장: 위 공지 + 채팅창(내 화면에만 표시). 새로고침(퇴장 후 20초 안에 다시 입장)은 둘 다 안 띄움 */
+  const t0=Date.now(),seen={},outT={};fdb.ref("market/accLog").limitToLast(8).on("child_added",s=>{const v=s.val();if(!v||!v.t||v.id===myId)return;if(v.t<t0+(typeof srvOff==="number"?srvOff:0)-3000)return;const nm=String(v.name||"누군가").slice(0,12);
+    if(v.k==="out"){clearTimeout(outT[v.id]);outT[v.id]=setTimeout(()=>{delete outT[v.id];delete seen[v.id];addMsg({sys:true,t:Date.now(),text:`🚪 ${nm}님이 퇴장했어요`});},20000);return;}
+    if(v.k!=="in")return;if(outT[v.id]){clearTimeout(outT[v.id]);delete outT[v.id];return;}
+    if(seen[v.id]&&Date.now()-seen[v.id]<120000)return;seen[v.id]=Date.now();addMsg({sys:true,t:Date.now(),text:`👋 ${nm}님이 입장했어요`});q.push(`👋 ${nm}님이 입장했어요`);show();});},300);}
 /* ---------- ⭐ 접속 경험치 (5분마다) ---------- */
 {let last=Date.now(),sv=0;setInterval(()=>{const now=Date.now(),d=Math.min(30000,Math.max(0,now-last));last=now;if(!me||!me._loaded||sessBlocked)return;me.onAcc=(me.onAcc||0)+d;if(me.onAcc>=ONLINE_MS){me.onAcc=Math.min(me.onAcc-ONLINE_MS,ONLINE_MS-1);addExp(ONLINE_EXP,"접속 5분");toast(`⭐ 접속 5분 보상 +${ONLINE_EXP} 경험치`);sv=now;return;}if(now-sv>60000&&!document.hidden){sv=now;saveMe();}renderAttBar&&renderAttBar();},15000);}
 $("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload").set(Date.now()).then(()=>toast("🔄 모두에게 새로고침을 보냈어요")).catch(()=>toast("실패"));};
