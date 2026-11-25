@@ -2949,25 +2949,26 @@ function openClw(){if(!me||!me._loaded)return toast("닉네임부터 정해 주�
   if(!d){d=document.createElement("div");d.id="clwMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)clwClose();};d.addEventListener("keydown",e=>e.stopPropagation());
     d.innerHTML=`<div class="btBox" style="max-width:340px;padding:10px 12px;max-height:94vh"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="font-size:14.5px">🧸 인형 뽑기</b><div style="display:flex;align-items:center;gap:4px"><button id="clwLst" style="padding:5px 9px;border-radius:9px;background:var(--card2);font-size:11.5px;font-weight:800">🎁 상품 목록</button><button id="clwX" style="font-size:18px;color:var(--sub);width:30px;height:30px">✕</button></div></div>
       <div id="clwTop"></div>
-      <div id="clwRl" style="margin:5px 0"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:12px">🎟️ 내 티켓 <b id="clwTix" style="color:var(--acc);font-size:16px">0</b>장</span><button id="clwSpin" style="padding:6px 11px;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:12px">🎰 룰렛 돌리기 (티켓 1장)</button></div>
-      <div id="clwGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div><div style="text-align:center;font-size:10.5px;color:var(--sub);margin-top:3px"><b id="clwCd" style="color:var(--acc)"></b> 뒤 새로 섞여요</div><div id="clwRes" style="min-height:30px;text-align:center;font-size:11.5px;margin-top:3px;line-height:1.4;color:var(--sub)">인형을 뽑으면 티켓을 받아요 · 티켓 1장으로 룰렛을 한 번 돌려요</div></div>
+      <div id="clwRl" style="margin:5px 0"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:12px">🎟️ 내 티켓 <b id="clwTix" style="color:var(--acc);font-size:16px">0</b>장</span><span id="clwSpin" style="font-size:11px;color:var(--sub);text-align:right"></span></div>
+      <div id="clwGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div><div style="text-align:center;font-size:10.5px;color:var(--sub);margin-top:3px"><b id="clwCd" style="color:var(--acc)"></b> 뒤 새로 섞여요</div><div id="clwRes" style="min-height:30px;text-align:center;font-size:11.5px;margin-top:3px;line-height:1.4;color:var(--sub)">인형을 뽑으면 티켓을 받고, 티켓 1장마다 룰렛이 한 번씩 바로 돌아가요</div></div>
       <canvas id="clwCv" width="${CLW.CW}" height="${CLW.CH}" style="display:block;margin:0 auto;height:min(272px,30vh);width:auto;max-width:100%;border-radius:12px;background:#000;touch-action:none"></canvas>
       <div style="display:flex;gap:8px;align-items:stretch;margin:7px 0 2px"><div style="display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,42px);gap:4px;flex:none">${[["u","▲","2","1"],["l","◀","1","2"],["d","▼","2","2"],["r","▶","3","2"]].map(([k,ch,c,r])=>`<button data-clk="${k}" style="grid-column:${c};grid-row:${r};background:var(--card2);border-radius:12px;font-size:18px;font-weight:900;touch-action:none">${ch}</button>`).join("")}</div>
       <div style="flex:1;display:flex;flex-direction:column;gap:5px;min-width:0"><button id="clwStart" style="width:100%;height:38px;border-radius:11px;background:var(--acc);color:#111;font-weight:900;font-size:13px"></button>
       <button id="clwGo" style="width:100%;flex:1;border-radius:13px;background:linear-gradient(#f87171,#dc2626);color:#fff;font-size:17px;font-weight:900;box-shadow:0 4px 0 #7f1d1d">집기! <span style="font-size:10px;font-weight:700">(스페이스)</span></button></div></div>
       <div style="text-align:center;font-size:10px;color:var(--sub)">PC: 방향키/WASD · 스페이스 집기 · 시작하면 10초 안에 집어야 해요</div>
       <div id="clwLog" style="margin-top:8px"></div><div id="clwAdm"></div></div>`;
-    d.querySelector("#clwX").onclick=clwClose;d.querySelector("#clwLst").onclick=clwShowList;clwBuildGrid();d.querySelector("#clwSpin").onclick=clwSpin;d.querySelector("#clwStart").onclick=clwStart;d.querySelector("#clwGo").onclick=()=>{if(clw.play&&clw.G&&clw.G.st==="move"){CLW.startDrop(clw.G);clwUI();}};
+    d.querySelector("#clwX").onclick=clwClose;d.querySelector("#clwLst").onclick=clwShowList;clwBuildGrid();d.querySelector("#clwStart").onclick=clwStart;d.querySelector("#clwGo").onclick=()=>{if(clw.play&&clw.G&&clw.G.st==="move"){CLW.startDrop(clw.G);clwUI();}};
     d.querySelectorAll("[data-clk]").forEach(b=>{const k=b.dataset.clk,on=e=>{e.preventDefault();clw.inp[k]=1;},off=e=>{if(e)e.preventDefault();clw.inp[k]=0;};b.addEventListener("pointerdown",on);["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,off));});}
+  if(!clw._pm)clw._pm=setInterval(clwAutoStep,700);
   d.style.display="flex";clw.lt=0;clwListen();clwSyncView();clwUI();if(!clw.raf)clw.raf=requestAnimationFrame(clwLoop);}
-function clwClose(){if(clw.play||clw.fin)return toast("🔑 도전 중에는 나갈 수 없어요");const d=$("clwMod");if(d)d.style.display="none";clw.inp={l:0,r:0,u:0,d:0};if(clw.rl.busy&&!clw.rl.mine){clw.rl.run=0;clw.rl.busy=false;}clwUnlisten();}
+function clwClose(){if(clw.play||clw.fin)return toast("🔑 도전 중에는 나갈 수 없어요");const d=$("clwMod");if(d)d.style.display="none";clw.inp={l:0,r:0,u:0,d:0};if(clw.rl.busy&&!clw.rl.mine){clw.rl.run=0;clw.rl.busy=false;}if(clw._pm){clearInterval(clw._pm);clw._pm=0;}clwUnlisten();}
 window.addEventListener("keydown",e=>{if(!clwOpen())return;const K={ArrowLeft:"l",a:"l",ArrowRight:"r",d:"r",ArrowUp:"u",w:"u",ArrowDown:"d",s:"d"},k=K[e.key.length===1?e.key.toLowerCase():e.key];
   if(e.key===" "){e.preventDefault();if(!e.repeat&&clw.play&&clw.G&&clw.G.st==="move"){CLW.startDrop(clw.G);clwUI();}return;}
   if(e.key==="Escape"){clwClose();return;}if(k){e.preventDefault();clw.inp[k]=1;}},true);
 window.addEventListener("keyup",e=>{const K={ArrowLeft:"l",a:"l",ArrowRight:"r",d:"r",ArrowUp:"u",w:"u",ArrowDown:"d",s:"d"},k=K[e.key.length===1?e.key.toLowerCase():e.key];if(k)clw.inp[k]=0;});
 function clwUI(){const d=$("clwMod");if(!d||d.style.display!=="flex")return;const COST=CLW.CLAW_COST,s=clw.s,live=s&&s.uid&&!clwStale(s),mineLive=live&&s.uid===myId;
   $("clwTop").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><span>내 현금 <b>${formatMoneyReadable(me?me.cash:0)}</b> · 남은 인형 <b>${clw.play&&clw.G?clw.G.keys.length:(clw.m&&clw.m.keys?clw.m.keys.length:0)}</b>개</span><span style="color:var(--sub)">참가비 <b style="color:var(--acc)">${formatMoneyReadable(COST)}</b></span></div>`;
-  {if(!clw.rl.busy&&clw.m&&clw.m.box&&clw.rl.sg!==clw.m.box.join(",")){clwBuildGrid();}const tx=$("clwTix");if(tx)tx.textContent=String(me?(me.clwTk|0):0);const sp=$("clwSpin");if(sp){const ro=clwRsOther(),off=clw.rl.busy||ro||!me||(me.clwTk|0)<1;sp.disabled=off;sp.style.opacity=off?.55:1;sp.innerHTML=ro?`👀 ${esc(String(clw.rs.name||"누군가").slice(0,8))}님 돌리는 중`:"🎰 룰렛 돌리기 (티켓 1장)";}}
+  {if(!clw.rl.busy&&clw.m&&clw.m.box&&clw.rl.sg!==clw.m.box.join(",")){clwBuildGrid();}const tx=$("clwTix");if(tx)tx.textContent=String(me?(me.clwTk|0):0);const sp=$("clwSpin");if(sp){const ro=clwRsOther(),tn=me?(me.clwTk|0):0,tx=ro?`👀 ${esc(String(clw.rs.name||"누군가").slice(0,8))}님 돌리는 중`:clw.rl.busy?"🎰 룰렛이 돌아가요":tn>0?"곧 룰렛이 돌아가요":"인형을 뽑으면 룰렛이 바로 돌아가요";if(sp._t!==tx){sp._t=tx;sp.innerHTML=tx;}}}
 
   const b=$("clwStart"),go=$("clwGo");let t="",dis=false;
   if(clw.play){t=clw.G&&clw.G.st==="move"?`⏱ 남은 시간 ${Math.ceil(clw.tl)}초`:"집게가 움직이는 중…";dis=true;}
@@ -3011,7 +3012,7 @@ function clwFinish(){clw.fin=true;const G=clw.G,res=G.res||{win:false},COST=clw.
   const nm={...clw.m,v:(clw.m.v|0)+1,keys:G.keys.map(clwPlain)},up={"m/keys":nm.keys,"m/v":nm.v,"s":null};
   const done=()=>{clw.play=false;clw.fin=false;clw.G=null;clw.m=nm;clwSyncView();clwUI();};
   fdb.ref("market/claw").update(up).catch(()=>{}).then(()=>{done();
-    if(res.win){toast(`🧸 인형 뽑기 성공! 🎟️ 티켓 +${tk}장 · 바로 룰렛이 돌아가요`);if(!clw.noAuto){clw.auto=(clw.auto|0)+tk;setTimeout(clwAuto,500);}}else toast(["허공을 집었어요…","집었는데 미끄러졌어요!","올라오다 떨어졌어요!"][res.why==="slide"?1:res.why==="drop"?2:0]||"아쉬워요!");});}
+    if(res.win){toast(`🧸 인형 뽑기 성공! 🎟️ 티켓 +${tk}장 · 바로 룰렛이 돌아가요`);if(!clw.noAuto)setTimeout(clwAutoStep,350);}else toast(["허공을 집었어요…","집었는데 미끄러졌어요!","올라오다 떨어졌어요!"][res.why==="slide"?1:res.why==="drop"?2:0]||"아쉬워요!");});}
 /* 🎰 룰렛: 티켓 1장 → 25칸에 불이 돌다가 멈춘 칸이 당첨 (지급은 돌기 전에 끝나 있어서 중간에 나가도 안전) */
 function clwTixPop(tk){const bg=modal(`<div style="text-align:center"><div style="font-size:46px">🧸</div><div style="font-size:15px;font-weight:900;margin:6px 0">인형을 뽑았어요!</div><div style="font-size:30px;font-weight:900;color:var(--acc);margin:4px 0">🎟️ 티켓 +${tk}장</div><div style="font-size:12px;color:var(--sub);margin-bottom:12px">지금 가진 티켓 <b style="color:var(--tx)">${me.clwTk|0}장</b> · 위쪽 룰렛에서 돌려 보세요</div><button id="clwTo" style="width:100%;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">확인</button></div>`);
   bg.style.zIndex=70;bg.querySelector("#clwTo").onclick=()=>{try{bg.remove();}catch(e){}};}
@@ -3024,7 +3025,7 @@ function clwRlEnd(rs,P,g,mine){clw.rl.busy=false;clw.rl.mine=false;clw.rl.run=0;
   const R2=$("clwRes");if(R2)R2.innerHTML=mine?`${P.ic} <b>${esc(P.nm)}</b> 당첨!<br><span style="color:var(--sub)">${g.txt}</span>`:`👀 <b>${esc(String(rs.name||"").slice(0,10))}</b>님 · ${P.ic} <b>${esc(P.nm)}</b> 당첨!`;
   if(mine&&!(P.k==="cash"&&P.v<=100000))clwResult(P,g);
   if(mine&&fdb)fdb.ref("market/claw/rs").transaction(c=>(c&&c.uid===myId&&c.t0===rs.t0)?null:undefined).catch(()=>{});
-  if(mine&&clw.auto>0)setTimeout(clwAuto,1100);}
+  if(mine&&!clw.noAuto)setTimeout(clwAutoStep,1100);}
 function clwRlPlay(rs,i0,mine,g){const P=CLW.POOL[rs.pi],n=clw.m&&clw.m.box?clw.m.box.length:25,T=clwRlTimes(rs.steps);let i=i0,prev=-1;clw.rl.busy=true;clw.rl.mine=mine;clw.rl.run=rs.t0;
   const R=$("clwRes");if(R)R.innerHTML=mine?"불빛이 돌아가요…":`👀 <b>${esc(String(rs.name||"").slice(0,10))}</b>님이 룰렛을 돌려요…`;clwUI();
   const tick=()=>{if(clw.rl.run!==rs.t0)return;if(prev>=0)clwHi(prev,0);const cur=(rs.start+i)%n;clwHi(cur,1);prev=cur;
@@ -3035,13 +3036,15 @@ function clwRsWatch(){const rs=clw.rs;if(rs&&rs.uid&&rs.uid!==myId&&(+rs.until||
     const T=clwRlTimes(rs.steps),el=nowS()-rs.t0;if(el<T[rs.steps]+700){let i=0;while(i<rs.steps&&T[i+1]<=el)i++;if(clw.rl.run)clw.rl.run=0;clwBuildGrid();clwRlPlay(rs,Math.max(0,i),false);}}
   if(rs&&rs.until){clearTimeout(clw._rst);clw._rst=setTimeout(clwUI,Math.max(0,rs.until-nowS())+80);}clwUI();}
 /* 인형을 뽑으면 받은 티켓만큼 룰렛이 바로 돌아감 (다른 사람이 돌리는 중이면 끝나길 기다림) */
-function clwAuto(w){if(!(clw.auto>0))return;w=(w|0)+1;if(w>80){clw.auto=0;return;}if(clw.rl.busy){setTimeout(()=>clwAuto(w),500);return;}if(!me||(me.clwTk|0)<1||!clw.m||!clw.m.box){clw.auto=0;return;}if(clwRsOther()){setTimeout(()=>clwAuto(w),700);return;}clwSpin();}
-function clwSpin(){if(clw.rl.busy)return;if(!me||!me._loaded||sessBlocked)return toast("지금은 할 수 없어요");if(!clw.m||!clw.m.box)return toast("룰렛을 준비하는 중이에요");if((me.clwTk|0)<1)return toast("🎟️ 티켓이 없어요 · 인형을 뽑아 모아 보세요");
-  if(clwRsOther())return toast(`지금 ${clw.rs.name}님이 룰렛을 돌리는 중이에요`);
+function clwAutoStep(){if(clw.noAuto||!clwOpen()||!me||!me._loaded||(me.clwTk|0)<1||!clw.m||!clw.m.box)return;
+  if(clw.rl.busy){if(!clw.rl.run&&performance.now()-(clw._bt||0)>7000)clw.rl.busy=false;else return;}
+  if(clwRsOther())return;clwSpin(true);}
+function clwSpin(q){if(clw.rl.busy)return;if(!me||!me._loaded||sessBlocked)return q?0:toast("지금은 할 수 없어요");if(!clw.m||!clw.m.box)return q?0:toast("룰렛을 준비하는 중이에요");if((me.clwTk|0)<1)return q?0:toast("🎟️ 티켓이 없어요 · 인형을 뽑아 모아 보세요");
+  if(clwRsOther())return q?0:toast(`지금 ${clw.rs.name}님이 룰렛을 돌리는 중이에요`);
   const box=clw.m.box.slice(),pos=CLW.rollBox(box),pi=box[pos],P=CLW.POOL[pi],ni=CLW.refill(box,pos),n=box.length,start=clw.rl.cur<0?0:clw.rl.cur,steps=20+(((pos-start-20)%n)+n)%n;
   const T=clwRlTimes(steps),t0=nowS(),rs={uid:myId,name:myName().slice(0,10),t0,start,steps,pos,pi,until:t0+T[steps]+750+1200};
-  clw.rl.busy=true;
-  const go=()=>{if((me.clwTk|0)<1){clw.rl.busy=false;clw.auto=0;return clwUI();}if(clw.auto>0)clw.auto--;
+  clw.rl.busy=true;clw._bt=performance.now();
+  const go=()=>{if((me.clwTk|0)<1){clw.rl.busy=false;return clwUI();}
     me.clwTk=(me.clwTk|0)-1;stAdd("clawSpin");if(P.t>=1)stAdd("clawRare");const g=clwGrant(P);saveMe();
     if(fdb)fdb.ref("market/claw/m/box/"+pos).transaction(cur=>{if(cur!==pi)return;return ni;}).catch(()=>{});/* 당첨된 칸에 같은 등급의 새 상품이 들어와요 */
     if(fdb&&P.t>=1)fdb.ref("market/claw/log").push({name:myName().slice(0,10),nm:P.nm,t:nowS()}).catch(()=>{});
@@ -3049,7 +3052,7 @@ function clwSpin(){if(clw.rl.busy)return;if(!me||!me._loaded||sessBlocked)return
     clwRlPlay(rs,0,true,g);};
   if(!fdb){go();return;}
   fdb.ref("market/claw/rs").transaction(cur=>{const now=nowS();if(cur&&cur.uid&&cur.uid!==myId&&(+cur.until||0)>now)return;return rs;},(err,ok)=>{
-    if(err||!ok){clw.rl.busy=false;clwUI();if(clw.auto>0){setTimeout(clwAuto,800);return;}return toast("다른 분이 먼저 룰렛을 돌리고 있어요");}go();},false);}
+    if(err||!ok){clw.rl.busy=false;clwUI();return q?0:toast("다른 분이 먼저 룰렛을 돌리고 있어요");}go();},false);}
 function clwResult(P,g){const bg=modal(`<div style="text-align:center"><span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:900;color:#111;background:${CLW.TIERS[P.t].col}">${CLW.TIERS[P.t].n}</span><div style="font-size:12px;color:var(--sub);margin-top:6px">🎰 룰렛 결과</div><div style="font-size:18px;font-weight:900;margin:6px 0">${esc(P.nm)}</div><canvas id="clwPc" width="380" height="380" style="width:190px;height:190px;background:radial-gradient(#2a2f45,#141722);border-radius:14px"></canvas><div style="font-size:12.5px;margin:8px 0 14px;line-height:1.5">${g.txt}</div><button id="clwOk" style="width:100%;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">확인</button></div>`);
   bg.style.zIndex=70;const cv=bg.querySelector("#clwPc"),pg=cv.getContext("2d");let stop=false;
   const anim=()=>{if(stop||!document.body.contains(cv))return;const t=performance.now();pg.setTransform(1,0,0,1,0,0);pg.clearRect(0,0,380,380);
