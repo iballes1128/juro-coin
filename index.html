@@ -938,7 +938,7 @@ function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,n
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
   $("shName").innerHTML=esc(n)+badges(ci);$("shPrice").textContent=c.delisted?"거래 정지":formatCoinPrice(p);$("shPrice").className="big "+(c.rate>0?"up":c.rate<0?"down":"");
   $("shRate").innerHTML=c.pre?'<span class="flat">곧 신규 상장 · 기본가 '+formatCoinPrice(base)+'</span>':c.delisted?'<span class="flat">상장폐지 · '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 뒤 재상장</span>':(c.rate>0?'<span class="up">+'+c.rate+'% ▲</span>':c.rate<0?'<span class="down">'+c.rate+'% ▼</span>':'<span class="flat">0% -</span>')+' <span class="flat" style="font-weight:400">직전 '+(curTick()/1000)+'초</span>';
-  {const d=c.hist.slice(-kSpan(3*3600000)).filter(v=>v>0);$("shRange").innerHTML=d.length?`<span style="font-size:10px">최근 3시간</span><br>고가 <span class="up">${formatCoinPrice(Math.max(...d))}</span><br>저가 <span class="down">${formatCoinPrice(Math.min(...d))}</span>`:"";}
+  {const d=c.hist.slice(-kSpan(12*3600000)).filter(v=>v>0);$("shRange").innerHTML=d.length?`<span style="font-size:10px">최근 12시간</span><br>고가 <span class="up">${formatCoinPrice(Math.max(...d))}</span><br>저가 <span class="down">${formatCoinPrice(Math.min(...d))}</span>`:"";}
   drawChart(c.hist.slice(-kSpan(chartN*10000)-1),chartHover);
   const h=me.coins[n]||{count:0,cost:0};$("shHold").innerHTML=h.count>0?`보유 <b style="color:var(--tx)">${formatCoinReadable(h.count)}</b> · 평단가 ${formatCoinPrice(Math.round(h.cost/h.count))}`:"보유 없음";
   const q=parseInt(($("qty").value||"").replace(/,/g,""),10)||0,g=$("goBtn");let html="",ok=false;
