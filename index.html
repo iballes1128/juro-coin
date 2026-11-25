@@ -343,7 +343,7 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=11,APP_V=22;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=11,APP_V=23;
 /* 11/25 17:22(KST)부터 v10 방식으로 되돌림 (지그재그 해제) */const F12_T=Date.parse("2026-11-25T08:22:00Z");let K12=0;
 /* 11/25 17:05(KST)부터 v11: 지그재그 파동 */const F11_T=Date.parse("2026-11-25T08:05:00Z");let K11=0;
 /* 11/25 16:50(KST)부터 v10: 기본가로 꼭 안 돌아옴, 폭락 후 바닥 횡보도 */const F10_T=Date.parse("2026-11-25T07:50:00Z");let K10=0;
@@ -633,7 +633,7 @@ function checkDelist(){if(!me||sessBlocked)return;let changed=false;const msgs=[
   if(changed){saveMe();toast("🚨 보유 코인 상장폐지\n"+msgs.join("\n"));broadcast(`🚨 ${myName()}님 보유 코인 상장폐지 (5% 환불)\n`+msgs.join("\n"));}}
 
 /* ===================== 화면: 시세 ===================== */
-function spark(cv,arr,col){const dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
+function spark(cv,arr,col){arr=afterRelist(arr);const dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
   const a=arr.filter(v=>v>0);if(a.length<2)return;const mn=Math.min(...a),mx=Math.max(...a),rg=mx-mn||1;g.strokeStyle=col;g.lineWidth=1.6;g.beginPath();
   arr.forEach((v,i)=>{if(v<=0)return;const x=i/(arr.length-1)*w,y=h-2-(v-mn)/rg*(h-4);i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();}
 function badges(ci){const c=M.coins[ci],[n,,mn]=COINS[ci];let s="";if(c.pre)return'<span class="badge b-new">상장 예정✨</span>';if(c.delisted)return'<span class="badge b-dead">상장폐지</span>';
@@ -644,7 +644,7 @@ function renderMarket(){const L=$("coinList");if(!L.children.length){COINS.forEa
     const h=me&&me.coins[n];d.querySelector(".hd").textContent=h&&h.count>0?"보유 "+formatCoinReadable(h.count):"";
     d.querySelector(".pr b").textContent=c.pre?"상장 예정":c.delisted?"거래 정지":formatCoinPrice(c.price);d.querySelector(".pr b").className=c.rate>0?"up":c.rate<0?"down":"";
     d.querySelector(".rt").innerHTML=c.pre?'<small class="flat">상장 '+Math.max(1,Math.ceil((tickT(LISTK[ci])-tickT(M.k))/60000))+'분 전</small>':c.delisted?'<small class="flat">재상장 '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 후</small>':rateHtml(c.rate);
-    const hs=c.hist.slice(-kSpan(1800000));spark(d.querySelector(".spark"),hs,hs[hs.length-1]>=hs[0]?"#f04452":"#3b82f6");});}
+    const hs=afterRelist(c.hist.slice(-kSpan(1800000)));spark(d.querySelector(".spark"),hs,hs[hs.length-1]>=hs[0]?"#f04452":"#3b82f6");});}
 
 /* ===================== 화면: 상단 / 내 자산 ===================== */
 function renderHeader(){if(!me)return;$("hCash").textContent=formatMoneyReadable(me.cash);$("hTotal").textContent=formatMoneyReadable(assetOf(me));}
@@ -917,7 +917,9 @@ function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[
   else{const raw=Math.floor(q*p),tx=taxInfo(raw,assetOf(me));ok=!c.delisted&&q>0&&q<=h.count&&canTrade();html=`<div>매도 금액 <b>${formatMoneyReadable(raw)}</b></div><div>거래 세금 (${tx.name}) <b>-${formatMoneyReadable(tx.fee)}</b></div><div>최종 입금액 <b>${formatMoneyReadable(raw-tx.fee)}</b></div>`;g.textContent=c.delisted?"상장폐지된 코인":!canTrade()?"거래 권한 없음":q>h.count?"보유 수량 초과":"매도하기";}
   $("prev").innerHTML=html;g.disabled=!ok;}
 let chartArr=[],chartHover=-1;
-function drawChart(arr,hv){if(arr)chartArr=arr;else arr=chartArr;if(hv===undefined)hv=chartHover;const cv=$("chart"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
+/* 상장폐지→재상장한 코인은 재상장 이후 구간만 그래프에 (앞쪽 빈 구간 때문에 오른쪽 끝에 몰려 보이던 문제) */
+const afterRelist=a=>{const z=a.lastIndexOf(0);return z>=0&&z<a.length-2?a.slice(z+1):a;};
+function drawChart(arr,hv){if(arr)arr=afterRelist(arr);if(arr)chartArr=arr;else arr=chartArr;if(hv===undefined)hv=chartHover;const cv=$("chart"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
   const a=arr.filter(v=>v>0);if(a.length<2){g.fillStyle="#8b93a3";g.font="13px Noto Sans KR";g.fillText("데이터 모으는 중…",10,h/2);return;}
   const hd=curCoin>=0&&me&&me.coins[COINS[curCoin][0]],avg=hd&&hd.count>0?hd.cost/hd.count:0;
   const mn=Math.min(...a,...(avg?[avg]:[])),mx=Math.max(...a,...(avg?[avg]:[])),rg=mx-mn||1,up=a[a.length-1]>=a[0],col=up?"#f04452":"#3b82f6";
