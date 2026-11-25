@@ -3045,17 +3045,18 @@ const BBP={W:360,H:420,FLOOR:372,PX:62,G:900,ANG:70*Math.PI/180,VMIN:420,VMAX:72
 const bbWk=t=>Math.floor((t+9*3600000-4*86400000)/(7*86400000));
 const bbWkEnd=w=>(w+1)*7*86400000+4*86400000-9*3600000;
 const bbTier=s=>{for(const t of BB_TIERS)if(s>=t[0])return t;return null;};
-function bbSim(p,hx){const B=BBP,th=B.ANG,v=B.VMIN+p*(B.VMAX-B.VMIN),hy=B.HY;
+function bbSim(p,hxa){const B=BBP,th=B.ANG,v=B.VMIN+p*(B.VMAX-B.VMIN),hy=B.HY,H=typeof hxa==="function"?hxa:()=>hxa;let hx=H(0);
   let x=B.PX+14,y=B.FLOOR-62,vx=v*Math.cos(th),vy=-v*Math.sin(th);
-  const L=[hx-B.RIMW,hy],R=[hx+B.RIMW,hy],bx=hx+B.RIMW+3,path=[];let board=false,rim=false,scored=false,pts=0,prevY=y,si=-1;const dt=1/240;
-  for(let i=0;i<1440;i++){vy+=B.G*dt;x+=vx*dt;y+=vy*dt;
+  const L=[0,hy],R=[0,hy],path=[];let bx=0;let board=false,rim=false,scored=false,pts=0,prevY=y,si=-1;const dt=1/240;
+  for(let i=0;i<1440;i++){hx=H(i*dt);L[0]=hx-B.RIMW;R[0]=hx+B.RIMW;bx=hx+B.RIMW+3;vy+=B.G*dt;x+=vx*dt;y+=vy*dt;
     if(vx>0&&x+B.BR>=bx&&x<bx+8&&y>hy+B.BOARDT&&y<hy+B.BOARDB){x=bx-B.BR;vx=-vx*.55;vy*=.85;board=true;}
     for(const q of[L,R]){const dx=x-q[0],dy=y-q[1],d=Math.hypot(dx,dy);if(d<B.BR+1.6&&d>0){const nx=dx/d,ny=dy/d,dot=vx*nx+vy*ny;if(dot<0){vx=(vx-1.55*dot*nx)*.8;vy=(vy-1.55*dot*ny)*.8;x=q[0]+nx*(B.BR+1.7);y=q[1]+ny*(B.BR+1.7);rim=true;}}}
     if(!scored&&prevY<hy&&y>=hy&&vy>0&&Math.abs(x-hx)<B.RIMW-4){scored=true;si=path.length;pts=(board||rim)?2:3;}
     prevY=y;path.push([x,y]);
     if(y>B.FLOOR+30||x>B.W+40||x<-30||(scored&&y>hy+60))break;}
-  return{pts,board,rim,path,si,hx};}
-const bb={on:false,phase:"idle",round:0,total:0,rs:0,t0:0,hx:BB_HX,ch:{on:false,t0:0},ball:null,cool:0,pop:[],raf:0,top:[],best:0,last:null,prev:null,q:null,wk:0,msg:"",cd:0,cs:0,ms:0,bon:0};
+  return{pts,board,rim,path,si,hx:H(0),hs:hx};}
+const bbHoop3=el=>BB_HX+26*Math.sin(el*1.2);
+const bb={hx0:BB_HX,hx1:BB_HX,sl:0,on:false,phase:"idle",round:0,total:0,rs:0,t0:0,hx:BB_HX,ch:{on:false,t0:0},ball:null,cool:0,pop:[],raf:0,top:[],best:0,last:null,prev:null,q:null,wk:0,msg:"",cd:0,cs:0,ms:0,bon:0};
 const bbOpen=()=>{const d=$("bbMod");return !!d&&d.style.display==="flex";};
 function bbClaim(){if(!fdb||!myId)return;const wp=bbWk(nowS())-1;if(wp<0)return;
   fdb.ref("market/bball/w/"+wp).orderByChild("k").limitToLast(1).once("value").then(s=>{const v=s.val();if(!v)return;const id=Object.keys(v)[0],r=v[id];bb.prev=r;bbPanel();
@@ -3086,7 +3087,7 @@ function openBb(){if(!me||!me._loaded)return toast("닉네임부터 정해 주�
         <div style="margin-top:6px">• 참가비 <b>${formatMoneyReadable(BB_COST)}</b></div>
         <div>• ${BB_LEN}초 × 3라운드, 점수 누적</div>
         <div>• 통과 기준: 1R <b>${BB_NEED[0]}점</b> · 2R 누적 <b>${BB_NEED[1]}점</b></div>
-        <div>• 3R는 골대가 움직임</div>
+        <div>• 매 슛마다 골대 위치가 바뀌고, 3R는 계속 움직임</div>
         <b style="display:block;margin-top:10px;font-size:13px">🎯 점수</b>
         <div style="margin-top:4px">• 클린샷 <b>3점</b></div>
         <div>• 백보드·림 맞고 <b>2점</b></div>
@@ -3116,12 +3117,12 @@ function bbDown(){const ph=bb.phase;
   if(ph==="between")return bbRound();
   if(ph==="play"&&!bb.ball&&!bb.ch.on&&performance.now()>=bb.cool&&bbLeft()>0){bb.ch={on:true,t0:performance.now()};}}
 function bbUp(){if(!bb.ch.on)return;const p=Math.min(1,(performance.now()-bb.ch.t0)/BB_FILL);bb.ch.on=false;if(bb.phase!=="play"||bb.ball)return;
-  const r=bbSim(p,bb.hx),fire=bb.bon>0;if(fire)bb.bon--;bb.ball={...r,t0:performance.now(),got:false,fin:0,fire};stAdd("bbShots");
+  const t0=performance.now(),r=bbSim(p,bb.round===3?(t=>bbHoop3((t0-bb.t0)/1000+t)):bb.hx),fire=bb.bon>0;if(fire)bb.bon--;bb.ball={...r,t0:performance.now(),got:false,fin:0,fire};stAdd("bbShots");
   if(fire){if(bb.bon===0){bb.cs=0;bb.ms=0;}}else{if(r.pts>0)bb.ms++;else bb.ms=0;if(r.pts===3)bb.cs++;else bb.cs=0;if(bb.cs>=5||bb.ms>=10){bb.bon=BB_FIRE;bb.cs=0;bb.ms=0;bb.fireAt=performance.now();}}}
 const bbLeft=()=>BB_LEN-(performance.now()-bb.t0)/1000;
 function bbStart(){if(bbBusy())return;if(!me||!me._loaded||sessBlocked)return toast("지금은 할 수 없어요");if(typeof casCanBet==="function"&&!casCanBet(BB_COST))return;if((me.cash|0)<BB_COST)return toast("돈이 모자라요");
   me.cash-=BB_COST;saveMe();renderHeader();bb.round=0;bb.total=0;bb.last=null;bbRound();}
-function bbRound(){bb.round++;bb.rs=0;bb.phase="count";bb.cd=performance.now()+BB_CD;bb.hx=BB_HX;bb.ball=null;bb.ch.on=false;bb.cool=0;bb.pop=[];bb.cs=0;bb.ms=0;bb.bon=0;bbRender();}
+function bbRound(){bb.round++;bb.rs=0;bb.phase="count";bb.cd=performance.now()+BB_CD;bb.hx=BB_HX;bb.hx0=BB_HX;bb.hx1=BB_HX;bb.sl=0;bb.ball=null;bb.ch.on=false;bb.cool=0;bb.pop=[];bb.cs=0;bb.ms=0;bb.bon=0;bbRender();}
 function bbEndRound(){bb.ch.on=false;bb.ball=null;bb.total+=bb.rs;const need=BB_NEED[bb.round-1];
   if(bb.round>=3)return bbFinish(true);
   if(bb.total>=need){bb.phase="between";bb.msg=`✅ <b>${bb.round}라운드 통과!</b> 이번 ${bb.rs}점 · 누적 <b>${bb.total}점</b><br>다음 목표: 누적 ${BB_NEED[bb.round]}점 ${bb.round===2?"· 골대가 움직여요!":""}`;bbRender();}
@@ -3134,18 +3135,18 @@ function bbFinish(passed){bb.phase="end";const need=BB_NEED[bb.round-1],tier=pas
   bbRender();if(tier&&tier[1]>=2)broadcast(`🏀 ${myName()}님이 농구 ${bb.total}점! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-BB_COST)}`);}
 function bbLoop(){if(!bbOpen())return;const now=performance.now();bbUpdate(now);bbDraw(now);bb.raf=requestAnimationFrame(bbLoop);}
 function bbUpdate(now){if(bb.phase==="count"){if(now>=bb.cd){bb.phase="play";bb.t0=now;bbRender();}return;}if(bb.phase!=="play")return;const el=(now-bb.t0)/1000;
-  if(!bb.ball)bb.hx=bb.round===3?BB_HX+26*Math.sin(el*1.4):BB_HX;
+  if(bb.round===3)bb.hx=bbHoop3(el);else{const u=Math.min(1,(now-bb.sl)/600);bb.hx=bb.hx0+(bb.hx1-bb.hx0)*(u*u*(3-2*u));}
   const b=bb.ball;
   if(b){const i=Math.floor((now-b.t0)/1000*240);
-    if(!b.got&&b.pts&&i>=b.si){b.got=true;let pt=b.pts,tx=pt===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col=pt===3?"#4ade80":"#fde047";if(b.fire){pt=5;tx="+5 🔥 불꽃슛!";col="#fb923c";}bb.rs+=pt;bb.pop.push({t:now,txt:tx,col,x:b.hx,y:BBP.HY-30});stAdd(b.pts===3?"bbClean":"bbBank");if(b.fire)stAdd("bbFire");}
-    if(i>=b.path.length-1){if(!b.fin)b.fin=now;if(now-b.fin>260){bb.ball=null;bb.cool=now+150;}}}
+    if(!b.got&&b.pts&&i>=b.si){b.got=true;let pt=b.pts,tx=pt===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col=pt===3?"#4ade80":"#fde047";if(b.fire){pt=5;tx="+5 🔥 불꽃슛!";col="#fb923c";}bb.rs+=pt;bb.pop.push({t:now,txt:tx,col,x:bb.hx,y:BBP.HY-30});stAdd(b.pts===3?"bbClean":"bbBank");if(b.fire)stAdd("bbFire");}
+    if(i>=b.path.length-1){if(!b.fin)b.fin=now;if(now-b.fin>260){bb.ball=null;if(bb.round===3)bb.cool=now+150;else{bb.hx0=bb.hx;bb.hx1=250+Math.random()*40;bb.sl=now+100;bb.cool=now+800;}}}}
   if(bb.ch.on&&bbLeft()<=0)bb.ch.on=false;
   if(bbLeft()<=0&&!bb.ball)bbEndRound();}
 function bbDraw(now){const cv=$("bbCv");if(!cv)return;const c=cv.getContext("2d"),B=BBP;c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,B.W,B.H);
   let g=c.createLinearGradient(0,0,0,B.H);g.addColorStop(0,"#1e293b");g.addColorStop(1,"#0f172a");c.fillStyle=g;c.fillRect(0,0,B.W,B.H);
   c.fillStyle="rgba(250,204,21,.06)";for(let i=0;i<6;i++)c.fillRect(10+i*60,0,26,B.FLOOR);
   c.fillStyle="#b45309";c.fillRect(0,B.FLOOR,B.W,B.H-B.FLOOR);c.fillStyle="#d97706";c.fillRect(0,B.FLOOR,B.W,4);c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=2;c.beginPath();c.moveTo(0,B.FLOOR+22);c.lineTo(B.W,B.FLOOR+22);c.stroke();
-  const play=bb.phase==="play",hx=bb.ball?bb.ball.hx:bb.hx,hy=B.HY,bx=hx+B.RIMW+3;
+  const play=bb.phase==="play",hx=bb.hx,hy=B.HY,bx=hx+B.RIMW+3;
   /* 골대 */
   c.strokeStyle="#64748b";c.lineWidth=5;c.beginPath();c.moveTo(bx+8,hy+B.BOARDB);c.lineTo(bx+8,B.FLOOR);c.stroke();
   c.fillStyle="rgba(241,245,249,.92)";c.fillRect(bx,hy+B.BOARDT,6,B.BOARDB-B.BOARDT);c.strokeStyle="#ef4444";c.lineWidth=2;c.strokeRect(bx+.5,hy-26,5,22);
