@@ -1590,12 +1590,19 @@ function hrBind(d){d.querySelectorAll("[data-hrt]").forEach(b=>b.onclick=()=>{hr
   if($("hrGo"))$("hrGo").onclick=hrGo;if($("hrTake"))$("hrTake").onclick=()=>{diceTake(true);hr.view=null;toast("💰 받았어요!");renderCas();};if($("hrBack"))$("hrBack").onclick=()=>{hr.view=null;renderCas();};
   if(hr.view)hrAnim();}
 function hrAnim(){cancelAnimationFrame(hr.raf);const v=hr.view;const step=()=>{const cv=$("hrCv");if(!cv||hr.view!==v)return;const ms=nowS()-v.t0;hrDraw(cv,v,ms);if(ms<hrDur(v))hr.raf=requestAnimationFrame(step);else{hrFinish(v);renderCas();}};step();}
+/* 말 그림 (오른쪽 보고 달림): 몸통·목·머리·다리·꼬리 + 기수 */
+function hrHorse(g,x,y,col,ph){const lg=ph?Math.sin(ph):0,lg2=ph?Math.sin(ph+Math.PI):0;g.save();g.translate(x-6,y+2);g.lineCap="round";
+  g.strokeStyle="#3f2a1a";g.lineWidth=2.4;[[-7,lg],[-3,lg2],[5,lg2],[9,lg]].forEach(([lx,a])=>{g.beginPath();g.moveTo(lx,3);g.lineTo(lx+a*3.5,10);g.stroke();});
+  g.strokeStyle="#3f2a1a";g.lineWidth=2;g.beginPath();g.moveTo(-11,-1);g.quadraticCurveTo(-17,1+lg*2,-16,6);g.stroke();
+  g.fillStyle="#7c4a24";g.beginPath();g.ellipse(1,0,11,5.5,0,0,7);g.fill();g.beginPath();g.moveTo(7,-3);g.lineTo(12,-10);g.lineTo(16,-8);g.lineTo(11,1);g.closePath();g.fill();g.beginPath();g.ellipse(16,-8.5,5,3,.35,0,7);g.fill();
+  g.fillStyle="#111";g.beginPath();g.arc(17,-9.5,.9,0,7);g.fill();g.fillStyle=col;g.fillRect(-4,-4,8,7);
+  g.fillStyle=col;g.beginPath();g.ellipse(1,-9,3.2,4.5,-.4,0,7);g.fill();g.fillStyle="#fde68a";g.beginPath();g.arc(3,-14.5,2.8,0,7);g.fill();g.fillStyle=col;g.beginPath();g.arc(3,-15.3,2.9,Math.PI,0);g.fill();g.restore();}
 function hrDraw(cv,r,ms){const g=cv.getContext("2d"),W=cv.width,H=cv.height,L=38,R=W-30,lh=(H-24)/HR_N,mine=r.uid===myId;g.clearRect(0,0,W,H);
   for(let i=0;i<HR_N;i++){g.fillStyle=i%2?"#166534":"#15803d";g.fillRect(0,12+i*lh,W,lh);}g.fillStyle="#f8fafc";for(let y=12;y<H-12;y+=8){g.fillRect(R,y,4,4);g.fillStyle=g.fillStyle==="#f8fafc"?"#111":"#f8fafc";}
   g.fillStyle="rgba(255,255,255,.35)";g.fillRect(L,12,2,H-24);
   const fin=[];for(let i=0;i<HR_N;i++){const x=L+(R-L)*hrPos(r,i,ms),y=12+i*lh+lh/2,isB=r.bet.h1===i||(r.bet.type==="ex"&&r.bet.h2===i);
     g.fillStyle="rgba(0,0,0,.25)";g.beginPath();g.ellipse(x-4,y+9,13,3,0,0,7);g.fill();
-    g.save();g.translate(x,y);g.scale(-1,1);g.font="26px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText("🏇",0,0);g.restore();
+    hrHorse(g,x,y,r.horses[i].c,ms<HR_WAIT||hrPos(r,i,ms)>=1?0:ms/55+i);
     g.fillStyle=r.horses[i].c;g.beginPath();g.arc(x-22,y-8,8,0,7);g.fill();g.fillStyle="#fff";g.font="bold 10px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(i+1,x-22,y-7.5);
     g.fillStyle=isB?"#fde047":"rgba(255,255,255,.85)";g.font=`${isB?"bold ":""}9px 'Noto Sans KR',sans-serif`;g.textAlign="left";g.fillText(r.horses[i].n+(isB?(mine?" ⭐내 말":" ⭐"):""),4,12+i*lh+8);}
   const t=(ms-HR_WAIT)/1000;r.order.forEach((i,k)=>{if(t>=r.plan[i][0]&&k<3){g.font="16px sans-serif";g.textAlign="right";g.textBaseline="middle";g.fillText(["🥇","🥈","🥉"][k],W-6,12+i*lh+lh/2);}});
