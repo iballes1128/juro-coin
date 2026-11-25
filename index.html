@@ -2703,7 +2703,7 @@ const PRIZES=[
  {t:1,k:"acc",id:"wizard",eq:1000000,nm:"마법사 모자",ic:"🎩"},
  {t:1,k:"acc",id:"horns",eq:1000000,nm:"악마 뿔",ic:"😈"},
  {t:1,k:"acc",id:"halo",eq:1000000,nm:"천사 링",ic:"😇"},
- {t:1,k:"cash",v:1500000,nm:"현금 150만",ic:"💴"},
+ {t:1,k:"cash",v:750000,nm:"현금 75만",ic:"💴"},
  {t:2,k:"acc",id:"crown",eq:3000000,nm:"왕관",ic:"👑"},
  {t:2,k:"aura",id:"meteor",eq:4000000,nm:"유성우 오라 (뽑기 한정)",ic:"🌠"},
  {t:2,k:"wing",id:"crystal",eq:4000000,nm:"수정 날개 (뽑기 한정)",ic:"🪽"},
@@ -2757,7 +2757,7 @@ const PRIZES=[
  {t:0,k:"cosm",ck:"aura",id:"firefly",eq:400000,nm:"반딧불 오라 (뽑기 한정)",ic:"✨"},
  {t:0,k:"cosm",ck:"plate",id:"sunset",eq:400000,nm:"노을 명찰 (뽑기 한정)",ic:"🌇"}];
 /* 밸런스: 상품마다 "손님 한 번 도전당 참가비의 몇 %가 이 상품으로 돌아가는지(share)"를 정하고 확률을 거기서 계산 */
-PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq;p.sh=(p.k==="cash"&&p.v>=1e8)?.15:(p.k==="aura"||p.k==="wing")?.05:p.id==="crown"?.045:[.03,.035,.05][p.t];p.p=Math.max(.002,Math.min(.7,p.sh*25*CLAW_COST/p.val*.98));});
+PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq;p.sh=(p.k==="cash"&&p.v>=1e8)?.15:(p.k==="aura"||p.k==="wing")?.05:p.id==="crown"?.045:[.03,.035,.05][p.t];p.p=Math.max(.002,Math.min(.7,p.sh*25*CLAW_COST/(p.t===1?Math.max(p.val,1e6):p.val)*.98));});
 const POOL=PRIZES;let BOX=PRIZES.slice();function setBox(a){BOX=a;}
 /* 월드: x,z ∈ [0,1], z=0 뒤 / 1 앞 */
 const CW=360,CH=336,FY0=172,FYH=118,RAIL=34;
@@ -2777,7 +2777,7 @@ function respawn(G,n){const p=spot(G,9,.26,.78,.22,.74);const k=mkKey(n,p.x,p.z,
 /* 집기 성공(모든 열쇠 공통) × 출구까지 안 떨어뜨리기(번호별로 다름) = 최종 확률 */
 const GRAB0=.93;
 const PITY_S=.9,PITY_G=1.3,PITY_CAP=8;/* 떨어질 때마다 그 열쇠는 다음에 1.3배 잘 잡힘(최대 8배) */
-function carryQ(n,d){const L=BOX[n].t===2;return Math.min(.97,PITY_S*(L?.25:1)*BOX[n].p/GRAB0*Math.min(L?1.5:PITY_CAP,Math.pow(PITY_G,d|0)));}/* 전설은 기본 확률 0.25배, 천장 최대 1.5배 */
+function carryQ(n,d){const L=BOX[n].t===2;return Math.min(.97,PITY_S*(L?.25:1)*BOX[n].p/GRAB0*Math.min(L?1.5:BOX[n].t===1?5:PITY_CAP,Math.pow(PITY_G,d|0)));}/* 전설은 기본 확률 0.25배, 천장 최대 1.5배 · 희귀는 천장 최대 5배 */
 function evalGrab(G){const R=34;let best=null,bd=1e9;for(const k of G.keys){if(k.fall)continue;const d=pxd(G,k);if(d<bd){bd=d;best=k;}}
   if(!best||bd>R)return{type:"miss"};
   const sg=GRAB0*(1-.5*bd/R);
