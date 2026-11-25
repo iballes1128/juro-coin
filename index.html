@@ -675,8 +675,8 @@ function openNts(){fKeys={};stAdd("visitNts");let d=$("ntsMod");if(!d){d=documen
 function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(me&&myId)all[myId]=me;const top=Object.entries(all).map(([id,p])=>({id,n:(p&&p.name)||"?",v:((p&&p.taxPaid)||0)+(taxPre[id]||0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
   const row=(a,b,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--sub)">${a}</span><b${c?` style="color:${c}"`:""}>${b}</b></div>`;
   d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">🏛️ 국세청</b><button id="ntsX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
-    <div style="text-align:center;margin:8px 0 12px"><div style="font-size:11px;color:var(--sub)">지금까지 걷힌 세금 총합</div><div style="font-size:24px;font-weight:900;color:var(--acc)">${formatMoneyReadable(taxAll.total||0)}</div></div>`+
-    Object.keys(TAX_K).map(k=>row(TAX_K[k],formatMoneyReadable(taxAll[k]||0))).join("")+
+    <div style="text-align:center;margin:8px 0 12px"><div style="font-size:11px;color:var(--sub)">지금까지 걷힌 세금 총합</div><div style="font-size:24px;font-weight:900;color:var(--acc)">${taxAll.total==null?"불러오는 중…":formatMoneyReadable(taxAll.total)}</div></div>`+
+    Object.keys(TAX_K).map(k=>row(TAX_K[k],taxAll.total==null?"…":formatMoneyReadable(taxAll[k]||0))).join("")+
     `<div style="margin-top:12px">`+row("🧾 내가 낸 세금",formatMoneyReadable(((me&&me.taxPaid)||0)+(taxPre[myId]||0)),"var(--acc)")+`</div>`+
     `<div style="font-size:12px;font-weight:900;margin:14px 0 4px">🏅 성실 납세자 TOP 5</div>`+(top.length?top.map((x,i)=>row(`${["🥇","🥈","🥉","4","5"][i]} ${esc(x.n)}`,formatMoneyReadable(x.v))).join(""):'<div style="color:var(--sub);font-size:12px">아직 없어요</div>')+
     `<div style="font-size:10px;color:var(--sub);margin-top:10px;text-align:center">${taxAll.backfilled?"이전 세금은 남아 있는 거래 기록으로 추정해서 합쳤어요":"이번 업데이트부터 걷힌 세금이 집계돼요"}</div></div>`;
