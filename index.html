@@ -1479,6 +1479,14 @@ function boatStep(dt,t,noIn){const bv=fBV,SP=.085;let ix=0,iy=0;
   fp.x=nx;fp.y=ny;if(Math.abs(bv.x)>.006)fp.dir=bv.x>0?1:-1;
   fBoatTilt+=((bv.x/SP)*.13-fBoatTilt)*Math.min(1,dt/180);
   if(Math.hypot(bv.x,bv.y)>.02&&t-fWakeT>110){fWakeT=t;fWake.push({x:fp.x-bv.x*70,y:fp.y+5,t});if(fWake.length>40)fWake.shift();}}
+/* 🔒 다리 건너편은 관리자 비밀번호를 입력해야 열려요 (열면 모두가 건널 수 있어요) */
+{const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/bridge").on("value",s=>{const v=s.val();bridgeOpen=!!(v&&v.open);});},500);}
+function bridgeGate(t){if(t-fGateT<1500)return;fGateT=t+1e9;fp.tx=null;fp.via=null;fp.y=DOCK.y+46;fKeys={};
+  const bg=modal(`<div style="text-align:center"><div style="font-size:34px">🔒</div><div style="font-size:15px;font-weight:900;margin:6px 0">아직 닫혀 있는 다리예요</div><div style="font-size:12px;color:var(--sub);margin-bottom:10px">비밀번호를 입력하면 열려요</div><input id="brPw" type="password" placeholder="비밀번호" autocomplete="off" style="width:100%;text-align:center"><div id="brErr" style="color:var(--up);font-size:11.5px;min-height:16px;margin:4px 0"></div><div style="display:flex;gap:8px"><button id="brNo" class="go" style="flex:1;background:var(--card2)">닫기</button><button id="brOk" class="go" style="flex:1;background:var(--acc);color:#111">열기</button></div></div>`);
+  bg.style.zIndex=80;const done=()=>{try{bg.remove();}catch(e){}fGateT=performance.now();};bg.addEventListener("keydown",e=>e.stopPropagation());
+  const go=async()=>{const pw=bg.querySelector("#brPw").value;if(!pw)return;if(await sha(pw)!==ADMIN_HASH){bg.querySelector("#brErr").textContent="비밀번호가 달라요";bg.querySelector("#brPw").value="";return;}
+    bridgeOpen=true;if(fdb)fdb.ref("market/bridge").set({open:true,t:Date.now()}).catch(()=>{});done();toast("🔓 다리가 열렸어요!");};
+  bg.querySelector("#brOk").onclick=go;bg.querySelector("#brNo").onclick=done;bg.querySelector("#brPw").addEventListener("keydown",e=>{if(e.key==="Enter")go();});setTimeout(()=>{const i=bg.querySelector("#brPw");if(i)i.focus();},60);}
 function fishArea(n,t){fArea=n;fp.tx=null;fp.via=null;fp.x=DOCK.x+DOCK.w/2;fp.y=n?FH-40:DOCK.y+36;fAreaT=t||performance.now();fLastSent="";fFloat.push({x:fp.x,y:fp.y-40,s:n?"🌲 다리 건너편":"🏙️ 주로 광장",t:performance.now(),c:"#fff"});setFishBtn();}
 function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 열쇠 뽑기에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=Math.max(BOAT_X0+8,Math.min(FW-34,fp.x));fp.y=92;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
 function boatLeave(){if(!fBoat)return;if(fstate!=="idle")return toast("낚시 중에는 내릴 수 없어요");fBoat=0;fBV.x=0;fBV.y=0;if(fp.x>=DOCK.x-26&&fp.x<=DOCK.x+DOCK.w+26){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();}
@@ -1501,7 +1509,7 @@ const walk1=(x,y)=>x>=10&&x<=FW-10&&y>=76&&y<=FH-12;
 const inDock=(x,y)=>x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+16&&y<=RIVER+16;
 const walkable=(x,y)=>!inShop(x,y)&&x>=10&&x<=FW-10&&y<=FH-12&&(y>=RIVER+14||inDock(x,y));
 function fishSpot(x,y){if(fArea)return false;if(inDock(x,y))return y<RIVER-6;return y<=RIVER+34&&!(x>DOCK.x-12&&x<DOCK.x+DOCK.w+12);}
-let fArea=0,fAreaT=-9999,fBoat=0,fBV={x:0,y:0},fBoatTilt=0,fWake=[],fWakeT=0;
+let bridgeOpen=false,fGateT=-9999,fArea=0,fAreaT=-9999,fBoat=0,fBV={x:0,y:0},fBoatTilt=0,fWake=[],fWakeT=0;
 let fp={x:120,y:300,dir:1,walk:0,tx:null,ty:null},fstate="idle",fT=0,fBite=0,fBob={x:0,y:0},fKeys={},fCv=null,fCtx=null,fRaf=0,fLastSend=0,fLastSent="",fScale=1,fOthers={},fFloat=[],fRes=null,fTab="dex";
 const DECOR=(()=>{const r=mulberry(777),a=[{t:"tree",x:96,y:330,c:.2},{t:"tree",x:342,y:330,c:.7},{t:"tree",x:100,y:432,c:.5},{t:"tree",x:332,y:428,c:.3},{t:"bush",x:160,y:205,c:.4},{t:"bush",x:196,y:410,c:.6}];a.push({t:"shop",x:SHOP.x,y:SHOP.y+SHOP.h});a.push({t:"nts",x:NTS.x,y:NTS.y+NTS.h});a.push({t:"cas",x:CAS.x,y:CAS.y+CAS.h});a.push({t:"clw",x:CLB.x,y:CLB.y+CLB.h});a.push({t:"phb",x:PHB.x,y:PHB.y+PHB.h});for(let i=0;i<14;i++){const fx=20+r()*320,fy=RIVER+40+r()*(FH-RIVER-60),fc=r();if(fx>RZ.x-8&&fx<RZ.x+RZ.w+8&&fy>RZ.y-8&&fy<RZ.y+RZ.h+16)continue;if(fx>NTS.x-10&&fx<NTS.x+NTS.w+10&&fy>NTS.y-24&&fy<NTS.y+NTS.h+10)continue;if(fx>CAS.x-10&&fx<CAS.x+CAS.w+10&&fy>CAS.y-24&&fy<CAS.y+CAS.h+10)continue;if(fx>CLB.x-10&&fx<CLB.x+CLB.w+10&&fy>CLB.y-24&&fy<CLB.y+CLB.h+10)continue;if(fx>PHB.x-10&&fx<PHB.x+PHB.w+10&&fy>PHB.y-24&&fy<PHB.y+PHB.h+10)continue;a.push({t:"flower",x:fx,y:fy,c:fc});}return a.sort((a,b)=>a.y-b.y);})();
 function fishActive(){return $("s-fish")&&$("s-fish").classList.contains("on");}
@@ -2296,7 +2304,7 @@ function fishStep(dt,t){
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   {const B=$("fBoatBtn");if(B){const own=myBoat()?1:0;if(!own&&fBoat)boatLeave();const d=own&&(fBoat||(fstate==="idle"&&fp.y<=RIVER+34))?"block":"none",tx=fBoat?"⚓ 보트 내리기":"🚤 보트 타기";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fBoat);}}}
-  if(fstate==="idle"&&!fBoat){if(!fArea&&inDock(fp.x,fp.y)&&fp.y<=DOCK.y+20)fishArea(1,t);else if(fArea&&fp.y>=FH-16&&fp.x>=DOCK.x+4&&fp.x<=DOCK.x+DOCK.w-4)fishArea(0,t);}
+  if(fstate==="idle"&&!fBoat){if(!fArea&&inDock(fp.x,fp.y)&&fp.y<=DOCK.y+20){if(bridgeOpen)fishArea(1,t);else bridgeGate(t);}else if(fArea&&fp.y>=FH-16&&fp.x>=DOCK.x+4&&fp.x<=DOCK.x+DOCK.w-4)fishArea(0,t);}
   if(fBoat&&fstate!=="idle")boatStep(dt,t,1);
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;const mx=dx*Math.min(1,dt/120),my=dy*Math.min(1,dt/120);o.x+=mx;o.y+=my;
     if(o.bt){const vx=mx/Math.max(1,dt);o.tl=(o.tl||0)+((vx/.085)*.13-(o.tl||0))*Math.min(1,dt/180);if(Math.hypot(mx,my)/Math.max(1,dt)>.02&&t-(o.wt||0)>110){o.wt=t;fWake.push({x:o.x-mx*8,y:o.y+5,t});if(fWake.length>40)fWake.shift();}}else o.tl=0;}
