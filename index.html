@@ -343,7 +343,7 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=11,APP_V=21;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=11,APP_V=22;
 /* 11/25 17:22(KST)부터 v10 방식으로 되돌림 (지그재그 해제) */const F12_T=Date.parse("2026-11-25T08:22:00Z");let K12=0;
 /* 11/25 17:05(KST)부터 v11: 지그재그 파동 */const F11_T=Date.parse("2026-11-25T08:05:00Z");let K11=0;
 /* 11/25 16:50(KST)부터 v10: 기본가로 꼭 안 돌아옴, 폭락 후 바닥 횡보도 */const F10_T=Date.parse("2026-11-25T07:50:00Z");let K10=0;
@@ -1309,9 +1309,9 @@ function fishResize(){if(!fCv)return;const top=$("fishWrap").getBoundingClientRe
 function hueOf(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h;}
 
 /* ---------- 🧑 캐릭터 ---------- */
-const CHARS=[["기본"],["낚시꾼"],["소녀"],["해적"],["닌자"],["곰"],["고양이"],["개구리"],["펭귄"],["로봇"],["유령"],["남자 (가르마)"],["남자 (뾰족머리)"],["여자 (긴생머리)"],["여자 (포니테일)"],["오리"]];
-const SKIN_PRICE={11:0,13:0,1:1e6,3:1e6,4:1e6,5:1e6,6:1e6,7:1e6,8:1e6,15:1e6,9:1e6,10:1e6};
-const CH_ORDER=[11,13,1,3,4,5,6,7,8,15,9,10];
+const CHARS=[["기본"],["낚시꾼"],["소녀"],["해적"],["닌자"],["곰"],["고양이"],["개구리"],["펭귄"],["로봇"],["유령"],["남자 (가르마)"],["남자 (뾰족머리)"],["여자 (긴생머리)"],["여자 (포니테일)"],["오리"],["말티즈"]];
+const SKIN_PRICE={11:0,13:0,1:1e6,3:1e6,4:1e6,5:1e6,6:1e6,7:1e6,8:1e6,15:1e6,16:1e6,9:1e6,10:1e6};
+const CH_ORDER=[11,13,1,3,4,5,6,7,8,15,16,9,10];
 const normCh=ch=>(ch===14||ch===2)?13:(typeof ch==="number"&&ch in SKIN_PRICE)?ch:11;
 const ownsSkin=(p,ch)=>SKIN_PRICE[ch]===0||!!(p&&p.skins&&p.skins["s"+ch]);
 let AWK_NOW=0;const AWK_EYE=[null,"#22d3ee","#c084fc","#fde047"];
@@ -1357,7 +1357,20 @@ c.fillStyle=o.pants||"#2b2f3a";c.fillRect(x-5,y-9,4,9+lg*.3);c.fillRect(x+1,y-9,
   if(o.hat){c.fillStyle=o.hat;c.beginPath();c.ellipse(x,y-33+bob,11,3,0,0,7);c.fill();c.beginPath();c.roundRect(x-6,y-40+bob,12,8,3);c.fill();}}
 function animal0(c,x,y,dir,bob,lg,o){c.fillStyle=o.feet||o.body;c.fillRect(x-6,y-6,5,6+lg*.3);c.fillRect(x+1,y-6,5,6-lg*.3);
   c.fillStyle=o.body;c.beginPath();c.ellipse(x,y-15+bob,9,10,0,0,7);c.fill();if(o.belly){c.fillStyle=o.belly;c.beginPath();c.ellipse(x+dir,y-13+bob,5.5,7,0,0,7);c.fill();}
-  const hy=y-29+bob;c.fillStyle=o.head||o.body;c.beginPath();c.arc(x,hy,8,0,7);c.fill();
+  const hy=y-29+bob;if(o.dog){c.fillStyle="#f8fafc";c.strokeStyle="#cbd5e1";c.lineWidth=.8;
+    for(let k=0;k<9;k++){const a=k/9*6.283;c.beginPath();c.arc(x+Math.cos(a)*8,y-15+bob+Math.sin(a)*9,2.6,0,7);c.fill();}
+    c.beginPath();c.ellipse(x,y-15+bob,9,10,0,0,7);c.fill();}
+  c.fillStyle=o.head||o.body;c.beginPath();c.arc(x,hy,8,0,7);c.fill();
+  if(o.dog){c.fillStyle="#f8fafc";for(let k=0;k<7;k++){const a=Math.PI+k/6*Math.PI;c.beginPath();c.arc(x+Math.cos(a)*7.5,hy+Math.sin(a)*7.5,2.8,0,7);c.fill();}
+    c.beginPath();c.arc(x,hy,7.6,0,7);c.fill();c.strokeStyle="#cbd5e1";c.lineWidth=.8;c.beginPath();c.arc(x,hy,8.6,Math.PI*1.05,Math.PI*1.95);c.stroke();
+    c.fillStyle="#eef2f7";c.beginPath();c.ellipse(x-dir*6.5,hy+2.5,3.4,6.8,dir*.25,0,7);c.fill();c.stroke();
+    c.fillStyle="#f8fafc";c.beginPath();c.ellipse(x+dir*1.8,hy+2.6,4.2,3.2,0,0,7);c.fill();
+    c.fillStyle="#111";c.beginPath();c.arc(x+dir*3-.2,hy-1.2,1.35,0,7);c.arc(x+dir*3-4.2,hy-1.2,1.35,0,7);c.fill();
+    c.fillStyle="#fff";c.fillRect(x+dir*3,hy-2,.8,.8);c.fillRect(x+dir*3-4,hy-2,.8,.8);
+    c.fillStyle="#1f2937";c.beginPath();c.ellipse(x+dir*4.6,hy+1.9,1.5,1.1,0,0,7);c.fill();
+    c.fillStyle="#fb7185";c.beginPath();c.ellipse(x+dir*3.4,hy+4.4,.9,1.2,0,0,7);c.fill();
+    c.fillStyle="#f472b6";c.beginPath();c.moveTo(x-dir*1,hy-8);c.lineTo(x-dir*5,hy-11);c.lineTo(x-dir*5,hy-5.5);c.closePath();c.moveTo(x-dir*1,hy-8);c.lineTo(x+dir*3,hy-11);c.lineTo(x+dir*3,hy-5.5);c.closePath();c.fill();
+    c.fillStyle="#db2777";c.beginPath();c.arc(x-dir*1,hy-8,1.3,0,7);c.fill();return;}
   if(o.ears==="round"){c.beginPath();c.arc(x-6,hy-6,3.2,0,7);c.arc(x+6,hy-6,3.2,0,7);c.fill();}
   if(o.ears==="tri"){c.beginPath();c.moveTo(x-8,hy-3);c.lineTo(x-6,hy-11);c.lineTo(x-2,hy-6);c.moveTo(x+8,hy-3);c.lineTo(x+6,hy-11);c.lineTo(x+2,hy-6);c.fill();}
   if(o.frog){c.fillStyle="#fff";c.beginPath();c.arc(x-4,hy-6,3.5,0,7);c.arc(x+4,hy-6,3.5,0,7);c.fill();c.fillStyle="#111";c.fillRect(x-4+dir,hy-7,2,2);c.fillRect(x+4+dir-1,hy-7,2,2);return;}
@@ -1409,6 +1422,7 @@ function drawChar(c,x,y,ch,hue,dir,bob,lg){switch(ch){
   case 13:return human(c,x,y,dir,bob,lg,{shirt:"#a78bfa",dress:1,pants:"#f2c9a0",hair:"#3a2418",hs:"long",fem:1});
   case 14:return human(c,x,y,dir,bob,lg,{shirt:"#fde047",pants:"#3b82f6",hair:"#7c2d12",hs:"pony",fem:1});
   case 15:return animal(c,x,y,dir,bob,lg,{body:"#fde047",head:"#fde047",beak:"#f97316",feet:"#f97316",belly:"#fef9c3",duck:1});
+  case 16:return animal(c,x,y,dir,bob,lg,{body:"#f8fafc",head:"#f8fafc",feet:"#e2e8f0",dog:1});
   default:return human(c,x,y,dir,bob,lg,{shirt:`hsl(${hue},65%,52%)`,hair:`hsl(${hue},30%,22%)`});}}
 const chOf=id=>({hue:hueOf(id),ch:id===myId?normCh(me&&me.ch):normCh(fOthers[id]&&fOthers[id].ch),au:id===myId?eqCos("aura"):(fOthers[id]&&fOthers[id].au)||"",wg:id===myId?eqCos("wing"):(fOthers[id]&&fOthers[id].wg)||"",tt:id===myId?myTitle():(fOthers[id]&&fOthers[id].tt)||"",rl:id===myId?rodLv():(fOthers[id]&&fOthers[id].rl)|0,np:id===myId?eqCos("plate"):(fOthers[id]&&fOthers[id].np)||"",ak:id===myId?myAwk():(fOthers[id]&&fOthers[id].ak)|0});
 function openChar(){fKeys={};stAdd("visitChar");$("fChar").style.display="flex";renderCharPick();}
