@@ -322,7 +322,7 @@ nav button.on{color:var(--tx);font-weight:700}
 const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",1000000,333000,3000000,"#d4af37"],["이더리움",300000,100000,900000,"#627eea"],["페페",100000,33000,300000,"#3d9a3d"],
   ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
 const NEWCOINS=["테더골드","플라즈마","페페"];
-const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z");const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
+const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z");/* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
 const DEFAULT_EPOCH=1795440000000;
 const MIG_T=1795503651243,MIG_F={"시바이누":10/3,"리플":10};/* 시바이누 300→1000, 리플 30→300 개편: 이전에 내린 가격지정 이벤트는 같은 비율로 환산 */
 
@@ -356,18 +356,18 @@ function stepTo(K){const m=M,E=EVENTS;
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
-        const v2=k>=K_V2,v3=k>=K_V3;if(v3&&!c.v3){c.v3=1;c.adk=0;}if(v2){/* v2: 30분~3시간 국면 / v3: 4~16시간 국면, 대부분 횡보, 가끔 천천히 오르거나 내림 */if((c.adk|0)<=0){const t=r();if(v3){c.ad=t<.6?0:(t<.8?.0001*(.5+r()):-.0001*(.5+r()));c.adk=1440+Math.floor(r()*4320);}else{c.ad=t<.4?.00015*(.5+r()):(t<.8?-.00015*(.5+r()):0);c.adk=180+Math.floor(r()*900);}}c.adk--;c.a+=c.ad;if(c.a>.8)c.a-=.002;if(c.a<-.9&&!(c.doom>0))c.a+=.002;}
+        const v2=k>=K_V2,v3=k>=K_V3,v4=k>=K_V4;if(v3&&!c.v3){c.v3=1;c.adk=0;}if(v2){/* v2: 30분~3시간 국면 / v3: 4~16시간 국면, 대부분 횡보, 가끔 천천히 오르거나 내림 */if((c.adk|0)<=0){const t=r();if(v3){c.ad=t<.6?0:(t<.8?.0001*(.5+r()):-.0001*(.5+r()));c.adk=1440+Math.floor(r()*4320);}else{c.ad=t<.4?.00015*(.5+r()):(t<.8?-.00015*(.5+r()):0);c.adk=180+Math.floor(r()*900);}}c.adk--;c.a+=c.ad;if(c.a>.8)c.a-=.002;if(c.a<-.9&&!(c.doom>0))c.a+=.002;}
         if(c.a<-1.204&&!(c.doom>0))c.a+=.002;if(c.a>(v2?1:.642))c.a-=.002;
         let pct;
-        if(c.wave>0){c.wave--;pct=c.wdir*(.012+r()*.012);}
-        else if(r()<.0004){c.wave=6+Math.floor(r()*14);c.wdir=r()<.5?1:-1;if(c.price>base*2)c.wdir=-1;pct=0;}
-        else{if(c.trendCount<=0){const t=r();c.trend=t<.45?1:(t<.9?-1:0);c.trendCount=6+Math.floor(r()*25);c.s=.002*(.3+r()*1.2);}
+        if(c.wave>0){c.wave--;pct=c.wdir*(v4?1.25:1)*(.012+r()*.012);}
+        else if(r()<(v4?.0006:.0004)){c.wave=6+Math.floor(r()*14);c.wdir=r()<.5?1:-1;if(c.price>base*2)c.wdir=-1;pct=0;}
+        else{if(c.trendCount<=0){const t=r();c.trend=t<.45?1:(t<.9?-1:0);c.trendCount=6+Math.floor(r()*25);c.s=(v4?.0025:.002)*(.3+r()*1.2);}
           c.trendCount--;const dev=Math.log(c.price/base)-c.a;
-          pct=c.trend*c.s+(r()+r()+r()-1.5)*.006-(v3?.01:v2?.008:.01)*dev;}
+          pct=c.trend*c.s+(r()+r()+r()-1.5)*(v4?.008:.006)-(v3?.01:v2?.008:.01)*dev;}
         applyPct(c,ci,pct);}
       if(c.price<=mn*1.05){c.delisted=true;c.delistK=k;c.rate=0;c.dl.push({k,price:c.price});}
       c.hist.push(c.delisted?0:c.price);if(c.hist.length>8700)c.hist.shift();}}}
-const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK);
+const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),K_V4=Math.floor((K_V4_T-EPOCH)/TICK);
 const nowK=()=>Math.max(0,Math.floor((Date.now()-EPOCH)/TICK));
 function rebuild(){M=newMarket();stepTo(nowK());}
 const priceOf=ci=>M.coins[ci].delisted?0:M.coins[ci].price;
@@ -942,7 +942,7 @@ const ENH_DROP_LV=25,ENH_DROP_P=.1;
 const matTier=v=>v<=0?0:Math.max(1,Math.log10(v));
 const matBonus=(i,L)=>{const t=matTier(FISH[i][1]);return t?.5*Math.pow(1.6,t)*Math.exp(-L/(2.5*t)):0;};
 let fBaitPro=0;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FISH.reduce((a,f)=>a+f[0],0);
-function rollFish(){const add=(fBaitPro||0)+rodBonus(rodLv()),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);const W=i=>FISH[i][0]*(FISH[i][1]>=100000?kR:kN);let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
+function rollFish(){const add=FISH_RARE*.2+(fBaitPro||0)+rodBonus(rodLv()),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);const W=i=>FISH[i][0]*(FISH[i][1]>=100000?kR:kN);let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
 const fKey=i=>"f"+i;
 function fishCountOf(p){let n=0;const m=(p&&p.fish)||{};for(const k in m)if(typeof m[k]==="number"&&m[k]>=0)n++;return n;}
 const hasSeen=(p,i)=>{const m=(p&&p.fish)||{};return typeof m[fKey(i)]==="number";};
@@ -1472,14 +1472,14 @@ function sessShow(mode,dev){
 function sessHide(){$("sessMod").style.display="none";}
 function sessKicked(v){sessActive=false;sessBlocked=true;try{sessRef().onDisconnect().cancel();}catch(e){}sessShow("kicked",v&&v.dev);}
 function sessActivate(){
-  sessActive=true;sessBlocked=false;sessHide();try{sessRef().onDisconnect().remove();}catch(e){}
+  sessActive=true;sessBlocked=false;sessHide();lastPres="";pushPresence.t=0;pushPresence();try{sessRef().onDisconnect().remove();}catch(e){}
   sessRef().on("value",s=>{sessVal=s.val();if(!sessActive||isOwner)return;
     if(sessVal===null){sessClaim(false).then(r=>{if(r.ok){try{sessRef().onDisconnect().remove();}catch(e){}}}).catch(()=>{});}
     else if(sessVal.sid!==mySid)sessKicked(sessVal);});
   setInterval(()=>{if(sessActive&&!isOwner&&sessVal&&sessVal.sid===mySid)sessRef().transaction(cur=>cur&&cur.sid===mySid?Object.assign(cur,{t:nowS()}):undefined).catch(()=>{});},20000);}
 async function sessStart(){
   if(isOwner)return;sessBlocked=true;
-  try{const r=await sessClaim(false);if(r.ok)sessActivate();else sessShow("ask",(r.other||{}).dev);}catch(e){sessBlocked=false;}}
+  try{const r=await sessClaim(false);if(r.ok)sessActivate();else sessShow("ask",(r.other||{}).dev);}catch(e){sessBlocked=false;lastPres="";pushPresence();}}
 function sessOwnerOn(){sessActive=false;sessBlocked=false;sessHide();try{sessRef().onDisconnect().cancel();sessRef().remove();}catch(e){}}
 {const g=id=>document.getElementById(id);
  g("sessYes").onclick=async()=>{if(sessMode==="ask"||sessMode==="kicked"){try{await sessClaim(true);}catch(e){}}location.reload();};
