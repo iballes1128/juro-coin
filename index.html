@@ -2505,7 +2505,7 @@ function evalGrab(G){const R=34;let best=null,bd=1e9;for(const k of G.keys){if(k
   const sg=GRAB0*(1-.5*bd/R);
   if(G.rng()>=sg){return G.rng()<.5?{type:"slide",key:best}:{type:"miss"};}
   if(G.rng()<carryQ(best.n))return{type:"win",key:best};
-  return{type:"drop",key:best,at:.15+G.rng()*.7,phase:G.rng()<.3?"up":"ret"};}
+  return{type:"drop",key:best,at:.95+G.rng()*.15,phase:"ret"};}
 function stepKeys(G,dt){for(const k of G.keys){if(k.wob>0)k.wob=Math.max(0,k.wob-dt);if(k.fall){k.fall.v+=dt*900;k.fall.y-=k.fall.v*dt;if(k.fall.y<=0){k.fall.y=0;if(k.fall.v>170){k.fall.v*=-.3;}else{k.fall=null;}}}}}
 function step(G,dt,inp){G.t+=dt;inp=inp||{};stepKeys(G,dt);
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -2603,9 +2603,14 @@ function clwEnsure(){if(!fdb||clw.initing||clw.play||clw.fin)return;const rid=cl
   clw.initing=true;fdb.ref("market/claw/m").transaction(c=>{if(c&&c.keys&&(c.r|0)>=clwRid())return;return clwNewRound(clwRid());}).catch(()=>{}).then(()=>{clw.initing=false;});}
 function clwSetBox(m){if(m&&m.box&&m.box.length===25)CLW.setBox(m.box.map(i=>CLW.POOL[i|0]||CLW.POOL[0]));}
 function clwListen(){if(clw.on||!fdb)return;clw.on=true;const r=fdb.ref("market/claw");
-  clw.h1=r.child("m").on("value",sn=>{const m=sn.val();if(!m||!m.keys){clw.m=null;clwEnsure();clwUI();return;}clw.m=m;clwSetBox(m);if(!clw.play){clwSyncView();clwEnsure();}clwUI();clwDraw();});
+  clw.h1=r.child("m").on("value",sn=>{const m=sn.val();if(!m||!m.keys){clw.m=null;clwEnsure();clwUI();return;}const pt=clw.m&&clw.m.r===m.r&&!clw.fin?(clw.m.taken||{}):null;clw.m=m;clwSetBox(m);if(!clw.play){clwSyncView();clwEnsure();}clwUI();clwDraw();if(pt){const tk=m.taken||{};for(const k in tk){if(!pt[k]&&tk[k]&&tk[k].u&&tk[k].u!==myId&&nowS()-(tk[k].t||0)<20000)clwSeeWin(+k,tk[k]);}}});
   clw.h2=r.child("s").on("value",sn=>{clw.s=sn.val();clwUI();if(!clw.s)clwEnsure();});
   clw.h4=r.child("log").limitToLast(8).on("value",sn=>{const o=sn.val()||{};clw.log=Object.keys(o).sort().map(k=>o[k]).reverse();clwUI();});}
+function clwSeeWin(i,tk){if(!clwOpen()||!clw.m||!clw.m.box)return;const P=CLW.POOL[clw.m.box[i]|0];if(!P)return;
+  const old=$("clwSee");if(old)old.remove();const col=CLW.TIERS[P.t].col;
+  const d=document.createElement("div");d.id="clwSee";d.style.cssText=`position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:75;width:min(86vw,300px);background:var(--card);border:2px solid ${col};border-radius:16px;padding:14px 12px;text-align:center;box-shadow:0 12px 40px rgba(0,0,0,.6)`;
+  d.innerHTML=`<span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:900;color:#111;background:${col}">${CLW.TIERS[P.t].n}</span><div style="font-size:12px;color:var(--sub);margin-top:6px"><b style="color:var(--tx)">${esc(String(tk.name||"").slice(0,10))}</b>님이 🔑 ${i+1}번 열쇠를 뽑았어요!</div><div style="font-size:34px;margin:6px 0 2px">${P.ic}</div><div style="font-size:16px;font-weight:900">${esc(P.nm)}</div><div style="font-size:11px;color:var(--sub);margin-top:6px">당첨! 🎉</div>`;
+  document.body.appendChild(d);setTimeout(()=>{try{d.remove();}catch(e){}},5000);d.onclick=()=>d.remove();}
 function clwUnlisten(){if(!clw.on||!fdb)return;clw.on=false;const r=fdb.ref("market/claw");try{r.child("m").off("value",clw.h1);r.child("s").off("value",clw.h2);r.child("log").off("value",clw.h4);}catch(e){}}
 /* 구경하는 사람(또는 대기 중)의 화면용 상태: DB의 열쇠 위치를 그대로 보여줌 */
 function clwSyncView(){if(!clw.m)return;const V=clw.V||(clw.V={keys:[],cx:.5,cz:.5,h:1,close:0,held:null,st:"move",t:0,tcx:.5,tcz:.5,th:1,tclose:0});
@@ -2648,8 +2653,8 @@ window.addEventListener("keyup",e=>{const K={ArrowLeft:"l",a:"l",ArrowRight:"r",
 function clwUI(){const d=$("clwMod");if(!d||d.style.display!=="flex")return;const COST=CLW.CLAW_COST,s=clw.s,live=s&&s.uid&&!clwStale(s),mineLive=live&&s.uid===myId;
   $("clwTop").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><span>내 현금 <b>${formatMoneyReadable(me?me.cash:0)}</b></span><span style="color:var(--sub)">참가비 <b style="color:var(--acc)">${formatMoneyReadable(COST)}</b></span></div>`;
   const m=clw.m,tk=(m&&m.taken)||{},P=CLW.POOL;
-  {const arr=m&&m.box?m.box.map((pi,i)=>({pi:pi|0,t:tk[i]})):[];arr.sort((x,y)=>(P[y.pi].t-P[x.pi].t)||(x.pi-y.pi)||((x.t?1:0)-(y.t?1:0)));
-  $("clwShelf").innerHTML=arr.length?arr.map(o=>{const p=P[o.pi],col=CLW.TIERS[p.t].col,gone=!!o.t;return `<div style="position:relative;background:var(--card);border:2px solid ${col};border-radius:9px;text-align:center;padding:6px 1px 3px;min-height:58px;${gone?"opacity:.45;":""}"><div style="font-size:18px;line-height:1.1;${gone?"filter:grayscale(1);":""}">${p.ic}</div><div style="font-size:8px;line-height:1.2;color:#cbd5e1;word-break:keep-all">${esc(p.nm)}</div>${gone?`<div style="font-size:7.5px;color:var(--acc)">${esc(String(o.t.name||"").slice(0,6))} 획득</div>`:`<div style="font-size:7.5px;color:${col}">${CLW.TIERS[p.t].n}</div>`}</div>`;}).join(""):`<div style="grid-column:1/-1;text-align:center;font-size:11.5px;color:var(--sub);padding:14px 0">상품을 준비하는 중…</div>`;}
+  {const arr=m&&m.box?m.box.map((pi,i)=>({pi:pi|0,i,t:tk[i]})):[];arr.sort((x,y)=>(P[y.pi].t-P[x.pi].t)||(x.pi-y.pi)||((x.t?1:0)-(y.t?1:0)));
+  $("clwShelf").innerHTML=arr.length?arr.map(o=>{const p=P[o.pi],col=CLW.TIERS[p.t].col,gone=!!o.t;return `<div style="position:relative;background:var(--card);border:2px solid ${col};border-radius:9px;text-align:center;padding:6px 1px 3px;min-height:58px;${gone?"opacity:.45;":""}"><div style="font-size:18px;line-height:1.1;${gone?"filter:grayscale(1);":""}">${p.ic}</div><div style="font-size:8px;line-height:1.2;color:#cbd5e1;word-break:keep-all">${esc(p.nm)}</div>${gone?`<div style="font-size:7.5px;color:var(--acc)">${o.i+1}번 · ${esc(String(o.t.name||"").slice(0,6))}</div>`:`<div style="font-size:7.5px;color:${col}">${CLW.TIERS[p.t].n}</div>`}</div>`;}).join(""):`<div style="grid-column:1/-1;text-align:center;font-size:11.5px;color:var(--sub);padding:14px 0">상품을 준비하는 중…</div>`;}
 
   const b=$("clwStart"),go=$("clwGo");let t="",dis=false;
   if(clw.play){t=clw.G&&clw.G.st==="move"?`⏱ 남은 시간 ${Math.ceil(clw.tl)}초`:"집게가 움직이는 중…";dis=true;}
@@ -2690,7 +2695,7 @@ function clwFinish(){clw.fin=true;const G=clw.G,res=G.res||{win:false},COST=clw.
   const mine=clw.s&&clw.s.uid===myId,same=clw.m&&clw.m.r===clw.round&&clw.m.v===clw.mv;
   if(!mine||!same){me.cash+=COST;saveMe();renderHeader();clw.play=false;clw.fin=false;clw.G=null;clwSyncView();clwUI();if(mine)fdb.ref("market/claw/s").remove().catch(()=>{});return toast("⏱ 기계가 새로 바뀌어서 참가비를 돌려 드렸어요");}
   let pz=-1,P=null,g=null;const box=(clw.m.box||[]).slice(),taken={...(clw.m.taken||{})};
-  if(res.win){pz=box[res.n]|0;P=CLW.POOL[pz];g=clwGrant(P);stAdd("clawWin");if(P.t>=1)stAdd("clawRare");taken[res.n]={name:myName().slice(0,10),t:nowS()};}
+  if(res.win){pz=box[res.n]|0;P=CLW.POOL[pz];g=clwGrant(P);stAdd("clawWin");if(P.t>=1)stAdd("clawRare");taken[res.n]={name:myName().slice(0,10),t:nowS(),u:myId};}
   const nm={r:clw.m.r,v:(clw.m.v|0)+1,keys:G.keys.map(clwPlain),box,taken},up={"m":nm,"s":null};
   const done=()=>{clw.play=false;clw.fin=false;clw.G=null;clw.m=nm;clwSetBox(nm);clwSyncView();clwUI();};
   if(res.win){saveMe();renderHeader();}
