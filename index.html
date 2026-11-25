@@ -290,7 +290,7 @@ nav button.on{color:var(--tx);font-weight:700}
   <div id="chatOn"></div><div id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
 <button id="admFab" class="gone">🛠️</button><button id="navAdmin" class="gone"></button>
-<div style="display:none"><button id="btOpen"></button><button id="fChBtn"></button></div><div id="dock"><button data-pg="my"><i>👤</i>마이</button><button data-pg="shop"><i>🛍️</i>상점</button><button data-pg="enh"><i>⚒️</i>강화</button><button data-pg="rank"><i>🏆</i>순위</button><button data-pg="ach"><i>🏅</i>업적</button><button id="admDock" style="display:none"><i>🛠️</i>관리</button></div>
+<div style="display:none"><button id="btOpen"></button><button id="fChBtn"></button></div><div id="dock"><button data-pg="set"><i>⚙️</i>설정</button><button data-pg="my"><i>👤</i>마이</button><button data-pg="shop"><i>🛍️</i>상점</button><button data-pg="enh"><i>⚒️</i>강화</button><button data-pg="rank"><i>🏆</i>순위</button><button data-pg="ach"><i>🏅</i>업적</button><button id="admDock" style="display:none"><i>🛠️</i>관리</button></div>
 <div id="gNotice"></div>
 <button id="chatFab">💬<span id="chatBadge"></span></button>
 <div id="updMod" style="display:none;position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);align-items:center;justify-content:center;padding:20px"><div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 20px;max-width:320px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)"><div style="font-size:27.5px">✨</div><div style="font-size:15.5px;font-weight:900;margin:6px 0 4px">새 버전이 나왔어요!</div><div id="updCnt" style="font-size:12px;color:var(--sub);margin-bottom:14px"></div><button onclick="hardReload()" style="width:100%;background:var(--acc);color:#111;font-weight:900;border-radius:12px;padding:12px 0;font-size:14px">지금 새로고침</button></div></div>
@@ -451,8 +451,10 @@ function renderRank(){const all={...players};if(me&&myId)all[myId]=me;const L=$(
 /* ===================== 거래 시트 ===================== */
 function openSheet(ci){if($("pgMod"))$("pgMod").style.display="none";curCoin=ci;$("qty").value="";setMode(M.coins[ci].delisted?"sell":"buy");$("sheetBg").style.display="block";requestAnimationFrame(()=>$("sheet").classList.add("on"));renderSheet();}
 $("shClose").onclick=()=>closeSheet();
-["dex","equip","shop","enh","ach","title"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
-["s-wallet","s-dex","s-equip","s-title","s-shop","s-enh","s-ach","s-rank","s-admin"].forEach(id=>$("pgBody").appendChild($(id)));
+["dex","equip","shop","enh","ach","title","set"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
+["s-wallet","s-dex","s-equip","s-title","s-shop","s-enh","s-ach","s-rank","s-admin","s-set"].forEach(id=>$("pgBody").appendChild($(id)));
+/* ⚙️ 설정: 항목은 나중에 추가 */
+$("s-set").innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div style="font-size:37px">⚙️</div><b style="font-size:14.5px">설정</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div></div>`;
 $("s-enh").innerHTML=`<div class="card" style="text-align:center;padding:36px 10px"><div style="font-size:40.5px">🎣⚒️</div><b style="font-size:14.5px">낚싯대 강화</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div><div style="font-size:11px;color:var(--sub);margin-top:12px">지금 장착 중: <b style="color:var(--tx)">기본 낚싯대</b></div></div>`;
 $("s-dex").appendChild($("fishInfo"));$("fishInfo").style.padding="0";$("fishInfo").style.overflowY="visible";
 $("s-equip").innerHTML=`<div class="card"><h3>🧑 캐릭터</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">가지고 있는 캐릭터 중에서 골라 입어요. 새 캐릭터는 🛍️ 상점에서 살 수 있어요.</div><div id="eqGrid" class="cgrid" style="padding:4px 0 0"></div></div>`+`<div class="card"><h3>🎣 낚싯대</h3><div id="eq_rod"></div></div><div class="card"><h3>🪱 미끼</h3><div id="eq_bait"></div></div>`+`<div class="card"><h3>✨ 오라</h3><div id="eq_aura" class="cgrid" style="padding:4px 0 0"></div></div><div class="card"><h3>🪽 날개</h3><div id="eq_wing" class="cgrid" style="padding:4px 0 0"></div></div><div class="card"><h3>🏷️ 명찰</h3><div id="eq_plate" class="cgrid" style="padding:4px 0 0"></div></div>`;
@@ -604,7 +606,7 @@ function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach|
       [["","없음",""]].concat(own).map(([id,nm,c])=>`<button data-tt="${id}" style="padding:8px 12px;border-radius:20px;font-size:12px;font-weight:700;background:${cur===id?"var(--acc)":"var(--card2)"};color:${cur===id?"#111":"var(--tx)"}" title="${c}">${id?"「"+esc(nm)+"」":"칭호 없음"}</button>`).join("")+`</div>${own.length?"":'<div style="color:var(--sub);font-size:12px;margin-top:10px">아직 칭호가 없어요 · 🏅 업적을 달성해 보세요</div>'}</div>`;
     T.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{me.title=b.dataset.tt;saveMe();lastPres="";pushPresence();renderAch();toast(me.title?`🎖️ 칭호 「${titleOf(me.title)}」 장착!`:"칭호를 뺐어요");});}}
 
-const PG_G={my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"],["plate","🏷️ 명찰"]]},rank:{t:"🏆 순위"},enh:{t:"⚒️ 강화",tabs:[["rod","🎣 낚싯대"],["awk","🌟 각성"]]},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
+const PG_G={set:{t:"⚙️ 설정"},my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["aura","✨ 오라"],["wing","🪽 날개"],["plate","🏷️ 명찰"]]},rank:{t:"🏆 순위"},enh:{t:"⚒️ 강화",tabs:[["rod","🎣 낚싯대"],["awk","🌟 각성"]]},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
 let pgCur="my",pgSub="wallet";
 function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;if(pgSub==="ch"){if(!$("shGrid"))S.innerHTML=`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">기본 남자·여자는 무료예요. 🔒 누르고 한 번 더 누르면 구매하고 바로 입어요.</div><div id="shGrid" class="cgrid" style="padding:0"></div>`;renderCharPick();}
   else if(pgSub==="bait")renderGear();
@@ -612,7 +614,7 @@ function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;if(pgSub==="c
   else{const n={rod:"🎣 낚싯대",aura:"✨ 오라",wing:"🪽 날개"}[pgSub];S.innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div style="font-size:37px">🚧</div><b style="font-size:14.5px">${n}</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div></div>`;}}
 function openPg(p,sub){if(p==="wallet"){p="my";sub="wallet";}if(p==="dex"){p="my";sub="dex";}const G=PG_G[p];pgCur=p;pgSub=sub||(G.tabs?G.tabs[0][0]:p);fKeys={};
   const T=$("pgTabs");T.style.display=G.tabs?"flex":"none";T.innerHTML=G.tabs?G.tabs.map(([k,n])=>`<button data-pt="${k}" class="${k===pgSub?"on":""}" style="font-size:11px">${n}</button>`).join(""):"";T.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>openPg(p,b.dataset.pt));
-  const sec=p==="my"?pgSub:p;["wallet","dex","equip","title","shop","enh","ach","rank","admin"].forEach(x=>$("s-"+x).classList.toggle("on",x===sec));
+  const sec=p==="my"?pgSub:p;["wallet","dex","equip","title","shop","enh","ach","rank","admin","set"].forEach(x=>$("s-"+x).classList.toggle("on",x===sec));
   $("pgTitle").textContent=G.t;$("pgMod").style.display="flex";$("pgBody").scrollTop=0;if(sec==="dex"){fTab="dex";}if(sec!=="dex")fDexOf=null;renderAll();renderShop();renderCharPick();renderGear();renderCos();renderEnh();renderAch();renderFishInfo();if(p==="admin")renderAccLog();}
 function closePg(){$("pgMod").style.display="none";}
 document.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>openPg(b.dataset.pg));$("pgX").onclick=closePg;$("pgMod").onclick=e=>{if(e.target.id==="pgMod")closePg();};
@@ -694,7 +696,7 @@ $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)ret
 
 /* ===================== 채팅 + 레벨업 ===================== */
 function hhmm(t){const d=new Date(t||Date.now());return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
-function addMsg(o){if(!o.me&&window._chatNote)window._chatNote();const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small${!o.me&&o.from?` data-bt="${o.from}" style="cursor:pointer" title="눌러서 정보·배틀"`:""}>${!o.me&&o.from?"⚔️ ":""}${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🏞️ 광장":"📈 코인"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
+function addMsg(o){if(!o.me&&window._chatNote)window._chatNote(o.t);const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small${!o.me&&o.from?` data-bt="${o.from}" style="cursor:pointer" title="눌러서 정보·배틀"`:""}>${!o.me&&o.from?"⚔️ ":""}${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🏞️ 광장":"📈 코인"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
   const atB=L.scrollHeight-L.scrollTop-L.clientHeight<60;L.appendChild(d);while(L.children.length>120)L.firstChild.remove();if(atB||o.me)L.scrollTop=L.scrollHeight;}
 function chatPush(o){if(sessBlocked)return;if(!o.sys)o.loc=(typeof fishActive==="function"&&fishActive())?"fish":"coin";if(!fdb)return addMsg(o);fdb.ref("chat").push({...o,t:Date.now(),from:myId}).catch(()=>{});}
 function broadcast(text,kind){chatPush({sys:true,text,kind:kind||""});}
@@ -762,8 +764,9 @@ function showNotices(){let html="";const recent=[];M.coins.forEach((c,ci)=>c.dl.
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="s-"+b.dataset.s));renderAll();fishShow(b.dataset.s==="fish");try{localStorage.setItem("jc_tab",b.dataset.s);}catch(e){}});
 setInterval(()=>{if(fishActive&&fishActive())try{localStorage.setItem("jc_pos",JSON.stringify({x:Math.round(fp.x),y:Math.round(fp.y)}));}catch(e){}},2000);
 let chatUnread=0;const chatVisible=()=>innerWidth>=940||$("chatSide").classList.contains("open");
-function setChatOpen(o){$("chatSide").classList.toggle("open",o);if(o){chatUnread=0;$("chatBadge").style.display="none";const L=$("chatLog");L.scrollTop=L.scrollHeight;}}
-window._chatNote=()=>{if(chatVisible())return;chatUnread++;const e=$("chatBadge");e.textContent=chatUnread>99?"99+":chatUnread;e.style.display="block";};
+let chatRead=(()=>{try{return +localStorage.getItem("jc_chatRead")||Date.now();}catch(e){return Date.now();}})();function chatMarkRead(){chatRead=Date.now();try{localStorage.setItem("jc_chatRead",chatRead);}catch(e){}}
+function setChatOpen(o){$("chatSide").classList.toggle("open",o);if(o){chatMarkRead();chatUnread=0;$("chatBadge").style.display="none";const L=$("chatLog");L.scrollTop=L.scrollHeight;}}
+window._chatNote=t=>{if(chatVisible()){chatMarkRead();return;}if(t&&t<=chatRead)return;chatUnread++;const e=$("chatBadge");e.textContent=chatUnread>99?"99+":chatUnread;e.style.display="block";};
 $("chatFab").onclick=()=>setChatOpen(!$("chatSide").classList.contains("open"));$("chatClose").onclick=()=>setChatOpen(false);
 document.querySelectorAll("#rankTabs button").forEach(b=>b.onclick=()=>{rankKey=b.dataset.k;document.querySelectorAll("#rankTabs button").forEach(x=>x.classList.toggle("on",x===b));renderRank();});
 function renderAll(){renderAttBar();renderHeader();renderMarket();renderWallet();renderRank();renderSheet();renderAdmin();showNotices();renderFishInfo();renderFTicker();}
