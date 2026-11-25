@@ -452,7 +452,7 @@ function renderRank(){const all={...players};if(me&&myId)all[myId]=me;const L=$(
       if(!(cost>0))continue;const pf=ev-cost,r=parseFloat((pf/cost*100).toFixed(1));
       list.push({id,name:p.name,v:r,sub:(profitCoin==="전체"?per.join("·"):per[0])+" · "+(pf>=0?"+":"")+formatMoneyReadable(pf),vs:(r>=0?"+":"")+r+"%",cls:r>=0?"up":"down"});}
     list.sort((a,b)=>b.v-a.v);}
-  else list=Object.entries(all).map(([id,p])=>({id,name:p.name,v:expOf(p),sub:"누적 경험치 "+expOf(p).toLocaleString()+(p.lastAtt===todayKey()?" · 오늘 출석 ✅":""),vs:"Lv."+lvOf(p)})).sort((a,b)=>b.v-a.v);
+  else list=Object.entries(all).map(([id,p])=>({id,name:p.name,v:lvScore(p),sub:"누적 경험치 "+expOf(p).toLocaleString()+(p.lastAtt===todayKey()?" · 오늘 출석 ✅":""),vs:"Lv."+lvOf(p)})).sort((a,b)=>b.v-a.v);
   if(!list.length){L.innerHTML='<div class="muted">'+(rankKey==="profit"?(profitCoin==="전체"?"코인을 보유한 사람이 없어요.":profitCoin+"을(를) 보유한 사람이 없어요."):"아직 기록이 없어요.")+'</div>';return;}
   L.innerHTML=list.slice(0,30).map((x,i)=>`<div class="rk${x.id===myId?' me':''}"><div class="n ${i===0?'g':i===1?'s':i===2?'b':''}">${i===0?'👑':i===1?'🥈':i===2?'🥉':i+1}</div><div class="w"><b>${esc(x.name||'이름없음')}</b><small>${esc(x.sub)}</small></div><div class="v ${x.cls||''}">${x.vs}</div></div>`).join("");}
 
@@ -610,7 +610,7 @@ const titleOf=(id,p)=>{p=p||me;const t=tierOf(id);if(t&&t[3])return t[1];const a
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
 const achNoted={};
 function achNext(a){const v=achVal(a.k);const i=a.tiers.findIndex((t,j)=>!(me&&me.ach&&me.ach[achId(a.k,j)]));return i<0?null:{i,t:a.tiers[i],v,ready:v>=a.tiers[i][0]};}
-function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();let n=0;const nw=[];for(const a of ACH){const x=achNext(a);if(x&&x.ready){n++;const id=achId(a.k,x.i);if(!achNoted[id]){achNoted[id]=1;nw.push(a.c.replace(/\s*\(.*\)$/,""));}}}
+function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();lvMig();let n=0;const nw=[];for(const a of ACH){const x=achNext(a);if(x&&x.ready){n++;const id=achId(a.k,x.i);if(!achNoted[id]){achNoted[id]=1;nw.push(a.c.replace(/\s*\(.*\)$/,""));}}}
   const b=document.querySelector('#dock [data-pg="ach"]');if(b){let d=b.querySelector(".achDot");if(!d){d=document.createElement("span");d.className="achDot";d.style.cssText="position:absolute;top:2px;right:4px;min-width:15px;height:15px;border-radius:8px;background:var(--up);color:#fff;font-size:8.5px;font-weight:900;line-height:15px;padding:0 3px";b.style.position="relative";b.appendChild(d);}d.textContent=n;d.style.display=n?"block":"none";}
   if(nw.length)toast(`🏅 업적 달성! ${nw.slice(0,2).join(", ")}${nw.length>2?` 외 ${nw.length-2}개`:""}\n업적에서 보상을 받아 가세요`);if(pgCur==="ach")renderAch();}
 function achClaim(k){const a=ACH.find(x=>x.k===k);if(!a||!me||!me._loaded)return;const x=achNext(a);if(!x||!x.ready)return;me.ach=me.ach||{};const id=achId(a.k,x.i),[need,nm,rw]=x.t;me.ach[id]=Date.now();me.cash+=rw;saveMe();renderHeader();
@@ -747,12 +747,17 @@ const ATT_REWARD=1000000,ATT_PER_LV=5;
 const todayKey=()=>{const d=new Date(Date.now()+9*3600000);return d.toISOString().slice(0,10);};
 const ATT_EXP=100,ONLINE_EXP=30,ONLINE_MS=300000;
 const expOf=p=>p?(typeof p.exp==="number"?p.exp:((p.att||0)*ATT_EXP)):0;
-const lvOf=p=>Math.floor((1+Math.sqrt(1+8*expOf(p)/100))/2+1e-9);
-const expFor=L=>50*L*(L-1); // 이 레벨이 되는 데 필요한 누적 경험치 (Lv.2 100, Lv.3 300, Lv.4 600 …)
+/* 레벨 v2 (11/25): 다음 레벨까지 필요 경험치 = 100×레벨 + 10×레벨² (올라갈수록 더 많이). 예전(v1: 100×레벨) 사람은 접속하면 레벨·진행률 그대로 옮겨짐 */
+const expFor1=L=>50*L*(L-1),lvOf1=E=>Math.floor((1+Math.sqrt(1+8*E/100))/2+1e-9);
+const expFor=L=>50*L*(L-1)+Math.round(10*(L-1)*L*(2*L-1)/6); // 이 레벨이 되는 데 필요한 누적 경험치 (Lv.2 110, Lv.3 350, Lv.5 1,300, Lv.10 7,350)
+const lvFromE=E=>{let L=1;while(expFor(L+1)<=E)L++;return L;};
+const lvOf=p=>{const E=expOf(p);return p&&p.lvV===2?lvFromE(E):lvOf1(E);};
+const lvScore=p=>{const E=expOf(p);if(p&&p.lvV===2){const L=lvFromE(E);return L+(E-expFor(L))/(expFor(L+1)-expFor(L));}const L=lvOf1(E);return L+(E-expFor1(L))/(expFor1(L+1)-expFor1(L));};
+function lvMig(){if(!me||!me._loaded||me.lvV===2)return;const E=expOf(me),L=lvOf1(E),fr=(E-expFor1(L))/(expFor1(L+1)-expFor1(L));me.exp=Math.round(expFor(L)+fr*(expFor(L+1)-expFor(L)));me.lvV=2;me.lvPaid=Math.max(me.lvPaid|0,L);saveMe();}
 const attFor=L=>L*(L-1)/2;
-function addExp(n,why,quiet){if(!me||!me._loaded)return;stAdd("exp_"+(why||"기타"),n);if(typeof me.exp!=="number")me.exp=expOf(me);const before=lvOf(me);me.exp+=n;const nl=lvOf(me);let bonus=0;for(let L=before+1;L<=nl;L++)bonus+=lvReward(L);me.cash+=bonus;saveMe();
+function addExp(n,why,quiet){if(!me||!me._loaded)return;lvMig();stAdd("exp_"+(why||"기타"),n);if(typeof me.exp!=="number")me.exp=expOf(me);const before=lvOf(me);me.exp+=n;const nl=lvOf(me);let bonus=0;for(let L=before+1;L<=nl;L++)if(L>(me.lvPaid|0))bonus+=lvReward(L);me.lvPaid=Math.max(me.lvPaid|0,nl);me.cash+=bonus;saveMe();
   if(nl>before){toast(`⭐ ${why} +${n} 경험치\n🎉 레벨 업! Lv.${nl} 보상 +${formatMoneyReadable(bonus)}`);broadcast(`[ 레벨 업 ] ${myName()}님이 Lv.${nl}(으)로 승급! 보상 +${formatMoneyReadable(bonus)}`);}else if(why&&!quiet)toast(`⭐ ${why} +${n} 경험치`);renderAll();return{up:nl>before,nl,bonus};}
-const lvReward=L=>(L-1)*500000; // Lv.2 50만, Lv.3 100만, Lv.4 150만 … 50만씩 늘어남 // 이 레벨이 되는 데 필요한 누적 출석
+const lvReward=L=>(L-1)*300000; // Lv.2 30만, Lv.3 60만, Lv.4 90만 … 30만씩 늘어남 (같은 레벨 보상은 한 번만: lvPaid) // 이 레벨이 되는 데 필요한 누적 출석
 function renderAtt(){if(!me)return;const done=me.lastAtt===todayKey(),E=expOf(me),L=lvOf(me),cur=E-expFor(L),need=expFor(L+1)-expFor(L);
   $("attInfo").innerHTML=`출석하면 <b style="color:var(--tx)">100만원 + ${ATT_EXP} 경험치</b>, 접속 5분마다 <b style="color:var(--tx)">${ONLINE_EXP} 경험치</b>, 낚시하면 시세에 따라 경험치를 받아요 (다음 접속 보상까지 ${Math.max(0,Math.ceil((ONLINE_MS-((me&&me.onAcc)||0))/60000))}분).<br>지금 <b style="color:var(--tx)">Lv.${L}</b> · 경험치 ${cur}/${need} · 다음 레벨까지 <b style="color:var(--tx)">${need-cur}</b> 남음 (누적 ${E})<div style="height:6px;background:var(--line);border-radius:3px;margin:6px 0;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100,cur/need*100)}%;background:var(--acc)"></i></div>Lv.${L+1} 달성 보상 <b style="color:var(--acc)">${formatMoneyReadable(lvReward(L+1))}</b>`;
   const b=$("attBtn");b.disabled=done||!canTrade();b.style.opacity=b.disabled?.4:1;b.textContent=done?"오늘은 출석 완료 ✅ (자정에 다시)":!canTrade()?"출석하려면 편집자 권한이 필요해요":"출석체크하고 100만원 받기";}
