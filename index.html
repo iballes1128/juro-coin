@@ -3038,7 +3038,7 @@ function tmStop(){if(!tm.on)return;tm.on=false;cancelAnimationFrame(tm.raf);cons
   tm.best=tm.best==null?err:Math.min(tm.best,err);tm.res={ms,pay,tier};saveMe();renderHeader();tmRender();
   if(tier&&tier[1]>=2.5)broadcast(`⏱️ ${myName()}님이 시간 맞추기에서 ${(ms/1000).toFixed(2)}초! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-TM_COST)}`);}
 /* ---------- 🏀 농구 : 3라운드 누적 · 꾹 눌러 힘 조절 · 백보드 2점 / 클린 3점 · 주간 순위 ---------- */
-const BB_COST=200000,BB_LEN=30,BB_NEED=[15,40],BB_FILL=1400,BB_PRIZE=5000000,BB_MIN=70,BB_HX=270,BB_CD=3000,BB_FIRE=3;
+const BB_COST=200000,BB_LEN=30,BB_NEED=[25,60],BB_FILL=1400,BB_PRIZE=5000000,BB_MIN=70,BB_HX=270,BB_CD=3000,BB_FIRE=3;
 /* [누적 점수 이상, 배수, 이름] — 3라운드 모두 통과했을 때만 */
 const BB_TIERS=[[120,10,"👑 전설의 슈터"],[100,4,"🔥 에이스"],[85,2,"⭐ 주전"],[70,1,"🏀 벤치 멤버"]];
 const BBP={W:360,H:420,FLOOR:372,PX:62,G:900,ANG:70*Math.PI/180,VMIN:420,VMAX:720,BR:6,HY:170,RIMW:22,BOARDT:-46,BOARDB:10};
