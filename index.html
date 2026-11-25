@@ -2760,8 +2760,8 @@ const TIERS=[{n:"일반",col:"#94a3b8"},{n:"희귀",col:"#60a5fa"},{n:"전설",c
 const PRIZES=[];
 const A=(t,o)=>{PRIZES.push(Object.assign({t},o));};
 const cashTx=v=>"현금 "+(v/10000)+"만";
-/* 일반: 현금 8칸은 항상 들어가고, 나머지 9칸은 아래 상품 중에서 랜덤 */
-[[10000,22],[15000,17],[20000,14],[30000,11],[40000,8],[50000,6],[70000,3],[100000,2]].forEach(([v,w])=>A(0,{k:"cash",v,fx:1,w,nm:cashTx(v),ic:"💵"}));
+/* 일반: 현금 7칸은 항상 들어가고, 나머지 10칸은 아래 상품 중에서 랜덤 */
+[[30000,20],[40000,18],[50000,16],[70000,12],[100000,9],[150000,4],[200000,2]].forEach(([v,w])=>A(0,{k:"cash",v,fx:1,w,nm:cashTx(v),ic:"💵"}));
 ["도지코인","리플","시바이누","솔라나","페페","플라즈마"].forEach(c=>A(0,{k:"coin",c,v:100000,w:.6,nm:c+" 10만원어치",ic:"🪙"}));
 A(0,{k:"bait",id:"mid",cnt:30,eq:90000,w:.6,nm:"중급 미끼 30개",ic:"🪱"});A(0,{k:"bait",id:"pro",cnt:50,eq:250000,w:.3,nm:"고급 미끼 50개",ic:"🪱"});
 [["ribbon","리본","🎀"],["glasses","동그란 안경","👓"],["phones","헤드폰","🎧"],["beanie","비니","🧢"],["scarf","목도리","🧣"],["ears","고양이 귀","🐱"],["flower","꽃핀","🌸"],["cap","야구모자","⚾"],["bunny","토끼 귀","🐰"],["bowtie","나비넥타이","👔"],["sprout","새싹","🌱"],["mustache","콧수염","🥸"],["headband","머리띠","🎽"]].forEach(([id,nm,ic])=>A(0,{k:"acc",id,eq:400000,w:.25,nm,ic}));
@@ -2799,7 +2799,7 @@ function pxd(G,k){return Math.hypot((k.x-G.cx)*Wz(G.cz),(k.z-G.cz)*FYH*1.7);}
 function startDrop(G){if(G.st!=="move")return false;G.st="down";G.tm=0;G.out=null;return true;}
 function respawn(G,n){const p=spot(G,7,.2,.8,.2,.78);const k=mkKey(n,p.x,p.z,G.rng,3);k.fall={y:70,v:0};G.keys.push(k);}
 /* 인형을 잡는 확률은 어느 인형이나 똑같아요: 집게가 인형에 얼마나 정확히 맞았는지 × 출구까지 안 떨어뜨리기(CARRY) */
-const GRAB0=.93,CARRY=.85;
+const GRAB0=.93,CARRY=.55;
 function evalGrab(G){const R=34;let best=null,bd=1e9;for(const k of G.keys){if(k.fall)continue;const d=pxd(G,k);if(d<bd){bd=d;best=k;}}
   if(!best||bd>R)return{type:"miss"};
   const sg=GRAB0*(1-.5*bd/R);
@@ -2900,7 +2900,7 @@ const clwT0=m=>m?(m.t0||((m.r|0)*CLW_LEN)):0;
 const clwNext=()=>clw.m?clwT0(clw.m)+CLW_LEN-nowS():0;
 const clwDue=m=>!m||!m.keys||m.dl!==2||!m.box||nowS()>=clwT0(m)+CLW_LEN;/* 30분마다 룰렛 칸·인형이 새로 바뀜 (예전 판도 교체) */
 function clwNewRound(rid){const P=CLW.POOL,idx=f=>P.map((q,i)=>[q,i]).filter(([q])=>f(q)).map(([,i])=>i),pick=(a,n)=>a.slice().sort(()=>Math.random()-.5).slice(0,n);
-  const box=[...idx(q=>q.t===0&&q.fx),...pick(idx(q=>q.t===0&&!q.fx),9),...pick(idx(q=>q.t===1),6),...pick(idx(q=>q.t===2),2)].sort(()=>Math.random()-.5);
+  const box=[...idx(q=>q.t===0&&q.fx),...pick(idx(q=>q.t===0&&!q.fx),10),...pick(idx(q=>q.t===1),6),...pick(idx(q=>q.t===2),2)].sort(()=>Math.random()-.5);
   return{r:rid,t0:nowS(),v:1,dl:2,box,keys:CLW.newGame().keys.map(clwPlain)};}
 /* 30분마다(또는 예전 판일 때) 새로 채움 · 누가 하는 중이면 끝난 뒤에 */
 function clwEnsure(){if(!fdb||clw.initing||clw.play||clw.fin)return;if(clw.m&&!clwDue(clw.m))return;if(clw.s&&!clwStale(clw.s))return;
