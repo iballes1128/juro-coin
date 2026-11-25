@@ -212,7 +212,7 @@ nav button.on{color:var(--tx);font-weight:700}
   <div class="brand"><h1>🪙 주로 <span>코인</span> 거래소</h1><div class="who" id="whoBtn" style="cursor:pointer"><span class="dot" id="dot"></span><span id="online">연결 중…</span></div></div>
   <div class="assets"><div><small>내 현금</small><b id="hCash">-</b></div><div><small>총 자산</small><b id="hTotal">-</b></div></div>
   <div class="tickbar"><i id="tickFill"></i></div>
-  <div class="ticklbl"><span id="tickLbl">3초마다 시세 갱신</span><span id="tickLeft"></span></div>
+  <div class="ticklbl"><span id="tickLbl">1초마다 시세 갱신</span><span id="tickLeft"></span></div>
 </header>
 <div id="onlineList" class="olist" style="display:none"></div>
 <div id="notices"></div>
@@ -341,8 +341,8 @@ const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",
   ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
 const NEWCOINS=["테더골드","플라즈마","페페"];
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
-/* 11/25 16:30(KST)부터 3초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T07:30:00Z"),FTICK=3000,ENG_V=6;let KS=0,TSe=0;
+/* 11/25 16:30(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
+const FAST_T=Date.parse("2026-11-25T07:30:00Z"),FTICK=1000,ENG_V=7;let KS=0,TSe=0;
 function fastInit(){const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
 const curTick=()=>Date.now()>=TSe?FTICK:TICK; // 지금 틱 길이
@@ -393,23 +393,23 @@ function stepTo(K){const m=M,E=EVENTS;
         applyPct(c,ci,pct);}
       if(c.price<=mn*1.05){c.delisted=true;c.delistK=k;c.rate=0;c.dl.push({k,price:c.price});}
       c.hist.push(c.delisted?0:c.price);if(c.hist.length>12000)c.hist.shift();}}}
-/* ===== v6 (3초 틱) 단타 장세: 국면(평온·급등·박스권·급락·슬금슬금 하락)이 돌아가며 이어짐 =====
+/* ===== v6 (1초 틱) 단타 장세: 국면(평온·급등·박스권·급락·슬금슬금 하락)이 돌아가며 이어짐 =====
    급등은 몇 분에 걸쳐 쭉 오르다 (중간중간 눌림) 박스권에서 왔다갔다 → 다시 오르거나 급락. 급등·박스권 중엔 드물게 갑자기 나락(폭락) */
 const FAST_RG={calm:[["calm",.40],["pump",.24],["bleed",.18],["range",.18]],pump:[["range",.55],["dump",.22],["pump",.23]],range:[["pump",.32],["dump",.28],["calm",.40]],dump:[["calm",.50],["range",.30],["pump",.20]],bleed:[["calm",.50],["pump",.30],["bleed",.20]]};
-const FAST_LEN={calm:[100,300],pump:[40,200],range:[80,300],dump:[8,50],bleed:[150,450]};
+const FAST_LEN={calm:[300,900],pump:[120,600],range:[240,900],dump:[24,150],bleed:[450,1350]};
 function fastStep(c,k,r,base){const lp=Math.log(c.price/base);
   if(!(c.rgk>0)){const hi=lp-(c.a||0)>.9,lo=lp-(c.a||0)<-.8,from=c.rg||"calm";let W=FAST_RG[from].map(([g,w])=>[g,w*(hi?(g==="pump"?.25:g==="dump"||g==="bleed"?2.2:1):lo?(g==="pump"?2.2:g==="dump"||g==="bleed"?.3:1):1)]);
     const tot=W.reduce((s,x)=>s+x[1],0);let t=r()*tot,g=W[W.length-1][0];for(const[x,w]of W){t-=w;if(t<=0){g=x;break;}}
     const L=FAST_LEN[g];c.rg=g;c.rgk=L[0]+Math.floor(r()*(L[1]-L[0]));const q=r();
     c.rgd=g==="pump"?Math.log(1.04+.32*q*q)/c.rgk:g==="dump"?Math.log(1-(.06+.2*q))/c.rgk:g==="bleed"?Math.log(1-(.04+.14*q))/c.rgk:0;c.rgA=lp;}
   c.rgk--;const n=r()+r()+r()-1.5;let pct;
-  if(c.rg==="pump")pct=c.rgd*(.3+r()*1.4)+n*.0045;
-  else if(c.rg==="dump")pct=c.rgd*(.5+r())+n*.006;
-  else if(c.rg==="bleed")pct=c.rgd+n*.003;
-  else if(c.rg==="range")pct=n*.0055-(lp-c.rgA)*.04;
-  else pct=n*.003-(lp-(c.a||0))*.004;
-  if((c.rg==="pump"||c.rg==="range")&&r()<.0008){c.rg="dump";c.rgk=5+Math.floor(r()*15);c.rgd=Math.log(1-(.12+r()*.16))/c.rgk;}
-  if(r()<.02)pct+=(r()<.5?1:-1)*(.005+r()*.015);
+  if(c.rg==="pump")pct=c.rgd*(.3+r()*1.4)+n*.0026;
+  else if(c.rg==="dump")pct=c.rgd*(.5+r())+n*.0035;
+  else if(c.rg==="bleed")pct=c.rgd+n*.0017;
+  else if(c.rg==="range")pct=n*.0032-(lp-c.rgA)*.0133;
+  else pct=n*.0017-(lp-(c.a||0))*.00133;
+  if((c.rg==="pump"||c.rg==="range")&&r()<.00027){c.rg="dump";c.rgk=15+Math.floor(r()*45);c.rgd=Math.log(1-(.12+r()*.16))/c.rgk;}
+  if(r()<.0067)pct+=(r()<.5?1:-1)*(.005+r()*.015);
   return pct;}
 
 const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),K_V4=Math.floor((K_V4_T-EPOCH)/TICK),K_V5=Math.floor((K_V5_T-EPOCH)/TICK);
@@ -420,10 +420,10 @@ function rebuild(){fastInit();const K=nowK(),want=K-kSpan(3*3600000)-10;let best
   for(const key in CKPTS){const c=CKPTS[key];if(c&&c.v===ENG_V&&c.e===EPOCH&&c.k>KS&&c.k<=want&&(!best||c.k>best.k))best=c;}
   if(best){try{const st=JSON.parse(best.s);M={k:st.k,ev:{lo:0,hi:0},coins:st.coins.map(c=>({...c,hist:[],dl:c.dl||[]}))};const T=tickT(M.k);while(M.ev.hi<EVENTS.length&&EVENTS[M.ev.hi].t<=T)M.ev.hi++;while(M.ev.lo<M.ev.hi&&EVENTS[M.ev.lo].t<=T-MANUAL)M.ev.lo++;}catch(e){best=null;}}
   if(!best)M=newMarket();stepTo(K);}
-function ckptMaybe(){if(!fdb||!M||M.k<=KS||M.k%1200!==0||CKPTS["k"+M.k])return;const st=M,k=M.k;
+function ckptMaybe(){if(!fdb||!M||M.k<=KS||M.k%3600!==0||CKPTS["k"+M.k])return;const st=M,k=M.k;
   try{const snap=JSON.stringify({k,coins:st.coins.map(c=>{const o={...c};delete o.hist;o.dl=(o.dl||[]).filter(d=>k-d.k<28800);return o;})});
     fdb.ref("market/ckpt/k"+k).transaction(c=>c?undefined:{v:ENG_V,e:EPOCH,k,s:snap,t:Date.now()}).catch(()=>{});
-    for(const key in CKPTS){const c=CKPTS[key];if(c&&c.k<k-14400)fdb.ref("market/ckpt/"+key).remove().catch(()=>{});}}catch(e){}}
+    for(const key in CKPTS){const c=CKPTS[key];if(c&&c.k<k-43200)fdb.ref("market/ckpt/"+key).remove().catch(()=>{});}}catch(e){}}
 const priceOf=ci=>M.coins[ci].delisted?0:M.coins[ci].price;
 
 /* ===================== 상태 ===================== */
@@ -658,7 +658,7 @@ const titleOf=(id,p)=>{p=p||me;const t=tierOf(id);if(t&&t[3])return t[1];const a
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
 const achNoted={};
 function achNext(a){const v=achVal(a.k);const i=a.tiers.findIndex((t,j)=>!(me&&me.ach&&me.ach[achId(a.k,j)]));return i<0?null:{i,t:a.tiers[i],v,ready:v>=a.tiers[i][0]};}
-function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();lvMig();if(me.hrPay&&nowS()>me.hrPay.at+3000&&!($("casMod")&&$("casMod").style.display==="flex"&&casTab==="hr")){const P=me.hrPay;me.hrPay=null;me.cash+=P.v;saveMe();renderHeader();toast(`🏇 ${P.txt} 적중! ${formatMoneyReadable(P.v)}을 넣어 드렸어요`);if(P.v-P.stake>=10000000)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${formatMoneyReadable(P.v-P.stake)}`);}
+function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();lvMig();if(me.hrPay&&nowS()>me.hrPay.at+3000&&!($("casMod")&&$("casMod").style.display==="flex"&&casTab==="hr"&&hr.view&&hr.view.uid===myId)){const P=me.hrPay;me.hrPay=null;me.cash+=P.v;saveMe();renderHeader();toast(`🏇 ${P.txt} 적중! ${formatMoneyReadable(P.v)}을 넣어 드렸어요`);if(P.v-P.stake>=10000000)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${formatMoneyReadable(P.v-P.stake)}`);}
   if(me.casPend>0&&!($("casMod")&&$("casMod").style.display==="flex")){const v=me.casPend;me.cash+=v;me.casPend=0;saveMe();renderHeader();toast(`🎲 못 받은 주사위 보상 ${formatMoneyReadable(v)}을 넣어 드렸어요`);}let n=0;const nw=[];for(const a of ACH){const x=achNext(a);if(x&&x.ready){n++;const id=achId(a.k,x.i);if(!achNoted[id]){achNoted[id]=1;nw.push(a.c.replace(/\s*\(.*\)$/,""));}}}
   const b=document.querySelector('#dock [data-pg="ach"]');if(b){let d=b.querySelector(".achDot");if(!d){d=document.createElement("span");d.className="achDot";d.style.cssText="position:absolute;top:2px;right:4px;min-width:15px;height:15px;border-radius:8px;background:var(--up);color:#fff;font-size:8.5px;font-weight:900;line-height:15px;padding:0 3px";b.style.position="relative";b.appendChild(d);}d.textContent=n;d.style.display=n?"block":"none";}
   if(nw.length)toast(`🏅 업적 달성! ${nw.slice(0,2).join(", ")}${nw.length>2?` 외 ${nw.length-2}개`:""}\n업적에서 보상을 받아 가세요`);if(pgCur==="ach")renderAch();}
@@ -1558,11 +1558,11 @@ const hrDur=r=>Math.max(...r.plan.map(p=>p[0]))*1000+HR_WAIT+1500;
 function hrPos(r,i,ms){const[T,a,f,ph]=r.plan[i],t=Math.max(0,(ms-HR_WAIT)/1000),u=Math.min(1,t/T);return u>=1?1:Math.max(0,u+a*Math.sin(6.283*f*u+ph)*u*(1-u)*4);}
 function hrWinPay(r){const b=r.bet,o=r.order;return b.type==="win"?(o[0]===b.h1?b.mult:0):(o[0]===b.h1&&o[1]===b.h2?b.mult:0);}
 function hrBetTxt(r){const b=r.bet,H=r.horses;return b.type==="win"?`${b.h1+1}번 ${H[b.h1].n} 단승`:`쌍승 ${b.h1+1}→${b.h2+1}`;}
-function hrGo(){if(casBusy)return;if((me&&me.casPend)>0||me.hrPay)return toast("먼저 지난 경주 보상을 받아 주세요");const stake=casBet;if(!casCanBet(stake))return;if(hr.type==="ex"&&hr.h1===hr.h2)return toast("1등과 2등은 다른 말로 골라 주세요");
+function hrGo(){if(casBusy)return;if((me&&me.casPend)>0)return toast("먼저 💰 받기를 눌러 주세요");if(me.hrPay)return toast("지난 경주가 끝나면 다시 할 수 있어요");const stake=casBet;if(!casCanBet(stake))return;if(hr.type==="ex"&&hr.h1===hr.h2)return toast("1등과 2등은 다른 말로 골라 주세요");
   const c=hr.card,mult=hrMult(),order=hrOrder(c.horses.map(h=>h.p)),r={uid:myId,name:myName(),horses:c.horses.map(h=>({n:h.n,c:h.c,o:h.o})),order,plan:hrPlan(order),bet:{type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult},t0:nowS()};
   me.cash-=stake;const win=hrWinPay(r),pay=win?Math.round(stake*mult):0;casPay(stake,pay,"hr",win?mult:0);if(hr.type==="ex")stAdd("hrExN");if(pay){stAdd(hr.type==="win"?"hrWinHit":"hrExHit");me.hrPay={v:pay,at:r.t0+hrDur(r),txt:hrBetTxt(r),m:mult,stake};}
   saveMe();renderHeader();hr.view={...r,k:"local"};if(fdb){const ref=fdb.ref("market/races").push();hr.view.k=ref.key;ref.set(r).catch(()=>{});}
-  if(stake>=10000000)broadcast(`🏇 ${myName()}님이 ${hrBetTxt(r)}(${mult}배)에 ${casFmt(stake)} 걸고 출발! 도박장 경마에서 구경해요`);hrNewCard();renderCas();}
+  broadcast(`🏇 ${myName()}님이 ${hrBetTxt(r)}(${mult}배)에 ${casFmt(stake)} 걸고 경마 출발! 도박장 → 경마에서 구경해요`);hrNewCard();renderCas();}
 function hrFinish(r){if(r.uid!==myId||r.done)return;r.done=1;const P=me&&me.hrPay;if(P&&Math.abs(P.at-(r.t0+hrDur(r)))<5){me.casPend=(me.casPend||0)+P.v;me.hrPay=null;saveMe();if(P.v-P.stake>=10000000)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${casFmt(P.v-P.stake)}`);}}
 function hrListen(){if(hrListen.on||!fdb)return;hrListen.on=1;fdb.ref("market/races").limitToLast(12).on("value",s=>{hr.live=s.val()||{};if(casTab==="hr")renderCas();});
   setInterval(()=>{if(!fdb||!myId)return;const old=Object.entries(hr.live).filter(([k,r])=>r&&r.uid===myId&&nowS()-r.t0>3600000);for(const[k]of old)fdb.ref("market/races/"+k).remove().catch(()=>{});},60000);}
@@ -1570,7 +1570,7 @@ function hrBody(){hrListen();if(!hr.card)hrNewCard();const v=hr.view,run=v&&nowS
   const live=Object.entries(hr.live).filter(([k,r])=>r&&r.t0&&nowS()-r.t0<hrDur(r)).sort((a,b)=>b[1].t0-a[1].t0),recent=Object.entries(hr.live).filter(([k,r])=>r&&r.t0&&nowS()-r.t0>=hrDur(r)).sort((a,b)=>b[1].t0-a[1].t0).slice(0,6);
   let h="";
   if(v){const H=v.horses,mine=v.uid===myId,done=!run,pay=hrWinPay(v);
-    h+=`<div style="font-size:12px;margin-bottom:6px;display:flex;justify-content:space-between"><span>${mine?"🏇 내 경주":`📺 ${esc(v.name)}님의 경주`} · <b>${hrBetTxt(v)}</b> ${casFmt(v.bet.stake)} (${v.bet.mult}배)</span>${run?`<b style="color:var(--up)">🔴 LIVE</b>`:""}</div>
+    h+=`<div style="font-size:12px;margin-bottom:6px;display:flex;justify-content:space-between"><span>${mine?"🏇 내 경주":`📺 ${esc(v.name)}님의 경주`} · <b>${hrBetTxt(v)}</b> ${casFmt(v.bet.stake)} (${v.bet.mult}배)</span>${run?`<span><b style="color:var(--up)">🔴 LIVE</b> <button id="hrExit" style="margin-left:6px;padding:3px 9px;border-radius:8px;background:var(--card2);font-size:11px;font-weight:700">🚪 나가기</button></span>`:""}</div>
       <canvas id="hrCv" width="340" height="216" style="width:100%;display:block;border-radius:12px;background:#14532d"></canvas>`;
     if(done){h+=`<div style="display:flex;gap:4px;justify-content:center;margin:8px 0;font-size:12px">${v.order.slice(0,3).map((i,k)=>`<span style="padding:3px 8px;border-radius:9px;background:var(--card2)">${["🥇","🥈","🥉"][k]} ${i+1}번 ${esc(H[i].n)}</span>`).join("")}</div>`;
       const R=mine&&(me.casPend>0)&&pay;h+=`<div class="${pay?"dwin":"dlose"}" style="text-align:center;padding:8px;border-radius:12px;background:${pay?"linear-gradient(90deg,#78350f,#b45309,#78350f)":"rgba(30,41,59,.9)"};border:1px solid ${pay?"#fbbf24":"var(--line)"}"><div style="font-size:${pay?19:15}px;font-weight:900;color:${pay?"#fde047":"#93c5fd"}">${pay?`🎉 ${mine?"":esc(v.name)+"님 "}적중! ${v.bet.mult}배`:`😢 ${mine?"":esc(v.name)+"님 "}꽝`}</div><div style="font-size:12px;color:${pay?"#fff":"var(--sub)"};margin-top:2px">${pay?`+${casFmt(v.bet.stake*v.bet.mult-v.bet.stake)}`:`-${casFmt(v.bet.stake)}`}</div>${R?`<button id="hrTake" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:#fde047;color:#111;font-weight:900">💰 ${casFmt(me.casPend)} 받기</button>`:""}</div>
@@ -1587,7 +1587,7 @@ function hrBody(){hrListen();if(!hr.card)hrNewCard();const v=hr.view,run=v&&nowS
 function hrBind(d){d.querySelectorAll("[data-hrt]").forEach(b=>b.onclick=()=>{hr.type=b.dataset.hrt;if(hr.h1===hr.h2)hr.h2=(hr.h1+1)%HR_N;renderCas();});
   d.querySelectorAll("[data-hr1]").forEach(b=>b.onclick=()=>{hr.h1=+b.dataset.hr1;if(hr.h2===hr.h1)hr.h2=(hr.h1+1)%HR_N;renderCas();});d.querySelectorAll("[data-hr2]").forEach(b=>b.onclick=()=>{const v=+b.dataset.hr2;if(v!==hr.h1){hr.h2=v;renderCas();}});
   d.querySelectorAll("[data-hrw]").forEach(b=>b.onclick=()=>{const r=hr.live[b.dataset.hrw];if(r){hr.view={...r,k:b.dataset.hrw};renderCas();}});
-  if($("hrGo"))$("hrGo").onclick=hrGo;if($("hrTake"))$("hrTake").onclick=()=>{diceTake(true);hr.view=null;toast("💰 받았어요!");renderCas();};if($("hrBack"))$("hrBack").onclick=()=>{hr.view=null;renderCas();};
+  if($("hrGo"))$("hrGo").onclick=hrGo;if($("hrTake"))$("hrTake").onclick=()=>{diceTake(true);hr.view=null;toast("💰 받았어요!");renderCas();};if($("hrBack"))$("hrBack").onclick=()=>{hr.view=null;renderCas();};if($("hrExit"))$("hrExit").onclick=()=>{cancelAnimationFrame(hr.raf);if(hr.view&&hr.view.uid===myId)toast("🏇 경주는 계속 달려요. 맞히면 끝난 뒤 자동으로 들어와요");hr.view=null;renderCas();};
   if(hr.view)hrAnim();}
 function hrAnim(){cancelAnimationFrame(hr.raf);const v=hr.view;const step=()=>{const cv=$("hrCv");if(!cv||hr.view!==v)return;const ms=nowS()-v.t0;hrDraw(cv,v,ms);if(ms<hrDur(v))hr.raf=requestAnimationFrame(step);else{hrFinish(v);renderCas();}};step();}
 /* 말 그림 (오른쪽 보고 달림): 몸통·목·머리·다리·꼬리 + 기수 */
