@@ -2308,7 +2308,7 @@ function fishStep(dt,t){
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   {const B=$("fBoatBtn");if(B){{const L=$("fBridgeLock");if(L){const d=isOwner&&fArea&&bridgeAll?"block":"none";if(L.style.display!==d)L.style.display=d;}}
   const own=myBoat()?1:0;if(!own&&fBoat)boatLeave();const d=own&&(fBoat||(fstate==="idle"&&fp.y<=RIVER+34))?"block":"none",tx=fBoat?"⚓ 보트 내리기":"🚤 보트 타기";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fBoat);}}}
-  if(fstate==="idle"&&!fBoat){if(!fArea&&inDock(fp.x,fp.y)&&fp.y<=DOCK.y+20){if(bridgeAll||(isOwner&&bridgeOpen))fishArea(1,t);else if(isOwner)bridgeGate(t);}
+  if(fstate==="idle"&&!fBoat){if(!fArea&&fp.y<=DOCK.y+22&&fp.x>=DOCK.x+2&&fp.x<=DOCK.x+DOCK.w-2){if(bridgeAll||(isOwner&&bridgeOpen))fishArea(1,t);else if(isOwner)bridgeGate(t);}
     else if(fArea&&!bridgeAll&&!(isOwner&&bridgeOpen))fishArea(0,t);else if(fArea&&fp.y>=FH-16&&fp.x>=DOCK.x+4&&fp.x<=DOCK.x+DOCK.w-4)fishArea(0,t);}
   if(fBoat&&fstate!=="idle")boatStep(dt,t,1);
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;const mx=dx*Math.min(1,dt/120),my=dy*Math.min(1,dt/120);o.x+=mx;o.y+=my;
