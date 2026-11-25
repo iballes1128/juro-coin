@@ -343,8 +343,8 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=19;
-/* 11/25 17:22(KST)부터 v12: 완만한 지그재그 */const F12_T=Date.parse("2026-11-25T08:22:00Z");let K12=0;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=20;
+/* 11/25 17:22(KST)부터 v10 방식으로 되돌림 (지그재그 해제) */const F12_T=Date.parse("2026-11-25T08:22:00Z");let K12=0;
 /* 11/25 17:05(KST)부터 v11: 지그재그 파동 */const F11_T=Date.parse("2026-11-25T08:05:00Z");let K11=0;
 /* 11/25 16:50(KST)부터 v10: 기본가로 꼭 안 돌아옴, 폭락 후 바닥 횡보도 */const F10_T=Date.parse("2026-11-25T07:50:00Z");let K10=0;
 /* 11/25 16:36(KST)부터 v9: 15분마다 2개 코인 큰 코스 + 점프 뒤 모멘텀 */const F9_T=Date.parse("2026-11-25T07:36:00Z");let K9=0,LISTK=[];
@@ -386,7 +386,7 @@ function stepTo(K){const m=M,E=EVENTS;
       const r=mulberry(seedOf(EPOCH,COINS[ci][5],k));const cm=cMode[name]&&cMode[name]!=="auto"?cMode[name]:null;
       const fk=k>KS;if(gMode){applyPct(c,ci,manualPct(gMode,r)*(fk?.3:1));}
       else if(cm){applyPct(c,ci,manualPct(cm,r)*(fk?.3:1));}
-      else if(fk){applyPct(c,ci,(k>=K12?(c,k,r,base)=>fastStep7(c,k,r,base,ci,K9):k>=K11?(c,k,r,base)=>fastStep6(c,k,r,base,ci,K9):k>=K10?(c,k,r,base)=>fastStep5(c,k,r,base,ci,K9):k>=K9?(c,k,r,base)=>fastStep4(c,k,r,base,ci,K9):k>=K8?fastStep3:k>=K7?fastStep2:fastStep)(c,k,r,base));}
+      else if(fk){applyPct(c,ci,(k>=K12?(c,k,r,base)=>fastStep5(c,k,r,base,ci,K9):k>=K11?(c,k,r,base)=>fastStep6(c,k,r,base,ci,K9):k>=K10?(c,k,r,base)=>fastStep5(c,k,r,base,ci,K9):k>=K9?(c,k,r,base)=>fastStep4(c,k,r,base,ci,K9):k>=K8?fastStep3:k>=K7?fastStep2:fastStep)(c,k,r,base));}
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
