@@ -337,15 +337,18 @@ nav button.on{color:var(--tx);font-weight:700}
 
 <script>
 /* ===================== 코인 규칙 (봇 코드 그대로) ===================== */
-const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",1000000,333000,3000000,"#d4af37"],["이더리움",300000,100000,900000,"#627eea"],["페페",100000,33000,300000,"#3d9a3d"],
-  ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
-const NEWCOINS=["테더골드","플라즈마","페페"];
+const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a",0],["테더골드",1000000,333000,3000000,"#d4af37",1],["아이리스",500000,166000,1500000,"#6366f1",9],["이더리움",300000,100000,900000,"#627eea",2],["페페",100000,33000,300000,"#3d9a3d",3],
+  ["솔라나",30000,10000,90000,"#9945ff",4],["플라즈마",10000,3300,30000,"#ff5fa2",5],["도지코인",3000,1000,9000,"#c2a633",6],["시바이누",1000,333,3000,"#e5502e",7],["리플",300,100,900,"#23292f",8]];
+const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
+/* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=9,APP_V=11;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=12;
+/* 11/25 16:36(KST)부터 v9: 15분마다 2개 코인 큰 코스 + 점프 뒤 모멘텀 */const F9_T=Date.parse("2026-11-25T07:36:00Z");let K9=0,LISTK=[];
 /* 11/25 16:22(KST)부터 v8: 매끈하게 흐르다 가끔 한 번에 2~6% 툭 */const F8_T=Date.parse("2026-11-25T07:22:00Z");let K8=0;
 /* 11/25 16:14(KST)부터 v7 변동폭 (단타용으로 더 크게) */const F7_T=Date.parse("2026-11-25T07:14:00Z");let K7=0;let KS=0,TSe=0;
-function fastInit(){K7=0;K8=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));}
+function fastInit(){K7=0;K8=0;K9=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));K9=KS+Math.max(1,Math.ceil((Math.max(F9_T,TSe)-TSe)/FTICK));
+  LISTK=COINS.map(([n])=>LIST_T[n]?(LIST_T[n]<=TSe?Math.max(0,Math.floor((LIST_T[n]-EPOCH)/TICK)):KS+Math.ceil((LIST_T[n]-TSe)/FTICK)):0);}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
 const curTick=()=>Date.now()>=TSe?FTICK:TICK; // 지금 틱 길이
 const kSpan=ms=>Math.max(1,Math.round(ms/curTick())); // 이 시간 동안의 틱 수 (차트·범위용)
@@ -375,11 +378,12 @@ function stepTo(K){const m=M,E=EVENTS;
     for(let i=m.ev.lo;i<m.ev.hi;i++){const e=E[i];if(e.m==="set")continue;if(e.c==="*"){gMode=e.m;if(e.m==="auto")for(const x in cMode)delete cMode[x];}else cMode[e.c]=e.m;}
     if(gMode==="auto")gMode=null;
     for(let ci=0;ci<COINS.length;ci++){const c=m.coins[ci],[name,base,mn]=COINS[ci];
+      if(LISTK[ci]){if(k<LISTK[ci]){c.pre=1;c.delisted=true;c.delistK=k;c.price=base;c.rate=0;c.hist.push(0);if(c.hist.length>12000)c.hist.shift();continue;}if(c.pre){c.pre=0;c.delisted=false;c.price=base;c.rate=0;c.createK=k;c.a=0;c.rg=null;c.rgk=0;c.fp=0;}}
       if(c.delisted){if(T-tickT(c.delistK)>=RELIST_MS){c.delisted=false;c.price=base;c.rate=0;c.createK=k;c.trend=1;c.trendCount=0;c.wave=0;c.a=0;c.doom=0;c.rg=null;c.rgk=0;}c.hist.push(c.delisted?0:c.price);if(c.hist.length>12000)c.hist.shift();continue;}
-      const r=mulberry(seedOf(EPOCH,ci,k));const cm=cMode[name]&&cMode[name]!=="auto"?cMode[name]:null;
+      const r=mulberry(seedOf(EPOCH,COINS[ci][5],k));const cm=cMode[name]&&cMode[name]!=="auto"?cMode[name]:null;
       const fk=k>KS;if(gMode){applyPct(c,ci,manualPct(gMode,r)*(fk?.3:1));}
       else if(cm){applyPct(c,ci,manualPct(cm,r)*(fk?.3:1));}
-      else if(fk){applyPct(c,ci,(k>=K8?fastStep3:k>=K7?fastStep2:fastStep)(c,k,r,base));}
+      else if(fk){applyPct(c,ci,(k>=K9?(c,k,r,base)=>fastStep4(c,k,r,base,ci,K9):k>=K8?fastStep3:k>=K7?fastStep2:fastStep)(c,k,r,base));}
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
@@ -452,6 +456,32 @@ function fastStep3(c,k,r,base){const lp=Math.log(c.price/base),dv=lp-(c.a||0);
   if((c.rg==="pump"||c.rg==="range")&&r()<.0003){c.rg="dump";c.rgk=10+Math.floor(r()*30);c.rgd=Math.log(1-(.1+r()*.14))/c.rgk;}
   return pct;}
 
+/* ===== v9 (1초 틱) 단타 장세 =====
+   · 평소: v8처럼 매끈하게 흐르다 가끔 2~6% 툭, 툭 튄 뒤엔 같은 방향으로 몇 초 더 밀리는 경우가 많음(추격 단타)
+   · 코스: 15분마다 10개 중 2개 코인이 돌아가며 큰 코스를 탐
+     ① 랠리: 15분 동안 계단식으로 +30~55% 오르다 어느 순간 10~22% 급락
+     ② 폭락: 초반에 25~40% 빠졌다가 일부 반등
+     ③ 로켓: 2~4분 만에 +20~40% 쏘고 천천히 반납 */
+const CRS_LEN=900;
+function crsPick(s){const r=mulberry(seedOf(EPOCH,777,s)),n=COINS.length,a=Math.floor(r()*n);let b=Math.floor(r()*(n-1));if(b>=a)b++;
+  return [a,b].map(sid=>{const t=r(),q=r(),q2=r(),q3=r();return{sid,ty:t<.5?"A":t<.8?"B":"C",q,q2,q3};});}
+function crsPath(o,u){/* u: 0~1, 반환: 코스 시작 대비 누적 로그 변화 */
+  if(o.ty==="A"){const G=Math.log(1.3+.25*o.q),uc=.6+.3*o.q2,D=Math.log(1-(.1+.12*o.q3)),cl=.02+.03*o.q3;
+    if(u<uc)return G*Math.pow(u/uc,1.25);if(u<uc+cl)return G+D*((u-uc)/cl);return G+D;}
+  if(o.ty==="B"){const Dn=Math.log(1-(.25+.15*o.q)),ub=.25+.25*o.q2,rb=-Dn*(.3+.25*o.q3);
+    if(u<ub)return Dn*Math.pow(u/ub,.8);return Dn+rb*((u-ub)/(1-ub));}
+  const G=Math.log(1.2+.2*o.q),ut=.13+.14*o.q2,back=.5+.2*o.q3;
+  if(u<ut)return G*Math.pow(u/ut,1.6);return G*(1-back*((u-ut)/(1-ut)));}
+function fastStep4(c,k,r,base,ci,K0){const sid=COINS[ci][5],t=k-K0,s=Math.floor(t/CRS_LEN),u=(t-s*CRS_LEN)/CRS_LEN,u0=Math.max(0,u-1/CRS_LEN);
+  const o=crsPick(s).find(x=>x.sid===sid);let pct;
+  if(o&&u>0){const d=crsPath(o,u)-crsPath(o,u0),n=r()+r()+r()-1.5;pct=d*(.4+r()*1.2)+n*.0012;
+    const up=o.ty==="A"?(u<.6?.8:.4):o.ty==="B"?(u<.3?.2:.65):(u<.2?.85:.35);if(r()<.016)pct+=(r()<up?1:-1)*(.015+r()*r()*.035);}
+  else{pct=fastStep3(c,k,r,base);}
+  /* 툭 튄 뒤 같은 방향으로 몇 초 더 (모멘텀) */
+  if(c.mk>0){c.mk--;pct+=c.md*(.5+r());}
+  else if(Math.abs(pct)>=.02&&r()<.35){c.mk=3+Math.floor(r()*8);c.md=Math.sign(pct)*(.001+r()*.002);}
+  return pct;}
+
 const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),K_V4=Math.floor((K_V4_T-EPOCH)/TICK),K_V5=Math.floor((K_V5_T-EPOCH)/TICK);
 const nowK=()=>{const t=Date.now();return t<TSe?Math.max(0,Math.floor((t-EPOCH)/TICK)):KS+Math.floor((t-TSe)/FTICK);};
 /* 체크포인트: 1시간마다 시장 상태(차트 제외)를 서버에 저장 → 새로 들어온 사람은 3시간 전 체크포인트부터만 계산 (처음부터 다 계산하면 폰에서 느려짐) */
@@ -499,14 +529,14 @@ function checkDelist(){if(!me||sessBlocked)return;let changed=false;const msgs=[
 function spark(cv,arr,col){const dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
   const a=arr.filter(v=>v>0);if(a.length<2)return;const mn=Math.min(...a),mx=Math.max(...a),rg=mx-mn||1;g.strokeStyle=col;g.lineWidth=1.6;g.beginPath();
   arr.forEach((v,i)=>{if(v<=0)return;const x=i/(arr.length-1)*w,y=h-2-(v-mn)/rg*(h-4);i?g.lineTo(x,y):g.moveTo(x,y);});g.stroke();}
-function badges(ci){const c=M.coins[ci],[n,,mn]=COINS[ci];let s="";if(c.delisted)return'<span class="badge b-dead">상장폐지</span>';
+function badges(ci){const c=M.coins[ci],[n,,mn]=COINS[ci];let s="";if(c.pre)return'<span class="badge b-new">상장 예정✨</span>';if(c.delisted)return'<span class="badge b-dead">상장폐지</span>';
   if(NEWCOINS.includes(n)&&tickT(M.k)-tickT(c.createK)<RELIST_MS)s+='<span class="badge b-new">신규상장🔥</span>';if(c.price<=mn*1.2)s+='<span class="badge b-warn">⚠️상폐위기</span>';return s;}
 function rateHtml(r){return r>0?`<small class="up">+${r}% ▲</small>`:r<0?`<small class="down">${r}% ▼</small>`:`<small class="flat">${r}% -</small>`;}
 function renderMarket(){const L=$("coinList");if(!L.children.length){COINS.forEach(([n,,,,col],ci)=>{const d=document.createElement("div");d.className="row";d.innerHTML=`<div class="ic" style="background:${col}22;color:${col}">${n[0]}</div><div class="nm"><b>${n}</b><span class="bd"></span><small class="hd"></small></div><canvas class="spark"></canvas><div class="pr"><b></b><span class="rt"></span></div>`;d.onclick=()=>openSheet(ci);L.appendChild(d);});}
   COINS.forEach(([n,,,,col],ci)=>{const d=L.children[ci],c=M.coins[ci];d.querySelector(".bd").innerHTML=badges(ci);
     const h=me&&me.coins[n];d.querySelector(".hd").textContent=h&&h.count>0?"보유 "+formatCoinReadable(h.count):"";
-    d.querySelector(".pr b").textContent=c.delisted?"거래 정지":formatCoinPrice(c.price);d.querySelector(".pr b").className=c.rate>0?"up":c.rate<0?"down":"";
-    d.querySelector(".rt").innerHTML=c.delisted?'<small class="flat">재상장 '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 후</small>':rateHtml(c.rate);
+    d.querySelector(".pr b").textContent=c.pre?"상장 예정":c.delisted?"거래 정지":formatCoinPrice(c.price);d.querySelector(".pr b").className=c.rate>0?"up":c.rate<0?"down":"";
+    d.querySelector(".rt").innerHTML=c.pre?'<small class="flat">상장 '+Math.max(1,Math.ceil((tickT(LISTK[ci])-tickT(M.k))/60000))+'분 전</small>':c.delisted?'<small class="flat">재상장 '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 후</small>':rateHtml(c.rate);
     const hs=c.hist.slice(-kSpan(300000));spark(d.querySelector(".spark"),hs,hs[hs.length-1]>=hs[0]?"#f04452":"#3b82f6");});}
 
 /* ===================== 화면: 상단 / 내 자산 ===================== */
@@ -771,7 +801,7 @@ function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(
 function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,name:"25% + 복권·로또 각 10조"};if(asset>=1e14)return{fee:Math.round(raw*.25),name:"25%"};if(asset>=1e13)return{fee:Math.round(raw*.2),name:"20%"};if(asset>=1e12)return{fee:Math.round(raw*.15),name:"15%"};if(asset>1e8)return{fee:Math.round(raw*.1),name:"10%"};return{fee:Math.round(raw*.05),name:"5% · 자산 1억 이하"};}
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
   $("shName").innerHTML=esc(n)+badges(ci);$("shPrice").textContent=c.delisted?"거래 정지":formatCoinPrice(p);$("shPrice").className="big "+(c.rate>0?"up":c.rate<0?"down":"");
-  $("shRate").innerHTML=c.delisted?'<span class="flat">상장폐지 · '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 뒤 재상장</span>':(c.rate>0?'<span class="up">+'+c.rate+'% ▲</span>':c.rate<0?'<span class="down">'+c.rate+'% ▼</span>':'<span class="flat">0% -</span>')+' <span class="flat" style="font-weight:400">직전 '+(curTick()/1000)+'초</span>';
+  $("shRate").innerHTML=c.pre?'<span class="flat">곧 신규 상장 · 기본가 '+formatCoinPrice(base)+'</span>':c.delisted?'<span class="flat">상장폐지 · '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 뒤 재상장</span>':(c.rate>0?'<span class="up">+'+c.rate+'% ▲</span>':c.rate<0?'<span class="down">'+c.rate+'% ▼</span>':'<span class="flat">0% -</span>')+' <span class="flat" style="font-weight:400">직전 '+(curTick()/1000)+'초</span>';
   {const d=c.hist.slice(-kSpan(3*3600000)).filter(v=>v>0);$("shRange").innerHTML=d.length?`<span style="font-size:10px">최근 3시간</span><br>고가 <span class="up">${formatCoinPrice(Math.max(...d))}</span><br>저가 <span class="down">${formatCoinPrice(Math.min(...d))}</span>`:"";}
   drawChart(c.hist.slice(-kSpan(chartN*10000)-1),chartHover);
   const h=me.coins[n]||{count:0,cost:0};$("shHold").innerHTML=h.count>0?`보유 <b style="color:var(--tx)">${formatCoinReadable(h.count)}</b> · 평단가 ${formatCoinPrice(Math.round(h.cost/h.count))}`:"보유 없음";
@@ -1647,9 +1677,10 @@ function hrRoomBet(){const id=hr.inRoom,R=hrRoomR();if(!R||R.order)return;if(!hr
     if(res.committed&&v&&v.bets&&v.bets[myId]){me.cash-=stake;me.hrOpen={id,stake,t:nowS()};saveMe();renderHeader();toast("✅ 골랐어요! 방장이 출발을 누르면 시작해요");}else toast("지금은 고를 수 없어요");renderCas();}).catch(()=>toast("실패했어요")).finally(()=>{hr.busy=false;});}
 function hrRoomUnbet(){const id=hr.inRoom;if(!id||hr.busy)return;hr.busy=true;let refund=0;
   hrRoomRef(id).transaction(c=>{refund=0;if(!c)return c;if(c.order||!c.bets||!c.bets[myId])return;refund=c.bets[myId].stake;delete c.bets[myId];return c;}).then(res=>{if(res.committed&&refund&&me.hrOpen&&me.hrOpen.id===id){me.cash+=refund;me.hrOpen=null;saveMe();renderHeader();toast("↩️ 선택을 취소했어요");}renderCas();}).catch(()=>{}).finally(()=>{hr.busy=false;});}
-function hrRoomStart(){const id=hr.inRoom,R=hrRoomR();if(!R||R.order||R.host!==myId||hr.busy)return;hr.busy=true;
-  hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||c.host!==myId)return;const B=c.bets||{},Mb=c.members||{};if(!Object.keys(B).length||Object.keys(Mb).some(u=>!B[u]))return;const order=hrOrder(c.horses.map(h=>h.p));c.order=order;c.plan=hrPlan(order);c.t0=nowS();return c;})
-    .then(res=>{if(!res.committed)toast("아직 말을 안 고른 사람이 있어요");else{const v=res.snapshot.val();if(v)broadcast(`🏁 ${myName()}님 방 경마 출발! (${Object.keys(v.bets||{}).length}명)`,"",{hr:id,hrR:1});}renderCas();}).catch(()=>{}).finally(()=>{hr.busy=false;});}
+function hrRoomStart(){const id=hr.inRoom,R=hrRoomR();if(!R||R.order||R.host!==myId||hr.busy)return;const wait=Object.keys(R.members||{}).filter(u=>!(R.bets&&R.bets[u])).length;
+  if(wait&&Date.now()-(hr.stArm||0)>4000){hr.stArm=Date.now();return toast(`아직 ${wait}명이 고르는 중이에요. 그래도 출발하려면 한 번 더 누르세요 (안 고른 사람은 구경)`);}hr.busy=true;
+  hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||c.host!==myId)return;const B=c.bets||{},Mb=c.members||{};if(!Object.keys(B).length)return;const order=hrOrder(c.horses.map(h=>h.p));c.order=order;c.plan=hrPlan(order);c.t0=nowS();return c;})
+    .then(res=>{if(!res.committed)toast("먼저 말을 골라 주세요");else{const v=res.snapshot.val();if(v)broadcast(`🏁 ${myName()}님 방 경마 출발! (${Object.keys(v.bets||{}).length}명)`,"",{hr:id,hrR:1});}renderCas();}).catch(()=>{}).finally(()=>{hr.busy=false;});}
 function hrRoomTick(){if(!fdb||!me||!myId)return;const now=nowS();
   for(const id in hr.rooms){const R=hr.rooms[id];if(!R)continue;
     /* 방장이 나가 버렸으면 가장 먼저 들어온 사람이 방장 */
@@ -1675,9 +1706,11 @@ const hrRoomsOpen=()=>Object.entries(hr.rooms).filter(([k,R])=>R&&R.horses&&!R.o
 async function hrWatch(k,isR){if(!me||!fdb)return;if(casBusy)return toast("지금 하는 게임이 끝나면 볼 수 있어요");if(hrLocked())return toast("내 경주가 끝나면 볼 수 있어요");hrListen();let r=isR?hr.rooms[k]:hr.live[k];
   if(!r){try{r=(await fdb.ref((isR?"market/hrRoom/":"market/races/")+k).once("value")).val();}catch(e){}}
   if(!r||(isR&&!r.horses))return toast("이미 끝나서 없어진 경주예요");
-  if(!($("casMod")&&$("casMod").style.display==="flex"))openCasino();casTab="hr";
-  if(isR&&!r.order){hr.mode="room";hrRoomEnter(k);return;}
-  if(hr.inRoom&&hr.inRoom!==k){const R=hrRoomR();if(R&&!R.order&&!(R.bets&&R.bets[myId]))hrRoomLeave(true);}
+  if(hr.inRoom&&hr.inRoom!==k){const R=hrRoomR();if(R&&!R.order&&R.bets&&R.bets[myId])return toast("돈 걸어 둔 방이 있어요. 그 방에서 먼저 나가 주세요");hrRoomLeave(true);}
+  if(innerWidth<940&&typeof setChatOpen==="function")setChatOpen(false);
+  if(!($("casMod")&&$("casMod").style.display==="flex"))openCasino();casTab="hr";cancelAnimationFrame(hr.raf);
+  if(isR&&!r.order){hr.mode="room";hr.view=null;hrRoomEnter(k);return;}
+  if(isR&&hr.inRoom===k){hr.view={...r,room:k};renderCas();return;}
   hr.view=isR?{...r,room:k}:{...r,k};renderCas();}
 /* 말 고르기 */
 function hrPickHtml(c){const ho=(i,sel,k)=>`<button data-${k}="${i}" style="display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;border-radius:9px;margin-bottom:4px;background:${sel?"#fbbf24":"var(--card2)"};color:${sel?"#111":"var(--tx)"};font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:${c.horses[i].c};color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</span><b style="flex:1;text-align:left">${esc(c.horses[i].n)}</b><span style="font-size:11px;opacity:.8">${Math.round(c.horses[i].p*100)}%</span><b style="width:52px;text-align:right">${c.horses[i].o}배</b></button>`;
@@ -1694,7 +1727,7 @@ function hrLobby(id,R){const Mb=R.members||{},B=R.bets||{},isHost=R.host===myId,
     ${ids.map(u=>row(u,Mb[u].name,B[u],0)).join("")}${gone.map(u=>row(u,B[u].name,B[u],1)).join("")}</div>`;
   if(!mine)h+=hrPickHtml(R)+`<button id="hrRBet" style="margin-top:6px;width:100%;padding:12px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:14px">✅ ${hrPickTxt()} (${hrMult()}배)에 ${casFmt(casBet)} 걸기</button>`;
   else h+=`<div style="text-align:center;font-size:12.5px;padding:8px;border-radius:10px;background:var(--card2)">내 선택: <b style="color:#fbbf24">${hrBetTxt2(mine,R.horses)}</b> · ${casFmt(mine.stake)} (${mine.mult}배) <button id="hrRUnbet" style="margin-left:6px;padding:3px 9px;border-radius:8px;background:var(--card);font-size:11px">↩️ 다시 고르기</button></div>`;
-  if(isHost){const can=nb>0&&!waiting.length;h+=`<button id="hrRStart" ${can?"":"disabled"} style="margin-top:8px;width:100%;padding:13px 0;border-radius:10px;background:${can?"#16a34a":"var(--card2)"};color:${can?"#fff":"var(--sub)"};font-weight:900;font-size:15px">${can?`🏁 출발! (${nb}명)`:waiting.length?`⏳ ${waiting.length}명이 아직 고르는 중`:"⏳ 먼저 말을 골라 주세요"}</button>`;}
+  if(isHost){const can=nb>0;h+=`<button id="hrRStart" ${can?"":"disabled"} style="margin-top:8px;width:100%;padding:13px 0;border-radius:10px;background:${can?(waiting.length?"#ca8a04":"#16a34a"):"var(--card2)"};color:${can?"#fff":"var(--sub)"};font-weight:900;font-size:15px">${!can?"⏳ 먼저 말을 골라 주세요":waiting.length?`🏁 출발 (${waiting.length}명 아직 고르는 중 · 구경)`:`🏁 출발! (${nb}명)`}</button>`;}
   else h+=`<div style="text-align:center;font-size:12px;color:var(--sub);margin-top:8px">모두 고르면 방장(👑)이 출발을 눌러요</div>`;
   h+=`<button id="hrRLeave" style="margin-top:8px;width:100%;padding:9px 0;border-radius:10px;background:var(--card2);font-weight:700">🚪 방 나가기${mine?" (건 돈 돌려받기)":""}</button>`;
   return h;}
