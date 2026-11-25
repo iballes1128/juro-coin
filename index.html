@@ -465,7 +465,7 @@ function bindGear(root){root.querySelectorAll("[data-geq]").forEach(b=>b.onclick
   root.querySelectorAll("[data-gbuy]").forEach(b=>b.onclick=()=>{if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const[k,id]=b.dataset.gbuy.split("|"),it=GEAR[k].list.find(x=>x[0]===id);
     if(gearArm!==k+id){gearArm=k+id;renderGear();setTimeout(()=>{if(gearArm===k+id){gearArm=null;renderGear();}},4000);return;}
     gearArm=null;if(me.cash<it[2]){renderGear();return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(it[2])} 필요)`);}
-    me.cash-=it[2];if(it[4]){const bk=baitKey(id);me[bk]=(me[bk]|0)+it[4];}else{me.gear=me.gear||{};me.gear[k+"_"+id]=true;}me.eq=me.eq||{};me.eq[k]=id;saveMe();renderHeader();toast(`🛍️ ${it[1]}${it[4]?" "+it[4]+"개":""} 구매! 바로 장착했어요 (-${formatMoneyReadable(it[2])})`);if(!it[4])broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);renderGear();});}
+    me.cash-=it[2];stAdd("spent",it[2]);stAdd("shopGearN");if(it[4]){const bk=baitKey(id);me[bk]=(me[bk]|0)+it[4];}else{me.gear=me.gear||{};me.gear[k+"_"+id]=true;}me.eq=me.eq||{};me.eq[k]=id;saveMe();renderHeader();toast(`🛍️ ${it[1]}${it[4]?" "+it[4]+"개":""} 구매! 바로 장착했어요 (-${formatMoneyReadable(it[2])})`);if(!it[4])broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);renderGear();});}
 function renderGear(){for(const k of["rod","bait"]){const E=$("eq_"+k);if(E){E.innerHTML=GEAR[k].list.filter(x=>ownsGear(k,x[0])).map(x=>gearRow(k,x,"eq")).join("");bindGear(E);}}
   if(pgCur==="shop"&&pgSub==="bait"){const S=$("s-shop");S.innerHTML=`<div class="card">${GEAR[pgSub].list.filter(x=>x[2]>0).map(x=>gearRow(pgSub,x,"shop")).join("")}<div style="font-size:10px;color:var(--sub);margin-top:8px">${pgSub==="bait"?"미끼는 던질 때마다 1개씩 써요 · 다 쓰면 기본 미끼로 바뀌어요":"한 번 사면 계속 쓸 수 있어요"} · 🎽 마이 → 장비에서 바꿔 낄 수 있어요</div></div>`;bindGear(S);}}
 let cosArm=null,enhMat=[],enhBusy=false;
@@ -478,7 +478,7 @@ function renderCosGrid(G,k,mode){const list=COS[k].list.filter(x=>mode==="shop"|
   G.querySelectorAll("[data-cos]").forEach(b=>b.onclick=()=>{if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const[kk,id]=b.dataset.cos.split("|");me.eq=me.eq||{};
     if(id&&!ownsCos(kk,id)){const it=COS[kk].list.find(x=>x[0]===id);if(cosArm!==kk+id){cosArm=kk+id;renderCos();setTimeout(()=>{if(cosArm===kk+id){cosArm=null;renderCos();}},4000);return;}
       cosArm=null;if(me.cash<it[2]){renderCos();return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(it[2])} 필요)`);}
-      me.cash-=it[2];me.cos=me.cos||{};me.cos[kk+"_"+id]=true;toast(`🛍️ ${it[1]} 구매! 바로 장착했어요`);broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);}
+      me.cash-=it[2];stAdd("spent",it[2]);stAdd("shopCosN");me.cos=me.cos||{};me.cos[kk+"_"+id]=true;toast(`🛍️ ${it[1]} 구매! 바로 장착했어요`);broadcast(`🛍️ ${myName()}님이 ${it[1]}을(를) 샀어요!`);}
     else if(mode==="shop"&&eqCos(kk)===id&&id){me.eq[kk]="";saveMe();renderHeader();lastPres="";pushPresence();renderCos();return toast(`${COS[kk].i} 장착 해제`);}
     me.eq[kk]=id;saveMe();renderHeader();lastPres="";pushPresence();renderCos();if(id)toast(`${COS[kk].i} ${COS[kk].list.find(x=>x[0]===id)[1]} 장착!`);});}
 function renderCos(){for(const k of["aura","wing","plate"]){const E=$("eq_"+k);if(E)renderCosGrid(E,k,"eq");}
@@ -508,7 +508,7 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;if(pgSub==="
 function enhDo(){if(enhBusy)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const L=rodLv();if(L>=50)return;const cost=enhCost(L);if(me.cash<cost)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);
   const mine=me.fish||{};for(const i of enhMat){const k=fKey(i);if(!((mine[k]||0)>=enhMat.filter(j=>j===i).length))return toast("재료 물고기가 부족해요"),renderEnh();}
   const tot=Math.min(100,enhBase(L)+enhMat.reduce((a,i)=>a+matBonus(i,L),0)+(me.enhPity||0));enhBusy=true;
-  me.cash-=cost;stAdd("enhN");stAdd("enhSpent",cost);stAdd("enhMatN",enhMat.length);for(const i of enhMat){const k=fKey(i);me.fish[k]=(me.fish[k]||0)-1;}enhMat=[];const ok=Math.random()*100<tot;stAdd(ok?"enhOk":"enhFail");
+  me.cash-=cost;stAdd("enhN");stAdd("enhSpent",cost);stAdd("spent",cost);stAdd("enhMatN",enhMat.length);for(const i of enhMat){const k=fKey(i);me.fish[k]=(me.fish[k]||0)-1;}enhMat=[];const ok=Math.random()*100<tot;stAdd(ok?"enhOk":"enhFail");
   let drop=false;if(!ok&&L>=ENH_DROP_LV&&Math.random()<ENH_DROP_P){drop=true;me.rodLv=L-1;stAdd("enhDrop");}
   if(ok)me.enhPity=0;else me.enhPity=(me.enhPity||0)+enhBase(L)*.03;
   if(ok){me.rodLv=L+1;if(me.rodLv%10===0||me.rodLv>=30)broadcast(`⚒️ ${myName()}님이 낚싯대를 +${me.rodLv}강으로 강화했어요!`);}
@@ -526,17 +526,21 @@ const ACH=[
  {g:"play",c:"📈 코인 누적 수익률 (시작 자금 1000만 원 대비)",k:"pr",u:"%",tiers:[[50,"개미 투자자",300000],[100,"단타의 고수",1000000],[300,"차트 도사",3000000],[1000,"워렌 버핏",10000000],[3000,"월가의 전설",30000000]]},
  {g:"play",c:"✊ 가위바위보 최고 연승 (무승부는 연승 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000],[3,"가위바위보 신동",500000],[5,"눈치 백단",1000000],[7,"독심술사",3000000],[10,"예언자",10000000],[15,"가위바위보의 신",30000000]]},
  {g:"play",c:"⚔️ 가위바위보 누적 승리",k:"bwn",u:"승",tiers:[[10,"승부사",300000],[50,"배틀 마니아",1000000],[100,"결투의 달인",3000000],[300,"백전백승",10000000],[1000,"전설의 승부사",30000000]]},
- {g:"tut",c:"🎣 처음 낚시하기",k:"t_fish",u:"회",tiers:[[1,"낚싯대 입문",50000]]},
- {g:"tut",c:"🛒 코인 처음 사기",k:"t_buy",u:"회",tiers:[[1,"코인 입문",100000]]},
- {g:"tut",c:"💵 코인 처음 팔기",k:"t_sell",u:"회",tiers:[[1,"매도 입문",100000]]},
- {g:"tut",c:"🐟 어시장에 물고기 팔기",k:"t_fmk",u:"회",tiers:[[1,"생선 장수",50000]]},
- {g:"tut",c:"⚒️ 낚싯대 처음 강화하기",k:"t_enh",u:"회",tiers:[[1,"대장장이 견습생",100000]]},
- {g:"tut",c:"✊ 가위바위보 처음 하기",k:"t_rps",u:"회",tiers:[[1,"도전자",50000]]},
- {g:"tut",c:"💸 친구에게 처음 송금하기",k:"t_send",u:"회",tiers:[[1,"인심 좋은 친구",50000]]},
+ {g:"tut",c:"🎣 낚시하기",k:"t_fish",u:"회",tiers:[[1,"낚싯대 입문",50000],[30,"초보 강태공",200000],[100,"낚시 애호가",500000],[300,"낚시광",1000000]]},
+ {g:"tut",c:"📈 코인 거래하기 (사기+팔기)",k:"t_buy",u:"회",tiers:[[1,"코인 입문",100000],[10,"단타 연습생",200000],[30,"차트 중독",500000],[100,"거래의 달인",1000000]]},
+ {g:"tut",c:"🐟 어시장에 물고기 팔기",k:"t_fmk",u:"마리",tiers:[[1,"생선 장수",50000],[30,"어시장 단골",200000],[100,"수산 도매상",500000],[300,"어시장 큰손",1000000]]},
+ {g:"tut",c:"⚒️ 낚싯대 강화하기",k:"t_enh",u:"회",tiers:[[1,"대장장이 견습생",100000],[10,"대장장이",200000],[30,"장인",500000],[100,"명장",1000000]]},
+ {g:"tut",c:"🏪 거래소에 판매 올리기",k:"t_list",u:"회",tiers:[[1,"첫 노점",50000],[5,"좌판 상인",200000],[10,"거래소 상인",500000],[30,"거래소 큰손",1000000]]},
+ {g:"tut",c:"🔁 거래소에 교환 올리기",k:"t_tlist",u:"회",tiers:[[1,"물물교환 입문",50000],[5,"교환 상인",200000],[10,"교환의 달인",500000],[30,"교환왕",1000000]]},
+ {g:"tut",c:"🛒 거래소에서 물품 사기",k:"t_mbuy",u:"회",tiers:[[1,"첫 쇼핑",50000],[5,"쇼핑객",200000],[10,"거래소 단골",500000],[30,"거래소 VIP",1000000]]},
+ {g:"tut",c:"🤝 거래소 교환 완료하기",k:"t_trade",u:"회",tiers:[[1,"첫 교환",50000],[5,"교환 친구",200000],[10,"교환 매니아",500000],[30,"교환 전설",1000000]]},
+ {g:"tut",c:"✊ 가위바위보 하기",k:"t_rps",u:"판",tiers:[[1,"도전자",50000],[10,"단골 도전자",200000],[30,"승부 중독자",500000],[100,"가위바위보 장인",1000000]]},
+ {g:"tut",c:"💸 친구에게 송금하기",k:"t_send",u:"회",tiers:[[1,"인심 좋은 친구",50000],[5,"마음 부자",200000],[10,"기부왕",500000],[30,"산타클로스",1000000]]},
  {g:"tut",c:"🎖️ 칭호 달아 보기",k:"t_title",u:"회",tiers:[[1,"멋쟁이",50000]]},
+ {g:"etc",c:"💳 돈 쓰기 (상점·강화·각성·스킨·거래소 구매·송금, 코인 매수 제외)",k:"spent",u:"",tiers:[[1e6,"소비 요정",100000],[1e7,"쇼핑 중독",500000],[1e8,"큰손",3000000],[1e9,"플렉스 대마왕",30000000],[1e10,"소비의 신",300000000]]},
  {g:"grow",c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",1000000],[1e9,"십억 부자",5000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
 const achId=(k,i)=>k+i;
-function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);const S=p.st||{};if(k==="t_fish")return Math.min(1,p.fishN|0);if(k==="t_buy")return(S.coinBuyN||Object.values(p.coins||{}).some(h=>h&&(h.count>0||h.cost>0))||p.coinPnL||p.bestPR)?1:0;if(k==="t_sell")return(S.coinSellN||p.coinPnL||p.bestPR)?1:0;if(k==="t_fmk")return S.fmkN?1:0;if(k==="t_enh")return(S.enhN||(p.rodLv|0)>0)?1:0;if(k==="t_rps")return((p.bw|0)+(p.bl|0)+(p.bd|0)+(S.btN|0))?1:0;if(k==="t_send")return S.sendN?1:0;if(k==="t_title")return p.title?1:0;
+function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);const S=p.st||{};if(k==="t_fish")return p.fishN|0;if(k==="t_buy")return Math.max((S.coinBuyN|0)+(S.coinSellN|0),(Object.values(p.coins||{}).some(h=>h&&(h.count>0||h.cost>0))||p.coinPnL||p.bestPR)?1:0);if(k==="t_fmk")return S.fmkN|0;if(k==="t_enh")return Math.max(S.enhN|0,p.rodLv|0);if(k==="t_list")return S.mktListN|0;if(k==="t_tlist")return S.mktTListN|0;if(k==="t_mbuy")return S.mktBuyN|0;if(k==="t_trade")return S.mktTradeN|0;if(k==="t_rps")return Math.max((p.bw|0)+(p.bl|0)+(p.bd|0),S.btN|0);if(k==="t_send")return S.sendN|0;if(k==="t_title")return p.title?1:0;if(k==="spent")return S.spent|0;
   if(k==="bws")return p.bwBest|0;if(k==="bwn")return p.bw|0;if(k==="money")return assetOf(p);return 0;}
 const titleOf=id=>{for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i][1];return "";};
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title):"";
@@ -548,18 +552,18 @@ function achCheck(){if(!me||!me._loaded||sessBlocked)return;let n=0;const nw=[];
 function achClaim(k){const a=ACH.find(x=>x.k===k);if(!a||!me||!me._loaded)return;const x=achNext(a);if(!x||!x.ready)return;me.ach=me.ach||{};const id=achId(a.k,x.i),[need,nm,rw]=x.t;me.ach[id]=Date.now();me.cash+=rw;saveMe();renderHeader();
   toast(`🎁 「${nm}」 보상 +${formatMoneyReadable(rw)}\n칭호를 얻었어요!`);if(x.i===a.tiers.length-1||rw>=10000000)broadcast(`🏅 ${myName()}님이 업적 달성! 칭호 「${nm}」 획득 (+${formatMoneyReadable(rw)})`);achCheck();renderAch();}
 setInterval(achCheck,5000);
-function fmtNeed(a,need){return a.k==="money"?formatMoneyReadable(need):need+a.u;}
-function achLeft(a,v,need){if(a.k==="dex"){const c=fishCountOf(me),nc=Math.ceil(need*FISH.length/100-1e-9);return `${Math.max(0,nc-c)}종 남음 (${nc}종 모으면 달성)`;}if(a.k==="money")return formatMoneyReadable(need-v)+" 남음";if(a.k==="pr")return `${formatMoneyReadable(need/100*START_CASH-((me&&me.coinPnL)||0))} 더 벌면 달성`;return (need-v)+a.u+" 남음";}
+function fmtNeed(a,need){return a.k==="money"||a.k==="spent"?formatMoneyReadable(need):need+a.u;}
+function achLeft(a,v,need){if(a.k==="dex"){const c=fishCountOf(me),nc=Math.ceil(need*FISH.length/100-1e-9);return `${Math.max(0,nc-c)}종 남음 (${nc}종 모으면 달성)`;}if(a.k==="money"||a.k==="spent")return formatMoneyReadable(need-v)+" 남음";if(a.k==="pr")return `${formatMoneyReadable(need/100*START_CASH-((me&&me.coinPnL)||0))} 더 벌면 달성`;return (need-v)+a.u+" 남음";}
 /* 업적 분류: 위에 분류 버튼(마이·코인·낚시·가위바위보·기타), 누른 분류의 업적만 보임. 새 업적은 g만 정해 주면 알아서 들어감 */
 const ACH_G=[["tut","📘 튜토리얼"],["play","🎮 플레이"],["grow","🌱 성장"],["etc","🎲 기타"]];
 let achTab=(()=>{try{return localStorage.getItem("jc_achTab")||"";}catch(e){return "";}})();
-function achCard(a){const v=achVal(a.k),got=a.tiers.filter((t,i)=>me&&me.ach&&me.ach[achId(a.k,i)]),ni=a.tiers.findIndex((t,i)=>!(me&&me.ach&&me.ach[achId(a.k,i)])),nx=ni>=0?a.tiers[ni]:null;
-      const pc=nx?Math.min(100,Math.floor(v/nx[0]*100)):100;const cur=a.k==="money"?formatMoneyReadable(v):a.k==="dex"?`${fishCountOf(me)}/${FISH.length}종 (${v}%)`:a.k==="pr"?`${v>=0?"+":""}${v}% (${formatMoneyReadable((me&&me.coinPnL)||0)})`:v+a.u;
-      return `<div class="card"><h3>${a.c}</h3>${got.length?`<div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px">${got.map(t=>`<span style="font-size:10px;padding:3px 8px;border-radius:12px;background:var(--card2);color:var(--sub)">✅ 「${t[1]}」</span>`).join("")}</div>`:""}`+
-      (nx?`<div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>다음 목표 <b>「${nx[1]}」</b></span><b style="color:var(--acc);font-size:12px">+${formatMoneyReadable(nx[2])}</b></div>${v>=nx[0]?`<button data-achc="${a.k}" style="width:100%;margin-top:8px;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">🎁 보상 받기 +${formatMoneyReadable(nx[2])}</button>`:""}
-        <div style="font-size:11px;color:var(--sub);margin:4px 0 6px">${fmtNeed(a,nx[0])} 달성하기 · 지금 ${cur}${v<nx[0]?` · <b style="color:var(--tx)">${achLeft(a,v,nx[0])}</b>`:""}</div>
-        <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--acc)"></div></div><b style="font-size:12px;min-width:38px;text-align:right">${pc}%</b></div>`
-        :`<div style="text-align:center;font-weight:900;padding:6px 0">👑 모두 달성!</div>`)+`</div>`;}
+function achCard(a){const has=(me&&me.ach)||{},v=achVal(a.k),got=a.tiers.filter((t,i)=>has[achId(a.k,i)]),ni=a.tiers.findIndex((t,i)=>!has[achId(a.k,i)]),nx=ni>=0?a.tiers[ni]:null;
+      const pc=nx?Math.max(0,Math.min(100,Math.floor(v/nx[0]*100))):100;const cur=a.k==="money"||a.k==="spent"?formatMoneyReadable(v):a.k==="dex"?`${fishCountOf(me)}/${FISH.length}종 (${v}%)`:a.k==="pr"?`${v>=0?"+":""}${v}% (${formatMoneyReadable((me&&me.coinPnL)||0)})`:v+a.u;
+      const step=a.tiers.length>1?` <span style="font-weight:400;color:var(--sub);font-size:10.5px">${got.length}/${a.tiers.length}단계</span>`:"";
+      return `<div class="card" style="padding:9px 12px;margin-bottom:7px"><div style="display:flex;justify-content:space-between;align-items:center;gap:6px"><b style="font-size:12.5px">${a.c}${step}</b>${nx?`<b style="color:var(--acc);font-size:11px;white-space:nowrap">+${formatMoneyReadable(nx[2])}</b>`:`<b style="font-size:11px">👑 완료</b>`}</div>`+
+      (got.length?`<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">${got.map(t=>`<span style="font-size:9px;padding:1px 6px;border-radius:9px;background:var(--card2);color:var(--sub)">✅ ${t[1]}</span>`).join("")}</div>`:"")+
+      (nx?`<div style="font-size:10.5px;color:var(--sub);margin:4px 0 4px">「${nx[1]}」 ${fmtNeed(a,nx[0])} · 지금 ${cur}${v<nx[0]?` · <b style="color:var(--tx)">${achLeft(a,v,nx[0])}</b>`:""}</div>
+        <div style="display:flex;align-items:center;gap:6px"><div style="flex:1;height:5px;background:var(--card2);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--acc)"></div></div>${v>=nx[0]?`<button data-achc="${a.k}" style="padding:4px 10px;border-radius:8px;background:var(--acc);color:#111;font-weight:900;font-size:11px;white-space:nowrap">🎁 받기</button>`:`<b style="font-size:10.5px;min-width:30px;text-align:right">${pc}%</b>`}</div>`:"")+`</div>`;}
 function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach||{});const has=me&&me.ach||{},total=ACH.reduce((n,a)=>n+a.tiers.length,0),done=ACH.reduce((n,a)=>n+a.tiers.filter((t,i)=>has[achId(a.k,i)]).length,0);
     const G=ACH_G,rdy=gk=>ACH.filter(a=>(a.g||"etc")===gk).filter(a=>{const x=achNext(a);return x&&x.ready;}).length;
     if(!G.some(([gk])=>gk===achTab))achTab=(G.find(([gk])=>rdy(gk))||G[0]||[""])[0];
@@ -658,7 +662,7 @@ function addLog(k,c,q,a){me.log=(me.log||[]).filter(l=>Date.now()-l.t<LOG_WIN).c
 /* ===================== 송금 / 닉네임 ===================== */
 $("sendBtn").onclick=async()=>{if(!fdb)return toast("연결 중이에요");const to=$("sendTo").value,amt=parseInt(($("sendAmt").value||"").replace(/,/g,""),10);
   if(!to)return toast("받는 사람을 골라 주세요");if(!(amt>0))return toast("⚠️ 금액을 확인해주세요.");if(me.cash<amt)return toast("💸 잔액이 부족합니다!");
-  const fee=Math.round(amt*.2),net=amt-fee;me.cash-=amt;addTax("send",fee);stAdd("sendN");stAdd("sendAmt",amt);saveMe();
+  const fee=Math.round(amt*.2),net=amt-fee;me.cash-=amt;addTax("send",fee);stAdd("sendN");stAdd("sendAmt",amt);stAdd("spent",amt);saveMe();
   try{await fdb.ref("transfers").push({from:myId,fromName:myName(),to,amount:amt,net,t:Date.now()});}catch(e){me.cash+=amt;saveMe();return toast("송금 실패");}
   $("sendAmt").value="";const rn=(players[to]||{}).name||"상대";toast(`💸 송금 완료!\n${rn}님께 ${formatMoneyReadable(net)} 전달 (수수료 20%)`);broadcast(`💸 ${myName()}님 → ${rn}님 ${formatMoneyReadable(net)} 송금`);renderAll();};
 $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)return;if(nameTaken(v,myId))return toast("이미 있는 닉네임이에요");me.name=v;$("nickIn").value="";saveMe();pushPresence();renderAll();toast("닉네임을 "+v+"(으)로 바꿨어요");};
@@ -1072,7 +1076,7 @@ function renderAwk(S){const ch=normCh(me&&me.ch),ak=myAwk(),nm=(CHARS[ch]||["?"]
   clearInterval(renderAwk.tm);renderAwk.tm=setInterval(()=>{if(!$("awkCv0"))return clearInterval(renderAwk.tm);draw();},60);draw();
   if($("awkGo"))$("awkGo").onclick=()=>{if(!me||!me._loaded)return;const cur=myAwk();if(cur>=3)return;const cost=AWK_COST[cur];if(me.cash<cost)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);
     if(renderAwk.arm!==cur||Date.now()-(renderAwk.at||0)>4000){renderAwk.arm=cur;renderAwk.at=Date.now();return toast(`한 번 더 누르면 ${formatMoneyReadable(cost)}으로 ${AWK_NAME[cur+1]}해요`);}renderAwk.arm=-1;
-    me.cash-=cost;me.awk=me.awk||{};me.awk[normCh(me.ch)]=cur+1;saveMe();renderHeader();lastPres="";pushPresence();toast(`🌟 ${AWK_NAME[cur+1]} 완료!`);if(cur+1>=2)broadcast(`🌟 ${myName()}님의 ${(CHARS[normCh(me.ch)]||["캐릭터"])[0]}이(가) ${AWK_NAME[cur+1]}했어요!`);renderAwk(S);};}
+    me.cash-=cost;stAdd("spent",cost);stAdd("awkN");me.awk=me.awk||{};me.awk[normCh(me.ch)]=cur+1;saveMe();renderHeader();lastPres="";pushPresence();toast(`🌟 ${AWK_NAME[cur+1]} 완료!`);if(cur+1>=2)broadcast(`🌟 ${myName()}님의 ${(CHARS[normCh(me.ch)]||["캐릭터"])[0]}이(가) ${AWK_NAME[cur+1]}했어요!`);renderAwk(S);};}
 function removedSkinFix(){if(!me||!me._loaded)return;let ref=0,ch=false;for(const k of[12,14,2]){if(me.skins&&me.skins["s"+k]){delete me.skins["s"+k];ref+=1000000;}}if([12,14,2].includes(me.ch)){me.ch=normCh(me.ch);ch=true;}if(ref||ch){me.cash+=ref;saveMe();renderHeader();lastPres="";pushPresence();if(ref)toast(`🧑 없어진 캐릭터 구매 금액 ${formatMoneyReadable(ref)}을 돌려드렸어요`);}}
 function drawChar(c,x,y,ch,hue,dir,bob,lg){switch(ch){
   case 1:return human(c,x,y,dir,bob,lg,{shirt:"#3a7bd5",pants:"#4b5563",hair:"#3b2a1a",hat:"#c9b27a"});
@@ -1104,7 +1108,7 @@ function renderCharGrid(G,eq){const cur=normCh(me&&me.ch);
     b.onclick=()=>{if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const nm=CHARS[v][0],pr=SKIN_PRICE[v];
       if(!ownsSkin(me,v)){if(skinArm!==v){skinArm=v;renderCharPick();setTimeout(()=>{if(skinArm===v){skinArm=null;renderCharPick();}},4000);return;}
         skinArm=null;if(me.cash<pr){renderCharPick();return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(pr)} 필요)`);}
-        me.cash-=pr;me.skins=me.skins||{};me.skins["s"+v]=true;toast(`🛍️ ${nm} 스킨 구매 완료! (-${formatMoneyReadable(pr)})`);broadcast(`🛍️ ${myName()}님이 ${nm} 스킨을 샀어요!`);}
+        me.cash-=pr;stAdd("spent",pr);stAdd("skinN");me.skins=me.skins||{};me.skins["s"+v]=true;toast(`🛍️ ${nm} 스킨 구매 완료! (-${formatMoneyReadable(pr)})`);broadcast(`🛍️ ${myName()}님이 ${nm} 스킨을 샀어요!`);}
       me.ch=v;saveMe();renderHeader();if(fdb&&myId)fdb.ref("online/"+myId).update({ch:me.ch,t:Date.now()}).catch(()=>{});renderCharPick();};});}
 function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
   const H=typeof hue==="object"?hue:{hue,ch:-1};hue=H.hue;
@@ -1295,20 +1299,20 @@ function renderMarketUI(){if($("fMk").style.display!=="flex")return;document.que
     const pr=$("sfPrice");if(pr)pr.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")go.click();});}}
 async function listTrade(i,w){if(w==="")return toast("⚠️ 원하는 물건을 골라 주세요");w=+w;if(w===i)return toast("⚠️ 같은 물건끼리는 교환할 수 없어요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물건이 없어요");if(FISH[i][1]>0&&!(me.fish[k]>1))return toast("📖 1마리뿐인 물고기는 거래소에 올릴 수 없어요\n(어시장에는 팔 수 있어요)");
   me.fish[k]--;saveMe();try{await fdb.ref("market/fishMarket").push({seller:myId,sellerName:myName(),fi:i,want:w,t:Date.now()});}catch(e){me.fish[k]++;saveMe();return toast("등록 실패");}
-  toast(`🔄 교환 등록!\n${FISH[i][2]} ↔ ${FISH[w][2]}`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${FISH[w][2]}(으)로 교환하자고 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
+  stAdd("mktTListN");saveMe();toast(`🔄 교환 등록!\n${FISH[i][2]} ↔ ${FISH[w][2]}`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${FISH[w][2]}(으)로 교환하자고 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
 async function tradeFish(id){const v=fMarket[id];if(!v||v.want==null||v.seller===myId)return;const wk=fKey(v.want);if(FISH[v.want][1]>0&&me.fish&&me.fish[wk]===1)return toast("📖 1마리뿐인 물고기는 거래소에서 교환할 수 없어요\n(어시장에는 팔 수 있어요)");if(!(me.fish&&me.fish[wk]>0))return toast(`⚠️ 교환하려면 ${FISH[v.want][2]}이(가) 있어야 해요`);
   const got=await takeListing(id,c=>c.seller!==myId&&c.want!=null).catch(()=>null);if(!got)return toast("이미 교환됐거나 내려간 매물이에요");
   if(!(me.fish[fKey(got.want)]>0)){await fdb.ref("market/fishMarket/"+id).set(got).catch(()=>{});return toast("교환할 물건이 없어요");}
-  me.fish[fKey(got.want)]--;const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;saveMe();
+  me.fish[fKey(got.want)]--;const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;stAdd("mktTradeN");saveMe();
   fdb.ref("transfers").push({from:myId,fromName:myName(),to:got.seller,amount:0,net:0,fish:got.want,note:`🔄 거래소 교환 완료! ${myName()}님과 교환했어요\n(내준 것: ${FISH[got.fi][2]} ↔ 받은 것: ${FISH[got.want][2]})`,t:Date.now()}).catch(()=>{});
   toast(`🤝 교환 완료!\n${FISH[got.want][2]} → ${FISH[got.fi][2]}${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🤝 [거래소] ${myName()}님과 ${got.sellerName||"?"}님이 교환했어요 (${FISH[got.fi][2]} ↔ ${FISH[got.want][2]})`);renderMarketUI();renderFishInfo();}
 async function sellFish(i,raw){const price=parseInt(String(raw||"").replace(/[^0-9]/g,""),10);if(!(price>0))return toast("⚠️ 판매가를 입력해 주세요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물고기가 없어요");if(!(me.fish[k]>1))return toast("📖 1마리뿐인 물고기는 거래소에 올릴 수 없어요\n(어시장에는 팔 수 있어요)");
   me.fish[k]--;saveMe();try{await fdb.ref("market/fishMarket").push({seller:myId,sellerName:myName(),fi:i,price,t:Date.now()});}catch(e){me.fish[k]++;saveMe();return toast("등록 실패");}
-  toast(`📤 ${FISH[i][2]} ${formatMoneyReadable(price)}에 등록!`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${formatMoneyReadable(price)}에 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
+  stAdd("mktListN");stAdd("mktListAmt",price);saveMe();toast(`📤 ${FISH[i][2]} ${formatMoneyReadable(price)}에 등록!`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${formatMoneyReadable(price)}에 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
 async function takeListing(id,check){let got=null;const r=await fdb.ref("market/fishMarket/"+id).transaction(cur=>{if(!cur||!check(cur))return;got=cur;return null;});return r.committed&&got?got:null;}
 async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)return;if(me.cash<v.price)return toast("💸 잔액이 부족합니다!");
   const got=await takeListing(id,c=>c.seller!==myId&&c.want==null).catch(()=>null);if(!got)return toast("이미 팔렸거나 내려간 매물이에요");
-  const fee=Math.round(got.price*.1),net=got.price-fee;me.cash-=got.price;addTax("mkt",fee);stAdd("mktBuyN");stAdd("mktBuyAmt",got.price);me.fish=me.fish||{};const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;saveMe();
+  const fee=Math.round(got.price*.1),net=got.price-fee;me.cash-=got.price;addTax("mkt",fee);stAdd("mktBuyN");stAdd("mktBuyAmt",got.price);stAdd("spent",got.price);me.fish=me.fish||{};const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;saveMe();
   fdb.ref("transfers").push({from:myId,fromName:myName(),to:got.seller,amount:got.price,net,note:`🐟 거래소 판매 완료! ${myName()}님이 ${FISH[got.fi][2]}을(를) 샀어요 (+${formatMoneyReadable(net)}, 수수료 10% 제외)`,t:Date.now()}).catch(()=>{});
   toast(`🛒 ${FISH[got.fi][2]} 구매 완료!${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🛒 [거래소] ${myName()}님이 ${got.sellerName||"?"}님의 ${FISH[got.fi][2]}을(를) ${formatMoneyReadable(got.price)}에 샀어요`);renderHeader();renderMarketUI();renderFishInfo();}
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
@@ -1561,7 +1565,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:90
     if(first){first=false;if(me._loaded&&!me.pinH)askSetPin();if(!me._loaded){showAuth((nm,pinH)=>{me=JSON.parse(JSON.stringify(local));me.name=nm;me.pinH=pinH;me.mig=1;me.skinRV=1;me.ch=11;me._loaded=true;saveMe();pushPresence();renderAll();broadcast(`👋 ${nm}님이 거래소에 처음 들어왔어요!`);});}}
     checkDelist();renderAll();});
   fdb.ref("transfers").orderByChild("to").equalTo(myId).on("value",s=>{if(!me._loaded)return;const v=s.val()||{};let got=0;const names=[],notes=[];
-    let gotFish=0;for(const id in v){const x=v[id];if(me.claimed.includes(id))continue;if(typeof x.fish==="number"&&FISH[x.fish]){me.fish=me.fish||{};me.fish[fKey(x.fish)]=(me.fish[fKey(x.fish)]||0)+1;gotFish++;}else if(!(x.net>0))continue;me.cash+=x.net||0;got+=x.net||0;if(x.note)notes.push(x.note);else names.push(x.fromName||"누군가");me.claimed.push(id);fdb.ref("transfers/"+id).remove().catch(()=>{});}
+    let gotFish=0;for(const id in v){const x=v[id];if(me.claimed.includes(id))continue;if(typeof x.fish==="number"&&FISH[x.fish]){me.fish=me.fish||{};me.fish[fKey(x.fish)]=(me.fish[fKey(x.fish)]||0)+1;gotFish++;if(String(x.note||"").includes("교환"))stAdd("mktTradeN");}else if(x.net>0&&String(x.note||"").includes("거래소 판매 완료")){stAdd("mktSoldN");stAdd("mktSoldAmt",x.net);}else if(x.net>0&&!x.note){stAdd("recvN");stAdd("recvAmt",x.net);}else if(!(x.net>0))continue;me.cash+=x.net||0;got+=x.net||0;if(x.note)notes.push(x.note);else names.push(x.fromName||"누군가");me.claimed.push(id);fdb.ref("transfers/"+id).remove().catch(()=>{});}
     if(got||gotFish){me.claimed=me.claimed.slice(-100);saveMe();toast(notes.length?notes.join("\n"):`💸 ${names.join(", ")}님에게서 ${formatMoneyReadable(got)} 받았어요!`);renderAll();}});
   sessStart();
   btInit();
