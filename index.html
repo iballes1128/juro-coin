@@ -259,7 +259,7 @@ nav button.on{color:var(--tx);font-weight:700}
     </div>
     <div class="card"><h3>💰 돈 지급</h3>
       <select id="admUser"></select>
-      <div class="l"><input id="admAmt" inputmode="numeric" placeholder="금액(원, 음수면 회수)"><button class="a" id="admGive">지급</button></div>
+      <div class="l"><button class="a" id="admSign" style="flex:none;width:52px">＋ 지급</button><input id="admAmt" inputmode="numeric" placeholder="금액(원)"><button class="a" id="admGive" style="flex:none;width:64px">지급</button></div>
     </div>
     <div class="card"><h3>👥 플레이어 관리</h3>
       <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">같은 이름이 여러 개면 <b style="color:#ffb020">중복</b>으로 표시돼요. 삭제하면 그 사람 기록이 사라지고, 그 기기에서는 닉네임부터 다시 시작해요.</div>
@@ -1026,9 +1026,10 @@ document.querySelectorAll("[data-one]").forEach(b=>b.onclick=async()=>{const c=$
 $("admSet").onclick=async()=>{const c=$("admCoin").value,ci=COINS.findIndex(x=>x[0]===c),p=parseInt(($("admPrice").value||"").replace(/,/g,""),10),[,,mn,mx]=COINS[ci];
   if(!(p>=mn&&p<=mx))return toast(`⚠️ ${c} 허용 범위: ${formatCoinPrice(mn)} ~ ${formatCoinPrice(mx)}`);if(M.coins[ci].delisted)return toast("❌ 상장폐지된 코인은 가격을 수정할 수 없어요");
   await pushEvent([{t:Date.now(),c,m:"set",p}]);$("admPrice").value="";toast("다음 갱신 때 적용돼요");};
-$("admGive").onclick=async()=>{const id=$("admUser").value,amt=parseInt(($("admAmt").value||"").replace(/,/g,""),10);if(!id||isNaN(amt))return toast("⚠️ 사람과 금액을 확인해주세요");
+let admNeg=false;$("admSign").onclick=()=>{admNeg=!admNeg;$("admSign").textContent=admNeg?"－ 회수":"＋ 지급";$("admGive").textContent=admNeg?"회수":"지급";$("admSign").style.color=admNeg?"var(--up)":"";};
+$("admGive").onclick=async()=>{const id=$("admUser").value,raw=parseInt(($("admAmt").value||"").replace(/[,\s-]/g,""),10),amt=isNaN(raw)?NaN:(admNeg?-Math.abs(raw):Math.abs(raw))*(($("admAmt").value||"").trim().startsWith("-")&&!admNeg?-1:1);if(!id||isNaN(amt))return toast("⚠️ 사람과 금액을 확인해주세요");
   if(id===myId){me.cash+=amt;saveMe();}else{const p=players[id];if(!p)return;try{await fdb.ref("players/"+id+"/cash").set((p.cash||0)+amt);}catch(e){return toast("지급 실패");}}
-  $("admAmt").value="";const nm=id===myId?myName():(players[id].name||"");toast("지급 완료");renderAll();};
+  $("admAmt").value="";const nm=id===myId?myName():(players[id].name||"");if(id!==myId&&fdb)fdb.ref("market/adminMsg/"+id).set({amt,t:Date.now(),k:Math.random().toString(36).slice(2,9)}).catch(()=>{});toast(amt<0?"회수 완료":"지급 완료");renderAll();};
 $("admReset").onclick=async()=>{if(!confirmReset())return;const t=Date.now();
   for(const[id,p]of Object.entries(players)){if(id===myId)continue;let sum=0;for(const n in(p.coins||{}))sum+=p.coins[n].cost||0;try{await fdb.ref("players/"+id).update({cash:(p.cash||0)+sum,coins:null,t});}catch(e){}}
   let s=0;for(const n in me.coins)s+=me.coins[n].cost||0;me.cash+=s;me.coins={};saveMe();
@@ -2801,6 +2802,10 @@ async function btAccept(id){
   if(!ok){btGive(b,1,tk.cost);saveMe();renderAll();return toast("이미 취소됐거나 시간이 지난 신청이에요 (판돈은 돌려받았어요)");}
   pushNotice(`⚔️ 배틀 성사! ${b.fromName} vs ${b.toName}\n판돈 ${btStakeTxt(b)} · 가위바위보 시작!`);
   renderAll();}
+/* 관리자가 돈을 주거나 회수하면 받는 사람 화면에 메시지가 떠요 */
+{let att="";setInterval(()=>{if(!fdb||!myId||att===myId)return;att=myId;const id=myId;fdb.ref("market/adminMsg/"+id).on("value",sn=>{const v=sn.val();if(!v||!v.k||!v.amt||id!==myId)return;let seen="";try{seen=localStorage.getItem("admMsgK_"+id)||"";}catch(e){}if(seen===v.k||Date.now()-(v.t||0)>6*3600000)return;try{localStorage.setItem("admMsgK_"+id,v.k);}catch(e){}
+  const pos=v.amt>0,bg=modal(`<div style="text-align:center"><div style="font-size:34px">${pos?"💰":"🧾"}</div><div style="font-size:15px;font-weight:900;margin:6px 0">관리자가 ${pos?"돈을 지급했어요":"돈을 회수했어요"}</div><div style="font-size:22px;font-weight:900;color:${pos?"var(--acc)":"var(--up)"};margin:4px 0 14px">${pos?"+":"-"}${formatMoneyReadable(Math.abs(v.amt))}</div><button id="admMsgOk" style="width:100%;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">확인</button></div>`);
+  bg.style.zIndex=80;const cl=()=>{try{bg.remove();}catch(e){}};const ok=bg.querySelector("#admMsgOk");if(ok)ok.onclick=cl;});},1000);}
 function pushNotice(text){if(fdb)fdb.ref("market/notice").set({text,t:Date.now(),k:Math.random().toString(36).slice(2,8)}).catch(()=>{});}
 function btDecline(id){btDismiss[id]=1;btSetSt(id,"declined","no");btRender();}
 function btCancel(id){btSetSt(id,"cancel","cancel");btRender();}
