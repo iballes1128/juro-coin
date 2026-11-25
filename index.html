@@ -2381,16 +2381,16 @@ function renderCas(){const d=$("casMod");if(!d||d.style.display!=="flex")return;
 
 /* ===== 뽑기방 엔진 (집게 · 열쇠 더미 · 확률) ===== */
 const CLW=(()=>{
-const CLAW_COST=300000;
+const CLAW_COST=100000;
 const TIERS=[{n:"일반",col:"#94a3b8"},{n:"희귀",col:"#60a5fa"},{n:"전설",col:"#fbbf24"}];
 const PRIZES=[
  {t:0,k:"cash",v:300000,nm:"현금 30만",ic:"💵"},
  {t:0,k:"cash",v:500000,nm:"현금 50만",ic:"💵"},
  {t:0,k:"cash",v:600000,nm:"현금 60만",ic:"💵"},
  {t:0,k:"cash",v:700000,nm:"현금 70만",ic:"💵"},
- {t:0,k:"coin",c:"도지코인",v:600000,nm:"도지코인 60만원어치",ic:"🪙"},
- {t:0,k:"coin",c:"리플",v:600000,nm:"리플 60만원어치",ic:"🪙"},
- {t:0,k:"coin",c:"시바이누",v:600000,nm:"시바이누 60만원어치",ic:"🪙"},
+ {t:0,k:"coin",c:"도지코인",v:250000,nm:"도지코인 25만원어치",ic:"🪙"},
+ {t:0,k:"coin",c:"리플",v:250000,nm:"리플 25만원어치",ic:"🪙"},
+ {t:0,k:"coin",c:"시바이누",v:250000,nm:"시바이누 25만원어치",ic:"🪙"},
  {t:0,k:"acc",id:"ribbon",eq:900000,nm:"리본",ic:"🎀"},
  {t:0,k:"acc",id:"glasses",eq:900000,nm:"동그란 안경",ic:"👓"},
  {t:0,k:"acc",id:"phones",eq:900000,nm:"헤드폰",ic:"🎧"},
@@ -2399,7 +2399,7 @@ const PRIZES=[
  {t:0,k:"acc",id:"ears",eq:900000,nm:"고양이 귀",ic:"🐱"},
  {t:0,k:"acc",id:"flower",eq:900000,nm:"꽃핀",ic:"🌸"},
  {t:1,k:"cash",v:1800000,nm:"현금 180만",ic:"💴"},
- {t:1,k:"coin",c:"이더리움",v:3000000,nm:"이더리움 300만원어치",ic:"💎"},
+ {t:1,k:"coin",c:"이더리움",v:1000000,nm:"이더리움 100만원어치",ic:"💎"},
  {t:1,k:"acc",id:"shades",eq:2400000,nm:"선글라스",ic:"🕶️"},
  {t:1,k:"acc",id:"wizard",eq:2400000,nm:"마법사 모자",ic:"🎩"},
  {t:1,k:"acc",id:"horns",eq:3000000,nm:"악마 뿔",ic:"😈"},
@@ -2419,12 +2419,12 @@ const PRIZES=[
  {t:1,k:"acc",id:"chef",eq:2400000,nm:"요리사 모자",ic:"👨‍🍳"},
  {t:1,k:"acc",id:"cowboy",eq:3000000,nm:"카우보이 모자",ic:"🤠"},
  {t:1,k:"acc",id:"tiara",eq:3000000,nm:"티아라",ic:"👸"},
- {t:0,k:"coin",c:"솔라나",v:600000,nm:"솔라나 60만원어치",ic:"🪙"},
- {t:0,k:"coin",c:"페페",v:600000,nm:"페페 60만원어치",ic:"🪙"},
- {t:0,k:"coin",c:"플라즈마",v:600000,nm:"플라즈마 60만원어치",ic:"🪙"},
+ {t:0,k:"coin",c:"솔라나",v:250000,nm:"솔라나 25만원어치",ic:"🪙"},
+ {t:0,k:"coin",c:"페페",v:250000,nm:"페페 25만원어치",ic:"🪙"},
+ {t:0,k:"coin",c:"플라즈마",v:250000,nm:"플라즈마 25만원어치",ic:"🪙"},
  {t:0,k:"bait",id:"mid",cnt:100,eq:500000,nm:"중급 미끼 100개",ic:"🪱"},
  {t:0,k:"bait",id:"pro",cnt:100,eq:1000000,nm:"고급 미끼 100개",ic:"🪱"},
- {t:1,k:"coin",c:"테더골드",v:3000000,nm:"테더골드 300만원어치",ic:"🪙"},
+ {t:1,k:"coin",c:"테더골드",v:1000000,nm:"테더골드 100만원어치",ic:"🪙"},
  {t:1,k:"bait",id:"max",cnt:300,eq:4500000,nm:"최고급 미끼 300개",ic:"🪱"},
  {t:1,k:"cosm",ck:"aura",id:"star",eq:10000000,nm:"별빛 오라",ic:"✨"},
  {t:1,k:"cosm",ck:"wing",id:"angel",eq:10000000,nm:"천사 날개",ic:"🪽"},
@@ -2447,7 +2447,7 @@ const PRIZES=[
  {t:2,k:"cosm",ck:"wing",id:"rainwing",eq:50000000,nm:"무지개 날개 (뽑기 한정)",ic:"🌈"},
  {t:2,k:"cosm",ck:"plate",id:"galaxy",eq:50000000,nm:"은하 명찰 (뽑기 한정)",ic:"🌠"}];
 /* 밸런스: 상품마다 "손님 한 번 도전당 참가비의 몇 %가 이 상품으로 돌아가는지(share)"를 정하고 확률을 거기서 계산 */
-PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq;p.sh=(p.k==="cash"&&p.v>=1e8)?.15:(p.k==="aura"||p.k==="wing")?.05:p.id==="crown"?.045:[.03,.035,.05][p.t];p.p=Math.max(.002,Math.min(.7,p.sh*25*CLAW_COST/p.val));});
+PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq;p.sh=(p.k==="cash"&&p.v>=1e8)?.15:(p.k==="aura"||p.k==="wing")?.05:p.id==="crown"?.045:[.03,.035,.05][p.t];p.p=Math.max(.002,Math.min(.7,p.sh*25*CLAW_COST/p.val*.98));});
 const POOL=PRIZES;let BOX=PRIZES.slice();function setBox(a){BOX=a;}
 /* 월드: x,z ∈ [0,1], z=0 뒤 / 1 앞 */
 const CW=360,CH=336,FY0=172,FYH=118,RAIL=34;
