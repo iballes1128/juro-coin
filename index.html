@@ -1466,7 +1466,7 @@ const onPad=(x,y)=>{if(y<PAD_Y||y>PAD_Y+PAD_H)return null;for(const[c,cx]of RPS_
 const nearNpc=(x,y)=>Math.hypot(x-RPS_NPC.x,y-RPS_NPC.y)<30&&!onPad(x,y);const nearFmk=(x,y)=>false;const nearNts=(x,y)=>nearB(NTS,x,y);const nearClw=(x,y)=>nearB(CLB,x,y);const nearCas=(x,y)=>nearB(CAS,x,y);const nearPhb=(x,y)=>nearB(PHB,x,y);
 /* 🚤 보트 (뽑기 상품): 가지고 있으면 낚시터 위쪽 버튼으로 타고 내려요. 강 위(선착장 오른쪽 물)에서 움직이고 낚시도 돼요 */
 const myBoat=()=>isOwner||(me&&me.boat&&me.boat.gold)?2:(me&&me.boat&&me.boat.wood)?1:0;
-const BH={x:DOCK.x+DOCK.w+56,y:88},BOAT_X0=DOCK.x+DOCK.w+16,BOAT_Y0=54;
+const BH={x:DOCK.x+DOCK.w+56,y:88},BOAT_X0=22,BOAT_Y0=54;
 const boatOK=(x,y)=>x>=BOAT_X0&&x<=FW-24&&y>=BOAT_Y0&&y<=RIVER-8;
 const boatBob=t=>Math.sin(t/650)*1.4;
 function boatStep(dt,t,noIn){const bv=fBV,SP=.085;let ix=0,iy=0;
@@ -1479,8 +1479,13 @@ function boatStep(dt,t,noIn){const bv=fBV,SP=.085;let ix=0,iy=0;
   fp.x=nx;fp.y=ny;if(Math.abs(bv.x)>.006)fp.dir=bv.x>0?1:-1;
   fBoatTilt+=((bv.x/SP)*.13-fBoatTilt)*Math.min(1,dt/180);
   if(Math.hypot(bv.x,bv.y)>.02&&t-fWakeT>110){fWakeT=t;fWake.push({x:fp.x-bv.x*70,y:fp.y+5,t});if(fWake.length>40)fWake.shift();}}
-function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 열쇠 뽑기에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=Math.max(BOAT_X0+10,Math.min(FW-34,fp.x));fp.y=92;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
-function boatLeave(){if(!fBoat)return;if(fstate!=="idle")return toast("낚시 중에는 내릴 수 없어요");fBoat=0;fBV.x=0;fBV.y=0;if(fp.x<DOCK.x+DOCK.w+48){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();}
+function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 열쇠 뽑기에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=Math.max(BOAT_X0+8,Math.min(FW-34,fp.x));fp.y=92;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
+function boatLeave(){if(!fBoat)return;if(fstate!=="idle")return toast("낚시 중에는 내릴 수 없어요");fBoat=0;fBV.x=0;fBV.y=0;if(fp.x>=DOCK.x-26&&fp.x<=DOCK.x+DOCK.w+26){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();}
+function drawDock(c){c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
+  c.fillStyle="#4a301b";for(const py of[DOCK.y,DOCK.y+40,DOCK.y+80]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}}
+/* 보트가 선착장 밑을 지나갈 때: 보트가 있는 부분만 선착장 판자를 위에 다시 덮어서 '다리 밑'처럼 보이게 */
+function dockOver(c){const L=[];if(fBoat)L.push([fp.x,fp.y]);for(const id in fOthers){const o=fOthers[id];if(o&&o.bt&&o.fs!=="away")L.push([o.x,o.y]);}
+  for(const[x,y]of L){const x0=Math.max(DOCK.x-4,x-34),x1=Math.min(DOCK.x+DOCK.w+4,x+34);if(x1<=x0)continue;c.save();c.beginPath();c.rect(x0,y-50,x1-x0,66);c.clip();drawDock(c);c.restore();}}
 const sitW=(o,fn,t)=>{if(!o.bt||o.fs==="away")return fn();c.save();c.translate(o.x,o.y+6+boatBob(performance.now()));c.rotate(o.tl||0);c.scale(1,.85);c.translate(-o.x,-o.y);fn();c.restore();};
 function boatBack(c,x,y,t,sk,tl){const G=sk===2,b=boatBob(t);c.save();c.translate(x,y+b+2);c.rotate((tl||0)+Math.sin(t/900)*.015);
   c.strokeStyle="rgba(255,255,255,.55)";c.lineWidth=1;c.beginPath();c.ellipse(0,6,27+Math.sin(t/300)*1.5,4.5,0,0,7);c.stroke();
@@ -2197,8 +2202,7 @@ function fishDraw(t){const c=fCtx;
   const gg=c.createLinearGradient(0,RIVER+20,0,FH);gg.addColorStop(0,"#5aa34a");gg.addColorStop(1,"#3f7d36");c.fillStyle=gg;c.fillRect(0,RIVER+20,FW,FH);
   c.fillStyle="rgba(255,255,255,.06)";for(let i=0;i<25;i++){const r=mulberry(i*13)();c.fillRect((i*53)%FW,RIVER+30+((i*97)%(FH-RIVER-40)),2,4+r*3);}
   c.strokeStyle="#4f8a3a";c.lineWidth=2;for(let x=6;x<FW;x+=17){if(x>DOCK.x-8&&x<DOCK.x+DOCK.w+8)continue;const s=Math.sin(t/700+x)*2;c.beginPath();c.moveTo(x,RIVER+16);c.lineTo(x+s,RIVER+2);c.stroke();}
-  c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
-  c.fillStyle="#4a301b";for(const py of[DOCK.y,DOCK.y+40,DOCK.y+80]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}
+  drawDock(c);
   c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(255,255,255,.85)";emoSign(c,"","주로 광장",FW/2,FH-16,"bold 10px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.35)",20);
   {c.fillStyle="rgba(0,0,0,.12)";c.beginPath();c.roundRect(RZ.x+2,RZ.y+4,RZ.w,RZ.h,14);c.fill();c.save();c.beginPath();c.roundRect(RZ.x,RZ.y,RZ.w,RZ.h,10);c.clip();c.fillStyle="#e8d59a";c.fillRect(RZ.x,RZ.y,RZ.w,RZ.h);
     for(let yy=RZ.y+3;yy<RZ.y+RZ.h;yy+=4){c.fillStyle=(yy-RZ.y)%8<4?"rgba(176,140,62,.22)":"rgba(255,255,255,.18)";c.fillRect(RZ.x,yy,RZ.w,1.5);}
@@ -2249,7 +2253,7 @@ function fishDraw(t){const c=fCtx;
       emoSign(c,"","인생네컷",X+W/2,Y-6,"bold 9px 'Noto Sans KR',sans-serif","#fbcfe8","rgba(131,24,67,.92)",16);}
     else if(d.t==="bush"){c.fillStyle=`hsl(${100+d.c*30},40%,32%)`;c.beginPath();c.arc(d.x,d.y-5,7,0,7);c.arc(d.x+7,d.y-3,6,0,7);c.arc(d.x-7,d.y-3,6,0,7);c.fill();}
     else{c.fillStyle=["#ffd166","#ef476f","#ffffff","#c77dff"][Math.floor(d.c*4)];c.beginPath();c.arc(d.x,d.y-2,2.2,0,7);c.fill();}}});
-  people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
+  people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());dockOver(c);
   {const st=rpsState();/* 이모지는 폰마다 폭이 달라서 글자와 따로 그림 (쏠림 방지) */const em=st.emo||"",tx=st.text;c.font="bold 10px 'Noto Sans KR',sans-serif";const txw=c.measureText(tx).width,ew=em?13:0,gap=em?3:0,cw=ew+gap+txw,tw=cw+16,bx=RPS_NPC.x-tw/2,by=RPS_NPC.y-84,x0=RPS_NPC.x-cw/2;c.fillStyle=st.hot?"#fde047":"rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,tw,20,9);c.fill();c.beginPath();c.moveTo(RPS_NPC.x-4,by+20);c.lineTo(RPS_NPC.x+4,by+20);c.lineTo(RPS_NPC.x,by+26);c.fill();c.textBaseline="middle";if(em){c.font="11px sans-serif";c.textAlign="center";c.fillText(em,x0+ew/2,by+10.5);}c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="#111";c.textAlign="left";c.fillText(tx,x0+ew+gap,by+10.5);c.textBaseline="alphabetic";c.textAlign="center";}
   const skL=(x,y,n,tt,ak,al)=>{if(!(n>0))return;if(tt)y-=12;y-=Math.max(awkLift(ak),al||0);c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
   skL(fp.x,fp.y,rpsN(),myTitle(),myAwkShow(),accLift(normCh(me&&me.ch),eqAcc(),myAwkShow()));for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt,o.ak,accLift(normCh(o.ch),o.ac,o.ak));}
@@ -2259,8 +2263,8 @@ function fishDraw(t){const c=fCtx;
   if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):nearCas(fp.x,fp.y)?(TOUCH?"🎰 버튼으로 도박장 들어가기":"스페이스: 도박장 들어가기"):nearClw(fp.x,fp.y)?(TOUCH?"🕹️ 버튼으로 오락실 들어가기":"스페이스: 오락실 들어가기"):nearPhb(fp.x,fp.y)?(TOUCH?"📸 버튼으로 인생네컷 들어가기":"스페이스: 인생네컷 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
   if(fstate==="bite"&&!TOUCH){c.font="bold 12px 'Noto Sans KR',sans-serif";c.fillStyle="#ff4757";c.textAlign="center";c.fillText("스페이스!",fp.x,fp.y+18);}}
 const TOUCH=matchMedia("(hover:none),(pointer:coarse)").matches;
-const fishBobY=(x,y)=>boatOK(x,y)?y+2:inDock(x,y)?Math.max(14,y-10):Math.max(14,RIVER-48);
-const fishBobX=(x,y,dir)=>boatOK(x,y)?Math.max(12,Math.min(FW-12,x+dir*34)):inDock(x,y)?(x<DOCK.x+DOCK.w/2?DOCK.x-34:DOCK.x+DOCK.w+34):x+dir*4;
+const fishBobY=(x,y)=>boatOK(x,y)&&!inDock(x,y)?y+2:inDock(x,y)?Math.max(14,y-10):Math.max(14,RIVER-48);
+const fishBobX=(x,y,dir)=>boatOK(x,y)&&!inDock(x,y)?Math.max(12,Math.min(FW-12,x+dir*34)):inDock(x,y)?(x<DOCK.x+DOCK.w/2?DOCK.x-34:DOCK.x+DOCK.w+34):x+dir*4;
 let fBubbles={};function fishBubble(id,text){if(!id)return;fBubbles[id]={text:String(text).slice(0,60),t:Date.now()};}
 function drawBubble(c,x,y,text){c.font="8.5px 'Noto Sans KR',sans-serif";const words=[...text],lines=[];let cur="";for(const ch of words){if(c.measureText(cur+ch).width>110){lines.push(cur);cur=ch;}else cur+=ch;}if(cur)lines.push(cur);const ls=lines.slice(0,3),w=Math.max(...ls.map(l=>c.measureText(l).width))+10,h=ls.length*12+6,bx=Math.max(4,Math.min(FW-w-4,x-w/2)),by=y-58-h;
   c.fillStyle="rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,w,h,8);c.fill();c.beginPath();c.moveTo(x-5,by+h);c.lineTo(x+5,by+h);c.lineTo(x,by+h+6);c.fill();c.fillStyle="#111";c.textAlign="left";ls.forEach((l,i)=>c.fillText(l,bx+5,by+12.5+i*12));c.textAlign="center";}
