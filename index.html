@@ -322,7 +322,7 @@ nav button.on{color:var(--tx);font-weight:700}
 const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",1000000,333000,3000000,"#d4af37"],["이더리움",300000,100000,900000,"#627eea"],["페페",100000,33000,300000,"#3d9a3d"],
   ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
 const NEWCOINS=["테더골드","플라즈마","페페"];
-const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z");/* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
+const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000;
 const DEFAULT_EPOCH=1795440000000;
 const MIG_T=1795503651243,MIG_F={"시바이누":10/3,"리플":10};/* 시바이누 300→1000, 리플 30→300 개편: 이전에 내린 가격지정 이벤트는 같은 비율로 환산 */
 
@@ -356,18 +356,19 @@ function stepTo(K){const m=M,E=EVENTS;
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
-        const v2=k>=K_V2,v3=k>=K_V3,v4=k>=K_V4;if(v3&&!c.v3){c.v3=1;c.adk=0;}if(v2){/* v2: 30분~3시간 국면 / v3: 4~16시간 국면, 대부분 횡보, 가끔 천천히 오르거나 내림 */if((c.adk|0)<=0){const t=r();if(v3){c.ad=t<.6?0:(t<.8?.0001*(.5+r()):-.0001*(.5+r()));c.adk=1440+Math.floor(r()*4320);}else{c.ad=t<.4?.00015*(.5+r()):(t<.8?-.00015*(.5+r()):0);c.adk=180+Math.floor(r()*900);}}c.adk--;c.a+=c.ad;if(c.a>.8)c.a-=.002;if(c.a<-.9&&!(c.doom>0))c.a+=.002;}
+        const v2=k>=K_V2,v3=k>=K_V3,v4=k>=K_V4,v5=k>=K_V5;if(v3&&!c.v3){c.v3=1;c.adk=0;}if(v2){/* v2: 30분~3시간 국면 / v3: 4~16시간 국면, 대부분 횡보, 가끔 천천히 오르거나 내림 */if((c.adk|0)<=0){const t=r();if(v3){c.ad=t<.6?0:(t<.8?.0001*(.5+r()):-.0001*(.5+r()));c.adk=1440+Math.floor(r()*4320);}else{c.ad=t<.4?.00015*(.5+r()):(t<.8?-.00015*(.5+r()):0);c.adk=180+Math.floor(r()*900);}}c.adk--;c.a+=c.ad;if(c.a>.8)c.a-=.002;if(c.a<-.9&&!(c.doom>0))c.a+=.002;}
         if(c.a<-1.204&&!(c.doom>0))c.a+=.002;if(c.a>(v2?1:.642))c.a-=.002;
         let pct;
         if(c.wave>0){c.wave--;pct=c.wdir*(v4?1.25:1)*(.012+r()*.012);}
+        else if(v5&&c.mw>0){c.mw--;pct=c.mwd*(.006+r()*.008)+(r()+r()+r()-1.5)*.004;}
         else if(r()<(v4?.0006:.0004)){c.wave=6+Math.floor(r()*14);c.wdir=r()<.5?1:-1;if(c.price>base*2)c.wdir=-1;pct=0;}
-        else{if(c.trendCount<=0){const t=r();c.trend=t<.45?1:(t<.9?-1:0);c.trendCount=6+Math.floor(r()*25);c.s=(v4?.0025:.002)*(.3+r()*1.2);}
+        else{if(v5&&r()<0.004){c.mw=3+Math.floor(r()*6);c.mwd=r()<.5?1:-1;if(c.price>base*2)c.mwd=-1;if(c.price<base*.6)c.mwd=1;}if(c.trendCount<=0){const t=r();c.trend=t<.45?1:(t<.9?-1:0);c.trendCount=6+Math.floor(r()*25);c.s=(v4?.0025:.002)*(.3+r()*1.2);}
           c.trendCount--;const dev=Math.log(c.price/base)-c.a;
-          pct=c.trend*c.s+(r()+r()+r()-1.5)*(v4?.008:.006)-(v3?.01:v2?.008:.01)*dev;}
+          pct=c.trend*c.s+(r()+r()+r()-1.5)*(v4?.008:.006)-(v3?.01:v2?.008:.01)*dev;if(v5&&r()<0.08)pct+=(r()<.5?1:-1)*(0.008+r()*0.017);}
         applyPct(c,ci,pct);}
       if(c.price<=mn*1.05){c.delisted=true;c.delistK=k;c.rate=0;c.dl.push({k,price:c.price});}
       c.hist.push(c.delisted?0:c.price);if(c.hist.length>8700)c.hist.shift();}}}
-const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),K_V4=Math.floor((K_V4_T-EPOCH)/TICK);
+const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),K_V4=Math.floor((K_V4_T-EPOCH)/TICK),K_V5=Math.floor((K_V5_T-EPOCH)/TICK);
 const nowK=()=>Math.max(0,Math.floor((Date.now()-EPOCH)/TICK));
 function rebuild(){M=newMarket();stepTo(nowK());}
 const priceOf=ci=>M.coins[ci].delisted?0:M.coins[ci].price;
@@ -507,21 +508,27 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;if(pgSub==="
 function enhDo(){if(enhBusy)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const L=rodLv();if(L>=50)return;const cost=enhCost(L);if(me.cash<cost)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);
   const mine=me.fish||{};for(const i of enhMat){const k=fKey(i);if(!((mine[k]||0)>=enhMat.filter(j=>j===i).length))return toast("재료 물고기가 부족해요"),renderEnh();}
   const tot=Math.min(100,enhBase(L)+enhMat.reduce((a,i)=>a+matBonus(i,L),0)+(me.enhPity||0));enhBusy=true;
-  me.cash-=cost;for(const i of enhMat){const k=fKey(i);me.fish[k]=(me.fish[k]||0)-1;}enhMat=[];const ok=Math.random()*100<tot;
-  let drop=false;if(!ok&&L>=ENH_DROP_LV&&Math.random()<ENH_DROP_P){drop=true;me.rodLv=L-1;}
+  me.cash-=cost;stAdd("enhN");stAdd("enhSpent",cost);stAdd("enhMatN",enhMat.length);for(const i of enhMat){const k=fKey(i);me.fish[k]=(me.fish[k]||0)-1;}enhMat=[];const ok=Math.random()*100<tot;stAdd(ok?"enhOk":"enhFail");
+  let drop=false;if(!ok&&L>=ENH_DROP_LV&&Math.random()<ENH_DROP_P){drop=true;me.rodLv=L-1;stAdd("enhDrop");}
   if(ok)me.enhPity=0;else me.enhPity=(me.enhPity||0)+enhBase(L)*.03;
   if(ok){me.rodLv=L+1;if(me.rodLv%10===0||me.rodLv>=30)broadcast(`⚒️ ${myName()}님이 낚싯대를 +${me.rodLv}강으로 강화했어요!`);}
   saveMe();renderHeader();renderFishInfo();renderEnh();
   toast(ok?`✨ 강화 성공! 낚싯대 +${L+1}\n좋은 물고기 확률 +${(rodBonus(L+1)*100).toFixed(2)}%p`:(drop?`💔 강화 실패… 레벨 하락! +${L} → +${L-1}`:`💥 강화 실패… (+${L} 유지)`)+`\n성공 확률 ${tot.toFixed(1)}%였어요`);setTimeout(()=>{enhBusy=false;renderEnh();},600);}
 
+/* 📊 활동 통계: 나중에 업적·기능을 추가해도 처음부터 다시 세지 않도록 모든 활동을 me.st에 누적 기록 */
+function stAdd(k,v){if(!me)return;me.st=me.st||{};me.st[k]=(me.st[k]||0)+(v===undefined?1:v);}
+function stMax(k,v){if(!me)return;me.st=me.st||{};if(!(me.st[k]>=v))me.st[k]=v;}
+function stMin(k,v){if(!me)return;me.st=me.st||{};if(!(me.st[k]<=v))me.st[k]=v;}
 const ACH=[
  {c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",100000],[7,"초심자",1000000],[30,"단골손님",3000000],[100,"개근왕",10000000],[365,"전설의 출석러",30000000]]},
  {c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",300000],[50,"숙련 낚시꾼",1000000],[75,"베테랑 낚시꾼",3000000],[100,"바다의 지배자",10000000]]},
  {c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000],[5,"월척 전문가",1000000],[10,"심해의 제왕",3000000],[30,"포세이돈",10000000]]},
  {c:"📈 코인 누적 수익률 (시작 자금 1000만 원 대비)",k:"pr",u:"%",tiers:[[50,"개미 투자자",300000],[100,"단타의 고수",1000000],[300,"차트 도사",3000000],[1000,"워렌 버핏",10000000],[3000,"월가의 전설",30000000]]},
+ {c:"✊ 가위바위보 최고 연승 (무승부는 연승 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000],[3,"가위바위보 신동",500000],[5,"눈치 백단",1000000],[7,"독심술사",3000000],[10,"예언자",10000000],[15,"가위바위보의 신",30000000]]},
+ {c:"⚔️ 가위바위보 누적 승리",k:"bwn",u:"승",tiers:[[5,"승부사",300000],[10,"배틀 마니아",500000],[30,"결투의 달인",1000000],[50,"역전의 용사",3000000],[100,"백전백승",10000000],[300,"전설의 승부사",30000000]]},
  {c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",1000000],[1e9,"십억 부자",5000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
 const achId=(k,i)=>k+i;
-function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);if(k==="money")return assetOf(p);return 0;}
+function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);if(k==="bws")return p.bwBest|0;if(k==="bwn")return p.bw|0;if(k==="money")return assetOf(p);return 0;}
 const titleOf=id=>{for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i][1];return "";};
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title):"";
 const achNoted={};
@@ -572,7 +579,7 @@ document.querySelectorAll(".bs button").forEach(b=>b.onclick=()=>setMode(b.datas
 $("qty").oninput=()=>renderSheet();
 document.querySelectorAll("#ranges button").forEach(b=>b.onclick=()=>{chartN=+b.dataset.n;document.querySelectorAll("#ranges button").forEach(x=>x.classList.toggle("on",x===b));renderSheet();});
 const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",mkt:"🏪 거래소 판매 수수료"};let taxAll={},taxPre={};
-function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=(me.taxPaid||0)+amt;}if(fdb)fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+amt;c[k]=(c[k]||0)+amt;return c;}).catch(()=>{});}
+function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=(me.taxPaid||0)+amt;stAdd("tax_"+k,amt);}if(fdb)fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+amt;c[k]=(c[k]||0)+amt;return c;}).catch(()=>{});}
 function openNts(){fKeys={};let d=$("ntsMod");if(!d){d=document.createElement("div");d.id="ntsMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
     if(fdb){fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/taxPre").on("value",s=>{taxPre=s.val()||{};if(d.style.display==="flex")renderNts();});}}d.style.display="flex";renderNts();}
 function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(me&&myId)all[myId]=me;const top=Object.entries(all).map(([id,p])=>({id,n:(p&&p.name)||"?",v:((p&&p.taxPaid)||0)+(taxPre[id]||0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
@@ -620,9 +627,9 @@ function drawChart(arr,hv){if(arr)chartArr=arr;else arr=chartArr;if(hv===undefin
  cv.addEventListener("pointermove",pick);cv.addEventListener("pointerdown",pick);cv.addEventListener("pointerleave",()=>{chartHover=-1;drawChart();});cv.addEventListener("pointerup",e=>{if(e.pointerType!=="mouse"){chartHover=-1;drawChart();}});}
 $("goBtn").onclick=()=>{if(curCoin<0||!me||!canTrade())return;const ci=curCoin,n=COINS[ci][0],p=priceOf(ci);if(p<=0)return;const q=parseInt(($("qty").value||"").replace(/,/g,""),10)||0;if(q<=0)return;
   if(!me.coins[n])me.coins[n]={count:0,cost:0,since:0};const h=me.coins[n];
-  if(mode==="buy"){const cost=q*p;if(cost>me.cash)return toast("💸 잔액이 부족합니다!");me.cash-=cost;h.count+=q;h.cost+=cost;h.since=M.k;addLog("buy",n,q,cost);
+  if(mode==="buy"){const cost=q*p;if(cost>me.cash)return toast("💸 잔액이 부족합니다!");me.cash-=cost;h.count+=q;h.cost+=cost;h.since=M.k;addLog("buy",n,q,cost);stAdd("coinBuyN");stAdd("coinBuyAmt",cost);stAdd("buyAmt_"+n,cost);
     toast(`📈 매수 완료\n${n} ${formatCoinReadable(q)} · 체결가 ${formatCoinPrice(p)}\n평단가 ${formatCoinPrice(Math.round(h.cost/h.count))}`);broadcast(`📈 ${myName()}님이 ${n} ${formatCoinReadable(q)} 매수 (${formatMoneyReadable(cost)})`,"buy");}
-  else{if(q>h.count)return toast("⚠️ 보유 수량을 넘었어요");const raw=q*p,tx=taxInfo(raw,assetOf(me)),fin=raw-tx.fee,_t=addTax("coin",tx.fee),avg=h.cost/h.count;h.count-=q;h.cost-=Math.round(avg*q);if(h.count===0)h.cost=0;me.cash+=fin;addLog("sell",n,q,fin);if(avg>0){const pr=(fin-avg*q)/(avg*q);if(pr>(me.bestPR||0))me.bestPR=pr;me.coinPnL=Math.round((me.coinPnL||0)+fin-avg*q);}
+  else{if(q>h.count)return toast("⚠️ 보유 수량을 넘었어요");const raw=q*p,tx=taxInfo(raw,assetOf(me)),fin=raw-tx.fee,_t=addTax("coin",tx.fee),avg=h.cost/h.count;h.count-=q;h.cost-=Math.round(avg*q);if(h.count===0)h.cost=0;me.cash+=fin;addLog("sell",n,q,fin);if(avg>0){const pr=(fin-avg*q)/(avg*q),pl=Math.round(fin-avg*q);if(pr>(me.bestPR||0))me.bestPR=pr;me.coinPnL=Math.round((me.coinPnL||0)+pl);stAdd(pl>=0?"coinWinN":"coinLoseN");stAdd(pl>=0?"coinGain":"coinLoss",Math.abs(pl));stAdd("pnl_"+n,pl);stMax("coinBestPL",pl);stMin("coinWorstPL",pl);stMin("coinWorstPR",Math.round(pr*1000)/1000);}stAdd("coinSellN");stAdd("coinSellAmt",raw);stAdd("coinSellNet",fin);stAdd("coinTax",tx.fee);
     toast(`📉 매도 완료\n${n} ${formatCoinReadable(q)} · 세금(${tx.name}) -${formatMoneyReadable(tx.fee)}\n입금 +${formatMoneyReadable(fin)}`);broadcast(`📉 ${myName()}님이 ${n} ${formatCoinReadable(q)} 매도 (+${formatMoneyReadable(fin)})`,"sell");}
   $("qty").value="";saveMe();renderAll();};
 
@@ -631,7 +638,7 @@ function addLog(k,c,q,a){me.log=(me.log||[]).filter(l=>Date.now()-l.t<LOG_WIN).c
 /* ===================== 송금 / 닉네임 ===================== */
 $("sendBtn").onclick=async()=>{if(!fdb)return toast("연결 중이에요");const to=$("sendTo").value,amt=parseInt(($("sendAmt").value||"").replace(/,/g,""),10);
   if(!to)return toast("받는 사람을 골라 주세요");if(!(amt>0))return toast("⚠️ 금액을 확인해주세요.");if(me.cash<amt)return toast("💸 잔액이 부족합니다!");
-  const fee=Math.round(amt*.2),net=amt-fee;me.cash-=amt;addTax("send",fee);saveMe();
+  const fee=Math.round(amt*.2),net=amt-fee;me.cash-=amt;addTax("send",fee);stAdd("sendN");stAdd("sendAmt",amt);saveMe();
   try{await fdb.ref("transfers").push({from:myId,fromName:myName(),to,amount:amt,net,t:Date.now()});}catch(e){me.cash+=amt;saveMe();return toast("송금 실패");}
   $("sendAmt").value="";const rn=(players[to]||{}).name||"상대";toast(`💸 송금 완료!\n${rn}님께 ${formatMoneyReadable(net)} 전달 (수수료 20%)`);broadcast(`💸 ${myName()}님 → ${rn}님 ${formatMoneyReadable(net)} 송금`);renderAll();};
 $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)return;if(nameTaken(v,myId))return toast("이미 있는 닉네임이에요");me.name=v;$("nickIn").value="";saveMe();pushPresence();renderAll();toast("닉네임을 "+v+"(으)로 바꿨어요");};
@@ -655,7 +662,7 @@ const expOf=p=>p?(typeof p.exp==="number"?p.exp:((p.att||0)*ATT_EXP)):0;
 const lvOf=p=>Math.floor((1+Math.sqrt(1+8*expOf(p)/100))/2+1e-9);
 const expFor=L=>50*L*(L-1); // 이 레벨이 되는 데 필요한 누적 경험치 (Lv.2 100, Lv.3 300, Lv.4 600 …)
 const attFor=L=>L*(L-1)/2;
-function addExp(n,why,quiet){if(!me||!me._loaded)return;if(typeof me.exp!=="number")me.exp=expOf(me);const before=lvOf(me);me.exp+=n;const nl=lvOf(me);let bonus=0;for(let L=before+1;L<=nl;L++)bonus+=lvReward(L);me.cash+=bonus;saveMe();
+function addExp(n,why,quiet){if(!me||!me._loaded)return;stAdd("exp_"+(why||"기타"),n);if(typeof me.exp!=="number")me.exp=expOf(me);const before=lvOf(me);me.exp+=n;const nl=lvOf(me);let bonus=0;for(let L=before+1;L<=nl;L++)bonus+=lvReward(L);me.cash+=bonus;saveMe();
   if(nl>before){toast(`⭐ ${why} +${n} 경험치\n🎉 레벨 업! Lv.${nl} 보상 +${formatMoneyReadable(bonus)}`);broadcast(`[ 레벨 업 ] ${myName()}님이 Lv.${nl}(으)로 승급! 보상 +${formatMoneyReadable(bonus)}`);}else if(why&&!quiet)toast(`⭐ ${why} +${n} 경험치`);renderAll();return{up:nl>before,nl,bonus};}
 const lvReward=L=>(L-1)*1000000; // Lv.2 100만, Lv.3 200만 … 높을수록 큼 // 이 레벨이 되는 데 필요한 누적 출석
 function renderAtt(){if(!me)return;const done=me.lastAtt===todayKey(),E=expOf(me),L=lvOf(me),cur=E-expFor(L),need=expFor(L+1)-expFor(L);
@@ -1182,7 +1189,7 @@ const fishExp=i=>FISH[i][1]>0?Math.max(5,Math.round(FISH_TOTW/FISH[i][0]/51)):0;
 function landFish(t){const i=rollFish(),[,base,name]=FISH[i];const tax=base>0?Math.round(base*.1):0,got=base-tax;
   me.fish=me.fish||{};const first=!hasSeen(me,i);me.fish[fKey(i)]=(me.fish[fKey(i)]||0)+1;me.fishN=(me.fishN||0)+1;if(base>=1e7)me.bigN=(me.bigN|0)+1;if(base<0){me.cash+=base;me.fishEarn=(me.fishEarn||0)+base;}
   let bonus="";if(!me.fishDone&&fishCountOf(me)===FISH.length){me.fishDone=true;me.cash+=100000000;bonus="\n🎉 도감 115종 완성! 보상 1억 원 지급!";broadcast(`🎉 ${myName()}님이 낚시 도감 115종을 모두 모았어요! (보상 1억 원)`);}
-  const fx=fishExp(i);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
+  const fx=fishExp(i);stAdd(base>0?"fishGoodN":"fishTrashN");if(base>0)stAdd("fishValue",base);stMax("fishBest",base);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
   fFloat.push({x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":"")+(fx>0?` ⭐+${fx}`:""),t,c:base>=10000000?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
   fishFeed(myName(),name,base,i);if(fdb&&myId)fdb.ref("online/"+myId+"/fc").set({n:name,v:base,i,t:Date.now()}).catch(()=>{});
   const r=$("fishRes");r.innerHTML=`<div style="font-size:11px;color:var(--sub)">도감 ${dexNo(i)}번${first?' · <b style="color:#ffcf4d">✨ 신규 도감 등록!</b>':''}</div><div style="font-size:18.5px;font-weight:900;margin:4px 0">${esc(name)}</div><div class="${base<0?'down':'up'}" style="font-weight:700">${base<0?formatMoneyReadable(base)+" 손해... 💸":"시세 "+formatMoneyReadable(base)}</div>${base>0?`<div style="font-size:10px;color:var(--sub)">🐟 어시장에 팔면 ${formatMoneyReadable(got)} (수수료 10%) · <b style="color:#ffcf4d">⭐ +${fx} 경험치</b></div>`:''}${bonus?`<div style="color:#ffcf4d;font-weight:700;margin-top:4px;white-space:pre-line">${bonus.trim()}</div>`:''}`;
@@ -1227,8 +1234,8 @@ function renderFmk(){if($("fSell").style.display!=="flex")return;const m=(me&&me
     :'<div style="color:var(--sub);padding:30px 0;text-align:center">팔 물고기가 없어요. 낚시부터 해 보세요!</div>';
   const B=$("fSellBody");B.querySelectorAll("[data-sq]").forEach(b=>{const i=+b.dataset.sq,inp=B.querySelector(`[data-qi="${i}"]`);b.onclick=()=>{const q=parseInt(inp.value,10);if(!(q>0))return toast("⚠️ 개수를 입력해 주세요");fmkSell(i,q);};inp.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")b.click();});});
   B.querySelectorAll("[data-dump]").forEach(b=>b.onclick=()=>{const k=fKey(+b.dataset.dump);me.fish[k]=0;saveMe();renderFmk();renderFishInfo();toast("🗑️ 버렸어요");});
-  if($("fSellAll"))$("fSellAll").onclick=()=>{let got=0,n=0;for(const[i,c]of posS){got+=fmkUnit(i)*c;n+=c;me.fish[fKey(i)]=0;addTax("fmk",(FISH[i][1]-fmkUnit(i))*c);}me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${n}마리 전부 팔았어요!\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 물고기를 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();};}
-function fmkSell(i,q){const k=fKey(i),have=me.fish[k]||0;if(have<=0)return toast("팔 물고기가 없어요");if(!q||q>have)q=have;const all=have;const got=fmkUnit(i)*q;addTax("fmk",(FISH[i][1]-fmkUnit(i))*q);me.fish[k]=all-q;me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${FISH[i][2]} ${q}개 판매\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 ${FISH[i][2]}을(를) 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();}$("fCharX").onclick=()=>$("fChar").style.display="none";$("fChar").onclick=e=>{if(e.target.id==="fChar")$("fChar").style.display="none";};
+  if($("fSellAll"))$("fSellAll").onclick=()=>{let got=0,n=0;for(const[i,c]of posS){got+=fmkUnit(i)*c;n+=c;stAdd("fmkN",c);stAdd("fmkAmt",fmkUnit(i)*c);me.fish[fKey(i)]=0;addTax("fmk",(FISH[i][1]-fmkUnit(i))*c);}me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${n}마리 전부 팔았어요!\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 물고기를 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();};}
+function fmkSell(i,q){const k=fKey(i),have=me.fish[k]||0;if(have<=0)return toast("팔 물고기가 없어요");if(!q||q>have)q=have;const all=have;const got=fmkUnit(i)*q;addTax("fmk",(FISH[i][1]-fmkUnit(i))*q);stAdd("fmkN",q);stAdd("fmkAmt",got);me.fish[k]=all-q;me.cash+=got;me.fishEarn=(me.fishEarn||0)+got;saveMe();renderHeader();toast(`💰 ${FISH[i][2]} ${q}개 판매\n+${formatMoneyReadable(got)}`);if(got>=10000000)broadcast(`🐟 [어시장] ${myName()}님이 ${FISH[i][2]}을(를) 팔아 ${formatMoneyReadable(got)}을(를) 벌었어요!`);renderFmk();renderFishInfo();}$("fCharX").onclick=()=>$("fChar").style.display="none";$("fChar").onclick=e=>{if(e.target.id==="fChar")$("fChar").style.display="none";};
 window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("fChar").style.display==="flex")$("fChar").style.display="none";});
 function openFInfo(t){fTab=t;fDexOf=null;fKeys={};$("fInfo").style.display="flex";renderFishInfo();$("fishInfo").scrollTop=0;}
 function closeFInfo(){$("fInfo").style.display="none";}
@@ -1281,7 +1288,7 @@ async function sellFish(i,raw){const price=parseInt(String(raw||"").replace(/[^0
 async function takeListing(id,check){let got=null;const r=await fdb.ref("market/fishMarket/"+id).transaction(cur=>{if(!cur||!check(cur))return;got=cur;return null;});return r.committed&&got?got:null;}
 async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)return;if(me.cash<v.price)return toast("💸 잔액이 부족합니다!");
   const got=await takeListing(id,c=>c.seller!==myId&&c.want==null).catch(()=>null);if(!got)return toast("이미 팔렸거나 내려간 매물이에요");
-  const fee=Math.round(got.price*.1),net=got.price-fee;me.cash-=got.price;addTax("mkt",fee);me.fish=me.fish||{};const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;saveMe();
+  const fee=Math.round(got.price*.1),net=got.price-fee;me.cash-=got.price;addTax("mkt",fee);stAdd("mktBuyN");stAdd("mktBuyAmt",got.price);me.fish=me.fish||{};const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;saveMe();
   fdb.ref("transfers").push({from:myId,fromName:myName(),to:got.seller,amount:got.price,net,note:`🐟 거래소 판매 완료! ${myName()}님이 ${FISH[got.fi][2]}을(를) 샀어요 (+${formatMoneyReadable(net)}, 수수료 10% 제외)`,t:Date.now()}).catch(()=>{});
   toast(`🛒 ${FISH[got.fi][2]} 구매 완료!${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🛒 [거래소] ${myName()}님이 ${got.sellerName||"?"}님의 ${FISH[got.fi][2]}을(를) ${formatMoneyReadable(got.price)}에 샀어요`);renderHeader();renderMarketUI();renderFishInfo();}
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
@@ -1401,9 +1408,9 @@ function btProcess(){
     if(b.st==="play"){
       if(!b.result){if(now>=b.startT+BT_PICK_MS+BT_GRACE)btResolve(id);continue;}
       const r=b.result,own=(mine?b.costA:b.costB)||0,opn=mine?b.toName:b.fromName;
-      if(r.w==="draw"){btGive(b,1,own);me.bd=(me.bd||0)+1;}
-      else if(r.w===myId){btGive(b,2,own+Math.round(b.amt*(b.px||0)));me.bw=(me.bw||0)+1;broadcast(`⚔️ ${myName()}님이 ${opn}님과의 가위바위보 배틀에서 승리! (+${btStakeTxt(b)})`);}
-      else me.bl=(me.bl||0)+1;
+      stAdd("btN");if(r.w==="draw"){btGive(b,1,own);me.bd=(me.bd||0)+1;}
+      else if(r.w===myId){btGive(b,2,own+Math.round(b.amt*(b.px||0)));me.bw=(me.bw||0)+1;me.bwStreak=(me.bwStreak||0)+1;if(me.bwStreak>(me.bwBest||0))me.bwBest=me.bwStreak;if(b.type!=="coin")stAdd("btWonAmt",Math.round(b.amt));broadcast(`⚔️ ${myName()}님이 ${opn}님과의 가위바위보 배틀에서 승리! (+${btStakeTxt(b)})`);}
+      else{me.bl=(me.bl||0)+1;me.bwStreak=0;if(b.type!=="coin")stAdd("btLostAmt",Math.round(b.amt));}
       btMarkDone(id);changed=true;}}
   if(changed){saveMe();renderAll();}}
 
