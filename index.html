@@ -454,16 +454,32 @@ function openSheet(ci){if($("pgMod"))$("pgMod").style.display="none";curCoin=ci;
 $("shClose").onclick=()=>closeSheet();
 ["dex","equip","shop","enh","ach","title","set"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
 ["s-wallet","s-dex","s-equip","s-title","s-shop","s-enh","s-ach","s-rank","s-admin","s-set"].forEach(id=>$("pgBody").appendChild($(id)));
-/* ⚙️ 설정 */
-const CTL={joy:["fJoy","left bottom","🕹️ 조이스틱 크기"],act:["fAct","right bottom","🎣 오른쪽 아래 버튼 크기"]};
+/* ⚙️ 설정: 화면 버튼(크기·위치), 낚시 알림 크기, 건의함 */
+const CTL={joy:["fJoy","left bottom","🕹️ 조이스틱"],act:["fAct","right bottom","🎣 오른쪽 아래 버튼"],feed:["fFeed","right top","🐟 낚시 알림(오른쪽 위)"]};
 function ctlGet(k){try{const v=+localStorage.getItem("jc_ctl_"+k);return v>=50&&v<=200?v:100;}catch(e){return 100;}}
-function ctlApply(){for(const k in CTL){const e=$(CTL[k][0]);if(!e)continue;const v=ctlGet(k);e.style.transformOrigin=CTL[k][1];e.style.transform=v===100?"":`scale(${v/100})`;}}
-$("s-set").innerHTML=`<div class="card"><h3>📱 화면 버튼 크기</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">폰 광장 화면의 조이스틱과 오른쪽 아래 버튼 크기를 바꿔요</div>`+
-  Object.keys(CTL).map(k=>`<div style="display:flex;align-items:center;gap:8px;margin:8px 0"><span style="font-size:12px;width:130px">${CTL[k][2]}</span><input type="range" min="60" max="180" step="5" value="${ctlGet(k)}" data-ctl="${k}" style="flex:1"><b data-ctlv="${k}" style="font-size:12px;width:40px;text-align:right">${ctlGet(k)}%</b></div>`).join("")+
-  `<button id="ctlReset" style="margin-top:4px;padding:7px 12px;border-radius:9px;background:var(--card2);font-size:12px">기본 크기로</button></div>`+
+function ctlPos(k){try{const v=JSON.parse(localStorage.getItem("jc_ctlp_"+k)||"null");return v&&isFinite(v.x)&&isFinite(v.y)?v:{x:0,y:0};}catch(e){return{x:0,y:0};}}
+function ctlApply(){for(const k in CTL){const e=$(CTL[k][0]);if(!e)continue;const v=ctlGet(k),p=k==="feed"?{x:0,y:0}:ctlPos(k);e.style.transformOrigin=CTL[k][1];e.style.transform=(v===100&&!p.x&&!p.y)?"":`translate(${p.x}px,${p.y}px) scale(${v/100})`;}}
+function ctlSliders(ks){return ks.map(k=>`<div style="display:flex;align-items:center;gap:8px;margin:6px 0"><span style="font-size:12px;width:128px">${CTL[k][2]} 크기</span><input type="range" min="60" max="180" step="5" value="${ctlGet(k)}" data-ctl="${k}" style="flex:1"><b data-ctlv="${k}" style="font-size:12px;width:40px;text-align:right">${ctlGet(k)}%</b></div>`).join("");}
+function ctlBind(root){root.querySelectorAll("[data-ctl]").forEach(r=>{r.oninput=()=>{const k=r.dataset.ctl;try{localStorage.setItem("jc_ctl_"+k,r.value);}catch(e){}document.querySelectorAll(`[data-ctl="${k}"]`).forEach(x=>{if(x!==r)x.value=r.value;});document.querySelectorAll(`[data-ctlv="${k}"]`).forEach(x=>x.textContent=r.value+"%");ctlApply();};});}
+function ctlReset(){for(const k in CTL){try{localStorage.removeItem("jc_ctl_"+k);localStorage.removeItem("jc_ctlp_"+k);}catch(e){}}document.querySelectorAll("[data-ctl]").forEach(x=>x.value=100);document.querySelectorAll("[data-ctlv]").forEach(x=>x.textContent="100%");ctlApply();toast("버튼 크기·위치를 기본으로 돌렸어요");}
+$("s-set").innerHTML=`<div class="card"><h3>📱 화면 버튼 · 알림</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">폰 광장 화면의 조이스틱·버튼 크기와 위치, 낚시 알림 크기를 바꿔요</div>`+ctlSliders(["joy","act","feed"])+
+  `<div style="display:flex;gap:6px;margin-top:8px"><button id="ctlEditGo" style="flex:2;padding:9px 0;border-radius:9px;background:var(--acc);color:#111;font-weight:900;font-size:12.5px">📍 화면 보면서 위치 옮기기</button><button id="ctlReset" style="flex:1;padding:9px 0;border-radius:9px;background:var(--card2);font-size:12px">기본으로</button></div></div>`+
   `<div class="card"><h3>📮 건의함</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">건의 및 문의할 내용을 남겨주세요</div><textarea id="sugIn" maxlength="500" rows="4" style="width:100%;box-sizing:border-box;background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:13px;resize:vertical"></textarea><button id="sugBtn" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">보내기</button></div>`;
-$("s-set").querySelectorAll("[data-ctl]").forEach(r=>{r.oninput=()=>{const k=r.dataset.ctl;try{localStorage.setItem("jc_ctl_"+k,r.value);}catch(e){}$("s-set").querySelector(`[data-ctlv="${k}"]`).textContent=r.value+"%";ctlApply();};});
-$("ctlReset").onclick=()=>{for(const k in CTL){try{localStorage.removeItem("jc_ctl_"+k);}catch(e){}const r=$("s-set").querySelector(`[data-ctl="${k}"]`);r.value=100;$("s-set").querySelector(`[data-ctlv="${k}"]`).textContent="100%";}ctlApply();toast("버튼 크기를 기본으로 돌렸어요");};
+ctlBind($("s-set"));$("ctlReset").onclick=ctlReset;
+/* 📍 위치 옮기기 모드: 광장 화면에서 조이스틱·버튼을 끌어서 옮김 */
+let ctlEdit=false;
+{const st=document.createElement("style");st.textContent=`body.ctlEdit #fJoy{display:block!important;outline:2px dashed #ffcf4d;outline-offset:3px}body.ctlEdit #fAct{display:flex!important;outline:2px dashed #ffcf4d;outline-offset:3px}#ctlBar{display:none;position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:6;background:rgba(14,16,20,.94);border:1px solid var(--acc);border-radius:12px;padding:8px 10px;width:min(300px,calc(100% - 16px));box-sizing:border-box;font-size:11px}body.ctlEdit #ctlBar{display:block}`;document.head.appendChild(st);
+ const bar=document.createElement("div");bar.id="ctlBar";bar.innerHTML=`<div style="font-weight:900;font-size:12px;margin-bottom:2px">📍 노란 점선 버튼을 끌어서 옮기세요</div>`+ctlSliders(["joy","act"])+`<div style="display:flex;gap:6px;margin-top:4px"><button id="ctlEditRs" style="flex:1;padding:6px 0;border-radius:8px;background:var(--card2);font-size:11.5px">기본으로</button><button id="ctlEditOk" style="flex:2;padding:6px 0;border-radius:8px;background:var(--acc);color:#111;font-weight:900;font-size:11.5px">완료</button></div>`;$("fishWrap").appendChild(bar);ctlBind(bar);
+ bar.addEventListener("pointerdown",e=>e.stopPropagation());bar.addEventListener("keydown",e=>e.stopPropagation());
+ $("ctlEditRs").onclick=ctlReset;$("ctlEditOk").onclick=()=>{ctlEdit=false;document.body.classList.remove("ctlEdit");toast("📍 위치를 저장했어요");};
+ $("ctlEditGo").onclick=()=>{closePg();const b=document.querySelector('#nav button[data-s="fish"]');if(b&&!b.classList.contains("on"))b.click();ctlEdit=true;document.body.classList.add("ctlEdit");};
+ const W=$("fishWrap");let drag=null;
+ W.addEventListener("pointerdown",e=>{if(!ctlEdit)return;const el=e.target.closest&&e.target.closest("#fJoy,#fAct");if(!el)return;e.preventDefault();e.stopPropagation();const k=el.id==="fJoy"?"joy":"act",p=ctlPos(k);drag={k,el,sx:e.clientX,sy:e.clientY,px:p.x,py:p.y,pid:e.pointerId};try{W.setPointerCapture(e.pointerId);}catch(_){}},true);
+ W.addEventListener("pointermove",e=>{if(!drag||e.pointerId!==drag.pid)return;e.stopPropagation();let x=drag.px+e.clientX-drag.sx,y=drag.py+e.clientY-drag.sy;
+   const old=ctlPos(drag.k);const wr=W.getBoundingClientRect(),er=drag.el.getBoundingClientRect(),bx=er.left-old.x,by=er.top-old.y;x=Math.max(wr.left-bx,Math.min(wr.right-er.width-bx,x));y=Math.max(wr.top-by,Math.min(wr.bottom-er.height-by,y));
+   try{localStorage.setItem("jc_ctlp_"+drag.k,JSON.stringify({x:Math.round(x),y:Math.round(y)}));}catch(_){}ctlApply();},true);
+ const end=e=>{if(drag&&e.pointerId===drag.pid){e.stopPropagation();drag=null;}};W.addEventListener("pointerup",end,true);W.addEventListener("pointercancel",end,true);
+ W.addEventListener("click",e=>{if(ctlEdit&&e.target.closest&&e.target.closest("#fJoy,#fAct")){e.preventDefault();e.stopPropagation();}},true);}
 $("sugIn").addEventListener("keydown",e=>e.stopPropagation());
 $("sugBtn").onclick=async()=>{const v=$("sugIn").value.trim();if(!v)return toast("내용을 적어 주세요");if(!fdb||!myId)return toast("서버에 연결 중이에요");if(Date.now()-(sugSend.t||0)<30000)return toast("잠시 후에 다시 보내 주세요");sugSend.t=Date.now();
   try{await fdb.ref("market/suggest").push({id:myId,name:myName(),text:v.slice(0,500),t:firebase.database.ServerValue.TIMESTAMP});$("sugIn").value="";stAdd("sugN");saveMe();toast("📮 건의를 보냈어요. 고마워요!");}catch(e){sugSend.t=0;toast("보내기 실패: 잠시 후 다시 해 주세요");}};
@@ -704,7 +720,7 @@ function addLog(k,c,q,a){me.log=(me.log||[]).filter(l=>Date.now()-l.t<LOG_WIN).c
 $("sendBtn").onclick=async()=>{if(!fdb)return toast("연결 중이에요");const to=$("sendTo").value,amt=parseInt(($("sendAmt").value||"").replace(/,/g,""),10);
   if(!to)return toast("받는 사람을 골라 주세요");if(!(amt>0))return toast("⚠️ 금액을 확인해주세요.");if(me.cash<amt)return toast("💸 잔액이 부족합니다!");
   const fee=Math.round(amt*.2),net=amt-fee;me.cash-=amt;addTax("send",fee);stAdd("sendN");stAdd("sendAmt",amt);stAdd("spent",amt);saveMe();
-  try{await fdb.ref("transfers").push({from:myId,fromName:myName(),to,amount:amt,net,t:Date.now()});}catch(e){me.cash+=amt;saveMe();return toast("송금 실패");}
+  try{await fdb.ref("transfers").push({from:myId,fromName:myName(),to,amount:amt,net,t:Date.now()});}catch(e){me.cash+=amt;stAdd("sendN",-1);stAdd("sendAmt",-amt);stAdd("spent",-amt);saveMe();return toast("송금 실패");}
   $("sendAmt").value="";const rn=(players[to]||{}).name||"상대";toast(`💸 송금 완료!\n${rn}님께 ${formatMoneyReadable(net)} 전달 (수수료 20%)`);broadcast(`💸 ${myName()}님 → ${rn}님 ${formatMoneyReadable(net)} 송금`);renderAll();};
 $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)return;if(nameTaken(v,myId))return toast("이미 있는 닉네임이에요");me.name=v;$("nickIn").value="";stAdd("nickN");saveMe();pushPresence();renderAll();toast("닉네임을 "+v+"(으)로 바꿨어요");};
 
