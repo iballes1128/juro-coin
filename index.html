@@ -634,8 +634,8 @@ const ACH=[
  {g:"play",c:"🤝 거래소 교환 완료하기",k:"p_trade",u:"회",tiers:[[5,"교환 친구",200000,1],[10,"10회",500000],[30,"교환 매니아",1000000,1],[100,"교환 전설",5000000,1]]},
  {g:"play",c:"💸 친구에게 송금하기",k:"p_send",u:"회",tiers:[[5,"마음 부자",200000,1],[10,"10회",500000],[30,"기부왕",1000000,1],[100,"산타클로스",5000000,1]]},
  {g:"play",c:"⚔️ 배틀 하기",k:"p_rps",u:"판",tiers:[[10,"단골 도전자",200000,1],[30,"30판",500000],[100,"승부사",1000000,1],[300,"승부 중독자",5000000,1]]},
- {g:"play",c:"✊ 가위바위보 최고 연승 (무승부는 연승 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000,1],[3,"3연승",500000],[5,"눈치 백단",1000000,1],[7,"7연승",3000000],[10,"예언자",10000000,1],[15,"가위바위보의 신",30000000,1]]},
- {g:"play",c:"🏆 가위바위보 누적 승리",k:"bwn",u:"승",tiers:[[10,"배틀 새싹",300000,1],[50,"50승",1000000],[100,"결투의 달인",3000000,1],[300,"백전백승",10000000,1],[1000,"전설의 승부사",30000000,1]]},
+ {g:"play",c:"✊ MC 가바보 최고 연승 (비기면 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000,1],[3,"3연승",500000],[5,"눈치 백단",1000000,1],[7,"7연승",3000000],[10,"예언자",10000000,1],[15,"가위바위보의 신",30000000,1]]},
+ {g:"play",c:"🏆 MC 가바보 누적 승리",k:"bwn",u:"승",tiers:[[10,"배틀 새싹",300000,1],[50,"50승",1000000],[100,"결투의 달인",3000000,1],[300,"백전백승",10000000,1],[1000,"전설의 승부사",30000000,1]]},
  {g:"play",c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",300000,1],[50,"50%",1000000],[75,"베테랑 낚시꾼",3000000,1],[100,"바다의 지배자",10000000,1]]},
  {g:"play",c:"🐋 대어 (700만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000,1],[5,"대어 5마리",1000000],[10,"심해의 제왕",3000000,1],[30,"포세이돈",10000000,1]]},
  {g:"play",c:"📈 코인 누적 수익률 (시작 자금 1000만 원 대비)",k:"pr",u:"%",tiers:[[50,"개미 투자자",300000,1],[100,"+100%",1000000],[300,"차트 도사",3000000,1],[1000,"워렌 버핏",10000000,1],[3000,"월가의 전설",30000000,1]]},
@@ -652,7 +652,7 @@ const ACH_MIG={t_fish1:"p_fish0",t_fish2:"p_fish1",t_fish3:"p_fish2",t_buy1:"p_c
 function achMig(){if(!me||!me.ach)return;for(const o in ACH_MIG)if(me.ach[o]&&!me.ach[ACH_MIG[o]])me.ach[ACH_MIG[o]]=me.ach[o];}
 const achId=(k,i)=>k+i;
 function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);const S=p.st||{},had=(Object.values(p.coins||{}).some(h=>h&&(h.count>0||h.cost>0))||p.coinPnL||p.bestPR)?1:0,one=v=>v?1:0;if(k==="t_nick")return one(S.nickN);if(k==="t_buy")return one(S.coinBuyN||had);if(k==="t_sell")return one(S.coinSellN||p.coinPnL||p.bestPR);if(k==="t_fish")return one(p.fishN);if(k==="t_vmkt")return one(S.visitMkt);if(k==="t_vfmk")return one(S.visitFmk);if(k==="t_vnts")return one(S.visitNts);if(k==="t_mbuy")return one(S.mktBuyN);if(k==="t_trade")return one(S.mktTradeN);if(k==="t_sold")return one(S.mktSoldN);if(k==="t_rps")return one((p.bw|0)+(p.bl|0)+(p.bd|0)+(S.btN|0));if(k==="t_mc")return one(S.mcN);if(k==="t_char")return one(S.charChgN);if(k==="t_chat")return one(S.chatN);if(k==="t_lad")return one(S.ladN);if(k==="t_dice")return one(S.diceN);if(k==="t_hr")return one(S.hrN);if(k==="t_all")return ACH.filter(x=>x.g==="tut"&&x.k!=="t_all").filter(x=>achVal(x.k,p)>=x.tiers[0][0]).length;if(k==="p_fish")return p.fishN|0;if(k==="p_coin")return Math.max((S.coinBuyN|0)+(S.coinSellN|0),had);if(k==="p_fmk")return S.fmkN|0;if(k==="p_enh")return Math.max(S.enhN|0,p.rodLv|0);if(k==="p_list")return S.mktListN|0;if(k==="p_tlist")return S.mktTListN|0;if(k==="p_mbuy")return S.mktBuyN|0;if(k==="p_trade")return S.mktTradeN|0;if(k==="p_send")return S.sendN|0;if(k==="p_rps")return Math.max((p.bw|0)+(p.bl|0)+(p.bd|0),S.btN|0);if(k==="spent")return S.spent|0;
-  if(k==="bws")return p.bwBest|0;if(k==="bwn")return p.bw|0;if(k==="money")return assetOf(p);return 0;}
+  if(k==="bws"||k==="bwn"){const cur=p===me?rpsN():(p.rps|0),best=Math.max(p.rpsBest|0,cur);return k==="bws"?best:Math.max(S.mcWin|0,best);}if(k==="money")return assetOf(p);return 0;}
 function tierOf(id){for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i];return null;}
 const titleOf=(id,p)=>{p=p||me;const t=tierOf(id);if(t&&t[3])return t[1];const at=p&&p.ach&&p.ach[id];if(at&&at<ACH_TITLE_CUT)return ACH_OLD_T[id]||"";return "";};
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
@@ -1482,7 +1482,7 @@ function rpsSet(n){rpsVal=n|0;if(me)me.rps=rpsVal;if(fdb&&myId)fdb.ref("market/r
 function rpsTick(){const rd=Math.floor(nowS()/RPS_MS);if(rpsLast===null){rpsLast=rd;return;}if(rd===rpsLast)return;const prev=rd-1;rpsLast=rd;
   if(!me||!me._loaded||!fishActive())return;const my=onPad(fp.x,fp.y);if(!my)return;stAdd("mcN");const ai=rpsPick(prev);const t=performance.now();
   if(my===ai){fFloat.push({x:fp.x,y:fp.y,s:`🤝 비김 (${rpsN()}연승 유지)`,t,c:"#e5e7eb"});return;}
-  if(BT_BEATS[my]===ai){rpsSet(rpsN()+1);fFloat.push({x:fp.x,y:fp.y,s:`🎉 이겼다! ${rpsN()}연승`,t,c:"#fde047"});}
+  if(BT_BEATS[my]===ai){rpsSet(rpsN()+1);stAdd("mcWin");if(rpsN()>(me.rpsBest|0))me.rpsBest=rpsN();fFloat.push({x:fp.x,y:fp.y,s:`🎉 이겼다! ${rpsN()}연승`,t,c:"#fde047"});}
   else{const was=rpsN();rpsSet(0);fFloat.push({x:fp.x,y:fp.y,s:was?`😢 졌다… ${was}연승 끊김`:"😢 졌다…",t,c:"#93c5fd"});}
   fLastSent="";}
 setInterval(rpsTick,250);
