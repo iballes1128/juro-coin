@@ -2814,7 +2814,7 @@ function evalGrab(G){const R=34;let best=null,bd=1e9;for(const k of G.keys){if(k
   const sg=GRAB0*(1-.5*bd/R);
   if(G.rng()>=sg){return G.rng()<.5?{type:"slide",key:best}:{type:"miss"};}
   if(G.rng()<CARRY)return{type:"win",key:best};
-  return{type:"drop",key:best,at:.95+G.rng()*.15,phase:"ret"};}
+  return{type:"drop",key:best,at:.2+G.rng()*.35,phase:"ret"};}
 function stepKeys(G,dt){for(const k of G.keys){if(k.wob>0)k.wob=Math.max(0,k.wob-dt);if(k.fall){k.fall.v+=dt*900;k.fall.y-=k.fall.v*dt;if(k.fall.y<=0){k.fall.y=0;if(k.fall.v>170){k.fall.v*=-.3;}else{k.fall=null;}}}}}
 function step(G,dt,inp){G.t+=dt;inp=inp||{};stepKeys(G,dt);
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -2826,7 +2826,7 @@ function step(G,dt,inp){G.t+=dt;inp=inp||{};stepKeys(G,dt);
     if(G.out&&G.out.type==="drop"&&G.out.phase==="up"&&G.h>=G.out.at){dropKey(G);}
     if(G.h>=1){G.st="ret";G.tm=0;G.sx=G.cx;G.sz=G.cz;}}
   else if(G.st==="ret"){const dx=HOME.x-G.cx,dz=HOME.z-G.cz,d=Math.hypot(dx,dz),sp=.55*dt;
-    if(G.out&&G.out.type==="drop"&&G.out.phase==="ret"&&G.held){const tot=Math.hypot(HOME.x-G.sx,HOME.z-G.sz),done=1-d/Math.max(tot,1e-6);if(done>=G.out.at-.2)dropKey(G);}
+    if(G.out&&G.out.type==="drop"&&G.out.phase==="ret"&&G.held){const tot=Math.hypot(HOME.x-G.sx,HOME.z-G.sz),done=1-d/Math.max(tot,1e-6);if(done>=G.out.at)dropKey(G);}
     if(d<=sp){G.cx=HOME.x;G.cz=HOME.z;G.st="open";G.tm=0;}else{G.cx+=dx/d*sp;G.cz+=dz/d*sp;}}
   else if(G.st==="open"){G.tm+=dt;G.close=Math.max(0,1-G.tm/.4);
     if(G.tm>=.4&&G.held){const k=G.held;G.held=null;k.chute=1;k.fall={y:0,v:0};k.hy=0;G.winKey=k;}
