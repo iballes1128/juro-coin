@@ -341,8 +341,8 @@ const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",
   ["솔라나",30000,10000,90000,"#9945ff"],["플라즈마",10000,3300,30000,"#ff5fa2"],["도지코인",3000,1000,9000,"#c2a633"],["시바이누",1000,333,3000,"#e5502e"],["리플",300,100,900,"#23292f"]];
 const NEWCOINS=["테더골드","플라즈마","페페"];
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
-/* 11/25 16:30(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T07:30:00Z"),FTICK=1000,ENG_V=7;let KS=0,TSe=0;
+/* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=8,APP_V=8;let KS=0,TSe=0;
 function fastInit(){const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
 const curTick=()=>Date.now()>=TSe?FTICK:TICK; // 지금 틱 길이
@@ -782,10 +782,10 @@ $("nickBtn").onclick=()=>{const v=$("nickIn").value.trim().slice(0,10);if(!v)ret
 
 /* ===================== 채팅 + 레벨업 ===================== */
 function hhmm(t){const d=new Date(t||Date.now());return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");}
-function addMsg(o){if(!o.me&&window._chatNote)window._chatNote(o.t);const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small${!o.me&&o.from?` data-bt="${o.from}" style="cursor:pointer" title="눌러서 정보·배틀"`:""}>${!o.me&&o.from?"⚔️ ":""}${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🏞️ 광장":"📈 코인"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
+function addMsg(o){if(!o.me&&window._chatNote)window._chatNote(o.t);const L=$("chatLog"),d=document.createElement("div");if(o.sys){d.className="msg sys";d.textContent=o.text+" ";const tm=document.createElement("span");tm.className="tm";tm.textContent=hhmm(o.t);d.appendChild(tm);if(o.hr){const b=document.createElement("button");b.textContent=o.hrR?"👥 참가·관전":"📺 관전하기";b.style.cssText="display:block;margin:4px auto 0;padding:4px 12px;border-radius:9px;background:#7c3aed;color:#fff;font-size:11px;font-weight:800";b.onclick=e=>{e.stopPropagation();hrWatch(o.hr,o.hrR);};d.appendChild(b);}}else{d.className="msg"+(o.me?" me":"");d.innerHTML=`<small${!o.me&&o.from?` data-bt="${o.from}" style="cursor:pointer" title="눌러서 정보·배틀"`:""}>${!o.me&&o.from?"⚔️ ":""}${esc(o.name)} · Lv.${o.lv|0}${o.loc?` · <span style="color:${o.loc==="fish"?"#5ec8a0":"#f5b400"}">${o.loc==="fish"?"🏞️ 광장":"📈 코인"}</span>`:""} · ${hhmm(o.t)}</small>`;d.appendChild(document.createTextNode(o.text));}
   const atB=L.scrollHeight-L.scrollTop-L.clientHeight<60;L.appendChild(d);while(L.children.length>120)L.firstChild.remove();if(atB||o.me)L.scrollTop=L.scrollHeight;}
 function chatPush(o){if(sessBlocked)return;if(!o.sys)o.loc=(typeof fishActive==="function"&&fishActive())?"fish":"coin";if(!fdb)return addMsg(o);fdb.ref("chat").push({...o,t:Date.now(),from:myId}).catch(()=>{});}
-function broadcast(text,kind){chatPush({sys:true,text,kind:kind||""});}
+function broadcast(text,kind,ex){chatPush({sys:true,text,kind:kind||"",...(ex||{})});}
 function sendChat(){const v=$("chatIn").value.trim().slice(0,80);if(!v||!me)return;stAdd("chatN");$("chatIn").value="";if(typeof fishActive==="function"&&fishActive())setTimeout(()=>$("chatIn").blur(),0);
   chatPush({name:myName(),lv:lvOf(me),text:v});}
 $("chatSend").onclick=sendChat;$("chatIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing)sendChat();});
@@ -1572,12 +1572,12 @@ function hrGo(){if(!hrCheckBet())return;const stake=casBet;
   const c=hr.card,mult=hrMult(),order=hrOrder(c.horses.map(h=>h.p)),r={uid:myId,name:myName(),horses:c.horses.map(h=>({n:h.n,c:h.c,o:h.o})),order,plan:hrPlan(order),bet:{type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult},t0:nowS()};
   me.cash-=stake;const win=hrWinPay(r),pay=win?Math.round(stake*mult):0;casPay(stake,pay,"hr",win?mult:0);if(hr.type==="ex")stAdd("hrExN");if(pay){stAdd(hr.type==="win"?"hrWinHit":"hrExHit");me.hrPay={v:pay,at:r.t0+hrDur(r),txt:hrBetTxt(r),m:mult,stake};}
   saveMe();renderHeader();hr.view={...r,k:"local"};if(fdb){const ref=fdb.ref("market/races").push();hr.view.k=ref.key;ref.set(r).catch(()=>{});}
-  broadcast(`🏇 ${myName()}님이 ${hrBetTxt(r)}(${mult}배)에 ${casFmt(stake)} 걸고 경마 출발! 도박장 → 경마에서 구경해요`);hrNewCard();renderCas();}
+  broadcast(`🏇 ${myName()}님이 ${hrBetTxt(r)}(${mult}배)에 ${casFmt(stake)} 걸고 경마 출발!`,"",hr.view.k!=="local"?{hr:hr.view.k}:null);hrNewCard();renderCas();}
 /* 👥 같이: 방 열기 / 참가 */
 function hrRoomOpen(){if(!fdb)return toast("서버에 연결 중이에요");if(!hrCheckBet())return;const stake=casBet,c=hr.card,mult=hrMult(),ref=fdb.ref("market/hrRoom").push(),at=nowS()+HR_ROOM_MS;
   const room={host:myId,hostName:myName(),horses:c.horses,startAt:at,bets:{[myId]:{name:myName(),type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult}}};
   me.cash-=stake;me.hrOpen={id:ref.key,stake,t:nowS()};saveMe();renderHeader();ref.set(room).then(()=>{hr.view={...room,room:ref.key};renderCas();}).catch(()=>{me.cash+=stake;me.hrOpen=null;saveMe();renderHeader();toast("방 만들기 실패");});
-  broadcast(`👥 ${myName()}님이 같이하는 경마를 열었어요! 10초 안에 도박장 → 경마 → 👥 같이에서 참가하세요`);hrNewCard();}
+  broadcast(`👥 ${myName()}님이 같이하는 경마를 열었어요! 10초 안에 참가하세요`,"",{hr:ref.key,hrR:1});hrNewCard();}
 function hrRoomJoin(id){const R=hr.rooms[id];if(!R||R.order)return toast("이미 출발했어요");if(nowS()>R.startAt-800)return toast("출발 직전이라 참가할 수 없어요");if(R.bets&&R.bets[myId])return;if(!hrCheckBet())return;const stake=casBet,mult=hrMult();
   me.cash-=stake;me.hrOpen={id,stake,t:nowS()};saveMe();renderHeader();fdb.ref(`market/hrRoom/${id}/bets/${myId}`).set({name:myName(),type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult}).then(()=>{toast("👥 참가했어요! 곧 출발해요");hr.view={...hr.rooms[id],room:id};renderCas();}).catch(()=>{me.cash+=stake;me.hrOpen=null;saveMe();renderHeader();toast("참가 실패");});}
 /* 출발 시각이 되면 (방장, 방장이 없으면 다른 참가자) 순위를 뽑아 올림 */
@@ -1593,6 +1593,12 @@ function hrListen(){if(hrListen.on||!fdb)return;hrListen.on=1;fdb.ref("market/ra
   fdb.ref("market/hrRoom").limitToLast(10).on("value",s=>{hr.rooms=s.val()||{};hr.roomsLoaded=1;if(hr.view&&hr.view.room){const R=hr.rooms[hr.view.room];if(R)hr.view={...R,room:hr.view.room};}if(casTab==="hr"&&$("casMod")&&$("casMod").style.display==="flex")renderCas();});
   setInterval(hrRoomTick,500);
   setInterval(()=>{if(!fdb||!myId)return;const old=Object.entries(hr.live).filter(([k,r])=>r&&r.uid===myId&&nowS()-r.t0>3600000);for(const[k]of old)fdb.ref("market/races/"+k).remove().catch(()=>{});},60000);}
+/* 채팅에서 바로 관전 */
+async function hrWatch(k,isR){if(!me||!fdb)return;if(casBusy)return toast("지금 하는 게임이 끝나면 볼 수 있어요");hrListen();let r=isR?hr.rooms[k]:hr.live[k];
+  if(!r){try{r=(await fdb.ref((isR?"market/hrRoom/":"market/races/")+k).once("value")).val();}catch(e){}}
+  if(!r)return toast("이미 끝나서 지워진 경주예요");
+  if(!($("casMod")&&$("casMod").style.display==="flex"))openCasino();casTab="hr";hr.exitRoom=null;
+  if(isR&&!r.order&&!(r.bets&&r.bets[myId])){hr.view=null;hr.mode="room";hr.room=k;hr.rooms[k]=r;}else hr.view=isR?{...r,room:k}:{...r,k};renderCas();}
 function hrRoomsOpen(){const now=nowS();return Object.entries(hr.rooms).filter(([k,R])=>R&&R.startAt&&!R.order&&now<R.startAt+8000).sort((a,b)=>a[1].startAt-b[1].startAt);}
 function hrBody(){hrListen();if(!hr.card)hrNewCard();
   /* 내가 참가한 방은 자동으로 그 경주 화면으로 */
@@ -1906,7 +1912,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:90
   fdb.ref("online").on("value",s=>{onlineMap=s.val()||{};const now=Date.now();for(const k in onlineMap){if(!onlineMap[k]||now-(onlineMap[k].t||0)>180000)delete onlineMap[k];}updOnline();fishSyncOthers();});
   setInterval(()=>{pushPresence.t=0;pushPresence();},60000);
   fdb.ref("market/ckpt").limitToLast(16).on("value",s=>{const had=Object.keys(CKPTS).length;CKPTS=s.val()||{};if(!had&&Object.keys(CKPTS).length){rebuild();renderAll();}});
-  fdb.ref("market/config").on("value",s=>{cfgReady=true;const v=s.val();const n=v&&typeof v.epoch==="number"?v.epoch:DEFAULT_EPOCH;if(n!==EPOCH){EPOCH=n;rebuild();renderAll();}});
+  fdb.ref("market/config").on("value",s=>{cfgReady=true;const v=s.val();if(v&&typeof v.appV==="number"&&v.appV>APP_V&&!/[?&]v=/.test(location.search+"")){location.replace(location.pathname+"?v="+v.appV);return;}const n=v&&typeof v.epoch==="number"?v.epoch:DEFAULT_EPOCH;if(n!==EPOCH){EPOCH=n;rebuild();renderAll();}});
   fdb.ref("market/events").on("value",s=>{evReady=true;let l=[];try{const v=s.val();l=v&&v.list?JSON.parse(v.list):[];}catch(e){}EVENTS=l.filter(e=>e&&typeof e.t==="number").sort((a,b)=>a.t-b.t);rebuild();checkDelist();renderAll();});
   fdb.ref("market/kicked/"+myId).on("value",s=>{if(!s.val())return;fdb.ref("market/kicked/"+myId).remove().catch(()=>{});me._loaded=false;try{localStorage.removeItem("jc_id");localStorage.removeItem("jc_admin");}catch(e){}alert("관리자가 이 계정을 정리했어요. 닉네임을 다시 정해 주세요.");location.reload();});
   let first=true;
@@ -1922,7 +1928,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:90
   sessStart();
   btInit();
   const L=$("chatLog");
-  fdb.ref("chat").limitToLast(60).on("child_added",s=>{const m=s.val()||{};if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300)});else{addMsg({me:m.from===myId,from:m.from,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}});
+  fdb.ref("chat").limitToLast(60).on("child_added",s=>{const m=s.val()||{};if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300),hr:m.hr?String(m.hr).slice(0,40):"",hrR:!!m.hrR});else{addMsg({me:m.from===myId,from:m.from,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}});
   setInterval(()=>{fdb.ref("chat").orderByChild("t").endAt(Date.now()-86400000).limitToFirst(50).once("value",s=>{const v=s.val();if(v)for(const k in v)fdb.ref("chat/"+k).remove().catch(()=>{});});},300000);
   showNotices();renderAll();
 }catch(e){console.error(e);toast("서버 연결 실패: 새로고침해 주세요");}})();
