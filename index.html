@@ -752,7 +752,7 @@ function renderCos(){for(const k of["aura","wing","plate"]){const E=$("eq_"+k);i
   if(pgCur==="shop"&&(pgSub==="aura"||pgSub==="wing"||pgSub==="plate")){const S=$("s-shop");if(!$("shCos")||S.dataset.k!==pgSub){S.dataset.k=pgSub;S.innerHTML=`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">${pgSub==="aura"?"발밑에 화려한 효과가 생겨요":pgSub==="wing"?"등 뒤에 날개가 달려요":"이름표 테두리가 멋있게 바뀌어요"} · 한 번 사면 계속 써요 · 🔒 누르고 한 번 더 누르면 구매 · 낀 걸 다시 누르면 해제</div><div id="shCos" class="cgrid" style="padding:0"></div>`;}renderCosGrid($("shCos"),pgSub,"shop");}}
 setInterval(()=>{if($("pgMod").style.display!=="flex")return;const ch=normCh(me&&me.ch);document.querySelectorAll("#pgBody canvas[data-cv]").forEach(cv=>{if(cv.offsetParent){const[k,id]=cv.dataset.cv.split("|");cosPreview(cv,k,id,ch);}});},60);
 function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;if(pgSub==="awk")return renderAwk(S);const L=rodLv(),mine=(me&&me.fish)||{};
-  enhMat=enhMat.filter((i,n)=>(mine[fKey(i)]||0)-1>=enhMat.slice(0,n+1).filter(j=>j===i).length);const used={};enhMat.forEach(i=>used[i]=(used[i]||0)+1);
+  enhMat=enhMat.filter((i,n)=>(mine[fKey(i)]||0)>=enhMat.slice(0,n+1).filter(j=>j===i).length);const used={};enhMat.forEach(i=>used[i]=(used[i]||0)+1);
   const mb=enhMat.reduce((a,i)=>a+matBonus(i,L),0),base=enhBase(L),pity=(me&&me.enhPity)||0,tot=Math.min(100,base+mb+pity),cost=enhCost(L);
   const fishes=FISH.map((f,i)=>[i,(mine[fKey(i)]||0)-(used[i]||0)]).filter(([i,c])=>FISH[i][1]>0&&c>0).sort((a,b)=>FISH[b[0]][1]-FISH[a[0]][1]);
   const pct=v=>(Math.round(v*10)/10).toFixed(1)+"%";
