@@ -2275,6 +2275,10 @@ const hrBetWin=(b,o)=>b.type==="win"?(o[0]===b.h1?b.mult:0):(o[0]===b.h1&&o[1]==
 function hrWinPay(r){return r.bet?hrBetWin(r.bet,r.order):0;}
 const hrBetTxt2=(b,H)=>b.type==="win"?`${b.h1+1}번 ${H[b.h1].n} 단승`:`쌍승 ${b.h1+1}→${b.h2+1}`;
 function hrBetTxt(r){return r.bet?hrBetTxt2(r.bet,r.horses):`👥 같이하는 경마 ${Object.keys(r.bets||{}).length}명`;}
+/* 이 말을 고른 사람들 (같이하는 방 / 구경하는 혼자 경주) */
+function hrWho(r,i){const L=[],add=(nm,b)=>{if(!b)return;const n=String(nm||"?").slice(0,6);if(b.type==="win"){if(b.h1===i)L.push(n);}else{if(b.h1===i)L.push(n+"(1등)");if(b.h2===i)L.push(n+"(2등)");}};
+  if(r&&r.bet)add(r.name,r.bet);else if(r&&r.bets)for(const u in r.bets)add(r.bets[u].name,r.bets[u]);return L;}
+const hrWhoTxt=(r,i,mx)=>{const L=hrWho(r,i);return L.length>(mx||3)?L.slice(0,mx||3).join(", ")+` 외 ${L.length-(mx||3)}명`:L.join(", ");};
 const hrMyBet=r=>r.bet&&r.uid===myId?r.bet:(r.bets&&r.bets[myId])||null;
 /* 내가 건 경주가 달리는 중이면 나갈 수 없음 */
 const hrLocked=()=>{const v=hr.view;return !!(v&&v.order&&v.t0&&hrMyBet(v)&&nowS()-v.t0<hrDur(v));};
@@ -2306,7 +2310,7 @@ function hrRoomLeave(quiet){const id=hr.inRoom;if(!id||!fdb)return;const R=hr.ro
     return c;}).then(res=>{if(res.committed&&refund&&me.hrOpen&&me.hrOpen.id===id){me.cash+=refund;me.hrOpen=null;saveMe();renderHeader();if(!quiet)toast(`🚪 방에서 나왔어요 · ${casFmt(refund)} 돌려받았어요`);}else if(!quiet)toast("🚪 방에서 나왔어요");renderCas();}).catch(()=>{});
   renderCas();}
 function hrRoomBet(){const id=hr.inRoom,R=hrRoomR();if(!R||R.order)return;if(!hrCheckBet())return;const stake=casBet,mult=hrMult(),b={name:myName(),type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult};hr.busy=true;
-  hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||!c.members||!c.members[myId])return;c.bets=c.bets||{};if(c.bets[myId])return;c.bets[myId]=b;return c;}).then(res=>{const v=res.snapshot.val();
+  hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||!c.horses)return;c.members=c.members||{};c.bets=c.bets||{};if(c.bets[myId])return;c.members[myId]=c.members[myId]||{name:myName(),t:nowS()};c.bets[myId]=b;return c;}).then(res=>{const v=res.snapshot.val();
     if(res.committed&&v&&v.bets&&v.bets[myId]){me.cash-=stake;me.hrOpen={id,stake,t:nowS()};saveMe();renderHeader();toast("✅ 골랐어요! 방장이 출발을 누르면 시작해요");}else toast("지금은 고를 수 없어요");renderCas();}).catch(()=>toast("실패했어요")).finally(()=>{hr.busy=false;});}
 function hrRoomUnbet(){const id=hr.inRoom;if(!id||hr.busy)return;hr.busy=true;let refund=0;
   hrRoomRef(id).transaction(c=>{refund=0;if(!c)return c;if(c.order||!c.bets||!c.bets[myId])return;refund=c.bets[myId].stake;delete c.bets[myId];return c;}).then(res=>{if(res.committed&&refund&&me.hrOpen&&me.hrOpen.id===id){me.cash+=refund;me.hrOpen=null;saveMe();renderHeader();toast("↩️ 선택을 취소했어요");}renderCas();}).catch(()=>{}).finally(()=>{hr.busy=false;});}
@@ -2321,6 +2325,8 @@ function hrRoomTick(){if(!fdb||!me||!myId)return;const now=nowS();
     /* 정리: 빈 방, 오래된 방 */
     const mem=Object.keys(R.members||{}).length,bets=Object.keys(R.bets||{}).length,age=now-(R.created||0);
     if(!R.horses||(!R.order&&!mem&&age>(bets?300000:30000))||(R.order&&now-R.t0>1800000)||(!R.order&&age>3*3600000)||(!R.order&&!bets&&age>1200000))hrRoomRef(id).remove().catch(()=>{});}
+  /* 접속이 잠깐 끊겨 방 멤버에서 빠졌으면 다시 넣기 (방장도 포함) */
+  {const R=hr.inRoom&&hr.rooms[hr.inRoom];if(R&&R.horses&&!R.order&&!(R.members&&R.members[myId])&&!hrRoomTick.rj){hrRoomTick.rj=1;const id=hr.inRoom;hrRoomRef(id).transaction(c=>{if(!c||c.order||!c.horses)return c;c.members=c.members||{};if(!c.members[myId])c.members[myId]={name:myName(),t:nowS()};return c;}).then(()=>hrMemberOn(id)).catch(()=>{}).finally(()=>{hrRoomTick.rj=0;});}}
   /* 내가 건 방 결과 정산 */
   const o=me.hrOpen;if(o){const R=hr.rooms[o.id];if(R&&R.order&&R.t0&&R.bets&&R.bets[myId]){const b=R.bets[myId],m=hrBetWin(b,R.order),pay=m?Math.round(b.stake*m):0;casPay(b.stake,pay,"hr",m);stAdd("hrRoomN");if(b.type==="ex")stAdd("hrExN");
       if(pay){stAdd(b.type==="win"?"hrWinHit":"hrExHit");me.hrPay={v:pay,at:R.t0+hrDur(R),txt:hrBetTxt2(b,R.horses),m:b.mult,stake:b.stake};}me.hrOpen=null;saveMe();}
@@ -2346,10 +2352,10 @@ async function hrWatch(k,isR){if(!me||!fdb)return;if(casBusy)return toast("지�
   if(isR&&hr.inRoom===k){hr.view={...r,room:k};renderCas();return;}
   hr.view=isR?{...r,room:k}:{...r,k};renderCas();}
 /* 말 고르기 */
-function hrPickHtml(c){const ho=(i,sel,k)=>`<button data-${k}="${i}" style="display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;border-radius:9px;margin-bottom:4px;background:${sel?"#fbbf24":"var(--card2)"};color:${sel?"#111":"var(--tx)"};font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:${c.horses[i].c};color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</span><b style="flex:1;text-align:left">${esc(c.horses[i].n)}</b><span style="font-size:11px;opacity:.8">${Math.round(c.horses[i].p*100)}%</span><b style="width:52px;text-align:right">${c.horses[i].o}배</b></button>`;
+function hrPickHtml(c){const ho=(i,sel,k)=>`<button data-${k}="${i}" style="display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;border-radius:9px;margin-bottom:4px;background:${sel?"#fbbf24":"var(--card2)"};color:${sel?"#111":"var(--tx)"};font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:${c.horses[i].c};color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</span><b style="flex:1;text-align:left">${esc(c.horses[i].n)}</b>${c.bets?(w=>w?`<span style="font-size:10.5px;font-weight:800;padding:1px 6px;border-radius:8px;background:rgba(124,58,237,.85);color:#fff;white-space:nowrap">👤 ${esc(w)}</span>`:"")(hrWhoTxt(c,i,2)):""}<span style="font-size:11px;opacity:.8">${Math.round(c.horses[i].p*100)}%</span><b style="width:52px;text-align:right">${c.horses[i].o}배</b></button>`;
   let h=`<div style="display:flex;gap:5px;margin-bottom:8px">${[["win","단승 (1등 맞히기)"],["ex","쌍승 (1·2등 순서대로)"]].map(([k,n])=>`<button data-hrt="${k}" style="flex:1;padding:7px 0;border-radius:9px;font-size:12px;font-weight:700;background:${hr.type===k?"#fbbf24":"var(--card2)"};color:${hr.type===k?"#111":"var(--tx)"}">${n}</button>`).join("")}</div>`;
   if(hr.type==="win")h+=c.horses.map((x,i)=>ho(i,i===hr.h1,"hr1")).join("");
-  else h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥇 1등</div>${c.horses.map((x,i)=>`<button data-hr1="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h1?"#fbbf24":"var(--card2)"};color:${i===hr.h1?"#111":"var(--tx)"}">${i+1}번 ${esc(x.n)}</button>`).join("")}</div><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥈 2등</div>${c.horses.map((x,i)=>`<button data-hr2="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h2?"#fbbf24":"var(--card2)"};color:${i===hr.h2?"#111":"var(--tx)"};${i===hr.h1?"opacity:.35":""}">${i+1}번 ${esc(x.n)}</button>`).join("")}</div></div>`;
+  else h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥇 1등</div>${c.horses.map((x,i)=>`<button data-hr1="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h1?"#fbbf24":"var(--card2)"};color:${i===hr.h1?"#111":"var(--tx)"}">${i+1}번 ${esc(x.n)}${c.bets&&hrWhoTxt(c,i,1)?` <small style="opacity:.85">👤${esc(hrWhoTxt(c,i,1))}</small>`:""}</button>`).join("")}</div><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥈 2등</div>${c.horses.map((x,i)=>`<button data-hr2="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h2?"#fbbf24":"var(--card2)"};color:${i===hr.h2?"#111":"var(--tx)"};${i===hr.h1?"opacity:.35":""}">${i+1}번 ${esc(x.n)}${c.bets&&hrWhoTxt(c,i,1)?` <small style="opacity:.85">👤${esc(hrWhoTxt(c,i,1))}</small>`:""}</button>`).join("")}</div></div>`;
   return h;}
 const hrPickTxt=()=>hr.type==="win"?`${hr.h1+1}번 단승`:`쌍승 ${hr.h1+1}→${hr.h2+1}`;
 /* 방 대기실 */
@@ -2415,7 +2421,7 @@ function hrDraw(cv,r,ms){const g=cv.getContext("2d"),W=cv.width,H=cv.height,L=38
     g.fillStyle="rgba(0,0,0,.25)";g.beginPath();g.ellipse(x-4,y+9,13,3,0,0,7);g.fill();
     hrHorse(g,x,y,r.horses[i].c,ms<HR_WAIT||hrPos(r,i,ms)>=1?0:ms/55+i);
     g.fillStyle=r.horses[i].c;g.beginPath();g.arc(x-22,y-8,8,0,7);g.fill();g.fillStyle="#fff";g.font="bold 10px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(i+1,x-22,y-7.5);
-    g.fillStyle=isB?"#fde047":"rgba(255,255,255,.85)";g.font=`${isB?"bold ":""}9px 'Noto Sans KR',sans-serif`;g.textAlign="left";g.fillText(r.horses[i].n+(isB?(mine?" ⭐내 말":" ⭐"):""),4,12+i*lh+8);}
+    g.fillStyle=isB?"#fde047":"rgba(255,255,255,.85)";g.font=`${isB?"bold ":""}9px 'Noto Sans KR',sans-serif`;g.textAlign="left";{const who=hrWhoTxt(r,i,3);g.fillText(r.horses[i].n+(isB?(mine?" ⭐내 말":" ⭐"):"")+(who?"  👤 "+who:""),4,12+i*lh+8);}}
   const t=(ms-HR_WAIT)/1000;r.order.forEach((i,k)=>{if(t>=r.plan[i][0]&&k<3){g.font="16px sans-serif";g.textAlign="right";g.textBaseline="middle";g.fillText(["🥇","🥈","🥉"][k],W-6,12+i*lh+lh/2);}});
   if(ms<HR_WAIT){g.fillStyle="rgba(0,0,0,.45)";g.fillRect(0,0,W,H);g.fillStyle="#fde047";g.font="bold 46px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(Math.ceil((HR_WAIT-ms)/1000),W/2,H/2);}}
 
