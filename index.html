@@ -342,9 +342,10 @@ const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",
 const NEWCOINS=["테더골드","플라즈마","페페"];
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=9,APP_V=10;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=9,APP_V=11;
+/* 11/25 16:22(KST)부터 v8: 매끈하게 흐르다 가끔 한 번에 2~6% 툭 */const F8_T=Date.parse("2026-11-25T07:22:00Z");let K8=0;
 /* 11/25 16:14(KST)부터 v7 변동폭 (단타용으로 더 크게) */const F7_T=Date.parse("2026-11-25T07:14:00Z");let K7=0;let KS=0,TSe=0;
-function fastInit(){K7=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));}
+function fastInit(){K7=0;K8=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
 const curTick=()=>Date.now()>=TSe?FTICK:TICK; // 지금 틱 길이
 const kSpan=ms=>Math.max(1,Math.round(ms/curTick())); // 이 시간 동안의 틱 수 (차트·범위용)
@@ -378,7 +379,7 @@ function stepTo(K){const m=M,E=EVENTS;
       const r=mulberry(seedOf(EPOCH,ci,k));const cm=cMode[name]&&cMode[name]!=="auto"?cMode[name]:null;
       const fk=k>KS;if(gMode){applyPct(c,ci,manualPct(gMode,r)*(fk?.3:1));}
       else if(cm){applyPct(c,ci,manualPct(cm,r)*(fk?.3:1));}
-      else if(fk){applyPct(c,ci,(k>=K7?fastStep2:fastStep)(c,k,r,base));}
+      else if(fk){applyPct(c,ci,(k>=K8?fastStep3:k>=K7?fastStep2:fastStep)(c,k,r,base));}
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
@@ -431,6 +432,24 @@ function fastStep2(c,k,r,base){const lp=Math.log(c.price/base),dv=lp-(c.a||0);
   else if(r()<.006){c.bk=4+Math.floor(r()*12);c.bd=(dv>.7?-1:dv<-.7?1:(r()<.5?1:-1))*(.0015+r()*.0035);}
   if((c.rg==="pump"||c.rg==="range")&&r()<.0003){c.rg="dump";c.rgk=15+Math.floor(r()*45);c.rgd=Math.log(1-(.12+r()*.16))/c.rgk;}
   if(r()<.006)pct+=(r()<.5?1:-1)*(.01+r()*.025);
+  return pct;}
+
+/* ===== v8 (1초 틱): 평소엔 매끈하게 흐르다가 가끔 한 번에 2~6%씩 '툭' 튀거나 빠짐. 급등·급락 구간은 계단식으로 크게 ===== */
+const FAST3_LEN={calm:[120,420],pump:[40,200],range:[90,300],dump:[15,80],bleed:[180,600]};
+function fastStep3(c,k,r,base){const lp=Math.log(c.price/base),dv=lp-(c.a||0);
+  if(!(c.rgk>0)){const hi=dv>.9,lo=dv<-.8,from=c.rg||"calm";let W=FAST_RG[from].map(([g,w])=>[g,w*(hi?(g==="pump"?.25:g==="dump"||g==="bleed"?2.2:1):lo?(g==="pump"?2.2:g==="dump"||g==="bleed"?.3:1):1)]);
+    const tot=W.reduce((s,x)=>s+x[1],0);let t=r()*tot,g=W[W.length-1][0];for(const[x,w]of W){t-=w;if(t<=0){g=x;break;}}
+    const L=FAST3_LEN[g];c.rg=g;c.rgk=L[0]+Math.floor(r()*(L[1]-L[0]));const q=r();
+    c.rgd=g==="pump"?Math.log(1.03+.2*q*q)/c.rgk:g==="dump"?Math.log(1-(.05+.14*q))/c.rgk:g==="bleed"?Math.log(1-(.03+.08*q))/c.rgk:0;c.rgA=lp;}
+  c.rgk--;const n=r()+r()+r()-1.5;let pct;
+  if(c.rg==="pump")pct=c.rgd*(.6+r()*.8)+n*.0016;
+  else if(c.rg==="dump")pct=c.rgd*(.6+r()*.8)+n*.002;
+  else if(c.rg==="bleed")pct=c.rgd+n*.0012;
+  else if(c.rg==="range")pct=n*.0018-(lp-c.rgA)*.01;
+  else pct=n*.0012-dv*.002;
+  /* 툭: 한 번에 2~6% (상승장엔 위로, 하락장엔 아래로 더 자주) */
+  if(r()<.011){const up=c.rg==="pump"?.75:c.rg==="dump"||c.rg==="bleed"?.25:dv>.6?.3:dv<-.6?.7:.5;pct+=(r()<up?1:-1)*(.02+r()*r()*.045);}
+  if((c.rg==="pump"||c.rg==="range")&&r()<.0003){c.rg="dump";c.rgk=10+Math.floor(r()*30);c.rgd=Math.log(1-(.1+r()*.14))/c.rgk;}
   return pct;}
 
 const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),K_V4=Math.floor((K_V4_T-EPOCH)/TICK),K_V5=Math.floor((K_V5_T-EPOCH)/TICK);
