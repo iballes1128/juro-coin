@@ -343,11 +343,12 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=15;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=16;
+/* 11/25 16:50(KST)부터 v10: 기본가로 꼭 안 돌아옴, 폭락 후 바닥 횡보도 */const F10_T=Date.parse("2026-11-25T07:50:00Z");let K10=0;
 /* 11/25 16:36(KST)부터 v9: 15분마다 2개 코인 큰 코스 + 점프 뒤 모멘텀 */const F9_T=Date.parse("2026-11-25T07:36:00Z");let K9=0,LISTK=[];
 /* 11/25 16:22(KST)부터 v8: 매끈하게 흐르다 가끔 한 번에 2~6% 툭 */const F8_T=Date.parse("2026-11-25T07:22:00Z");let K8=0;
 /* 11/25 16:14(KST)부터 v7 변동폭 (단타용으로 더 크게) */const F7_T=Date.parse("2026-11-25T07:14:00Z");let K7=0;let KS=0,TSe=0;
-function fastInit(){K7=0;K8=0;K9=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));K9=KS+Math.max(1,Math.ceil((Math.max(F9_T,TSe)-TSe)/FTICK));
+function fastInit(){K7=0;K8=0;K9=0;K10=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));K9=KS+Math.max(1,Math.ceil((Math.max(F9_T,TSe)-TSe)/FTICK));K10=KS+Math.max(1,Math.ceil((Math.max(F10_T,TSe)-TSe)/FTICK));
   LISTK=COINS.map(([n])=>LIST_T[n]?(LIST_T[n]<=TSe?Math.max(0,Math.floor((LIST_T[n]-EPOCH)/TICK)):KS+Math.ceil((LIST_T[n]-TSe)/FTICK)):0);}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
 const curTick=()=>Date.now()>=TSe?FTICK:TICK; // 지금 틱 길이
@@ -383,7 +384,7 @@ function stepTo(K){const m=M,E=EVENTS;
       const r=mulberry(seedOf(EPOCH,COINS[ci][5],k));const cm=cMode[name]&&cMode[name]!=="auto"?cMode[name]:null;
       const fk=k>KS;if(gMode){applyPct(c,ci,manualPct(gMode,r)*(fk?.3:1));}
       else if(cm){applyPct(c,ci,manualPct(cm,r)*(fk?.3:1));}
-      else if(fk){applyPct(c,ci,(k>=K9?(c,k,r,base)=>fastStep4(c,k,r,base,ci,K9):k>=K8?fastStep3:k>=K7?fastStep2:fastStep)(c,k,r,base));}
+      else if(fk){applyPct(c,ci,(k>=K10?(c,k,r,base)=>fastStep5(c,k,r,base,ci,K9):k>=K9?(c,k,r,base)=>fastStep4(c,k,r,base,ci,K9):k>=K8?fastStep3:k>=K7?fastStep2:fastStep)(c,k,r,base));}
       else{/* 자연 등락: 짧은 오르내림(1~5분)이 계속 이어지면서, 천천히 움직이는 기준가로 되돌아오려는 힘이 있어 한 방향으로 오래 쭉 가지 않음.
            가끔 급등·급락 파동, 아주 가끔(코인당 일주일에 한 번쯤) 기준가가 무너지는 상폐 위기 */
         c.a+=(r()-.5)*.006;if(c.doom>0){c.doom--;c.a-=.004;}else if(r()<1.4e-5)c.doom=300;
@@ -478,6 +479,43 @@ function fastStep4(c,k,r,base,ci,K0){const sid=COINS[ci][5],t=k-K0,s=Math.floor(
     const up=o.ty==="A"?(u<.6?.8:.4):o.ty==="B"?(u<.3?.2:.65):(u<.2?.85:.35);if(r()<.016)pct+=(r()<up?1:-1)*(.015+r()*r()*.035);}
   else{pct=fastStep3(c,k,r,base);}
   /* 툭 튄 뒤 같은 방향으로 몇 초 더 (모멘텀) */
+  if(c.mk>0){c.mk--;pct+=c.md*(.5+r());}
+  else if(Math.abs(pct)>=.02&&r()<.35){c.mk=3+Math.floor(r()*8);c.md=Math.sign(pct)*(.001+r()*.002);}
+  return pct;}
+
+/* ===== v10 (1초 틱): 기본가로 꼭 돌아오지 않음 =====
+   · 큰 움직임(국면 전환·코스) 뒤엔 그 가격대가 새 기준이 되는 경우가 많음 → 폭락 후 그냥 바닥에서 왔다갔다, 급등 후 그 자리에서 횡보도 함
+   · 폭락 코스: 반등 없음 40% / 조금 반등 35% / 크게 반등 25%
+   · 너무 멀리 간 경우(기본가의 약 1/2.5 이하, 2.5배 이상)만 반대쪽으로 조금씩 기울어짐 */
+const F5_LEN={calm:[180,600],pump:[40,200],range:[120,420],dump:[15,80],bleed:[180,600]};
+function crsPath5(ty,o,u){
+  if(ty==="A"){const G=Math.log(1.3+.25*o.q),uc=.6+.3*o.q2,D=Math.log(1-(.1+.12*o.q3)),cl=.02+.03*o.q3;
+    if(u<uc)return G*Math.pow(u/uc,1.25);if(u<uc+cl)return G+D*((u-uc)/cl);return G+D;}
+  if(ty==="B"){const Dn=Math.log(1-(.25+.15*o.q)),ub=.2+.2*o.q2,rbf=o.q3<.4?0:o.q3<.75?.15+.2*(o.q3-.4)/.35:.4+.3*(o.q3-.75)/.25;
+    if(u<ub)return Dn*Math.pow(u/ub,.8);return Dn*(1-rbf*((u-ub)/(1-ub)));}
+  const G=Math.log(1.2+.2*o.q),ut=.13+.14*o.q2,back=o.q3*.6;
+  if(u<ut)return G*Math.pow(u/ut,1.6);return G*(1-back*((u-ut)/(1-ut)));}
+function fastStep5(c,k,r,base,ci,K0){const sid=COINS[ci][5],t=k-K0,s=Math.floor(t/CRS_LEN),u=(t-s*CRS_LEN)/CRS_LEN,u0=Math.max(0,u-1/CRS_LEN);
+  const lp=Math.log(c.price/base),far=lp>.92?-1:lp<-.55?1:0;if(c.a===undefined||c.a===null)c.a=0;
+  const o=crsPick(s).find(x=>x.sid===sid);let pct;
+  if(o&&u>0){if(c.cs!==s){c.cs=s;c.cty=o.ty==="B"&&lp<-.35?"C":(o.ty==="A"||o.ty==="C")&&far<0?"B":o.ty;}
+    const d=crsPath5(c.cty,o,u)-crsPath5(c.cty,o,u0),n=r()+r()+r()-1.5;pct=d*(.4+r()*1.2)+n*.0012;
+    const ty=c.cty,up=ty==="A"?(u<.6?.8:.4):ty==="B"?(u<.3?.2:.55):(u<.2?.85:.4);if(r()<.016)pct+=(r()<up?1:-1)*(.015+r()*r()*.035);c.inC=1;}
+  else{if(c.inC){c.inC=0;c.rgk=0;if(r()<.7)c.a=lp;}/* 코스 끝: 대부분 그 가격대가 새 기준 */
+    const dv=lp-c.a;
+    if(!(c.rgk>0)){if(r()<.4)c.a=lp;/* 국면 바뀔 때 40%는 지금 가격대를 새 기준으로 */
+      const hi=far<0||dv>.5,lo=far>0||dv<-.5,from=c.rg||"calm";let W=FAST_RG[from].map(([g,w])=>[g,w*(hi?(g==="pump"?.3:g==="dump"||g==="bleed"?2:1):lo?(g==="pump"?2:g==="dump"||g==="bleed"?.35:1):1)]);
+      const tot=W.reduce((s,x)=>s+x[1],0);let tt=r()*tot,g=W[W.length-1][0];for(const[x,w]of W){tt-=w;if(tt<=0){g=x;break;}}
+      const L=F5_LEN[g];c.rg=g;c.rgk=L[0]+Math.floor(r()*(L[1]-L[0]));const q=r();
+      c.rgd=g==="pump"?Math.log(1.03+.2*q*q)/c.rgk:g==="dump"?Math.log(1-(.05+.14*q))/c.rgk:g==="bleed"?Math.log(1-(.03+.08*q))/c.rgk:0;c.rgA=lp;}
+    c.rgk--;const n=r()+r()+r()-1.5;
+    if(c.rg==="pump")pct=c.rgd*(.6+r()*.8)+n*.0016;
+    else if(c.rg==="dump")pct=c.rgd*(.6+r()*.8)+n*.002;
+    else if(c.rg==="bleed")pct=c.rgd+n*.0012;
+    else if(c.rg==="range")pct=n*.0018-(lp-c.rgA)*.01;
+    else pct=n*.0012-dv*.0006+far*.0004;
+    if(r()<.011){const upP=c.rg==="pump"?.75:c.rg==="dump"||c.rg==="bleed"?.25:far>0?.65:far<0?.35:.5;pct+=(r()<upP?1:-1)*(.02+r()*r()*.045);}
+    if((c.rg==="pump"||c.rg==="range")&&r()<.0003){c.rg="dump";c.rgk=10+Math.floor(r()*30);c.rgd=Math.log(1-(.1+r()*.14))/c.rgk;}}
   if(c.mk>0){c.mk--;pct+=c.md*(.5+r());}
   else if(Math.abs(pct)>=.02&&r()<.35){c.mk=3+Math.floor(r()*8);c.md=Math.sign(pct)*(.001+r()*.002);}
   return pct;}
