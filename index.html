@@ -2777,7 +2777,7 @@ function respawn(G,n){const p=spot(G,9,.26,.78,.22,.74);const k=mkKey(n,p.x,p.z,
 /* 집기 성공(모든 열쇠 공통) × 출구까지 안 떨어뜨리기(번호별로 다름) = 최종 확률 */
 const GRAB0=.93;
 const PITY_S=.9,PITY_G=1.3,PITY_CAP=8;/* 떨어질 때마다 그 열쇠는 다음에 1.3배 잘 잡힘(최대 8배) */
-function carryQ(n,d){const L=BOX[n].t===2;return Math.min(.97,PITY_S*(L?.25:1)*BOX[n].p/GRAB0*Math.min(L?1.5:BOX[n].t===1?5:PITY_CAP,Math.pow(PITY_G,d|0)));}/* 전설은 기본 확률 0.25배, 천장 최대 1.5배 · 희귀는 천장 최대 5배 */
+function carryQ(n,d){const L=BOX[n].t===2;return Math.min(.97,PITY_S*(L?.25:BOX[n].t===1?.7:1)*BOX[n].p/GRAB0*Math.min(L?1.5:BOX[n].t===1?3:PITY_CAP,Math.pow(PITY_G,d|0)));}/* 전설은 기본 확률 0.25배, 천장 최대 1.5배 · 희귀는 기본 0.7배, 천장 최대 3배 */
 function evalGrab(G){const R=34;let best=null,bd=1e9;for(const k of G.keys){if(k.fall)continue;const d=pxd(G,k);if(d<bd){bd=d;best=k;}}
   if(!best||bd>R)return{type:"miss"};
   const sg=GRAB0*(1-.5*bd/R);
