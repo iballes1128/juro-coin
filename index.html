@@ -380,6 +380,7 @@ let EPOCH=DEFAULT_EPOCH,EVENTS=[],M=null;
 function newMarket(){return{k:0,ev:{lo:0,hi:0},coins:COINS.map(([n,b])=>({price:b,rate:0,trend:1,trendCount:0,s:0,wave:0,wdir:1,a:0,doom:0,delisted:false,delistK:0,createK:0,hist:[b],dl:[]}))};}
 function applyPct(c,ci,pct){const[,,mn,mx]=COINS[ci];const old=c.price;const f0=(c.fp&&c.fpP===old)?c.fp:old;let f=f0*(1+pct);f=f<mn?mn:(f>mx?mx:f);c.fp=f;const b0=COINS[ci][1],np=b0<100?Math.round(f*2)/2:Math.round(f);c.price=np;c.fpP=np;c.rate=parseFloat((((np-old)/old)*100).toFixed(1));}
 function manualPct(mode,r){if(mode==="down")return-((3+r()*7)/100);if(mode==="crash")return-((10+r()*5)/100);if(mode==="up")return(3+r()*7)/100;if(mode==="surge")return(10+r()*5)/100;return 0;}
+const HCAP=47000;/* 시세 기록 최대 길이(틱) · 12시간 그래프용 */
 function stepTo(K){const m=M,E=EVENTS;
   while(m.k<K){const k=++m.k,T=tickT(k);
     while(m.ev.hi<E.length&&E[m.ev.hi].t<=T){const e=E[m.ev.hi++];if(e.m==="set"){const ci=COINS.findIndex(c=>c[0]===e.c);if(ci>=0&&!m.coins[ci].delisted){const c=m.coins[ci],old=c.price,pp=(e.t<MIG_T&&MIG_F[e.c])?Math.round(e.p*MIG_F[e.c]):e.p;c.price=pp;c.rate=parseFloat((((pp-old)/old)*100).toFixed(1));}}}
@@ -388,8 +389,8 @@ function stepTo(K){const m=M,E=EVENTS;
     for(let i=m.ev.lo;i<m.ev.hi;i++){const e=E[i];if(e.m==="set")continue;if(e.c==="*"){gMode=e.m;if(e.m==="auto")for(const x in cMode)delete cMode[x];}else cMode[e.c]=e.m;}
     if(gMode==="auto")gMode=null;
     for(let ci=0;ci<COINS.length;ci++){const c=m.coins[ci],[name,base,mn]=COINS[ci];
-      if(LISTK[ci]){if(k<LISTK[ci]){c.pre=1;c.delisted=true;c.delistK=k;c.price=base;c.rate=0;c.hist.push(0);if(c.hist.length>12000)c.hist.shift();continue;}if(c.pre){c.pre=0;c.delisted=false;c.price=base;c.rate=0;c.createK=k;c.a=0;c.rg=null;c.rgk=0;c.fp=0;}}
-      if(c.delisted){if(T-tickT(c.delistK)>=RELIST_MS){c.delisted=false;c.price=base;c.rate=0;c.createK=k;c.trend=1;c.trendCount=0;c.wave=0;c.a=0;c.doom=0;c.rg=null;c.rgk=0;}c.hist.push(c.delisted?0:c.price);if(c.hist.length>12000)c.hist.shift();continue;}
+      if(LISTK[ci]){if(k<LISTK[ci]){c.pre=1;c.delisted=true;c.delistK=k;c.price=base;c.rate=0;c.hist.push(0);if(c.hist.length>HCAP)c.hist.shift();continue;}if(c.pre){c.pre=0;c.delisted=false;c.price=base;c.rate=0;c.createK=k;c.a=0;c.rg=null;c.rgk=0;c.fp=0;}}
+      if(c.delisted){if(T-tickT(c.delistK)>=RELIST_MS){c.delisted=false;c.price=base;c.rate=0;c.createK=k;c.trend=1;c.trendCount=0;c.wave=0;c.a=0;c.doom=0;c.rg=null;c.rgk=0;}c.hist.push(c.delisted?0:c.price);if(c.hist.length>HCAP)c.hist.shift();continue;}
       const r=mulberry(seedOf(EPOCH,COINS[ci][5],k));const cm=cMode[name]&&cMode[name]!=="auto"?cMode[name]:null;
       const fk=k>KS;if(gMode){applyPct(c,ci,manualPct(gMode,r)*(fk?.3:1));}
       else if(cm){applyPct(c,ci,manualPct(cm,r)*(fk?.3:1));}
@@ -408,7 +409,7 @@ function stepTo(K){const m=M,E=EVENTS;
           pct=c.trend*c.s+(r()+r()+r()-1.5)*(v4?.008:.006)-(v3?.01:v2?.008:.01)*dev;if(v5&&r()<0.08)pct+=(r()<.5?1:-1)*(0.008+r()*0.017);}
         applyPct(c,ci,pct);}
       if(c.price<=mn*1.05){c.delisted=true;c.delistK=k;c.rate=0;c.dl.push({k,price:c.price});}
-      c.hist.push(c.delisted?0:c.price);if(c.hist.length>12000)c.hist.shift();}}}
+      c.hist.push(c.delisted?0:c.price);if(c.hist.length>HCAP)c.hist.shift();}}}
 /* ===== v6 (1초 틱) 단타 장세: 국면(평온·급등·박스권·급락·슬금슬금 하락)이 돌아가며 이어짐 =====
    급등은 몇 분에 걸쳐 쭉 오르다 (중간중간 눌림) 박스권에서 왔다갔다 → 다시 오르거나 급락. 급등·박스권 중엔 드물게 갑자기 나락(폭락) */
 const FAST_RG={calm:[["calm",.40],["pump",.24],["bleed",.18],["range",.18]],pump:[["range",.55],["dump",.22],["pump",.23]],range:[["pump",.32],["dump",.28],["calm",.40]],dump:[["calm",.50],["range",.30],["pump",.20]],bleed:[["calm",.50],["pump",.30],["bleed",.20]]};
@@ -599,14 +600,26 @@ const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),
 const nowK=()=>{const t=tnow();return t<TSe?Math.max(0,Math.floor((t-EPOCH)/TICK)):KS+Math.floor((t-TSe)/FTICK);};
 /* 체크포인트: 1시간마다 시장 상태(차트 제외)를 서버에 저장 → 새로 들어온 사람은 3시간 전 체크포인트부터만 계산 (처음부터 다 계산하면 폰에서 느려짐) */
 let CKPTS={};
-function rebuild(){fastInit();const K=nowK(),want=K-kSpan(3*3600000)-10;let best=null;
+let HB=0;
+function ckptMarket(best){try{const st=JSON.parse(best.s),m={k:st.k,ev:{lo:0,hi:0},coins:st.coins.map(c=>({...c,hist:[],dl:c.dl||[]}))};const T=tickT(m.k);while(m.ev.hi<EVENTS.length&&EVENTS[m.ev.hi].t<=T)m.ev.hi++;while(m.ev.lo<m.ev.hi&&EVENTS[m.ev.lo].t<=T-MANUAL)m.ev.lo++;return m;}catch(e){return null;}}
+function histBackfill(){if(!M||M.k<=KS||!M.coins[0])return;const tok=++HB,K=nowK(),span=kSpan(12*3600000),want=K-span-10,len0=M.coins[0].hist.length,baseK=M.k-(len0-1);
+  if(len0>=span+20||baseK<=K-span)return;let old=null,low=null;
+  for(const key in CKPTS){const c=CKPTS[key];if(!c||c.v!==ENG_V||c.e!==EPOCH||c.k<=KS||c.k>=baseK-60)continue;if(c.k<=want){if(!old||c.k>old.k)old=c;}if(!low||c.k<low.k)low=c;}
+  const ck=old||low;if(!ck)return;const M2=ckptMarket(ck);if(!M2)return;const target=baseK-1;
+  const run=()=>{if(tok!==HB||!M)return;const sv=M;try{M=M2;stepTo(Math.min(target,M2.k+300));}finally{M=sv;}
+    if(M2.k<target){setTimeout(run,12);return;}
+    const now=M.coins[0].hist.length;if(M.k-(now-1)!==baseK)return;
+    M.coins.forEach((c,i)=>{const pre=M2.coins[i]&&M2.coins[i].hist;if(!pre||!pre.length)return;let h=pre.concat(c.hist);if(h.length>HCAP)h=h.slice(h.length-HCAP);c.hist=h;});
+    try{renderSheet();}catch(e){}};
+  setTimeout(run,300);}
+function rebuild(){HB++;histBackfill.done=0;fastInit();const K=nowK(),want=K-kSpan(3*3600000)-10;let best=null;
   for(const key in CKPTS){const c=CKPTS[key];if(c&&c.v===ENG_V&&c.e===EPOCH&&c.k>KS&&c.k<=want&&(!best||c.k>best.k))best=c;}
   if(best){try{const st=JSON.parse(best.s);M={k:st.k,ev:{lo:0,hi:0},coins:st.coins.map(c=>({...c,hist:[],dl:c.dl||[]}))};const T=tickT(M.k);while(M.ev.hi<EVENTS.length&&EVENTS[M.ev.hi].t<=T)M.ev.hi++;while(M.ev.lo<M.ev.hi&&EVENTS[M.ev.lo].t<=T-MANUAL)M.ev.lo++;}catch(e){best=null;}}
   if(!best)M=newMarket();stepTo(K);}
 function ckptMaybe(){if(!fdb||!M||M.k<=KS||M.k%3600!==0||CKPTS["k"+M.k])return;const st=M,k=M.k;
   try{const snap=JSON.stringify({k,coins:st.coins.map(c=>{const o={...c};delete o.hist;o.dl=(o.dl||[]).filter(d=>k-d.k<28800);return o;})});
     fdb.ref("market/ckpt/k"+k).transaction(c=>c?undefined:{v:ENG_V,e:EPOCH,k,s:snap,t:Date.now()}).catch(()=>{});
-    for(const key in CKPTS){const c=CKPTS[key];if(c&&c.k<k-43200)fdb.ref("market/ckpt/"+key).remove().catch(()=>{});}}catch(e){}}
+    for(const key in CKPTS){const c=CKPTS[key];if(c&&c.k<k-50400)fdb.ref("market/ckpt/"+key).remove().catch(()=>{});}}catch(e){}}
 const priceOf=ci=>M.coins[ci].delisted?0:M.coins[ci].price;
 
 /* ===================== 상태 ===================== */
@@ -938,17 +951,17 @@ function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,n
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
   $("shName").innerHTML=esc(n)+badges(ci);$("shPrice").textContent=c.delisted?"거래 정지":formatCoinPrice(p);$("shPrice").className="big "+(c.rate>0?"up":c.rate<0?"down":"");
   $("shRate").innerHTML=c.pre?'<span class="flat">곧 신규 상장 · 기본가 '+formatCoinPrice(base)+'</span>':c.delisted?'<span class="flat">상장폐지 · '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 뒤 재상장</span>':(c.rate>0?'<span class="up">+'+c.rate+'% ▲</span>':c.rate<0?'<span class="down">'+c.rate+'% ▼</span>':'<span class="flat">0% -</span>')+' <span class="flat" style="font-weight:400">직전 '+(curTick()/1000)+'초</span>';
-  {const d=c.hist.slice(-kSpan(12*3600000)).filter(v=>v>0);$("shRange").innerHTML=d.length?`<span style="font-size:10px">최근 12시간</span><br>고가 <span class="up">${formatCoinPrice(Math.max(...d))}</span><br>저가 <span class="down">${formatCoinPrice(Math.min(...d))}</span>`:"";}
+  {const d=c.hist.slice(-kSpan(12*3600000));let hi=0,lo=Infinity;for(const v of d)if(v>0){if(v>hi)hi=v;if(v<lo)lo=v;}$("shRange").innerHTML=hi>0?`<span style="font-size:10px">최근 12시간</span><br>고가 <span class="up">${formatCoinPrice(hi)}</span><br>저가 <span class="down">${formatCoinPrice(lo)}</span>`:"";}
   drawChart(c.hist.slice(-kSpan(chartN*10000)-1),chartHover);
   const h=me.coins[n]||{count:0,cost:0};$("shHold").innerHTML=h.count>0?`보유 <b style="color:var(--tx)">${formatCoinReadable(h.count)}</b> · 평단가 ${formatCoinPrice(Math.round(h.cost/h.count))}`:"보유 없음";
   const q=parseInt(($("qty").value||"").replace(/,/g,""),10)||0,g=$("goBtn");let html="",ok=false;
   if(mode==="buy"){const cost=Math.ceil(q*p);ok=!c.delisted&&q>0&&cost<=me.cash&&canTrade();html=`<div>주문 금액 <b>${formatMoneyReadable(cost)}</b></div><div>주문 후 현금 <b>${formatMoneyReadable(me.cash-cost)}</b></div>`;g.textContent=c.delisted?"상장폐지된 코인":!canTrade()?"거래 권한 없음":cost>me.cash?"잔액 부족":"매수하기";}
   else{const raw=Math.floor(q*p),tx=taxInfo(raw,assetOf(me));ok=!c.delisted&&q>0&&q<=h.count&&canTrade();html=`<div>매도 금액 <b>${formatMoneyReadable(raw)}</b></div><div>거래 세금 (${tx.name}) <b>-${formatMoneyReadable(tx.fee)}</b></div><div>최종 입금액 <b>${formatMoneyReadable(raw-tx.fee)}</b></div>`;g.textContent=c.delisted?"상장폐지된 코인":!canTrade()?"거래 권한 없음":q>h.count?"보유 수량 초과":"매도하기";}
   $("prev").innerHTML=html;g.disabled=!ok;}
-let chartArr=[],chartHover=-1;
+let chartArr=[],chartHover=-1,chartRatio=1;
 /* 상장폐지→재상장한 코인은 재상장 이후 구간만 그래프에 (앞쪽 빈 구간 때문에 오른쪽 끝에 몰려 보이던 문제) */
 const afterRelist=a=>{const z=a.lastIndexOf(0);return z>=0&&z<a.length-2?a.slice(z+1):a;};
-function drawChart(arr,hv){if(arr)arr=afterRelist(arr);if(arr)chartArr=arr;else arr=chartArr;if(hv===undefined)hv=chartHover;const cv=$("chart"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
+function drawChart(arr,hv){if(arr){arr=afterRelist(arr);chartRatio=1;if(arr.length>1400){const nb=600,sz=arr.length/nb,o=[];for(let b=0;b<nb;b++){const i0=Math.floor(b*sz),i1=Math.max(i0+1,Math.floor((b+1)*sz));let lo=i0,hi=i0;for(let i=i0;i<i1&&i<arr.length;i++){if(arr[i]<arr[lo])lo=i;if(arr[i]>arr[hi])hi=i;}if(arr[i0]<=0||arr[lo]<=0){o.push(arr[i0]);continue;}if(lo<hi){o.push(arr[lo],arr[hi]);}else if(hi<lo){o.push(arr[hi],arr[lo]);}else o.push(arr[lo]);}o.push(arr[arr.length-1]);chartRatio=(arr.length-1)/(o.length-1);arr=o;}chartArr=arr;}else arr=chartArr;if(hv===undefined)hv=chartHover;const cv=$("chart"),dpr=devicePixelRatio||1,w=cv.clientWidth,h=cv.clientHeight;cv.width=w*dpr;cv.height=h*dpr;const g=cv.getContext("2d");g.scale(dpr,dpr);
   const a=arr.filter(v=>v>0);if(a.length<2){g.fillStyle="#8b93a3";g.font="13px Noto Sans KR";g.fillText("데이터 모으는 중…",10,h/2);return;}
   const hd=curCoin>=0&&me&&me.coins[COINS[curCoin][0]],avg=hd&&hd.count>0?hd.cost/hd.count:0;
   const mn=Math.min(...a,...(avg?[avg]:[])),mx=Math.max(...a,...(avg?[avg]:[])),rg=mx-mn||1,up=a[a.length-1]>=a[0],col=up?"#f04452":"#3b82f6";
@@ -962,7 +975,7 @@ function drawChart(arr,hv){if(arr)arr=afterRelist(arr);if(arr)chartArr=arr;else 
     const lab=`내 평단 ${formatCoinPrice(Math.round(avg))} (${pr>=0?"+":""}${pr}%)`;g.font="bold 11px Noto Sans KR";const tw=g.measureText(lab).width+12,ly=y<22?y+4:y-20;
     g.fillStyle="rgba(245,180,0,.92)";g.beginPath();g.roundRect?g.roundRect(4,ly,tw,16,4):g.rect(4,ly,tw,16);g.fill();g.fillStyle="#111";g.textAlign="left";g.fillText(lab,10,ly+12);}
   if(hv>=0&&hv<arr.length){const v=arr[hv],x=X(hv);g.strokeStyle="rgba(255,255,255,.35)";g.setLineDash([3,3]);g.beginPath();g.moveTo(x,0);g.lineTo(x,h);g.stroke();g.setLineDash([]);
-    const t=new Date(tickT(M.k-(arr.length-1-hv))),hh=String(t.getHours()).padStart(2,"0"),mi=String(t.getMinutes()).padStart(2,"0"),ss=String(t.getSeconds()).padStart(2,"0");
+    const t=new Date(tickT(M.k-Math.round((arr.length-1-hv)*chartRatio))),hh=String(t.getHours()).padStart(2,"0"),mi=String(t.getMinutes()).padStart(2,"0"),ss=String(t.getSeconds()).padStart(2,"0");
     const lab=`${hh}시 ${mi}분 ${ss}초 · `+(v>0?formatCoinPrice(v):"거래 정지");
     if(v>0){const y=Y(v);g.fillStyle=col;g.beginPath();g.arc(x,y,4,0,7);g.fill();g.strokeStyle="#fff";g.lineWidth=1.5;g.stroke();}
     g.font="bold 12px Noto Sans KR";const tw=g.measureText(lab).width+16,bx=Math.min(Math.max(x-tw/2,0),w-tw);g.fillStyle="rgba(34,39,51,.95)";g.strokeStyle="#3a4150";g.lineWidth=1;
@@ -3657,7 +3670,7 @@ function sessOwnerOn(){sessActive=false;sessBlocked=false;sessHide();try{sessRef
 /* ===================== 틱 루프 ===================== */
 rebuild();me=JSON.parse(JSON.stringify(local));renderAll();
 setInterval(()=>{const K=nowK(),now=tnow(),D=curTick(),left=now>=TSe?FTICK-((now-TSe)%FTICK):TICK-((now-EPOCH)%TICK);$("tickFill").style.width=(100-left/D*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";if($("tickLbl"))$("tickLbl").textContent=(D/1000)+"초마다 시세 갱신";
-  if(K>M.k){stepTo(K);checkDelist();renderTick();ckptMaybe();}migrateMe();},250);
+  if(K>M.k){stepTo(K);checkDelist();renderTick();ckptMaybe();}if(!histBackfill.done&&typeof evReady!=="undefined"&&evReady&&Object.keys(CKPTS).length){histBackfill.done=1;histBackfill();}migrateMe();},250);
 
 /* ===================== Firebase 연결 ===================== */
 const firebaseConfig={apiKey:"AIzaSyA_pAOrECvY-WCkbOaqZEQtI_LXvUbeUGc",authDomain:"juro-coin.firebaseapp.com",databaseURL:"https://juro-coin-default-rtdb.asia-southeast1.firebasedatabase.app",projectId:"juro-coin",storageBucket:"juro-coin.firebasestorage.app",messagingSenderId:"661254337078",appId:"1:661254337078:web:9857a6bc73e208c4749e97"};
