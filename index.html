@@ -343,7 +343,7 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=13;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=14;
 /* 11/25 16:36(KST)부터 v9: 15분마다 2개 코인 큰 코스 + 점프 뒤 모멘텀 */const F9_T=Date.parse("2026-11-25T07:36:00Z");let K9=0,LISTK=[];
 /* 11/25 16:22(KST)부터 v8: 매끈하게 흐르다 가끔 한 번에 2~6% 툭 */const F8_T=Date.parse("2026-11-25T07:22:00Z");let K8=0;
 /* 11/25 16:14(KST)부터 v7 변동폭 (단타용으로 더 크게) */const F7_T=Date.parse("2026-11-25T07:14:00Z");let K7=0;let KS=0,TSe=0;
@@ -1767,7 +1767,7 @@ function hrBind(d){d.querySelectorAll("[data-hrt]").forEach(b=>b.onclick=()=>{hr
   on("hrBack",()=>{const v=hr.view;if(v&&v.room&&hr.inRoom===v.room){hrRoomLeave(true);hr.mode="room";}hr.view=null;renderCas();});
   on("hrExit",()=>{if(hrLocked())return toast("내가 건 경주가 끝나야 나갈 수 있어요");cancelAnimationFrame(hr.raf);hr.view=null;renderCas();});
   if(hr.view&&hr.view.order)hrAnim();}
-function hrAnim(){cancelAnimationFrame(hr.raf);const v=hr.view;const step=()=>{const cv=$("hrCv");if(!cv||hr.view!==v)return;const ms=nowS()-v.t0;hrDraw(cv,v,ms);if(ms<hrDur(v))hr.raf=requestAnimationFrame(step);else{hrFinish(v);renderCas();}};step();}
+function hrAnim(){cancelAnimationFrame(hr.raf);const v=hr.view;const step=()=>{const cv=$("hrCv");if(!cv||hr.view!==v)return;const ms=nowS()-v.t0;hrDraw(cv,v,ms);if(ms<hrDur(v))hr.raf=requestAnimationFrame(step);else if(!v.fin){v.fin=1;hrFinish(v);renderCas();}};step();}
 /* 말 그림 (오른쪽 보고 달림): 몸통·목·머리·다리·꼬리 + 기수 */
 function hrHorse(g,x,y,col,ph){const lg=ph?Math.sin(ph):0,lg2=ph?Math.sin(ph+Math.PI):0;g.save();g.translate(x-6,y+2);g.lineCap="round";
   g.strokeStyle="#3f2a1a";g.lineWidth=2.4;[[-7,lg],[-3,lg2],[5,lg2],[9,lg]].forEach(([lx,a])=>{g.beginPath();g.moveTo(lx,3);g.lineTo(lx+a*3.5,10);g.stroke();});
