@@ -228,6 +228,7 @@ nav button.on{color:var(--tx);font-weight:700}
     <div class="fhelp mo">왼쪽 조이스틱으로 이동 · 오른쪽 버튼으로 낚시/거래소 · 💬 채팅</div>
   </section>
   <section class="sec adm" id="s-admin">
+    <div class="card"><h3>📮 건의함</h3><div id="sugBox" style="max-height:340px;overflow-y:auto"></div></div>
     <div class="card"><h3>👥 접속 기록 (최근 300개)</h3><div class="nick" style="margin-bottom:6px"><input id="accQ" placeholder="이름으로 찾기"><button id="accClr" style="background:var(--card2)">비우기</button></div><div id="accLogBox" style="max-height:340px;overflow-y:auto"></div></div>
     <div class="card"><h3>🛠️ 전체 시장 (1분간 유지)</h3>
       <div class="g"><button class="a b" data-all="down">📉 하락</button><button class="a b" data-all="crash">💥 폭락</button><button class="a r" data-all="surge">🚀 폭등</button></div>
@@ -453,8 +454,21 @@ function openSheet(ci){if($("pgMod"))$("pgMod").style.display="none";curCoin=ci;
 $("shClose").onclick=()=>closeSheet();
 ["dex","equip","shop","enh","ach","title","set"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
 ["s-wallet","s-dex","s-equip","s-title","s-shop","s-enh","s-ach","s-rank","s-admin","s-set"].forEach(id=>$("pgBody").appendChild($(id)));
-/* ⚙️ 설정: 항목은 나중에 추가 */
-$("s-set").innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div style="font-size:37px">⚙️</div><b style="font-size:14.5px">설정</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div></div>`;
+/* ⚙️ 설정 */
+const CTL={joy:["fJoy","left bottom","🕹️ 조이스틱 크기"],act:["fAct","right bottom","🎣 오른쪽 아래 버튼 크기"]};
+function ctlGet(k){try{const v=+localStorage.getItem("jc_ctl_"+k);return v>=50&&v<=200?v:100;}catch(e){return 100;}}
+function ctlApply(){for(const k in CTL){const e=$(CTL[k][0]);if(!e)continue;const v=ctlGet(k);e.style.transformOrigin=CTL[k][1];e.style.transform=v===100?"":`scale(${v/100})`;}}
+$("s-set").innerHTML=`<div class="card"><h3>📱 화면 버튼 크기</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">폰 광장 화면의 조이스틱과 오른쪽 아래 버튼 크기를 바꿔요</div>`+
+  Object.keys(CTL).map(k=>`<div style="display:flex;align-items:center;gap:8px;margin:8px 0"><span style="font-size:12px;width:130px">${CTL[k][2]}</span><input type="range" min="60" max="180" step="5" value="${ctlGet(k)}" data-ctl="${k}" style="flex:1"><b data-ctlv="${k}" style="font-size:12px;width:40px;text-align:right">${ctlGet(k)}%</b></div>`).join("")+
+  `<button id="ctlReset" style="margin-top:4px;padding:7px 12px;border-radius:9px;background:var(--card2);font-size:12px">기본 크기로</button></div>`+
+  `<div class="card"><h3>📮 건의함</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">건의 및 문의할 내용을 남겨주세요</div><textarea id="sugIn" maxlength="500" rows="4" style="width:100%;box-sizing:border-box;background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:13px;resize:vertical"></textarea><button id="sugBtn" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">보내기</button></div>`;
+$("s-set").querySelectorAll("[data-ctl]").forEach(r=>{r.oninput=()=>{const k=r.dataset.ctl;try{localStorage.setItem("jc_ctl_"+k,r.value);}catch(e){}$("s-set").querySelector(`[data-ctlv="${k}"]`).textContent=r.value+"%";ctlApply();};});
+$("ctlReset").onclick=()=>{for(const k in CTL){try{localStorage.removeItem("jc_ctl_"+k);}catch(e){}const r=$("s-set").querySelector(`[data-ctl="${k}"]`);r.value=100;$("s-set").querySelector(`[data-ctlv="${k}"]`).textContent="100%";}ctlApply();toast("버튼 크기를 기본으로 돌렸어요");};
+$("sugIn").addEventListener("keydown",e=>e.stopPropagation());
+$("sugBtn").onclick=async()=>{const v=$("sugIn").value.trim();if(!v)return toast("내용을 적어 주세요");if(!fdb||!myId)return toast("서버에 연결 중이에요");if(Date.now()-(sugSend.t||0)<30000)return toast("잠시 후에 다시 보내 주세요");sugSend.t=Date.now();
+  try{await fdb.ref("market/suggest").push({id:myId,name:myName(),text:v.slice(0,500),t:firebase.database.ServerValue.TIMESTAMP});$("sugIn").value="";stAdd("sugN");saveMe();toast("📮 건의를 보냈어요. 고마워요!");}catch(e){sugSend.t=0;toast("보내기 실패: 잠시 후 다시 해 주세요");}};
+function sugSend(){}
+ctlApply();
 $("s-enh").innerHTML=`<div class="card" style="text-align:center;padding:36px 10px"><div style="font-size:40.5px">🎣⚒️</div><b style="font-size:14.5px">낚싯대 강화</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div><div style="font-size:11px;color:var(--sub);margin-top:12px">지금 장착 중: <b style="color:var(--tx)">기본 낚싯대</b></div></div>`;
 $("s-dex").appendChild($("fishInfo"));$("fishInfo").style.padding="0";$("fishInfo").style.overflowY="visible";
 $("s-equip").innerHTML=`<div class="card"><h3>🧑 캐릭터</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">가지고 있는 캐릭터 중에서 골라 입어요. 새 캐릭터는 🛍️ 상점에서 살 수 있어요.</div><div id="eqGrid" class="cgrid" style="padding:4px 0 0"></div></div>`+`<div class="card"><h3>🎣 낚싯대</h3><div id="eq_rod"></div></div><div class="card"><h3>🪱 미끼</h3><div id="eq_bait"></div></div>`+`<div class="card"><h3>✨ 오라</h3><div id="eq_aura" class="cgrid" style="padding:4px 0 0"></div></div><div class="card"><h3>🪽 날개</h3><div id="eq_wing" class="cgrid" style="padding:4px 0 0"></div></div><div class="card"><h3>🏷️ 명찰</h3><div id="eq_plate" class="cgrid" style="padding:4px 0 0"></div></div>`;
@@ -534,7 +548,7 @@ const ACH=[
  {g:"tut",c:"🤝 거래소 교환 1회 완료",k:"t_trade",u:"회",tiers:[[1,"첫 교환",50000]]},
  {g:"tut",c:"💰 거래소 판매 1회 완료 (내 물건이 팔림)",k:"t_sold",u:"회",tiers:[[1,"첫 판매",50000]]},
  {g:"tut",c:"⚔️ 배틀 해 보기",k:"t_rps",u:"회",tiers:[[1,"첫 배틀",50000]]},
- {g:"tut",c:"🎤 광장 MC 가바보 발판 게임 해 보기",k:"t_mc",u:"회",tiers:[[1,"MC 도전",50000]]},
+ {g:"tut",c:"✊ 가위바위보 게임 해 보기",k:"t_mc",u:"회",tiers:[[1,"MC 도전",50000]]},
  {g:"tut",c:"👕 캐릭터 바꿔 보기",k:"t_char",u:"회",tiers:[[1,"캐릭터 변경",50000]]},
  {g:"tut",c:"💬 채팅 보내 보기",k:"t_chat",u:"회",tiers:[[1,"첫 인사",50000]]},
  {g:"tut",c:"🎓 튜토리얼 모두 완료",k:"t_all",u:"개",tiers:[[14,"새내기 졸업",1000000,1]]},
@@ -743,7 +757,10 @@ $("admReset").onclick=async()=>{if(!confirmReset())return;const t=Date.now();
   try{await fdb.ref("market/config").set({epoch:Math.floor(t/TICK)*TICK});await fdb.ref("market/events").set({list:"[]"});await fdb.ref("chat").remove();}catch(e){}
   broadcast("🧹 [ 코인 시장 전면 초기화 완료 ]\n모든 코인이 기본 가격으로 리셋되고, 매수 원금이 현금으로 전액 환불되었습니다! 💰");toast("초기화 완료");};
 let resetArm=0;function confirmReset(){if(Date.now()-resetArm<4000)return true;resetArm=Date.now();toast("정말 초기화하려면 4초 안에 한 번 더 누르세요");return false;}
-function renderAdmin(){if(!isOwner)return;const s=$("admCoin");if(!s.options.length)s.innerHTML=COINS.map(c=>`<option>${c[0]}</option>`).join("");
+let sugList=[],sugOn=false;function sugListen(){if(sugOn||!fdb||!isOwner)return;sugOn=true;fdb.ref("market/suggest").limitToLast(200).on("value",s=>{const v=s.val()||{};sugList=Object.entries(v).map(([k,x])=>({k,...x})).sort((a,b)=>(b.t||0)-(a.t||0));renderSug();});}
+function renderSug(){const B=$("sugBox");if(!B)return;B.innerHTML=sugList.length?sugList.map(x=>`<div style="padding:8px 2px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub)"><b style="color:var(--tx)">${esc(x.name||"?")}</b><span>${x.t?new Date(x.t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):""} <button data-sugdel="${x.k}" style="margin-left:6px;font-size:10.5px;color:var(--up)">삭제</button></span></div><div style="font-size:12.5px;white-space:pre-wrap;margin-top:3px">${esc(x.text||"")}</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">아직 건의가 없어요</div>';
+  B.querySelectorAll("[data-sugdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더";return;}fdb.ref("market/suggest/"+b.dataset.sugdel).remove().catch(()=>toast("삭제 실패"));});}
+function renderAdmin(){if(!isOwner)return;sugListen();renderSug();const s=$("admCoin");if(!s.options.length)s.innerHTML=COINS.map(c=>`<option>${c[0]}</option>`).join("");
   const u=$("admUser"),v=u.value,all={...players};if(myId)all[myId]=me;u.innerHTML='<option value="">받는 사람</option>'+Object.entries(all).map(([id,p])=>`<option value="${id}">${esc(p.name||'이름없음')}</option>`).join("");u.value=v;renderAdmPlayers();}
 let delArm={};function agoTxt(t){if(!t)return"기록 없음";const m=Math.floor((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.floor(m/60)+"시간 전":Math.floor(m/1440)+"일 전";}
 function renderAdmPlayers(){const box=$("admPlayers");if(!box)return;const all={...players};if(myId&&me)all[myId]=me;
@@ -755,10 +772,14 @@ function renderAdmPlayers(){const box=$("admPlayers");if(!box)return;const all={
     delete delArm[id];const nm=(players[id]&&players[id].name)||"";try{await fdb.ref("market/kicked/"+id).set(Date.now());await fdb.ref("players/"+id).remove();await fdb.ref("online/"+id).remove();toast(`${nm}님 삭제 완료`);}catch(e){toast("삭제 실패");}});}
 
 /* ===================== 공지 / 탭 ===================== */
+/* 공지 접기: 최근 거래는 전체→3개→접힘→전체, 상장폐지는 펼침↔접힘 (기기에 기억) */
+function ntState(){try{return JSON.parse(localStorage.getItem("jc_nt")||"{}")||{};}catch(e){return{};}}
+function ntToggle(k){const st=ntState();st.tr=st.tr|0;st.dl=st.dl|0;if(k==="tr")st.tr=(st.tr+1)%3;else st.dl=st.dl?0:1;try{localStorage.setItem("jc_nt",JSON.stringify(st));}catch(e){}showNotices();}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest("[data-nt]");if(b)ntToggle(b.dataset.nt);});
 function showNotices(){let html="";const recent=[];M.coins.forEach((c,ci)=>c.dl.forEach(d=>{if(M.k-d.k<1080)recent.push(`• ${COINS[ci][0]} (${formatCoinPrice(d.price)}) · ${Math.round((M.k-d.k)*TICK/60000)}분 전`);}));
   const logs=[];const allP={...players};if(me&&myId)allP[myId]=me;for(const[id,p]of Object.entries(allP))for(const l of(p.log||[]))if(l&&Date.now()-l.t<LOG_WIN)logs.push({...l,name:p.name||"이름없음"});
-  logs.sort((a,b)=>b.t-a.t);if(logs.length)html+=`<div class="notice tr">🔔 최근 거래 (30분)\n${logs.slice(0,6).reverse().map(l=>{const m=Math.floor((Date.now()-l.t)/60000);return `<span class="${l.k==='buy'?'up':'down'}">• ${m<1?'방금':m+'분 전'} · ${esc(l.name)}님 ${esc(l.c)} ${formatCoinReadable(l.q)} ${l.k==='buy'?'매수':'매도'}</span> <span style="color:var(--sub)">(${formatMoneyReadable(l.a)})</span>`;}).join("\n")}</div>`;
-  if(recent.length)html+=`<div class="notice">🚨 상장폐지 공지 (최근 3시간)\n${recent.join("\n")}\n보유자에게는 잔여 가치의 5%가 현금 환불돼요.</div>`;
+  logs.sort((a,b)=>b.t-a.t);const ntS=ntState();if(logs.length)html+=`<div class="notice tr"><b data-nt="tr" style="cursor:pointer;display:flex;justify-content:space-between;font-weight:700">🔔 최근 거래 (30분)${ntS.tr?` · ${logs.length}건`:""}<span style="color:var(--sub);font-weight:400;font-size:10.5px">${["▲ 줄이기","▲ 접기","▼ 펼치기"][ntS.tr]}</span></b>${ntS.tr===2?"":"\n"+logs.slice(0,ntS.tr===1?3:6).reverse().map(l=>{const m=Math.floor((Date.now()-l.t)/60000);return `<span class="${l.k==='buy'?'up':'down'}">• ${m<1?'방금':m+'분 전'} · ${esc(l.name)}님 ${esc(l.c)} ${formatCoinReadable(l.q)} ${l.k==='buy'?'매수':'매도'}</span> <span style="color:var(--sub)">(${formatMoneyReadable(l.a)})</span>`;}).join("\n")}</div>`;
+  if(recent.length)html+=`<div class="notice"><b data-nt="dl" style="cursor:pointer;display:flex;justify-content:space-between">🚨 상장폐지 공지 (최근 3시간)${ntS.dl?` · ${recent.length}건`:""}<span style="font-weight:400;font-size:10.5px;opacity:.8">${ntS.dl?"▼ 펼치기":"▲ 접기"}</span></b>${ntS.dl?"":"\n"+recent.join("\n")+"\n보유자에게는 잔여 가치의 5%가 현금 환불돼요."}</div>`;
   if(!fdb)html+=`<div class="notice info">⏳ 서버에 연결하는 중이에요…</div>`;
   $("notices").innerHTML=html;}
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));document.querySelectorAll(".sec").forEach(s=>s.classList.toggle("on",s.id==="s-"+b.dataset.s));renderAll();fishShow(b.dataset.s==="fish");try{localStorage.setItem("jc_tab",b.dataset.s);}catch(e){}});
