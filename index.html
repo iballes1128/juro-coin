@@ -289,7 +289,7 @@ nav button.on{color:var(--tx);font-weight:700}
   <div class="sh-top" style="padding-right:40px"><div><div id="shName" style="font-weight:700;font-size:14.5px"></div><div class="big" id="shPrice"></div><div id="shRate" style="font-size:12px;font-weight:700"></div></div>
     <div style="text-align:right;font-size:11px;color:var(--sub);line-height:1.7" id="shRange"></div></div>
   <canvas id="chart"></canvas>
-  <div class="ranges" id="ranges"><button data-n="60" class="on">10분</button><button data-n="180">30분</button><button data-n="360">1시간</button><button data-n="1080">3시간</button></div>
+  <div class="ranges" id="ranges"><button data-n="180" class="on">30분</button><button data-n="1080">3시간</button><button data-n="2160">6시간</button><button data-n="4320">12시간</button></div>
   <div id="shHold" style="font-size:12px;color:var(--sub);margin-bottom:10px"></div>
   <div class="bs"><button class="buy on" data-m="buy">매수</button><button class="sell" data-m="sell">매도</button></div>
   <input id="qty" inputmode="numeric" placeholder="수량(개)">
@@ -614,7 +614,7 @@ let fdb=null,db=null,user=null,room=null,myId=null,isOwner=false,canWrite=false,
 const canTrade=()=>canWrite||localMode;
 const LKEY='cau_coin_local_v1';
 function enterLocal(){if(localMode)return;localMode=true;try{const v=JSON.parse(localStorage.getItem(LKEY)||'null');if(v&&typeof v.cash==='number'){me={...local,...v};}}catch(e){}if(!me.name)me.name='나';me._loaded=true;showNotices();renderAll();}
-let profitCoin="전체",me=null,players={},saving=false,dirty=false,curCoin=-1,mode="buy",rankKey="rich",chartN=60;
+let profitCoin="전체",me=null,players={},saving=false,dirty=false,curCoin=-1,mode="buy",rankKey="rich",chartN=180;
 const local={cash:START_CASH,coins:{},name:"",att:0,lastAtt:"",claimed:[]};
 const $=id=>document.getElementById(id);
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2600);}
