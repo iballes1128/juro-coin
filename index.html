@@ -898,17 +898,35 @@ $("qty").oninput=()=>renderSheet();
 document.querySelectorAll("#ranges button").forEach(b=>b.onclick=()=>{chartN=+b.dataset.n;document.querySelectorAll("#ranges button").forEach(x=>x.classList.toggle("on",x===b));renderSheet();});
 const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",mkt:"🏪 어시장 거래 수수료",casino:"🎰 도박장"};let taxAll={},taxPre={};
 function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=(me.taxPaid||0)+amt;stAdd("tax_"+k,amt);}if(fdb)fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+amt;c[k]=(c[k]||0)+amt;return c;}).catch(()=>{});}
+/* ===== 💝 복지 지원금: 걷힌 세금에서 자산 1000만원 이하인 사람에게 300만원 (1시간에 1번) ===== */
+const WEL_AMT=3000000,WEL_MAX=10000000,WEL_CD=3600000;let welAll={},welLog=[];
+const welAvail=()=>Math.max(0,(taxAll.total||0)-(welAll.paid||0));
+const welLeft=()=>Math.max(0,((welAll.u&&welAll.u[myId])||0)+WEL_CD-nowS());
+const welTm=t=>{const d=new Date(t);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
+function welState(){if(!me||!me._loaded)return{ok:false,msg:"닉네임부터 정해 주세요"};if(taxAll.total==null)return{ok:false,msg:"불러오는 중…"};const a=Math.round(assetOf(me));
+  if(a>WEL_MAX)return{ok:false,msg:`자산 ${formatMoneyReadable(WEL_MAX)} 이하만 받을 수 있어요 (내 자산 ${formatMoneyReadable(a)})`};
+  const l=welLeft();if(l>0){const m=Math.floor(l/60000),sc=Math.floor(l/1000)%60;return{ok:false,msg:`⏳ ${m}분 ${String(sc).padStart(2,"0")}초 뒤에 다시 받을 수 있어요`};}
+  if(welAvail()<WEL_AMT)return{ok:false,msg:"지원금 재원이 부족해요 (세금이 더 걷히면 가능)"};return{ok:true,msg:`💝 ${formatMoneyReadable(WEL_AMT)} 받기`};}
+function welHtml(){const st=welState();return `<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900"><span>💝 복지 지원금</span><span style="color:var(--sub);font-weight:500;font-size:11px">재원 ${taxAll.total==null?"…":formatMoneyReadable(welAvail())}</span></div><div style="font-size:11px;color:var(--sub);margin:4px 0 8px;line-height:1.5">걷힌 세금으로 자산 ${formatMoneyReadable(WEL_MAX)} 이하인 분께 ${formatMoneyReadable(WEL_AMT)}을 드려요 · 1시간에 한 번</div><button id="welBtn" ${st.ok?"":"disabled"} style="width:100%;padding:11px 0;border-radius:10px;background:${st.ok?"var(--acc)":"var(--card2)"};color:${st.ok?"#111":"var(--sub)"};font-weight:900;font-size:12.5px">${st.msg}</button>
+  <div style="font-size:11.5px;font-weight:900;margin:10px 0 2px">📜 지급 기록</div>`+(welLog.length?welLog.map(v=>`<div style="display:flex;justify-content:space-between;gap:6px;padding:4px 0;border-top:1px solid var(--line);font-size:11px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(String(v.name||"?").slice(0,10))} · ${formatMoneyReadable(v.amt||0)}</span><span style="color:var(--sub);flex:none">${welTm(v.t||0)}</span></div>`).join(""):'<div style="color:var(--sub);font-size:11px;padding:4px 0">아직 지급 기록이 없어요</div>')+`</div>`;}
+function claimWelfare(){const st=welState();if(!st.ok)return toast(st.msg);if(!fdb)return;const b=$("welBtn");if(b)b.disabled=true;const asset=Math.round(assetOf(me));
+  fdb.ref("market/welfare").transaction(c=>{c=c||{};c.u=c.u||{};const now=nowS();if(now-(c.u[myId]||0)<WEL_CD)return;if((c.paid||0)+WEL_AMT>(taxAll.total||0))return;c.paid=(c.paid||0)+WEL_AMT;c.n=(c.n|0)+1;c.u[myId]=now;return c;},(err,ok)=>{
+    if(err||!ok){toast("지금은 받을 수 없어요");renderNts();return;}
+    me.cash+=WEL_AMT;me.welAt=nowS();stAdd("welfare");saveMe();renderHeader();
+    fdb.ref("market/welfareLog").push({name:myName().slice(0,10),amt:WEL_AMT,t:nowS(),as:asset}).catch(()=>{});
+    toast(`💝 복지 지원금 ${formatMoneyReadable(WEL_AMT)}을 받았어요!`);renderNts();},false);}
 function openNts(){fKeys={};stAdd("visitNts");let d=$("ntsMod");if(!d){d=document.createElement("div");d.id="ntsMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
-    if(fdb){fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/taxPre").on("value",s=>{taxPre=s.val()||{};if(d.style.display==="flex")renderNts();});}}d.style.display="flex";renderNts();}
+    if(fdb){fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/taxPre").on("value",s=>{taxPre=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/welfare").on("value",s=>{welAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/welfareLog").limitToLast(10).on("value",s=>{const o=s.val()||{};welLog=Object.keys(o).sort().map(k=>o[k]).reverse();if(d.style.display==="flex")renderNts();});}
+    setInterval(()=>{if(d.style.display!=="flex")return;const b=$("welBtn");if(!b)return;const st=welState();if(b.textContent!==st.msg)b.textContent=st.msg;b.disabled=!st.ok;b.style.background=st.ok?"var(--acc)":"var(--card2)";b.style.color=st.ok?"#111":"var(--sub)";},1000);}d.style.display="flex";renderNts();}
 function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(me&&myId)all[myId]=me;const top=Object.entries(all).map(([id,p])=>({id,n:(p&&p.name)||"?",v:((p&&p.taxPaid)||0)+(taxPre[id]||0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
   const row=(a,b,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--sub)">${a}</span><b${c?` style="color:${c}"`:""}>${b}</b></div>`;
   d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">🏛️ 국세청</b><button id="ntsX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
     <div style="text-align:center;margin:8px 0 12px"><div style="font-size:11px;color:var(--sub)">지금까지 걷힌 세금 총합</div><div style="font-size:24px;font-weight:900;color:var(--acc)">${taxAll.total==null?"불러오는 중…":formatMoneyReadable(taxAll.total)}</div></div>`+
     Object.keys(TAX_K).map(k=>row(TAX_K[k],taxAll.total==null?"…":formatMoneyReadable(taxAll[k]||0))).join("")+
-    `<div style="margin-top:12px">`+row("🧾 내가 낸 세금",formatMoneyReadable(((me&&me.taxPaid)||0)+(taxPre[myId]||0)),"var(--acc)")+`</div>`+
+    `<div style="margin-top:12px">`+row("🧾 내가 낸 세금",formatMoneyReadable(((me&&me.taxPaid)||0)+(taxPre[myId]||0)),"var(--acc)")+`</div>`+welHtml()+
     `<div style="font-size:12px;font-weight:900;margin:14px 0 4px">🏅 성실 납세자 TOP 5</div>`+(top.length?top.map((x,i)=>row(`${["🥇","🥈","🥉","4","5"][i]} ${esc(x.n)}`,formatMoneyReadable(x.v))).join(""):'<div style="color:var(--sub);font-size:12px">아직 없어요</div>')+
     `<div style="font-size:10px;color:var(--sub);margin-top:10px;text-align:center">${taxAll.backfilled?"이전 세금은 남아 있는 거래 기록으로 추정해서 합쳤어요":"이번 업데이트부터 걷힌 세금이 집계돼요"}</div></div>`;
-  $("ntsX").onclick=()=>d.style.display="none";}
+  $("ntsX").onclick=()=>d.style.display="none";const wb=$("welBtn");if(wb)wb.onclick=claimWelfare;}
 function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,name:"25% + 복권·로또 각 10조"};if(asset>=1e14)return{fee:Math.round(raw*.25),name:"25%"};if(asset>=1e13)return{fee:Math.round(raw*.2),name:"20%"};if(asset>=1e12)return{fee:Math.round(raw*.15),name:"15%"};if(asset>1e8)return{fee:Math.round(raw*.1),name:"10%"};return{fee:Math.round(raw*.05),name:"5% · 자산 1억 이하"};}
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
   $("shName").innerHTML=esc(n)+badges(ci);$("shPrice").textContent=c.delisted?"거래 정지":formatCoinPrice(p);$("shPrice").className="big "+(c.rate>0?"up":c.rate<0?"down":"");
