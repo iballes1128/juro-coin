@@ -3038,9 +3038,9 @@ function tmStop(){if(!tm.on)return;tm.on=false;cancelAnimationFrame(tm.raf);cons
   tm.best=tm.best==null?err:Math.min(tm.best,err);tm.res={ms,pay,tier};saveMe();renderHeader();tmRender();
   if(tier&&tier[1]>=2.5)broadcast(`⏱️ ${myName()}님이 시간 맞추기에서 ${(ms/1000).toFixed(2)}초! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-TM_COST)}`);}
 /* ---------- 🏀 농구 : 3라운드 누적 · 꾹 눌러 힘 조절 · 백보드 2점 / 클린 3점 · 주간 순위 ---------- */
-const BB_COST=200000,BB_LEN=30,BB_NEED=[25,60],BB_FILL=1400,BB_PRIZE=5000000,BB_MIN=70,BB_HX=270,BB_CD=3000,BB_FIRE=3;
+const BB_COST=200000,BB_LEN=30,BB_NEED=[25,60],BB_FILL=1400,BB_PRIZE=5000000,BB_MIN=90,BB_HX=270,BB_CD=3000,BB_FIRE=3;
 /* [누적 점수 이상, 배수, 이름] — 3라운드 모두 통과했을 때만 */
-const BB_TIERS=[[120,10,"👑 전설의 슈터"],[100,4,"🔥 에이스"],[85,2,"⭐ 주전"],[70,1,"🏀 벤치 멤버"]];
+const BB_TIERS=[[135,10,"👑 전설의 슈터"],[120,4,"🔥 에이스"],[105,2,"⭐ 주전"],[90,1,"🏀 벤치 멤버"]];
 const BBP={W:360,H:420,FLOOR:372,PX:62,G:900,ANG:70*Math.PI/180,VMIN:420,VMAX:720,BR:6,HY:170,RIMW:22,BOARDT:-46,BOARDB:10};
 const bbWk=t=>Math.floor((t+9*3600000-4*86400000)/(7*86400000));
 const bbWkEnd=w=>(w+1)*7*86400000+4*86400000-9*3600000;
@@ -3141,7 +3141,7 @@ function bbDraw(now){const cv=$("bbCv");if(!cv)return;const c=cv.getContext("2d"
   /* 캐릭터 */
   const H=phSelf().H;phPerson(c,H,myName().slice(0,8),B.PX,B.FLOOR+4,1.7,now,bb.ch.on?"up":"base",1);
   /* 공 */
-  const ball=(x,y,rot,fire)=>{c.save();c.translate(x,y);if(fire){c.fillStyle="rgba(251,146,60,.35)";c.beginPath();c.arc(0,0,13+Math.sin(now/60)*2,0,7);c.fill();c.fillStyle="rgba(253,224,71,.5)";c.beginPath();c.arc(0,0,10,0,7);c.fill();}c.rotate(rot);c.fillStyle=fire?"#fb923c":"#f97316";c.beginPath();c.arc(0,0,7.5,0,7);c.fill();c.strokeStyle="#7c2d12";c.lineWidth=1.1;c.beginPath();c.arc(0,0,7.5,0,7);c.moveTo(-7.5,0);c.lineTo(7.5,0);c.moveTo(0,-7.5);c.lineTo(0,7.5);c.stroke();c.restore();};
+  const ball=(x,y,rot,fire)=>{c.save();c.translate(x,y);if(fire){c.fillStyle="rgba(251,146,60,.35)";c.beginPath();c.arc(0,0,13+Math.sin(now/60)*2,0,7);c.fill();c.fillStyle="rgba(253,224,71,.5)";c.beginPath();c.arc(0,0,10,0,7);c.fill();}c.rotate(rot);c.fillStyle=fire?"#fb923c":"#f97316";c.beginPath();c.arc(0,0,9,0,7);c.fill();c.strokeStyle="#7c2d12";c.lineWidth=1.1;c.beginPath();c.arc(0,0,9,0,7);c.moveTo(-9,0);c.lineTo(9,0);c.moveTo(0,-9);c.lineTo(0,9);c.stroke();c.restore();};
   if(bb.ball){const b=bb.ball,i=Math.min(b.path.length-1,Math.floor((now-b.t0)/1000*240)),pt=b.path[i]||b.path[b.path.length-1];ball(pt[0],pt[1],i/18,b.fire);}
   else if(play||bb.phase==="idle")ball(B.PX+14,B.FLOOR-62-(bb.ch.on?Math.sin(now/90)*1.5:0),0,bb.bon>0);
   /* 게이지 */
