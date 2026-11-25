@@ -342,7 +342,7 @@ const COINS=[["비트코인",3000000,1000000,9000000,"#f7931a"],["테더골드",
 const NEWCOINS=["테더골드","플라즈마","페페"];
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=8,APP_V=8;let KS=0,TSe=0;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=8,APP_V=9;let KS=0,TSe=0;
 function fastInit(){const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
 const curTick=()=>Date.now()>=TSe?FTICK:TICK; // 지금 틱 길이
@@ -658,7 +658,7 @@ const titleOf=(id,p)=>{p=p||me;const t=tierOf(id);if(t&&t[3])return t[1];const a
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
 const achNoted={};
 function achNext(a){const v=achVal(a.k);const i=a.tiers.findIndex((t,j)=>!(me&&me.ach&&me.ach[achId(a.k,j)]));return i<0?null:{i,t:a.tiers[i],v,ready:v>=a.tiers[i][0]};}
-function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();lvMig();if(me.hrOpen)hrListen();if(me.hrPay&&nowS()>me.hrPay.at+3000&&!($("casMod")&&$("casMod").style.display==="flex"&&casTab==="hr"&&hr.view&&hrMyBet(hr.view))){const P=me.hrPay;me.hrPay=null;me.cash+=P.v;saveMe();renderHeader();toast(`🏇 ${P.txt} 적중! ${formatMoneyReadable(P.v)}을 넣어 드렸어요`);if(P.v-P.stake>=10000000)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${formatMoneyReadable(P.v-P.stake)}`);}
+function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();lvMig();if(me.hrOpen)hrListen();if(me.hrPay&&nowS()>me.hrPay.at+3000&&!($("casMod")&&$("casMod").style.display==="flex"&&casTab==="hr"&&hr.view&&hrMyBet(hr.view))){const P=me.hrPay;me.hrPay=null;me.cash+=P.v;saveMe();renderHeader();toast(`🏇 ${P.txt} 적중! ${formatMoneyReadable(P.v)}을 넣어 드렸어요`);if(P.v>P.stake)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${formatMoneyReadable(P.v-P.stake)}`);}
   if(me.casPend>0&&!($("casMod")&&$("casMod").style.display==="flex")){const v=me.casPend;me.cash+=v;me.casPend=0;saveMe();renderHeader();toast(`🎲 못 받은 주사위 보상 ${formatMoneyReadable(v)}을 넣어 드렸어요`);}let n=0;const nw=[];for(const a of ACH){const x=achNext(a);if(x&&x.ready){n++;const id=achId(a.k,x.i);if(!achNoted[id]){achNoted[id]=1;nw.push(a.c.replace(/\s*\(.*\)$/,""));}}}
   const b=document.querySelector('#dock [data-pg="ach"]');if(b){let d=b.querySelector(".achDot");if(!d){d=document.createElement("span");d.className="achDot";d.style.cssText="position:absolute;top:2px;right:4px;min-width:15px;height:15px;border-radius:8px;background:var(--up);color:#fff;font-size:8.5px;font-weight:900;line-height:15px;padding:0 3px";b.style.position="relative";b.appendChild(d);}d.textContent=n;d.style.display=n?"block":"none";}
   if(nw.length)toast(`🏅 업적 달성! ${nw.slice(0,2).join(", ")}${nw.length>2?` 외 ${nw.length-2}개`:""}\n업적에서 보상을 받아 가세요`);if(pgCur==="ach")renderAch();}
@@ -1502,7 +1502,7 @@ function casPay(stake,payout,game,mult){addTax("casino",stake*CAS_EDGE);stAdd("c
 function casCanBet(v){if(!me||!me._loaded||!canTrade()||sessBlocked){toast("지금은 할 수 없어요");return false;}if(!(v>=CAS_MIN))return toast(`최소 ${casFmt(CAS_MIN)}부터 걸 수 있어요`),false;if(v>CAS_MAX)return toast(`최대 ${casFmt(CAS_MAX)}까지 걸 수 있어요`),false;if(v>me.cash)return toast("💸 잔액이 부족해요"),false;return true;}
 function openCasino(){fKeys={};stAdd("visitCas");let d=$("casMod");if(!d){d=document.createElement("div");d.id="casMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d&&!casBusy)casClose();};d.addEventListener("keydown",e=>e.stopPropagation());}d.style.display="flex";if(lad.stage!=="won")ladNew();renderCas();}
 function diceTake(silent){const v=(me&&me.casPend)|0;if(v>0){me.cash+=v;me.casPend=0;saveMe();renderHeader();if(!silent)toast(`💰 ${casFmt(v)} 받았어요!`);}dice.res=null;dice.shown=[1,1,1];if(!silent)renderCas();}
-function casClose(){const d=$("casMod");if(d)d.style.display="none";if((me&&me.casPend)>0)diceTake(true);if(lad.streak>0){lad.stage="won";ladCollect(true);}}
+function casClose(){if(casTab==="hr"&&hrLocked())return toast("내가 건 경주가 끝나야 나갈 수 있어요");{const R=hrRoomR();if(R&&!R.order&&!(R.bets&&R.bets[myId]))hrRoomLeave(true);}const d=$("casMod");if(d)d.style.display="none";if((me&&me.casPend)>0)diceTake(true);if(lad.streak>0){lad.stage="won";ladCollect(true);}}
 /* ---------- 🪜 사다리 ---------- */
 function ladNew(){const n=lad.n,R=[];for(let r=0;r<LAD_ROWS;r++){const row=[];for(let c=0;c<n-1;c++)row.push(!row[c-1]&&Math.random()<.5);R.push(row);}
   for(let c=0;c<n-1;c++)if(!R.some(row=>row[c])){const r=Math.floor(Math.random()*LAD_ROWS);if(!R[r][c-1]&&!R[r][c+1])R[r][c]=true;}
@@ -1516,7 +1516,7 @@ function ladResult(ok,stake){const m=LAD_MULT[lad.n];stAdd("ladRound");
     saveMe();renderHeader();renderCas();}
   else{casPay(stake,0,"lad",0);const was=lad.streak;lad.streak=0;lad.pot=0;lad.stage="lost";saveMe();renderHeader();renderCas();if(was>=2&&stake>=10000000)broadcast(`🎰 ${myName()}님 사다리 ${was+1}연속 도전 실패… ${casFmt(stake)} 증발 💸`);}}
 function ladCollect(silent){if(lad.stage!=="won")return;const first=lad.pot/Math.pow(LAD_MULT[lad.n],lad.streak),profit=lad.pot-first;
-  if(profit>=10000000)broadcast(`🎰 ${myName()}님 사다리 ${lad.n}줄 ${lad.streak>1?lad.streak+"연속 ":""}성공! +${casFmt(profit)}`);if(!silent)toast(`💰 ${casFmt(lad.pot)} 받았어요!`);lad.streak=0;lad.pot=0;lad.stage="pick";ladNew();if(!silent)renderCas();}
+  if(profit>0)broadcast(`🎰 ${myName()}님 사다리 ${lad.n}줄 ${lad.streak>1?lad.streak+"연속 ":""}성공! +${casFmt(profit)}`);if(!silent)toast(`💰 ${casFmt(lad.pot)} 받았어요!`);lad.streak=0;lad.pot=0;lad.stage="pick";ladNew();if(!silent)renderCas();}
 function ladAgain(){if(lad.stage!=="won")return;if(lad.streak>=LAD_MAXSTREAK)return toast(`최대 ${LAD_MAXSTREAK}연속까지예요`);lad.stage="pick";ladNew();renderCas();}
 function drawLad(){const cv=$("ladCv");if(!cv)return;const g=cv.getContext("2d"),W=cv.width,H=cv.height,n=lad.n,top=34,bot=H-38,colX=c=>W*(c+.5)/n,rowY=r=>top+(bot-top)*(r+1)/(LAD_ROWS+1);
   g.clearRect(0,0,W,H);g.lineCap="round";const hide=lad.stage==="pick";
@@ -1536,26 +1536,27 @@ function diceMult(){return dice.sel==="sum"?DICE_SUM[dice.sum]:dice.sel==="any3"
 function diceRoll(){if(casBusy)return;if((me&&me.casPend)>0)return toast("먼저 💰 받기를 눌러 주세요");const stake=casBet;if(!casCanBet(stake))return;me.cash-=stake;saveMe();renderHeader();casBusy=true;dice.res=null;dice.stop=0;
   const fin=[1,2,3].map(()=>1+Math.floor(Math.random()*6));const t0=performance.now();const tm=setInterval(()=>{const el=performance.now()-t0;dice.stop=el>1900?3:el>1300?2:el>700?1:0;dice.shown=[0,1,2].map(i=>i<dice.stop?fin[i]:1+Math.floor(Math.random()*6));drawDice();if(el>1900){clearInterval(tm);dice.shown=fin;
     const m=diceEval(fin),pay=Math.round(stake*m),tri=fin[0]===fin[1]&&fin[1]===fin[2];if(pay)me.casPend=(me.casPend||0)+pay;casPay(stake,pay,"dice",m);if(tri)stAdd("diceTriple");if(tri&&fin[0]===6)stAdd("dice666");
-    dice.res={fin,m,pay,stake,tri,pend:!!pay};casBusy=false;saveMe();renderHeader();renderCas();if(pay-stake>=10000000)broadcast(`🎲 ${myName()}님 주사위 ${diceSelName()} 적중! ${fin.join("-")} → +${casFmt(pay-stake)} (${m}배)`);}},70);renderCas();}
+    dice.res={fin,m,pay,stake,tri,pend:!!pay};casBusy=false;saveMe();renderHeader();renderCas();if(pay>stake)broadcast(`🎲 ${myName()}님 주사위 ${diceSelName()} 적중! ${fin.join("-")} → +${casFmt(pay-stake)} (${m}배)`);}},70);renderCas();}
 function drawDice(){const b=$("diceBox");if(!b)return;const R=dice.res,rolling=casBusy&&casTab==="dice",st=dice.stop||0;
   if(b.children.length!==3)b.innerHTML=[0,1,2].map(()=>`<div style="width:58px;height:58px;border-radius:12px;background:#f8fafc;color:#111;display:flex;align-items:center;justify-content:center;font-size:46px;line-height:1;box-shadow:0 3px 10px rgba(0,0,0,.4);transition:background .2s,box-shadow .2s"></div>`).join("");
   [...b.children].forEach((e,i)=>{const t=DFACE[dice.shown[i]];if(e.textContent!==t)e.textContent=t;const cls=rolling&&i>=st?"dspin":(rolling&&i<st?"dland":"");if(e.className!==cls)e.className=cls;e.style.background=R&&!R.pay?"#cbd5e1":"#f8fafc";e.style.boxShadow=R&&R.pay?"0 0 0 3px #fbbf24,0 0 18px #fbbf24":"0 3px 10px rgba(0,0,0,.4)";});
   const r=$("diceRes");if(r)r.innerHTML=R?`<div class="${R.pay?"dwin":"dlose"}" style="text-align:center;padding:8px 6px;border-radius:12px;margin:-2px 0 10px;background:${R.pay?"linear-gradient(90deg,#78350f,#b45309,#78350f)":"rgba(30,41,59,.9)"};border:1px solid ${R.pay?"#fbbf24":"var(--line)"}"><div style="font-size:${R.pay?20:16}px;font-weight:900;color:${R.pay?"#fde047":"#93c5fd"}">${R.pay?`🎉 당첨! ${R.m}배`:"😢 꽝"}</div><div style="font-size:12px;margin-top:2px;color:${R.pay?"#fff":"var(--sub)"}">${R.fin.join(" - ")} · 합 ${R.fin[0]+R.fin[1]+R.fin[2]}${R.tri?" · 트리플!":""} → ${R.pay?`+${casFmt(R.pay-R.stake)}`:`-${casFmt(R.stake)}`}</div>${R.pay&&R.pend?`<button id="diceTake" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:#fde047;color:#111;font-weight:900;font-size:14px">💰 ${casFmt(R.pay)} 받기</button>`:""}</div>`:(rolling?`<div style="text-align:center;font-size:12px;color:var(--sub);margin:-2px 0 10px">🎲 굴리는 중… ${diceSelName()}에 ${casFmt(casBet)}</div>`:"");if($("diceTake"))$("diceTake").onclick=()=>diceTake(false);}
 /* ---------- 🏇 경마 ----------
    🏇 혼자: 걸면 바로 출발 (다른 사람은 실시간 구경)
-   👥 같이: 누가 방을 열면 10초 뒤 자동 출발, 그 전에 들어온 사람은 같은 경주에 각자 걸 수 있음
+   👥 같이: 방 만들기 → 사람들이 들어와서 각자 말 고르기 → 모두 고르면 방장이 출발 (혼자 골라도 출발 가능)
    말 5마리, 우승 확률은 경주마다 랜덤(컨디션). 단승 배당 = 0.9÷확률, 쌍승(1·2등 순서) = 0.9÷(p1×p2/(1-p1)). 순위는 확률대로 뽑고 달리는 모습은 그 순위에 맞게 연출 */
-const HR_N=5,HR_WAIT=3000,HR_ROOM_MS=10000;
+const HR_N=5,HR_WAIT=3000;
 const HR_NAMES=["번개","당근러버","질주본능","느림보","막판스퍼트","천둥","바람돌이","흑마왕","복덩이","로켓","꼬마","대박이","치타","거북이","불꽃","폭풍","은빛갈기","흙먼지","돌격대장","월광"];
 const HR_COLS=["#ef4444","#3b82f6","#22c55e","#f59e0b","#a855f7","#ec4899","#14b8a6","#f97316"];
-let hr={card:null,type:"win",h1:0,h2:1,view:null,live:{},rooms:{},mode:"solo",room:null,raf:0};
+let hr={card:null,type:"win",h1:0,h2:1,view:null,live:{},rooms:{},mode:"solo",inRoom:null,raf:0,busy:false};
 const hrOdd=p=>Math.max(1.1,Math.floor(.9/p*10)/10);
 const hrExOdd=(c,a,b)=>{const p=c.horses[a].p*c.horses[b].p/(1-c.horses[a].p);return Math.floor(.9/p*10)/10;};
 /* 매 경주 컨디션 랜덤: 강한 말~약한 말 확률이 매번 다름 (최소 4%, 최대 55%) */
 function hrProbs(){let w=Array.from({length:HR_N},()=>Math.exp((Math.random()+Math.random()+Math.random()+Math.random()-2)*1.1));for(let it=0;it<4;it++){const s=w.reduce((a,b)=>a+b,0);w=w.map(x=>Math.min(.55,Math.max(.04,x/s)));}const s=w.reduce((a,b)=>a+b,0);return w.map(x=>Math.round(x/s*1000)/1000);}
 function hrMakeCard(){const nm=[...HR_NAMES].sort(()=>Math.random()-.5).slice(0,HR_N),cl=[...HR_COLS].sort(()=>Math.random()-.5),ps=hrProbs();return{horses:nm.map((n,i)=>({n,c:cl[i],p:ps[i],o:hrOdd(ps[i])}))};}
 function hrNewCard(){hr.card=hrMakeCard();hr.h1=0;hr.h2=1;}
-const hrCurCard=()=>hr.mode==="room"&&hr.room&&hr.rooms[hr.room]?hr.rooms[hr.room]:hr.card;
+const hrRoomR=()=>hr.inRoom&&hr.rooms[hr.inRoom]&&hr.rooms[hr.inRoom].horses?hr.rooms[hr.inRoom]:null;
+const hrCurCard=()=>{const R=hrRoomR();return R&&!R.order?R:hr.card;};
 function hrMult(){const c=hrCurCard();return hr.type==="win"?c.horses[hr.h1].o:hrExOdd(c,hr.h1,hr.h2);}
 function hrOrder(ps){const left=ps.map((p,i)=>[i,p]),o=[];while(left.length){let r=Math.random()*left.reduce((a,x)=>a+x[1],0),k=0;for(;k<left.length-1;k++){r-=left[k][1];if(r<=0)break;}o.push(left[k][0]);left.splice(k,1);}return o;}
 function hrPlan(order){const T=[];let t=11+Math.random()*1.2;order.forEach(i=>{T[i]=t;t+=.2+Math.random()*.5;});return T.map(t=>[+t.toFixed(2),+(.02+Math.random()*.015).toFixed(3),+(1+Math.random()*1).toFixed(2),+(Math.random()*6.28).toFixed(2)]);}
@@ -1566,88 +1567,127 @@ function hrWinPay(r){return r.bet?hrBetWin(r.bet,r.order):0;}
 const hrBetTxt2=(b,H)=>b.type==="win"?`${b.h1+1}번 ${H[b.h1].n} 단승`:`쌍승 ${b.h1+1}→${b.h2+1}`;
 function hrBetTxt(r){return r.bet?hrBetTxt2(r.bet,r.horses):`👥 같이하는 경마 ${Object.keys(r.bets||{}).length}명`;}
 const hrMyBet=r=>r.bet&&r.uid===myId?r.bet:(r.bets&&r.bets[myId])||null;
-function hrCheckBet(){if(casBusy)return false;if((me&&me.casPend)>0){toast("먼저 💰 받기를 눌러 주세요");return false;}if(me.hrPay||me.hrOpen){toast("지난 경주가 끝나면 다시 할 수 있어요");return false;}if(!casCanBet(casBet))return false;if(hr.type==="ex"&&hr.h1===hr.h2){toast("1등과 2등은 다른 말로 골라 주세요");return false;}return true;}
+/* 내가 건 경주가 달리는 중이면 나갈 수 없음 */
+const hrLocked=()=>{const v=hr.view;return !!(v&&v.order&&v.t0&&hrMyBet(v)&&nowS()-v.t0<hrDur(v));};
+function hrCheckBet(){if(casBusy||hr.busy)return false;if((me&&me.casPend)>0){toast("먼저 💰 받기를 눌러 주세요");return false;}if(me.hrPay||me.hrOpen){toast("지난 경주가 끝나면 다시 할 수 있어요");return false;}if(!casCanBet(casBet))return false;if(hr.type==="ex"&&hr.h1===hr.h2){toast("1등과 2등은 다른 말로 골라 주세요");return false;}return true;}
 /* 🏇 혼자 */
 function hrGo(){if(!hrCheckBet())return;const stake=casBet;
   const c=hr.card,mult=hrMult(),order=hrOrder(c.horses.map(h=>h.p)),r={uid:myId,name:myName(),horses:c.horses.map(h=>({n:h.n,c:h.c,o:h.o})),order,plan:hrPlan(order),bet:{type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult},t0:nowS()};
   me.cash-=stake;const win=hrWinPay(r),pay=win?Math.round(stake*mult):0;casPay(stake,pay,"hr",win?mult:0);if(hr.type==="ex")stAdd("hrExN");if(pay){stAdd(hr.type==="win"?"hrWinHit":"hrExHit");me.hrPay={v:pay,at:r.t0+hrDur(r),txt:hrBetTxt(r),m:mult,stake};}
   saveMe();renderHeader();hr.view={...r,k:"local"};if(fdb){const ref=fdb.ref("market/races").push();hr.view.k=ref.key;ref.set(r).catch(()=>{});}
   broadcast(`🏇 ${myName()}님이 ${hrBetTxt(r)}(${mult}배)에 ${casFmt(stake)} 걸고 경마 출발!`,"",hr.view.k!=="local"?{hr:hr.view.k}:null);hrNewCard();renderCas();}
-/* 👥 같이: 방 열기 / 참가 */
-function hrRoomOpen(){if(!fdb)return toast("서버에 연결 중이에요");if(!hrCheckBet())return;const stake=casBet,c=hr.card,mult=hrMult(),ref=fdb.ref("market/hrRoom").push(),at=nowS()+HR_ROOM_MS;
-  const room={host:myId,hostName:myName(),horses:c.horses,startAt:at,bets:{[myId]:{name:myName(),type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult}}};
-  me.cash-=stake;me.hrOpen={id:ref.key,stake,t:nowS()};saveMe();renderHeader();ref.set(room).then(()=>{hr.view={...room,room:ref.key};renderCas();}).catch(()=>{me.cash+=stake;me.hrOpen=null;saveMe();renderHeader();toast("방 만들기 실패");});
-  broadcast(`👥 ${myName()}님이 같이하는 경마를 열었어요! 10초 안에 참가하세요`,"",{hr:ref.key,hrR:1});hrNewCard();}
-function hrRoomJoin(id){const R=hr.rooms[id];if(!R||R.order)return toast("이미 출발했어요");if(nowS()>R.startAt-800)return toast("출발 직전이라 참가할 수 없어요");if(R.bets&&R.bets[myId])return;if(!hrCheckBet())return;const stake=casBet,mult=hrMult();
-  me.cash-=stake;me.hrOpen={id,stake,t:nowS()};saveMe();renderHeader();fdb.ref(`market/hrRoom/${id}/bets/${myId}`).set({name:myName(),type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult}).then(()=>{toast("👥 참가했어요! 곧 출발해요");hr.view={...hr.rooms[id],room:id};renderCas();}).catch(()=>{me.cash+=stake;me.hrOpen=null;saveMe();renderHeader();toast("참가 실패");});}
-/* 출발 시각이 되면 (방장, 방장이 없으면 다른 참가자) 순위를 뽑아 올림 */
-function hrRoomTick(){const now=nowS();for(const id in hr.rooms){const R=hr.rooms[id];if(!R||R.order||!R.startAt)continue;const iam=R.host===myId,inR=R.bets&&R.bets[myId];if(!(iam&&now>=R.startAt)&&!(inR&&now>=R.startAt+2500)&&!(now>=R.startAt+8000))continue;if(hrRoomTick.busy===id)continue;hrRoomTick.busy=id;
-  const order=hrOrder(R.horses.map(h=>h.p)),plan=hrPlan(order);fdb.ref("market/hrRoom/"+id).transaction(c=>{if(!c||c.order)return;c.order=order;c.plan=plan;c.t0=nowS();return c;}).catch(()=>{}).finally(()=>{hrRoomTick.busy=null;});}
+/* 👥 같이: 방 만들기 / 들어가기 / 나가기 */
+const hrRoomRef=id=>fdb.ref("market/hrRoom/"+id);
+function hrMemberOn(id){const r=hrRoomRef(id).child("members/"+myId);try{r.onDisconnect().remove();}catch(e){}}
+function hrRoomCreate(){if(!fdb||!me||!me._loaded)return toast("서버에 연결 중이에요");if(hr.busy)return;if(hr.inRoom)return toast("이미 방에 들어가 있어요");
+  const c=hrMakeCard(),ref=fdb.ref("market/hrRoom").push(),id=ref.key;hr.busy=true;
+  ref.set({host:myId,hostName:myName(),horses:c.horses,created:nowS(),members:{[myId]:{name:myName(),t:nowS()}}}).then(()=>{hr.inRoom=id;hr.view=null;hr.h1=0;hr.h2=1;hrMemberOn(id);stAdd("hrRoomMake");
+    broadcast(`👥 ${myName()}님이 경마 방을 만들었어요! 들어와서 같이 말 골라요`,"",{hr:id,hrR:1});renderCas();}).catch(()=>toast("방 만들기 실패")).finally(()=>{hr.busy=false;});}
+function hrRoomEnter(id){if(!fdb||!me||!me._loaded)return;if(hr.inRoom===id){renderCas();return;}if(hr.inRoom)return toast("지금 있는 방에서 먼저 나가 주세요");if(hr.busy)return;hr.busy=true;
+  hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||!c.horses)return;c.members=c.members||{};c.members[myId]={name:myName(),t:nowS()};return c;}).then(res=>{const v=res.snapshot.val();
+    if(res.committed&&v&&v.members&&v.members[myId]){hr.inRoom=id;hr.view=null;hr.h1=0;hr.h2=1;hr.rooms[id]=v;hrMemberOn(id);}
+    else if(v&&v.order){hr.view={...v,room:id};}else toast("없어진 방이에요");renderCas();}).catch(()=>toast("입장 실패")).finally(()=>{hr.busy=false;});}
+/* 나가기: 출발 전이면 건 돈 돌려받음. 방장이 나가면 다음 사람이 방장, 아무도 없으면 방 삭제 */
+function hrRoomLeave(quiet){const id=hr.inRoom;if(!id||!fdb)return;const R=hr.rooms[id];if(R&&R.order&&hrLocked())return toast("내가 건 경주가 끝나야 나갈 수 있어요");
+  hr.inRoom=null;hr.view=null;try{hrRoomRef(id).child("members/"+myId).onDisconnect().cancel();}catch(e){}
+  let refund=0;hrRoomRef(id).transaction(c=>{refund=0;if(!c)return c;if(c.members)delete c.members[myId];
+    if(!c.order){const b=c.bets&&c.bets[myId];if(b){refund=b.stake;delete c.bets[myId];}
+      const left=Object.entries(c.members||{}).sort((a,b)=>(a[1].t||0)-(b[1].t||0));if(!left.length)return null;
+      if(c.host===myId){c.host=left[0][0];c.hostName=left[0][1].name;}}
+    return c;}).then(res=>{if(res.committed&&refund&&me.hrOpen&&me.hrOpen.id===id){me.cash+=refund;me.hrOpen=null;saveMe();renderHeader();if(!quiet)toast(`🚪 방에서 나왔어요 · ${casFmt(refund)} 돌려받았어요`);}else if(!quiet)toast("🚪 방에서 나왔어요");renderCas();}).catch(()=>{});
+  renderCas();}
+function hrRoomBet(){const id=hr.inRoom,R=hrRoomR();if(!R||R.order)return;if(!hrCheckBet())return;const stake=casBet,mult=hrMult(),b={name:myName(),type:hr.type,h1:hr.h1,h2:hr.h2,stake,mult};hr.busy=true;
+  hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||!c.members||!c.members[myId])return;c.bets=c.bets||{};if(c.bets[myId])return;c.bets[myId]=b;return c;}).then(res=>{const v=res.snapshot.val();
+    if(res.committed&&v&&v.bets&&v.bets[myId]){me.cash-=stake;me.hrOpen={id,stake,t:nowS()};saveMe();renderHeader();toast("✅ 골랐어요! 방장이 출발을 누르면 시작해요");}else toast("지금은 고를 수 없어요");renderCas();}).catch(()=>toast("실패했어요")).finally(()=>{hr.busy=false;});}
+function hrRoomUnbet(){const id=hr.inRoom;if(!id||hr.busy)return;hr.busy=true;let refund=0;
+  hrRoomRef(id).transaction(c=>{refund=0;if(!c)return c;if(c.order||!c.bets||!c.bets[myId])return;refund=c.bets[myId].stake;delete c.bets[myId];return c;}).then(res=>{if(res.committed&&refund&&me.hrOpen&&me.hrOpen.id===id){me.cash+=refund;me.hrOpen=null;saveMe();renderHeader();toast("↩️ 선택을 취소했어요");}renderCas();}).catch(()=>{}).finally(()=>{hr.busy=false;});}
+function hrRoomStart(){const id=hr.inRoom,R=hrRoomR();if(!R||R.order||R.host!==myId||hr.busy)return;hr.busy=true;
+  hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||c.host!==myId)return;const B=c.bets||{},Mb=c.members||{};if(!Object.keys(B).length||Object.keys(Mb).some(u=>!B[u]))return;const order=hrOrder(c.horses.map(h=>h.p));c.order=order;c.plan=hrPlan(order);c.t0=nowS();return c;})
+    .then(res=>{if(!res.committed)toast("아직 말을 안 고른 사람이 있어요");else{const v=res.snapshot.val();if(v)broadcast(`🏁 ${myName()}님 방 경마 출발! (${Object.keys(v.bets||{}).length}명)`,"",{hr:id,hrR:1});}renderCas();}).catch(()=>{}).finally(()=>{hr.busy=false;});}
+function hrRoomTick(){if(!fdb||!me||!myId)return;const now=nowS();
+  for(const id in hr.rooms){const R=hr.rooms[id];if(!R)continue;
+    /* 방장이 나가 버렸으면 가장 먼저 들어온 사람이 방장 */
+    if(!R.order&&R.members&&R.members[myId]&&!R.members[R.host]){const first=Object.entries(R.members).sort((a,b)=>(a[1].t||0)-(b[1].t||0))[0];if(first&&first[0]===myId&&hrRoomTick.h!==id){hrRoomTick.h=id;hrRoomRef(id).transaction(c=>{if(!c)return c;if(c.order||(c.members&&c.members[c.host]))return;c.host=myId;c.hostName=myName();return c;}).catch(()=>{}).finally(()=>{hrRoomTick.h=null;});}}
+    /* 정리: 빈 방, 오래된 방 */
+    const mem=Object.keys(R.members||{}).length,bets=Object.keys(R.bets||{}).length,age=now-(R.created||0);
+    if(!R.horses||(!R.order&&!mem&&age>(bets?300000:30000))||(R.order&&now-R.t0>1800000)||(!R.order&&age>3*3600000))hrRoomRef(id).remove().catch(()=>{});}
   /* 내가 건 방 결과 정산 */
-  const o=me&&me.hrOpen;if(o){const R=hr.rooms[o.id];if(R&&R.order&&R.t0&&R.bets&&R.bets[myId]){const b=R.bets[myId],m=hrBetWin(b,R.order),pay=m?Math.round(b.stake*m):0;casPay(b.stake,pay,"hr",m);stAdd("hrRoomN");if(b.type==="ex")stAdd("hrExN");
+  const o=me.hrOpen;if(o){const R=hr.rooms[o.id];if(R&&R.order&&R.t0&&R.bets&&R.bets[myId]){const b=R.bets[myId],m=hrBetWin(b,R.order),pay=m?Math.round(b.stake*m):0;casPay(b.stake,pay,"hr",m);stAdd("hrRoomN");if(b.type==="ex")stAdd("hrExN");
       if(pay){stAdd(b.type==="win"?"hrWinHit":"hrExHit");me.hrPay={v:pay,at:R.t0+hrDur(R),txt:hrBetTxt2(b,R.horses),m:b.mult,stake:b.stake};}me.hrOpen=null;saveMe();}
-    else if(hr.roomsLoaded&&!R&&nowS()-(o.t||0)>60000){me.cash+=o.stake;me.hrOpen=null;saveMe();renderHeader();toast("👥 경마 방이 사라져서 판돈을 돌려드렸어요");}}
-  if(fdb&&myId)for(const id in hr.rooms){const R=hr.rooms[id];if(R&&R.host===myId&&R.t0&&now-R.t0>1800000)fdb.ref("market/hrRoom/"+id).remove().catch(()=>{});}}
-function hrFinish(r){if(r.done)return;r.done=1;const P=me&&me.hrPay;if(P&&Math.abs(P.at-(r.t0+hrDur(r)))<5){me.casPend=(me.casPend||0)+P.v;me.hrPay=null;saveMe();if(P.v-P.stake>=10000000)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${casFmt(P.v-P.stake)}`);}}
+    else if(hr.roomsLoaded&&!(R&&R.bets&&R.bets[myId])&&now-(o.t||0)>60000&&!hr.chk){hr.chk=1;hrRoomRef(o.id).once("value").then(s=>{const v=s.val();if(me.hrOpen!==o)return;
+        if(v&&v.bets&&v.bets[myId]){hr.rooms[o.id]=v;if(!v.order&&!hr.inRoom&&v.members!==undefined){hr.inRoom=o.id;hrRoomRef(o.id).child("members/"+myId).set({name:myName(),t:nowS()}).catch(()=>{});hrMemberOn(o.id);}}
+        else{me.cash+=o.stake;me.hrOpen=null;saveMe();renderHeader();toast("👥 경마 방이 사라져서 판돈을 돌려드렸어요");}}).catch(()=>{}).finally(()=>{hr.chk=0;});}}
+  /* 새로고침 후: 돈 걸어 둔 방에 다시 들어가기 */
+  if(o&&!hr.inRoom){const R=hr.rooms[o.id];if(R&&!R.order&&R.bets&&R.bets[myId]){hr.inRoom=o.id;hrRoomRef(o.id).child("members/"+myId).set({name:myName(),t:nowS()}).catch(()=>{});hrMemberOn(o.id);}}}
+function hrFinish(r){if(r.done)return;r.done=1;const P=me&&me.hrPay;if(P&&Math.abs(P.at-(r.t0+hrDur(r)))<5){me.casPend=(me.casPend||0)+P.v;me.hrPay=null;saveMe();if(P.v>P.stake)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${casFmt(P.v-P.stake)}`);}}
 function hrListen(){if(hrListen.on||!fdb)return;hrListen.on=1;fdb.ref("market/races").limitToLast(12).on("value",s=>{hr.live=s.val()||{};if(casTab==="hr")renderCas();});
-  fdb.ref("market/hrRoom").limitToLast(10).on("value",s=>{hr.rooms=s.val()||{};hr.roomsLoaded=1;if(hr.view&&hr.view.room){const R=hr.rooms[hr.view.room];if(R)hr.view={...R,room:hr.view.room};}if(casTab==="hr"&&$("casMod")&&$("casMod").style.display==="flex")renderCas();});
-  setInterval(hrRoomTick,500);
+  fdb.ref("market/hrRoom").limitToLast(20).on("value",s=>{hr.rooms=s.val()||{};hr.roomsLoaded=1;if(hr.inRoom&&!hr.rooms[hr.inRoom]){hr.inRoom=null;}if(casTab==="hr"&&$("casMod")&&$("casMod").style.display==="flex")renderCas();});
+  setInterval(hrRoomTick,700);
   setInterval(()=>{if(!fdb||!myId)return;const old=Object.entries(hr.live).filter(([k,r])=>r&&r.uid===myId&&nowS()-r.t0>3600000);for(const[k]of old)fdb.ref("market/races/"+k).remove().catch(()=>{});},60000);}
-/* 채팅에서 바로 관전 */
-async function hrWatch(k,isR){if(!me||!fdb)return;if(casBusy)return toast("지금 하는 게임이 끝나면 볼 수 있어요");hrListen();let r=isR?hr.rooms[k]:hr.live[k];
+const hrRoomsOpen=()=>Object.entries(hr.rooms).filter(([k,R])=>R&&R.horses&&!R.order&&Object.keys(R.members||{}).length).sort((a,b)=>(b[1].created||0)-(a[1].created||0));
+/* 채팅에서 바로 관전·입장 */
+async function hrWatch(k,isR){if(!me||!fdb)return;if(casBusy)return toast("지금 하는 게임이 끝나면 볼 수 있어요");if(hrLocked())return toast("내 경주가 끝나면 볼 수 있어요");hrListen();let r=isR?hr.rooms[k]:hr.live[k];
   if(!r){try{r=(await fdb.ref((isR?"market/hrRoom/":"market/races/")+k).once("value")).val();}catch(e){}}
-  if(!r)return toast("이미 끝나서 지워진 경주예요");
-  if(!($("casMod")&&$("casMod").style.display==="flex"))openCasino();casTab="hr";hr.exitRoom=null;
-  if(isR&&!r.order&&!(r.bets&&r.bets[myId])){hr.view=null;hr.mode="room";hr.room=k;hr.rooms[k]=r;}else hr.view=isR?{...r,room:k}:{...r,k};renderCas();}
-function hrRoomsOpen(){const now=nowS();return Object.entries(hr.rooms).filter(([k,R])=>R&&R.startAt&&!R.order&&now<R.startAt+8000).sort((a,b)=>a[1].startAt-b[1].startAt);}
+  if(!r||(isR&&!r.horses))return toast("이미 끝나서 없어진 경주예요");
+  if(!($("casMod")&&$("casMod").style.display==="flex"))openCasino();casTab="hr";
+  if(isR&&!r.order){hr.mode="room";hrRoomEnter(k);return;}
+  if(hr.inRoom&&hr.inRoom!==k){const R=hrRoomR();if(R&&!R.order&&!(R.bets&&R.bets[myId]))hrRoomLeave(true);}
+  hr.view=isR?{...r,room:k}:{...r,k};renderCas();}
+/* 말 고르기 */
+function hrPickHtml(c){const ho=(i,sel,k)=>`<button data-${k}="${i}" style="display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;border-radius:9px;margin-bottom:4px;background:${sel?"#fbbf24":"var(--card2)"};color:${sel?"#111":"var(--tx)"};font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:${c.horses[i].c};color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</span><b style="flex:1;text-align:left">${esc(c.horses[i].n)}</b><span style="font-size:11px;opacity:.8">${Math.round(c.horses[i].p*100)}%</span><b style="width:52px;text-align:right">${c.horses[i].o}배</b></button>`;
+  let h=`<div style="display:flex;gap:5px;margin-bottom:8px">${[["win","단승 (1등 맞히기)"],["ex","쌍승 (1·2등 순서대로)"]].map(([k,n])=>`<button data-hrt="${k}" style="flex:1;padding:7px 0;border-radius:9px;font-size:12px;font-weight:700;background:${hr.type===k?"#fbbf24":"var(--card2)"};color:${hr.type===k?"#111":"var(--tx)"}">${n}</button>`).join("")}</div>`;
+  if(hr.type==="win")h+=c.horses.map((x,i)=>ho(i,i===hr.h1,"hr1")).join("");
+  else h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥇 1등</div>${c.horses.map((x,i)=>`<button data-hr1="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h1?"#fbbf24":"var(--card2)"};color:${i===hr.h1?"#111":"var(--tx)"}">${i+1}번 ${esc(x.n)}</button>`).join("")}</div><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥈 2등</div>${c.horses.map((x,i)=>`<button data-hr2="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h2?"#fbbf24":"var(--card2)"};color:${i===hr.h2?"#111":"var(--tx)"};${i===hr.h1?"opacity:.35":""}">${i+1}번 ${esc(x.n)}</button>`).join("")}</div></div>`;
+  return h;}
+const hrPickTxt=()=>hr.type==="win"?`${hr.h1+1}번 단승`:`쌍승 ${hr.h1+1}→${hr.h2+1}`;
+/* 방 대기실 */
+function hrLobby(id,R){const Mb=R.members||{},B=R.bets||{},isHost=R.host===myId,mine=B[myId];
+  const ids=Object.keys(Mb).sort((a,b)=>(Mb[a].t||0)-(Mb[b].t||0)),gone=Object.keys(B).filter(u=>!Mb[u]),waiting=ids.filter(u=>!B[u]),nb=Object.keys(B).length;
+  const row=(u,nm,b,off)=>`<div style="display:flex;justify-content:space-between;gap:6px;font-size:12px;padding:5px 2px;border-bottom:1px solid var(--line)"><span>${u===R.host?"👑":"🙂"} <b>${esc(nm)}</b>${u===myId?" (나)":""}${off?" <small style='color:var(--sub)'>(잠시 나감)</small>":""}</span><span style="color:${b?"#fbbf24":"var(--sub)"}">${b?`${hrBetTxt2(b,R.horses)} · ${casFmt(b.stake)} (${b.mult}배)`:"고르는 중…"}</span></div>`;
+  let h=`<div style="padding:10px;border-radius:12px;background:var(--card);border:1px solid var(--line);margin-bottom:8px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:900;margin-bottom:4px"><span>👥 ${esc(R.hostName)}님의 방</span><span style="color:var(--sub);font-size:11px">${ids.length}명 · ${nb}명 고름</span></div>
+    ${ids.map(u=>row(u,Mb[u].name,B[u],0)).join("")}${gone.map(u=>row(u,B[u].name,B[u],1)).join("")}</div>`;
+  if(!mine)h+=hrPickHtml(R)+`<button id="hrRBet" style="margin-top:6px;width:100%;padding:12px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:14px">✅ ${hrPickTxt()} (${hrMult()}배)에 ${casFmt(casBet)} 걸기</button>`;
+  else h+=`<div style="text-align:center;font-size:12.5px;padding:8px;border-radius:10px;background:var(--card2)">내 선택: <b style="color:#fbbf24">${hrBetTxt2(mine,R.horses)}</b> · ${casFmt(mine.stake)} (${mine.mult}배) <button id="hrRUnbet" style="margin-left:6px;padding:3px 9px;border-radius:8px;background:var(--card);font-size:11px">↩️ 다시 고르기</button></div>`;
+  if(isHost){const can=nb>0&&!waiting.length;h+=`<button id="hrRStart" ${can?"":"disabled"} style="margin-top:8px;width:100%;padding:13px 0;border-radius:10px;background:${can?"#16a34a":"var(--card2)"};color:${can?"#fff":"var(--sub)"};font-weight:900;font-size:15px">${can?`🏁 출발! (${nb}명)`:waiting.length?`⏳ ${waiting.length}명이 아직 고르는 중`:"⏳ 먼저 말을 골라 주세요"}</button>`;}
+  else h+=`<div style="text-align:center;font-size:12px;color:var(--sub);margin-top:8px">모두 고르면 방장(👑)이 출발을 눌러요</div>`;
+  h+=`<button id="hrRLeave" style="margin-top:8px;width:100%;padding:9px 0;border-radius:10px;background:var(--card2);font-weight:700">🚪 방 나가기${mine?" (건 돈 돌려받기)":""}</button>`;
+  return h;}
 function hrBody(){hrListen();if(!hr.card)hrNewCard();
-  /* 내가 참가한 방은 자동으로 그 경주 화면으로 */
-  if(!hr.view&&me&&me.hrOpen&&hr.rooms[me.hrOpen.id]&&hr.exitRoom!==me.hrOpen.id)hr.view={...hr.rooms[me.hrOpen.id],room:me.hrOpen.id};
+  const R=hrRoomR();if(R&&R.order&&!(hr.view&&hr.view.room===hr.inRoom&&hr.view.order))hr.view={...R,room:hr.inRoom};
+  if(R&&!R.order)return hrLobby(hr.inRoom,R);
   const v=hr.view;let h="";
-  if(v&&v.room&&!v.order){const left=Math.max(0,Math.ceil((v.startAt-nowS())/1000)),B=v.bets||{},joined=!!B[myId];
-    h+=`<div style="text-align:center;padding:10px;border-radius:12px;background:var(--card);border:1px solid var(--line)"><div style="font-size:12px;color:var(--sub)">👥 ${esc(v.hostName)}님의 같이하는 경마</div><div style="font-size:30px;font-weight:900;color:#fbbf24;margin:4px 0">${left>0?left+"초 후 출발":"출발 준비 중…"}</div>
-      ${Object.values(B).map(b=>`<div style="font-size:12px;padding:3px 0">🏇 <b>${esc(b.name)}</b> · ${hrBetTxt2(b,v.horses)} ${casFmt(b.stake)} (${b.mult}배)</div>`).join("")}</div>`+
-      (joined?"":`<div style="font-size:11px;color:var(--sub);margin:8px 0 4px">아래에서 말을 고르고 참가하세요</div>`)+
-      `<button id="hrExit" style="margin-top:8px;width:100%;padding:9px 0;border-radius:10px;background:var(--card2);font-weight:700">🚪 나가기${joined?" (경주는 그대로 진행돼요)":""}</button>`;
-    if(joined)return h;hr.mode="room";hr.room=v.room;}
-  else if(v){const H=v.horses,mb=hrMyBet(v),run=nowS()-v.t0<hrDur(v),done=!run;
-    h+=`<div style="font-size:12px;margin-bottom:6px;display:flex;justify-content:space-between;gap:6px"><span>${v.room?`👥 ${esc(v.hostName)}님 방 · ${Object.keys(v.bets||{}).length}명`:(v.uid===myId?"🏇 내 경주":`📺 ${esc(v.name)}님의 경주`)}${v.bet?` · <b>${hrBetTxt(v)}</b> ${casFmt(v.bet.stake)} (${v.bet.mult}배)`:""}</span>${run?`<span style="white-space:nowrap"><b style="color:var(--up)">🔴 LIVE</b> <button id="hrExit" style="margin-left:4px;padding:3px 9px;border-radius:8px;background:var(--card2);font-size:11px;font-weight:700">🚪 나가기</button></span>`:""}</div>
+  if(v&&v.order){const H=v.horses,mb=hrMyBet(v),run=nowS()-v.t0<hrDur(v),done=!run;
+    h+=`<div style="font-size:12px;margin-bottom:6px;display:flex;justify-content:space-between;gap:6px"><span>${v.room?`👥 ${esc(v.hostName)}님 방 · ${Object.keys(v.bets||{}).length}명`:(v.uid===myId?"🏇 내 경주":`📺 ${esc(v.name)}님의 경주`)}${v.bet?` · <b>${hrBetTxt(v)}</b> ${casFmt(v.bet.stake)} (${v.bet.mult}배)`:mb?` · 내 선택 <b>${hrBetTxt2(mb,H)}</b>`:""}</span>${run?`<span style="white-space:nowrap"><b style="color:var(--up)">🔴 LIVE</b>${mb?"":` <button id="hrExit" style="margin-left:4px;padding:3px 9px;border-radius:8px;background:var(--card2);font-size:11px;font-weight:700">🚪 나가기</button>`}</span>`:""}</div>
       <canvas id="hrCv" width="340" height="216" style="width:100%;display:block;border-radius:12px;background:#14532d"></canvas>`;
     if(done){h+=`<div style="display:flex;gap:4px;justify-content:center;margin:8px 0;font-size:12px">${v.order.slice(0,3).map((i,k)=>`<span style="padding:3px 8px;border-radius:9px;background:var(--card2)">${["🥇","🥈","🥉"][k]} ${i+1}번 ${esc(H[i].n)}</span>`).join("")}</div>`;
       const all=v.bet?[[v.uid,{...v.bet,name:v.name}]]:Object.entries(v.bets||{});
       if(all.length>1||!mb)h+=all.map(([u,b])=>{const m=hrBetWin(b,v.order);return `<div style="display:flex;justify-content:space-between;font-size:12px;padding:4px 6px;border-bottom:1px solid var(--line)"><span>${u===myId?"⭐ ":""}${esc(b.name)} · ${hrBetTxt2(b,H)}</span><b style="color:${m?"#fbbf24":"var(--sub)"}">${m?`🎉 +${casFmt(b.stake*m-b.stake)}`:`꽝 -${casFmt(b.stake)}`}</b></div>`;}).join("");
-      if(mb){const m=hrBetWin(mb,v.order),R=(me.casPend>0)&&m;h+=`<div class="${m?"dwin":"dlose"}" style="margin-top:8px;text-align:center;padding:8px;border-radius:12px;background:${m?"linear-gradient(90deg,#78350f,#b45309,#78350f)":"rgba(30,41,59,.9)"};border:1px solid ${m?"#fbbf24":"var(--line)"}"><div style="font-size:${m?19:15}px;font-weight:900;color:${m?"#fde047":"#93c5fd"}">${m?`🎉 적중! ${m}배`:"😢 꽝"}</div><div style="font-size:12px;color:${m?"#fff":"var(--sub)"};margin-top:2px">${m?`+${casFmt(mb.stake*m-mb.stake)}`:`-${casFmt(mb.stake)}`}</div>${R?`<button id="hrTake" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:#fde047;color:#111;font-weight:900">💰 ${casFmt(me.casPend)} 받기</button>`:""}</div>`;if(R)return h;}
-      h+=`<button id="hrBack" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:var(--card2);font-weight:900">🏇 새 경주 하기</button>`;}
+      if(mb){const m=hrBetWin(mb,v.order),RR=(me.casPend>0)&&m;h+=`<div class="${m?"dwin":"dlose"}" style="margin-top:8px;text-align:center;padding:8px;border-radius:12px;background:${m?"linear-gradient(90deg,#78350f,#b45309,#78350f)":"rgba(30,41,59,.9)"};border:1px solid ${m?"#fbbf24":"var(--line)"}"><div style="font-size:${m?19:15}px;font-weight:900;color:${m?"#fde047":"#93c5fd"}">${m?`🎉 적중! ${m}배`:"😢 꽝"}</div><div style="font-size:12px;color:${m?"#fff":"var(--sub)"};margin-top:2px">${m?`+${casFmt(mb.stake*m-mb.stake)}`:`-${casFmt(mb.stake)}`}</div>${RR?`<button id="hrTake" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:#fde047;color:#111;font-weight:900">💰 ${casFmt(me.casPend)} 받기</button>`:""}</div>`;if(RR)return h;}
+      h+=`<button id="hrBack" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:var(--card2);font-weight:900">${v.room&&hr.inRoom===v.room?"🚪 방 나가기":"🏇 경마 목록으로"}</button>`;}
     return h;}
   /* 고르기 화면 */
-  const opens=hrRoomsOpen().filter(([k,R])=>nowS()<R.startAt-800);
-  if(hr.mode==="room"&&(!hr.room||!opens.some(([k])=>k===hr.room)))hr.room=opens.length?opens[0][0]:null;
+  const opens=hrRoomsOpen();
   h+=`<div style="display:flex;gap:5px;margin-bottom:8px">${[["solo","🏇 혼자 (바로 출발)"],["room",`👥 같이 (${opens.length}방)`]].map(([k,n])=>`<button data-hrm="${k}" style="flex:1;padding:8px 0;border-radius:9px;font-size:12px;font-weight:900;background:${hr.mode===k?"var(--acc)":"var(--card2)"};color:${hr.mode===k?"#111":"var(--tx)"}">${n}</button>`).join("")}</div>`;
-  if(hr.mode==="room"){if(!hr.room){h+=`<div style="text-align:center;color:var(--sub);font-size:12px;padding:16px 0">지금 열린 방이 없어요<br>🏇 혼자 탭에서 <b>👥 같이하는 방 열기</b>를 누르면 10초 뒤 출발하는 방이 생겨요</div>`;}
-    else h+=`<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px">${opens.map(([k,R])=>`<button data-hrroom="${k}" style="flex:1;padding:6px 4px;border-radius:9px;font-size:11.5px;background:${k===hr.room?"#fbbf24":"var(--card2)"};color:${k===hr.room?"#111":"var(--tx)"}">${esc(R.hostName)}님 방 · ${Object.keys(R.bets||{}).length}명<br><b>${Math.max(0,Math.ceil((R.startAt-nowS())/1000))}초</b> 후 출발</button>`).join("")}</div>`;}
-  const c=hrCurCard();if(hr.mode==="room"&&!hr.room)return h+hrListHtml();
-  const ho=(i,sel,k)=>`<button data-${k}="${i}" style="display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;border-radius:9px;margin-bottom:4px;background:${sel?"#fbbf24":"var(--card2)"};color:${sel?"#111":"var(--tx)"};font-size:12.5px"><span style="width:18px;height:18px;border-radius:50%;background:${c.horses[i].c};color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center">${i+1}</span><b style="flex:1;text-align:left">${esc(c.horses[i].n)}</b><span style="font-size:11px;opacity:.8">${Math.round(c.horses[i].p*100)}%</span><b style="width:52px;text-align:right">${c.horses[i].o}배</b></button>`;
-  h+=`<div style="display:flex;gap:5px;margin-bottom:8px">${[["win","단승 (1등 맞히기)"],["ex","쌍승 (1·2등 순서대로)"]].map(([k,n])=>`<button data-hrt="${k}" style="flex:1;padding:7px 0;border-radius:9px;font-size:12px;font-weight:700;background:${hr.type===k?"#fbbf24":"var(--card2)"};color:${hr.type===k?"#111":"var(--tx)"}">${n}</button>`).join("")}</div>`;
-  if(hr.type==="win")h+=c.horses.map((x,i)=>ho(i,i===hr.h1,"hr1")).join("");
-  else h+=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥇 1등</div>${c.horses.map((x,i)=>`<button data-hr1="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h1?"#fbbf24":"var(--card2)"};color:${i===hr.h1?"#111":"var(--tx)"}">${i+1}번 ${esc(x.n)}</button>`).join("")}</div><div><div style="font-size:11px;color:var(--sub);margin-bottom:3px">🥈 2등</div>${c.horses.map((x,i)=>`<button data-hr2="${i}" style="width:100%;padding:6px;border-radius:8px;margin-bottom:3px;font-size:12px;background:${i===hr.h2?"#fbbf24":"var(--card2)"};color:${i===hr.h2?"#111":"var(--tx)"};${i===hr.h1?"opacity:.35":""}">${i+1}번 ${esc(x.n)}</button>`).join("")}</div></div>`;
-  const pick=hr.type==="win"?`${hr.h1+1}번 단승`:`쌍승 ${hr.h1+1}→${hr.h2+1}`;
-  if(hr.mode==="room")h+=`<button id="hrJoin" style="margin-top:8px;width:100%;padding:12px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:14px">👥 참가 · ${pick} (${hrMult()}배)</button>`;
-  else h+=`<div style="display:flex;gap:6px;margin-top:8px"><button id="hrGo" style="flex:3;padding:12px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:13.5px">🏁 혼자 출발<br><small style="font-weight:700">${pick} (${hrMult()}배)</small></button><button id="hrRoomOpen" style="flex:2;padding:12px 0;border-radius:10px;background:#7c3aed;color:#fff;font-weight:900;font-size:12.5px">👥 같이하는<br>방 열기 (10초)</button></div>`;
+  if(hr.mode==="room"){h+=`<button id="hrRMake" style="width:100%;padding:12px 0;border-radius:10px;background:#7c3aed;color:#fff;font-weight:900;font-size:14px;margin-bottom:8px">➕ 방 만들기</button>`;
+    h+=opens.length?opens.map(([k,R])=>{const Mb=R.members||{},n=Object.keys(Mb).length,nb=Object.keys(R.bets||{}).length;return `<button data-hrin="${k}" style="display:flex;justify-content:space-between;align-items:center;width:100%;padding:9px 10px;border-radius:10px;margin-bottom:5px;background:var(--card2);font-size:12.5px"><span>👑 <b>${esc(R.hostName)}</b>님의 방 · ${n}명 (${nb}명 고름)</span><b style="color:var(--acc)">입장 ›</b></button>`;}).join(""):`<div style="text-align:center;color:var(--sub);font-size:12px;padding:12px 0">지금 열린 방이 없어요. 방을 만들고 친구를 불러 보세요!</div>`;
+    return h+hrListHtml();}
+  h+=hrPickHtml(hr.card)+`<button id="hrGo" style="margin-top:8px;width:100%;padding:12px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:14px">🏁 출발 · ${hrPickTxt()} (${hrMult()}배)</button>`;
   return h+hrListHtml();}
-function hrListHtml(){const live=Object.entries(hr.live).filter(([k,r])=>r&&r.t0&&nowS()-r.t0<hrDur(r)).map(([k,r])=>[k,r,0]).concat(Object.entries(hr.rooms).filter(([k,R])=>R&&R.order&&R.t0&&nowS()-R.t0<hrDur(R)).map(([k,R])=>[k,R,1])).sort((a,b)=>b[1].t0-a[1].t0);
-  const recent=Object.entries(hr.live).filter(([k,r])=>r&&r.t0&&nowS()-r.t0>=hrDur(r)).map(([k,r])=>[k,r,0]).concat(Object.entries(hr.rooms).filter(([k,R])=>R&&R.order&&R.t0&&nowS()-R.t0>=hrDur(R)).map(([k,R])=>[k,R,1])).sort((a,b)=>b[1].t0-a[1].t0).slice(0,6);
+function hrListHtml(){const fin=R=>R&&R.order&&R.t0&&R.plan;const live=Object.entries(hr.live).filter(([k,r])=>r&&r.t0&&nowS()-r.t0<hrDur(r)).map(([k,r])=>[k,r,0]).concat(Object.entries(hr.rooms).filter(([k,R])=>fin(R)&&nowS()-R.t0<hrDur(R)).map(([k,R])=>[k,R,1])).sort((a,b)=>b[1].t0-a[1].t0);
+  const recent=Object.entries(hr.live).filter(([k,r])=>r&&r.t0&&nowS()-r.t0>=hrDur(r)).map(([k,r])=>[k,r,0]).concat(Object.entries(hr.rooms).filter(([k,R])=>fin(R)&&nowS()-R.t0>=hrDur(R)).map(([k,R])=>[k,R,1])).sort((a,b)=>b[1].t0-a[1].t0).slice(0,6);
   const nm=(r,isR)=>isR?`👥 ${esc(r.hostName)}님 방 ${Object.keys(r.bets||{}).length}명`:`${esc(r.name)} · ${hrBetTxt(r)}`;
   return `<div style="font-size:12px;font-weight:900;margin:12px 0 4px">📺 지금 달리는 경주</div>`+(live.length?live.map(([k,r,isR])=>`<button data-hrw="${k}" data-hrr="${isR}" style="display:flex;justify-content:space-between;width:100%;padding:7px 8px;border-radius:9px;margin-bottom:4px;background:var(--card2);font-size:12px"><span>${nm(r,isR)}${isR?"":" "+casFmt(r.bet.stake)}</span><b style="color:var(--up)">🔴 보기</b></button>`).join(""):`<div style="font-size:11px;color:var(--sub)">지금 달리는 경주가 없어요</div>`)+
     `<div style="font-size:12px;font-weight:900;margin:10px 0 4px">🏁 최근 경주</div>`+(recent.length?recent.map(([k,r,isR])=>{const p=isR?0:hrWinPay(r);return `<button data-hrw="${k}" data-hrr="${isR}" style="display:flex;justify-content:space-between;width:100%;padding:6px 8px;border-radius:9px;margin-bottom:3px;background:var(--card);border:1px solid var(--line);font-size:11.5px"><span>${nm(r,isR)} · 🥇${r.order[0]+1}번</span><b style="color:${p?"#fbbf24":"var(--sub)"}">${isR?"결과 보기":p?`+${casFmt(r.bet.stake*r.bet.mult-r.bet.stake)}`:"꽝"}</b></button>`;}).join(""):`<div style="font-size:11px;color:var(--sub)">아직 없어요</div>`);}
 function hrBind(d){d.querySelectorAll("[data-hrt]").forEach(b=>b.onclick=()=>{hr.type=b.dataset.hrt;if(hr.h1===hr.h2)hr.h2=(hr.h1+1)%HR_N;renderCas();});
-  d.querySelectorAll("[data-hrm]").forEach(b=>b.onclick=()=>{hr.mode=b.dataset.hrm;renderCas();});d.querySelectorAll("[data-hrroom]").forEach(b=>b.onclick=()=>{hr.room=b.dataset.hrroom;renderCas();});
+  d.querySelectorAll("[data-hrm]").forEach(b=>b.onclick=()=>{hr.mode=b.dataset.hrm;renderCas();});d.querySelectorAll("[data-hrin]").forEach(b=>b.onclick=()=>hrRoomEnter(b.dataset.hrin));
   d.querySelectorAll("[data-hr1]").forEach(b=>b.onclick=()=>{hr.h1=+b.dataset.hr1;if(hr.h2===hr.h1)hr.h2=(hr.h1+1)%HR_N;renderCas();});d.querySelectorAll("[data-hr2]").forEach(b=>b.onclick=()=>{const v=+b.dataset.hr2;if(v!==hr.h1){hr.h2=v;renderCas();}});
   d.querySelectorAll("[data-hrw]").forEach(b=>b.onclick=()=>{const k=b.dataset.hrw,isR=b.dataset.hrr==="1",r=isR?hr.rooms[k]:hr.live[k];if(r){hr.view=isR?{...r,room:k}:{...r,k};renderCas();}});
-  if($("hrGo"))$("hrGo").onclick=hrGo;if($("hrRoomOpen"))$("hrRoomOpen").onclick=hrRoomOpen;if($("hrJoin"))$("hrJoin").onclick=()=>{if(hr.room)hrRoomJoin(hr.room);};
-  if($("hrTake"))$("hrTake").onclick=()=>{diceTake(true);hr.view=null;toast("💰 받았어요!");renderCas();};if($("hrBack"))$("hrBack").onclick=()=>{hr.view=null;hr.mode="solo";renderCas();};
-  if($("hrExit"))$("hrExit").onclick=()=>{cancelAnimationFrame(hr.raf);if(hr.view&&hrMyBet(hr.view))toast("🏇 경주는 계속 진행돼요. 맞히면 끝난 뒤 자동으로 들어와요");if(hr.view&&hr.view.room)hr.exitRoom=hr.view.room;hr.view=null;hr.mode="solo";renderCas();};
-  if(hr.view&&hr.view.order)hrAnim();else if(hr.view&&hr.view.room){clearTimeout(hr.wt);hr.wt=setTimeout(()=>{if(casTab==="hr"&&hr.view&&hr.view.room&&!hr.view.order)renderCas();},500);}
-  else if(hr.mode==="room"){clearTimeout(hr.wt);hr.wt=setTimeout(()=>{if(casTab==="hr"&&!hr.view&&hr.mode==="room")renderCas();},1000);}}
+  const on=(id,f)=>{if($(id))$(id).onclick=f;};
+  on("hrGo",hrGo);on("hrRMake",hrRoomCreate);on("hrRBet",hrRoomBet);on("hrRUnbet",hrRoomUnbet);on("hrRStart",hrRoomStart);on("hrRLeave",()=>hrRoomLeave());
+  on("hrTake",()=>{diceTake(true);toast("💰 받았어요!");renderCas();});
+  on("hrBack",()=>{const v=hr.view;if(v&&v.room&&hr.inRoom===v.room){hrRoomLeave(true);hr.mode="room";}hr.view=null;renderCas();});
+  on("hrExit",()=>{if(hrLocked())return toast("내가 건 경주가 끝나야 나갈 수 있어요");cancelAnimationFrame(hr.raf);hr.view=null;renderCas();});
+  if(hr.view&&hr.view.order)hrAnim();}
 function hrAnim(){cancelAnimationFrame(hr.raf);const v=hr.view;const step=()=>{const cv=$("hrCv");if(!cv||hr.view!==v)return;const ms=nowS()-v.t0;hrDraw(cv,v,ms);if(ms<hrDur(v))hr.raf=requestAnimationFrame(step);else{hrFinish(v);renderCas();}};step();}
 /* 말 그림 (오른쪽 보고 달림): 몸통·목·머리·다리·꼬리 + 기수 */
 function hrHorse(g,x,y,col,ph){const lg=ph?Math.sin(ph):0,lg2=ph?Math.sin(ph+Math.PI):0;g.save();g.translate(x-6,y+2);g.lineCap="round";
