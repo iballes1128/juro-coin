@@ -1480,7 +1480,7 @@ function boatStep(dt,t,noIn){const bv=fBV,SP=.085;let ix=0,iy=0;
   fBoatTilt+=((bv.x/SP)*.13-fBoatTilt)*Math.min(1,dt/180);
   if(Math.hypot(bv.x,bv.y)>.02&&t-fWakeT>110){fWakeT=t;fWake.push({x:fp.x-bv.x*70,y:fp.y+5,t});if(fWake.length>40)fWake.shift();}}
 function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 열쇠 뽑기에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=BH.x;fp.y=BH.y;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
-function boatLeave(){if(!fBoat)return;if(fstate!=="idle")return toast("낚시 중에는 내릴 수 없어요");fBoat=0;fBV.x=0;fBV.y=0;fp.x=DOCK.x+DOCK.w-12;fp.y=DOCK.y+64;fp.tx=null;fp.via=null;fLastSent="";setFishBtn();}
+function boatLeave(){if(!fBoat)return;if(fstate!=="idle")return toast("낚시 중에는 내릴 수 없어요");fBoat=0;fBV.x=0;fBV.y=0;if(fp.x<DOCK.x+DOCK.w+48){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();}
 const sitW=(o,fn,t)=>{if(!o.bt||o.fs==="away")return fn();c.save();c.translate(o.x,o.y+6+boatBob(performance.now()));c.rotate(o.tl||0);c.scale(1,.85);c.translate(-o.x,-o.y);fn();c.restore();};
 function boatBack(c,x,y,t,sk,tl){const G=sk===2,b=boatBob(t);c.save();c.translate(x,y+b+2);c.rotate((tl||0)+Math.sin(t/900)*.015);
   c.strokeStyle="rgba(255,255,255,.55)";c.lineWidth=1;c.beginPath();c.ellipse(0,6,27+Math.sin(t/300)*1.5,4.5,0,0,7);c.stroke();
