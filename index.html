@@ -2821,7 +2821,7 @@ function evalGrab(G){const R=34;let best=null,bd=1e9;for(const k of G.keys){if(k
 function stepKeys(G,dt){for(const k of G.keys){if(k.wob>0)k.wob=Math.max(0,k.wob-dt);if(k.fall){k.fall.v+=dt*900;k.fall.y-=k.fall.v*dt;if(k.fall.y<=0){k.fall.y=0;if(k.fall.v>170){k.fall.v*=-.3;}else{k.fall=null;}}}}}
 function step(G,dt,inp){G.t+=dt;inp=inp||{};stepKeys(G,dt);
   const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-  if(G.st==="move"){G.cx=clamp(G.cx+((inp.r?1:0)-(inp.l?1:0))*dt*.5,.05,.95);G.cz=clamp(G.cz+((inp.d?1:0)-(inp.u?1:0))*dt*.42,.05,.95);G.h=1;G.close=0;}
+  if(G.st==="move"){{const ix=clamp((inp.r?1:0)-(inp.l?1:0)+(inp.ax||0),-1,1),iy=clamp((inp.d?1:0)-(inp.u?1:0)+(inp.ay||0),-1,1);G.cx=clamp(G.cx+ix*dt*.5,.05,.95);G.cz=clamp(G.cz+iy*dt*.42,.05,.95);}G.h=1;G.close=0;}
   else if(G.st==="down"){G.h=Math.max(0,G.h-dt/.9);if(G.h<=0){G.st="close";G.tm=0;}}
   else if(G.st==="close"){G.tm+=dt;G.close=Math.min(1,G.tm/.5);if(G.tm>=.6){G.out=evalGrab(G);G.st="up";G.tm=0;G.prog=0;
       if(G.out.type==="win"||G.out.type==="drop"){G.held=G.out.key;}else if(G.out.type==="slide"){G.out.key.wob=.7;}}}
@@ -2955,16 +2955,20 @@ function openClw(){if(!me||!me._loaded)return toast("닉네임부터 정해 주�
       <div id="clwRl" style="margin:5px 0"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:12px">🎟️ 내 티켓 <b id="clwTix" style="color:var(--acc);font-size:16px">0</b>장</span><span id="clwSpin" style="font-size:11px;color:var(--sub);text-align:right"></span></div>
       <div id="clwGrid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"></div><div style="text-align:center;font-size:10.5px;color:var(--sub);margin-top:3px"><b id="clwCd" style="color:var(--acc)"></b> 뒤 새로 섞여요</div><div id="clwRes" style="min-height:30px;text-align:center;font-size:11.5px;margin-top:3px;line-height:1.4;color:var(--sub)">인형을 뽑으면 티켓을 받고, 티켓 1장마다 룰렛이 한 번씩 바로 돌아가요</div></div>
       <canvas id="clwCv" width="${CLW.CW}" height="${CLW.CH}" style="display:block;margin:0 auto;height:min(272px,30vh);width:auto;max-width:100%;border-radius:12px;background:#000;touch-action:none"></canvas>
-      <div style="display:flex;gap:8px;align-items:stretch;margin:7px 0 2px"><div style="display:grid;grid-template-columns:repeat(3,42px);grid-template-rows:repeat(2,42px);gap:4px;flex:none">${[["u","▲","2","1"],["l","◀","1","2"],["d","▼","2","2"],["r","▶","3","2"]].map(([k,ch,c,r])=>`<button data-clk="${k}" style="grid-column:${c};grid-row:${r};background:var(--card2);border-radius:12px;font-size:18px;font-weight:900;touch-action:none">${ch}</button>`).join("")}</div>
+      <div style="display:flex;gap:8px;align-items:stretch;margin:7px 0 2px"><div id="clwJoy" style="position:relative;width:92px;height:92px;flex:none;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.25);touch-action:none"><i style="position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(255,255,255,.6);box-shadow:0 2px 8px rgba(0,0,0,.4);pointer-events:none"></i></div>
       <div style="flex:1;display:flex;flex-direction:column;gap:5px;min-width:0"><button id="clwStart" style="width:100%;height:38px;border-radius:11px;background:var(--acc);color:#111;font-weight:900;font-size:13px"></button>
       <button id="clwGo" style="width:100%;flex:1;border-radius:13px;background:linear-gradient(#f87171,#dc2626);color:#fff;font-size:17px;font-weight:900;box-shadow:0 4px 0 #7f1d1d">집기! <span style="font-size:10px;font-weight:700">(스페이스)</span></button></div></div>
-      <div style="text-align:center;font-size:10px;color:var(--sub)">PC: 방향키/WASD · 스페이스 집기 · 시작하면 10초 안에 집어야 해요</div>
+      <div style="text-align:center;font-size:10px;color:var(--sub)">PC: 방향키/WASD · 스페이스 집기 · 모바일: 왼쪽 조이스틱 · 시작하면 10초 안에 집어야 해요</div>
       <div id="clwLog" style="margin-top:8px"></div><div id="clwAdm"></div></div>`;
     d.querySelector("#clwX").onclick=clwClose;d.querySelector("#clwLst").onclick=clwShowList;clwBuildGrid();d.querySelector("#clwStart").onclick=clwStart;d.querySelector("#clwGo").onclick=()=>{if(clw.play&&clw.G&&clw.G.st==="move"){CLW.startDrop(clw.G);clwUI();}};
-    d.querySelectorAll("[data-clk]").forEach(b=>{const k=b.dataset.clk,on=e=>{e.preventDefault();clw.inp[k]=1;},off=e=>{if(e)e.preventDefault();clw.inp[k]=0;};b.addEventListener("pointerdown",on);["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,off));});}
+    {const J=d.querySelector("#clwJoy"),K=J.querySelector("i");let pid=null;
+      const mv=e=>{const r=J.getBoundingClientRect(),R=r.width/2;let dx=e.clientX-(r.left+R),dy=e.clientY-(r.top+R);const dd=Math.hypot(dx,dy);if(dd>R){dx=dx/dd*R;dy=dy/dd*R;}K.style.transform=`translate(${dx}px,${dy}px)`;const m=Math.min(1,dd/R);if(m<.15){clw.inp.ax=0;clw.inp.ay=0;}else{const l=Math.max(1,Math.hypot(dx,dy));clw.inp.ax=dx/l*m;clw.inp.ay=dy/l*m;}};
+      const end=()=>{pid=null;clw.inp.ax=0;clw.inp.ay=0;K.style.transform="";};
+      J.addEventListener("pointerdown",e=>{e.preventDefault();pid=e.pointerId;try{J.setPointerCapture(pid);}catch(_){}mv(e);});J.addEventListener("pointermove",e=>{if(e.pointerId===pid)mv(e);});
+      ["pointerup","pointercancel","lostpointercapture"].forEach(n=>J.addEventListener(n,end));J.addEventListener("contextmenu",e=>e.preventDefault());}}
   if(!clw._pm)clw._pm=setInterval(clwAutoStep,700);
   d.style.display="flex";clw.lt=0;clwListen();clwSyncView();clwUI();if(!clw.raf)clw.raf=requestAnimationFrame(clwLoop);}
-function clwClose(){if(clw.play||clw.fin)return toast("🔑 도전 중에는 나갈 수 없어요");const d=$("clwMod");if(d)d.style.display="none";clw.inp={l:0,r:0,u:0,d:0};if(clw.rl.busy&&!clw.rl.mine){clw.rl.run=0;clw.rl.busy=false;}if(clw._pm){clearInterval(clw._pm);clw._pm=0;}clwUnlisten();}
+function clwClose(){if(clw.play||clw.fin)return toast("🔑 도전 중에는 나갈 수 없어요");const d=$("clwMod");if(d)d.style.display="none";clw.inp={l:0,r:0,u:0,d:0,ax:0,ay:0};if(clw.rl.busy&&!clw.rl.mine){clw.rl.run=0;clw.rl.busy=false;}if(clw._pm){clearInterval(clw._pm);clw._pm=0;}clwUnlisten();}
 window.addEventListener("keydown",e=>{if(!clwOpen())return;const K={ArrowLeft:"l",a:"l",ArrowRight:"r",d:"r",ArrowUp:"u",w:"u",ArrowDown:"d",s:"d"},k=K[e.key.length===1?e.key.toLowerCase():e.key];
   if(e.key===" "){e.preventDefault();if(!e.repeat&&clw.play&&clw.G&&clw.G.st==="move"){CLW.startDrop(clw.G);clwUI();}return;}
   if(e.key==="Escape"){clwClose();return;}if(k){e.preventDefault();clw.inp[k]=1;}},true);
