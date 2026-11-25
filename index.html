@@ -141,8 +141,6 @@ nav button.on{color:var(--tx);font-weight:700}
 #pgMod>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 .gone{display:none!important}
 .pgBtns{display:flex;gap:8px;margin:2px 0 8px}.pgBtns button{flex:1;background:var(--card);border-radius:12px;padding:11px 0;font-weight:700;font-size:12px}
-#fSell{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
-#fSell>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 #fInfo{position:fixed;inset:0;padding:12px;z-index:40;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center}
 #fInfo>div{background:var(--bg);width:100%;max-width:560px;max-height:86vh;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:flex;flex-direction:column}
 #fRow{display:flex;gap:8px;justify-content:center;align-items:flex-start;margin-bottom:10px}#fRow #fishWrap{margin:0}
@@ -174,7 +172,7 @@ nav button.on{color:var(--tx);font-weight:700}
 @media (min-width:940px){:root{--cw:min(900px,calc(100vw - 400px));--cl:calc((100vw - var(--cw) - 352px)/2)}
   body{max-width:var(--cw);margin:0 0 0 var(--cl)}nav,.sheet,#fMk>div{max-width:var(--cw)!important}nav{left:var(--cl);transform:none}
   .sheet{left:var(--cl);transform:translate(0,100%)}.sheet.on{transform:translate(0,0)}
-  #fMk,#fInfo,#pgMod,#fChar,#fSell,#awkPv{justify-content:center;padding-left:var(--cl);padding-right:calc(100vw - var(--cl) - var(--cw))}#fInfo>div,#pgMod>div,#fMk>div{max-width:min(680px,var(--cw))!important}
+  #fMk,#fInfo,#pgMod,#fChar,#awkPv{justify-content:center;padding-left:var(--cl);padding-right:calc(100vw - var(--cl) - var(--cw))}#fInfo>div,#pgMod>div,#fMk>div{max-width:min(680px,var(--cw))!important}
   .toast{left:calc(var(--cl) + var(--cw)/2)}
   #chatSide{left:calc(var(--cl) + var(--cw) + 12px);top:0;width:340px;height:100vh;border-left:1px solid var(--line);border-right:1px solid var(--line)}#chatFab,#chatClose{display:none}}
 @media (max-width:600px){
@@ -301,14 +299,11 @@ nav button.on{color:var(--tx);font-weight:700}
 <div id="awkPv"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px"><b style="font-size:15.5px">🌟 각성 모습 미리보기</b><button id="awkPvX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
   <div style="font-size:11px;color:var(--sub);padding:0 14px 6px">캐릭터를 고르면 기본 · 1 · 2 · 3각성 모습이 움직이는 그대로 보여요</div>
   <div id="awkPvPick" style="display:flex;gap:6px;overflow-x:auto;padding:2px 14px 8px"></div><div id="awkPvRow" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 14px 16px;overflow-y:auto"></div></div></div>
-<div id="fSell"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 4px"><b style="font-size:15.5px">🐟 어시장</b><button id="fSellX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
-  <div style="font-size:11px;color:var(--sub);padding:0 14px 8px">잡은 물고기를 시세대로 바로 팔아요 (수수료 10%). 다른 사람과 사고팔려면 🏪 거래소로 가세요.</div>
-  <div id="fSellTop" style="padding:0 14px 8px"></div><div id="fSellBody" style="overflow-y:auto;padding:0 14px 20px"></div></div></div>
 <div id="fInfo"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px" id="fInfoT">📖 도감</b><button id="fInfoX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
   <div class="tabs2" id="fishTabs" style="margin:0 14px 8px;display:none"><button data-f="dex" class="on">📖 도감</button><button data-f="rank">🏆 순위</button><button data-f="hof">🐋 명예의 전당</button></div><div id="fishInfo" style="overflow-y:auto;padding:0 14px 20px"></div></div></div>
-<div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px">🐟 주로 거래소</b><button id="fMkX" style="font-size:20px;color:var(--sub)">✕</button></div>
-  <div class="tabs2" id="fMkTabs" style="margin:0 14px 6px"><button data-m="list" class="on">🛒 매물</button><button data-m="sell">📤 올리기 (판매·교환)</button></div>
-  <div style="font-size:10px;color:var(--sub);padding:0 14px 6px">판매는 수수료 10% 빼고 입금 · 교환은 수수료 없이 물건끼리 바꿔요</div><div id="fMkBody"></div></div></div>
+<div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px">🏪 주로 거래소 · 어시장</b><button id="fMkX" style="font-size:20px;color:var(--sub)">✕</button></div>
+  <div class="tabs2" id="fMkTabs" style="margin:0 14px 6px"><button data-m="quick" class="on">🐟 바로 팔기</button><button data-m="list">🛒 매물</button><button data-m="sell">📤 올리기 (판매·교환)</button></div>
+  <div id="fMkInfo" style="font-size:10px;color:var(--sub);padding:0 14px 6px">잡은 물고기를 시세대로 바로 팔아요 (수수료 10%)</div><div id="fMkBody"></div></div></div>
 <aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><button id="chatClose">✕</button></div>
   <div id="chatOn"></div><div id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
@@ -1322,13 +1317,13 @@ const SHOP={x:16,y:150,w:58,h:34};const nearB=(B,x,y)=>x>B.x-26&&x<B.x+B.w+26&&y
 const FMK={x:16,y:214,w:58,h:34};const NTS={x:12,y:362,w:66,h:38},CAS={x:12,y:282,w:66,h:38};
 const RPS_NPC={x:262,y:198},RPS_PADS=[["s",204],["r",262],["p",320]],PAD_Y=206,PAD_H=78,PAD_W=50,RZ={x:174,y:174,w:180,h:126};
 const onPad=(x,y)=>{if(y<PAD_Y||y>PAD_Y+PAD_H)return null;for(const[c,cx]of RPS_PADS)if(Math.abs(x-cx)<=PAD_W/2)return c;return null;};
-const nearNpc=(x,y)=>Math.hypot(x-RPS_NPC.x,y-RPS_NPC.y)<30&&!onPad(x,y);const nearFmk=(x,y)=>nearB(FMK,x,y);const nearNts=(x,y)=>nearB(NTS,x,y);const nearCas=(x,y)=>nearB(CAS,x,y);
-const inShop=(x,y)=>(x>NTS.x-6&&x<NTS.x+NTS.w+6&&y>NTS.y-4&&y<NTS.y+NTS.h+4)||(x>CAS.x-6&&x<CAS.x+CAS.w+6&&y>CAS.y-4&&y<CAS.y+CAS.h+4)||(x>SHOP.x-6&&x<SHOP.x+SHOP.w+6&&y>SHOP.y-4&&y<SHOP.y+SHOP.h+4)||(x>FMK.x-6&&x<FMK.x+FMK.w+6&&y>FMK.y-4&&y<FMK.y+FMK.h+4);
+const nearNpc=(x,y)=>Math.hypot(x-RPS_NPC.x,y-RPS_NPC.y)<30&&!onPad(x,y);const nearFmk=(x,y)=>false;const nearNts=(x,y)=>nearB(NTS,x,y);const nearCas=(x,y)=>nearB(CAS,x,y);
+const inShop=(x,y)=>(x>NTS.x-6&&x<NTS.x+NTS.w+6&&y>NTS.y-4&&y<NTS.y+NTS.h+4)||(x>CAS.x-6&&x<CAS.x+CAS.w+6&&y>CAS.y-4&&y<CAS.y+CAS.h+4)||(x>SHOP.x-6&&x<SHOP.x+SHOP.w+6&&y>SHOP.y-4&&y<SHOP.y+SHOP.h+4);
 const inDock=(x,y)=>x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+8&&y<=RIVER+16;
 const walkable=(x,y)=>!inShop(x,y)&&x>=10&&x<=FW-10&&y<=FH-12&&(y>=RIVER+14||inDock(x,y));
 function fishSpot(x,y){if(inDock(x,y))return y<RIVER-6;return y<=RIVER+34&&!(x>DOCK.x-12&&x<DOCK.x+DOCK.w+12);}
 let fp={x:120,y:300,dir:1,walk:0,tx:null,ty:null},fstate="idle",fT=0,fBite=0,fBob={x:0,y:0},fKeys={},fCv=null,fCtx=null,fRaf=0,fLastSend=0,fLastSent="",fScale=1,fOthers={},fFloat=[],fRes=null,fTab="dex";
-const DECOR=(()=>{const r=mulberry(777),a=[{t:"tree",x:96,y:330,c:.2},{t:"tree",x:342,y:330,c:.7},{t:"tree",x:100,y:432,c:.5},{t:"tree",x:332,y:428,c:.3},{t:"bush",x:160,y:205,c:.4},{t:"bush",x:196,y:410,c:.6}];a.push({t:"shop",x:SHOP.x,y:SHOP.y+SHOP.h});a.push({t:"fmk",x:FMK.x,y:FMK.y+FMK.h});a.push({t:"nts",x:NTS.x,y:NTS.y+NTS.h});a.push({t:"cas",x:CAS.x,y:CAS.y+CAS.h});for(let i=0;i<14;i++){const fx=20+r()*320,fy=RIVER+40+r()*(FH-RIVER-60),fc=r();if(fx>RZ.x-8&&fx<RZ.x+RZ.w+8&&fy>RZ.y-8&&fy<RZ.y+RZ.h+16)continue;if(fx>NTS.x-10&&fx<NTS.x+NTS.w+10&&fy>NTS.y-24&&fy<NTS.y+NTS.h+10)continue;if(fx>CAS.x-10&&fx<CAS.x+CAS.w+10&&fy>CAS.y-24&&fy<CAS.y+CAS.h+10)continue;a.push({t:"flower",x:fx,y:fy,c:fc});}return a.sort((a,b)=>a.y-b.y);})();
+const DECOR=(()=>{const r=mulberry(777),a=[{t:"tree",x:96,y:330,c:.2},{t:"tree",x:342,y:330,c:.7},{t:"tree",x:100,y:432,c:.5},{t:"tree",x:332,y:428,c:.3},{t:"bush",x:160,y:205,c:.4},{t:"bush",x:196,y:410,c:.6}];a.push({t:"shop",x:SHOP.x,y:SHOP.y+SHOP.h});a.push({t:"nts",x:NTS.x,y:NTS.y+NTS.h});a.push({t:"cas",x:CAS.x,y:CAS.y+CAS.h});for(let i=0;i<14;i++){const fx=20+r()*320,fy=RIVER+40+r()*(FH-RIVER-60),fc=r();if(fx>RZ.x-8&&fx<RZ.x+RZ.w+8&&fy>RZ.y-8&&fy<RZ.y+RZ.h+16)continue;if(fx>NTS.x-10&&fx<NTS.x+NTS.w+10&&fy>NTS.y-24&&fy<NTS.y+NTS.h+10)continue;if(fx>CAS.x-10&&fx<CAS.x+CAS.w+10&&fy>CAS.y-24&&fy<CAS.y+CAS.h+10)continue;a.push({t:"flower",x:fx,y:fy,c:fc});}return a.sort((a,b)=>a.y-b.y);})();
 function fishActive(){return $("s-fish")&&$("s-fish").classList.contains("on");}
 function fishResize(){if(!fCv)return;const top=$("fishWrap").getBoundingClientRect().top+scrollY,avail=innerHeight-top-(TOUCH?66:80);const w=Math.max(240,Math.min($("s-fish").clientWidth-($("fRow").classList.contains("tkoff")?0:(innerWidth>600?136:91)),Math.max(300,avail)*FW/FH,620));if(Math.abs(w-(fishResize.w||0))<2&&fCv.width)return;fishResize.w=w;fScale=w/FW;const dpr=window.devicePixelRatio||1;fCv.style.width=w+"px";fCv.style.height=(FH*fScale)+"px";fCv.width=Math.round(w*dpr);fCv.height=Math.round(FH*fScale*dpr);fCtx.setTransform(dpr*fScale,0,0,dpr*fScale,0,0);}
 function hueOf(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h;}
@@ -1805,7 +1800,7 @@ function fishDraw(t){const c=fCtx;
     else if(d.t==="shop"||d.t==="fmk"){const S=d.t==="shop"?SHOP:FMK,fm=d.t==="fmk",X=S.x,Y=S.y,W=S.w,H=S.h;c.fillStyle="rgba(0,0,0,.25)";c.fillRect(X+4,Y+H-4,W,8);c.fillStyle="#8b5a2b";c.fillRect(X+4,Y+14,W-8,H-14);c.fillStyle="#6b4423";c.fillRect(X+8,Y+H-16,W-16,12);
       for(let i=0;i<6;i++){c.fillStyle=i%2?"#f2f2f2":(fm?"#2563eb":"#e63946");c.beginPath();c.moveTo(X+i*W/6,Y+4);c.lineTo(X+(i+1)*W/6,Y+4);c.lineTo(X+(i+1)*W/6,Y+18);c.arc(X+(i+.5)*W/6,Y+18,W/12,0,Math.PI);c.fill();}
       c.fillStyle="#5c3d22";c.fillRect(X,Y,W,5);c.font="12px sans-serif";c.textAlign="center";c.fillText(fm?"🐟💰🐠":"🐟🦀🦑",X+W/2,Y+H-6);
-      c.fillStyle="rgba(0,0,0,.55)";c.beginPath();c.roundRect(X+W/2-26,Y-16,52,16,8);c.fill();c.fillStyle="#ffcf4d";c.font="bold 9px 'Noto Sans KR',sans-serif";c.fillText(fm?"어시장":"거래소",X+W/2,Y-4.5);}
+      c.fillStyle="rgba(0,0,0,.55)";c.beginPath();c.roundRect(X+W/2-36,Y-16,72,16,8);c.fill();c.fillStyle="#ffcf4d";c.font="bold 9px 'Noto Sans KR',sans-serif";c.fillText(fm?"어시장":"어시장·거래소",X+W/2,Y-4.5);}
     else if(d.t==="nts"){const X=NTS.x,Y=NTS.y,W=NTS.w,H=NTS.h;c.fillStyle="rgba(0,0,0,.25)";c.fillRect(X+4,Y+H-4,W,8);
       c.fillStyle="#cbd5e1";c.fillRect(X+2,Y+H-6,W-4,6);c.fillStyle="#e2e8f0";c.fillRect(X+5,Y+12,W-10,H-18);c.fillStyle="#f8fafc";c.beginPath();c.moveTo(X,Y+13);c.lineTo(X+W/2,Y);c.lineTo(X+W,Y+13);c.closePath();c.fill();c.strokeStyle="#94a3b8";c.lineWidth=1;c.stroke();
       c.fillStyle="#cbd5e1";for(let k=0;k<5;k++)c.fillRect(X+9+k*12.5,Y+15,4,H-21);c.fillStyle="#475569";c.fillRect(X+W/2-5,Y+H-15,10,9);
@@ -1827,7 +1822,7 @@ function fishDraw(t){const c=fCtx;
   const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p)drawBubble(c,p.x,p.y,b.text);}
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);
-  if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🏪 버튼으로 거래소 열기":"스페이스: 거래소 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):nearCas(fp.x,fp.y)?(TOUCH?"🎰 버튼으로 도박장 들어가기":"스페이스: 도박장 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
+  if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🏪 버튼으로 거래소·어시장 열기":"스페이스: 거래소·어시장 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):nearCas(fp.x,fp.y)?(TOUCH?"🎰 버튼으로 도박장 들어가기":"스페이스: 도박장 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
   if(fstate==="bite"&&!TOUCH){c.font="bold 12px 'Noto Sans KR',sans-serif";c.fillStyle="#ff4757";c.textAlign="center";c.fillText("스페이스!",fp.x,fp.y+18);}}
 const TOUCH=matchMedia("(hover:none),(pointer:coarse)").matches;
 const fishBobY=(x,y)=>inDock(x,y)?Math.max(14,y-10):Math.max(14,RIVER-48);
@@ -1859,7 +1854,7 @@ function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.
   const h=`${ic}<small>${tx}</small>`;if(a.innerHTML!==h)a.innerHTML=h;a.className=cl;}
 function setFishBtn(){setFishAct();const b=$("fishBtn");if(!b)return;const can=fishSpot(fp.x,fp.y);
   if(fstate==="idle"&&nearFmk(fp.x,fp.y)){b.textContent="🐟 어시장 열기";b.disabled=false;b.className="fbtn";}
-  else if(fstate==="idle"&&nearShop(fp.x,fp.y)){b.textContent="🏪 거래소 열기";b.disabled=false;b.className="fbtn";}
+  else if(fstate==="idle"&&nearShop(fp.x,fp.y)){b.textContent="🏪 거래소·어시장 열기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"&&nearNts(fp.x,fp.y)){b.textContent="🏛️ 국세청 들어가기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"&&nearCas(fp.x,fp.y)){b.textContent="🎰 도박장 들어가기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"){b.textContent=can?"🎣 낚싯대 던지기":"🚶 강가로 가세요";b.disabled=!can;b.className="fbtn";}
@@ -1915,11 +1910,9 @@ function fishShow(on){if(on){if(!fishShow.sp&&myId){fishShow.sp=1;let sp=spawnOf
 fishInit();
 {const w=setInterval(()=>{if(!me||!me._loaded||!myId)return;clearInterval(w);let t0="";try{t0=localStorage.getItem("jc_tab")||"";}catch(e){}if(t0==="fish"){const b=document.querySelector('#nav button[data-s="fish"]');if(b&&!b.classList.contains("on"))b.click();}},200);}
 $("fChBtn").onclick=openChar;
-function openFmk(){fKeys={};stAdd("visitFmk");$("fSell").style.display="flex";renderFmk();}
-function closeFmk(){$("fSell").style.display="none";}
-$("fSellX").onclick=closeFmk;$("fSell").onclick=e=>{if(e.target.id==="fSell")closeFmk();};window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("fSell").style.display==="flex")closeFmk();});
+function openFmk(){fMkTab="quick";openMarket();}
 const fmkUnit=i=>FISH[i][1]-Math.round(FISH[i][1]*.1);
-function renderFmk(){if($("fSell").style.display!=="flex")return;const m=(me&&me.fish)||{};const L=DEX_ORDER.map(i=>[i,m[fKey(i)]||0]).filter(x=>x[1]>0);const pos=L.filter(([i])=>FISH[i][1]>0).map(([i,c])=>[i,c,c]),neg=L.filter(([i])=>FISH[i][1]<0);const posS=pos.filter(x=>x[1]>0);
+function renderFmk(){if($("fMk").style.display!=="flex"||fMkTab!=="quick"||!$("fSellTop"))return;const m=(me&&me.fish)||{};const L=DEX_ORDER.map(i=>[i,m[fKey(i)]||0]).filter(x=>x[1]>0);const pos=L.filter(([i])=>FISH[i][1]>0).map(([i,c])=>[i,c,c]),neg=L.filter(([i])=>FISH[i][1]<0);const posS=pos.filter(x=>x[1]>0);
   const tot=posS.reduce((s,[i,c])=>s+fmkUnit(i)*c,0);
   $("fSellTop").innerHTML=posS.length?`<button id="fSellAll" style="width:100%;background:var(--up);color:#fff;font-weight:900;border-radius:12px;padding:11px 0">전부 팔기 · +${formatMoneyReadable(tot)}</button>`:"";
   $("fSellBody").innerHTML=L.length?`<div style="font-size:11px;color:var(--sub);margin-bottom:6px">📖 다 팔아도 도감에는 남아요 · 1마리뿐인 물고기는 거래소에 못 올려요</div>`+pos.map(([i,c,all])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${all}개 · 1개 ${formatMoneyReadable(fmkUnit(i))}</small></div>${c>0?`<input type="number" inputmode="numeric" min="1" max="${c}" value="${c}" data-qi="${i}" style="width:58px;text-align:center"><button class="buy" data-sq="${i}">팔기</button>`:`<span style="font-size:11px;color:var(--sub)">도감용 1마리</span>`}</div>`).join("")+
@@ -1943,12 +1936,13 @@ $("fAct").onclick=e=>{e.preventDefault();fishAction();};
 function openFChat(){fKeys={};if(innerWidth<940)setChatOpen(true);$("chatIn").focus();}
 $("chatIn").addEventListener("keydown",e=>{if(e.key==="Escape"){$("chatIn").blur();if(innerWidth<940)setChatOpen(false);}else if(e.key==="Enter"&&!e.isComposing&&fishActive()&&!$("chatIn").value.trim())setTimeout(()=>$("chatIn").blur(),0);});
 /* ---------- 🐟 거래소 ---------- */
-let fMarket={},fMkTab="list",fSellSel=null,fSellMode="sell",fSellQ="";
-function openMarket(){fKeys={};stAdd("visitMkt");$("fMk").style.display="flex";renderMarketUI();}
+let fMarket={},fMkTab="quick",fMkQV=0,fSellSel=null,fSellMode="sell",fSellQ="";
+function openMarket(tab){fKeys={};stAdd("visitMkt");fMkQV=0;if(typeof tab==="string")fMkTab=tab;$("fMk").style.display="flex";renderMarketUI();}
 function closeMarket(){$("fMk").style.display="none";}
 $("fMkX").onclick=closeMarket;$("fMk").onclick=e=>{if(e.target.id==="fMk")closeMarket();};
 document.querySelectorAll("#fMkTabs button").forEach(b=>b.onclick=()=>{fMkTab=b.dataset.m;renderMarketUI();});
-function renderMarketUI(){if($("fMk").style.display!=="flex")return;document.querySelectorAll("#fMkTabs button").forEach(b=>b.classList.toggle("on",b.dataset.m===fMkTab));const B=$("fMkBody");const m=(me&&me.fish)||{};
+function renderMarketUI(){if($("fMk").style.display!=="flex")return;document.querySelectorAll("#fMkTabs button").forEach(b=>b.classList.toggle("on",b.dataset.m===fMkTab));const B=$("fMkBody");const m=(me&&me.fish)||{};const inf=$("fMkInfo");if(inf)inf.textContent=fMkTab==="quick"?"잡은 물고기를 시세대로 바로 팔아요 (수수료 10%) · 다른 사람과 사고팔려면 🛒 매물 · 📤 올리기":"판매는 수수료 10% 빼고 입금 · 교환은 수수료 없이 물건끼리 바꿔요";
+  if(fMkTab==="quick"){if(!fMkQV){fMkQV=1;stAdd("visitFmk");}B.innerHTML='<div id="fSellTop" style="padding:0 0 8px"></div><div id="fSellBody"></div>';return renderFmk();}
   if(fMkTab==="list"){const L=Object.entries(fMarket).filter(([,v])=>v&&FISH[v.fi]&&(v.want==null||FISH[v.want])).sort((a,b)=>b[1].t-a[1].t);
     B.innerHTML=L.length?L.map(([id,v])=>{const mine=v.seller===myId,tr=v.want!=null;const have=tr&&(m[fKey(v.want)]||0)>0;
       return `<div class="mki"><div class="w"><b>${esc(FISH[v.fi][2])}</b><small>${tr?"🔄 교환":"💰 판매"} · 도감 ${dexNo(v.fi)}번 · ${esc(v.sellerName||"?")}${mine?" (나)":""}</small></div>`+
