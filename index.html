@@ -2421,7 +2421,7 @@ function hrDraw(cv,r,ms){const g=cv.getContext("2d"),W=cv.width,H=cv.height,L=38
     g.fillStyle="rgba(0,0,0,.25)";g.beginPath();g.ellipse(x-4,y+9,13,3,0,0,7);g.fill();
     hrHorse(g,x,y,r.horses[i].c,ms<HR_WAIT||hrPos(r,i,ms)>=1?0:ms/55+i);
     g.fillStyle=r.horses[i].c;g.beginPath();g.arc(x-22,y-8,8,0,7);g.fill();g.fillStyle="#fff";g.font="bold 10px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(i+1,x-22,y-7.5);
-    g.fillStyle=isB?"#fde047":"rgba(255,255,255,.85)";g.font=`${isB?"bold ":""}9px 'Noto Sans KR',sans-serif`;g.textAlign="left";{const who=hrWhoTxt(r,i,3);g.fillText(r.horses[i].n+(isB?(mine?" ⭐내 말":" ⭐"):"")+(who?"  👤 "+who:""),4,12+i*lh+8);}}
+    g.fillStyle=isB?"#fde047":"rgba(255,255,255,.85)";g.font=`${isB?"bold ":""}9px 'Noto Sans KR',sans-serif`;g.textAlign="left";{const who=hrWhoTxt(r,i,3);if(who){const tx="👤 "+who;g.save();g.font="bold 9px 'Noto Sans KR',sans-serif";const tw=g.measureText(tx).width+8,bx=Math.max(2,Math.min(W-tw-2,x-8-tw/2)),by=y-24;g.fillStyle="rgba(15,23,42,.82)";g.beginPath();g.roundRect(bx,by,tw,11,5);g.fill();g.fillStyle=isB&&mine?"#fde047":"#fff";g.textAlign="left";g.textBaseline="middle";g.fillText(tx,bx+4,by+6);g.restore();}g.fillText(r.horses[i].n+(isB?(mine?" ⭐내 말":" ⭐"):"")+(who?"  👤 "+who:""),4,12+i*lh+8);}}
   const t=(ms-HR_WAIT)/1000;r.order.forEach((i,k)=>{if(t>=r.plan[i][0]&&k<3){g.font="16px sans-serif";g.textAlign="right";g.textBaseline="middle";g.fillText(["🥇","🥈","🥉"][k],W-6,12+i*lh+lh/2);}});
   if(ms<HR_WAIT){g.fillStyle="rgba(0,0,0,.45)";g.fillRect(0,0,W,H);g.fillStyle="#fde047";g.font="bold 46px sans-serif";g.textAlign="center";g.textBaseline="middle";g.fillText(Math.ceil((HR_WAIT-ms)/1000),W/2,H/2);}}
 
