@@ -1155,6 +1155,8 @@ function crystalWing(c,t){const f=Math.sin(t/300)*.12;c.save();c.translate(-2,-2
 
 /* 캐릭터별 머리 기준점 (발끝이 원점, 위가 -) : cy 머리 중심, s 크기 */
 function accAnchor(ch){if(ch===9)return{cy:-30,s:.95};if(ch===10)return{cy:-27+Math.sin(Date.now()/300)*2,s:1.2,ghost:1};if([5,6,7,8,16].includes(ch))return{cy:-29,s:1.1};if(ch===15)return{cy:-29,s:1.05};return{cy:-28,s:1};}
+const ACC_TOPY={ribbon:39.2,beanie:46.8,ears:39.8,flower:38.5,wizard:50.2,horns:43,halo:46.8,crown:47.5,cap:41,bunny:48.8,sprout:43,santa:44.5,chef:47.2,cowboy:40.5,tiara:43};
+function accLift(ch,id,ak){if(!id||(ak|0)>=1||!ACC_TOPY[id])return 0;const d=ch===10?3:[5,6,7,8,16].includes(ch)?2.3:(ch===9||ch===15)?1.6:0;return Math.max(0,ACC_TOPY[id]+d-36.5);}
 function drawAccFor(c,x,y,ch,id,t,bob,dir,ak){if(!id||!isFinite(x)||!isFinite(y))return;ak=ak|0;if(ak>=1&&ACC_TOP[id])return;const A=accAnchor(ch),S=[1,1,1.04,1.15][ak]||1;
   c.save();c.translate(x,y);c.scale(S,S);c.translate(0,A.cy+(A.ghost?0:(bob||0)));c.scale((dir<0?-1:1)*A.s,A.s);c.translate(0,28);try{accDraw(c,id,t||0,0);}finally{c.restore();}}
 function sparkle(c,x,y,r,col){c.fillStyle=col;c.beginPath();c.moveTo(x,y-r);c.lineTo(x+r*.3,y-r*.3);c.lineTo(x+r,y);c.lineTo(x+r*.3,y+r*.3);c.lineTo(x,y+r);c.lineTo(x-r*.3,y+r*.3);c.lineTo(x-r,y);c.lineTo(x-r*.3,y-r*.3);c.closePath();c.fill();}
@@ -1866,7 +1868,7 @@ function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
   const H=typeof hue==="object"?hue:{hue,ch:-1};hue=H.hue;
   const bob=walk?Math.sin(t/90)*1.5:0;const lg=walk?Math.sin(t/90)*3:0;
   drawAura(c,x,y,H.au,t,0);c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,y+2,9,3.5,0,0,7);c.fill();
-  drawWing(c,x,y,dir,H.wg,t,bob);drawCharAwk(c,x,y,H.ch,hue,dir,bob,lg,H.ak|0,t,!!H.wg);if(H.ac)drawAccFor(c,x,y,H.ch,H.ac,t,bob,dir,H.ak|0);drawAura(c,x,y,H.au,t,1);const ex=awkLift(H.ak);
+  drawWing(c,x,y,dir,H.wg,t,bob);drawCharAwk(c,x,y,H.ch,hue,dir,bob,lg,H.ak|0,t,!!H.wg);if(H.ac)drawAccFor(c,x,y,H.ch,H.ac,t,bob,dir,H.ak|0);drawAura(c,x,y,H.au,t,1);const ex=awkLift(H.ak)+accLift(H.ch,H.ac,H.ak);
   if(rod)drawRod(c,x+dir*5,y-16,rod.x0,rod.y0,H.rl|0,t);
   drawPlate(c,x,y-ex,name,H.np||"",t,isMe);if(H.tt){c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;const ty=H.np==="royal"?9:H.np==="legend"?16:H.np==="diamond"?7:0;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64-ty-ex,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8-ty-ex);}
   if(state==="bite"){c.font="bold 14.5px sans-serif";c.fillStyle="#ff4757";c.fillText("!",x+12,y-34);}}
@@ -1924,8 +1926,8 @@ function fishDraw(t){const c=fCtx;
     else{c.fillStyle=["#ffd166","#ef476f","#ffffff","#c77dff"][Math.floor(d.c*4)];c.beginPath();c.arc(d.x,d.y-2,2.2,0,7);c.fill();}}});
   people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
   {const st=rpsState();/* 이모지는 폰마다 폭이 달라서 글자와 따로 그림 (쏠림 방지) */const em=st.emo||"",tx=st.text;c.font="bold 10px 'Noto Sans KR',sans-serif";const txw=c.measureText(tx).width,ew=em?13:0,gap=em?3:0,cw=ew+gap+txw,tw=cw+16,bx=RPS_NPC.x-tw/2,by=RPS_NPC.y-84,x0=RPS_NPC.x-cw/2;c.fillStyle=st.hot?"#fde047":"rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,tw,20,9);c.fill();c.beginPath();c.moveTo(RPS_NPC.x-4,by+20);c.lineTo(RPS_NPC.x+4,by+20);c.lineTo(RPS_NPC.x,by+26);c.fill();c.textBaseline="middle";if(em){c.font="11px sans-serif";c.textAlign="center";c.fillText(em,x0+ew/2,by+10.5);}c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="#111";c.textAlign="left";c.fillText(tx,x0+ew+gap,by+10.5);c.textBaseline="alphabetic";c.textAlign="center";}
-  const skL=(x,y,n,tt,ak)=>{if(!(n>0))return;if(tt)y-=12;y-=awkLift(ak);c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
-  skL(fp.x,fp.y,rpsN(),myTitle(),myAwkShow());for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt,o.ak);}
+  const skL=(x,y,n,tt,ak,al)=>{if(!(n>0))return;if(tt)y-=12;y-=awkLift(ak)+(al||0);c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
+  skL(fp.x,fp.y,rpsN(),myTitle(),myAwkShow(),accLift(normCh(me&&me.ch),eqAcc(),myAwkShow()));for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt,o.ak,accLift(normCh(o.ch),o.ac,o.ak));}
   const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p)drawBubble(c,p.x,p.y,b.text);}
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);
