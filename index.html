@@ -1458,7 +1458,7 @@ function fishCountOf(p){let n=0;const m=(p&&p.fish)||{};for(const k in m)if(type
 const hasSeen=(p,i)=>{const m=(p&&p.fish)||{};return typeof m[fKey(i)]==="number";};
 
 /* 월드: 360 x 440, 위쪽은 강, 오른쪽에 나무 선착장 */
-const FW=360,FH=440,RIVER=112,DOCK={x:84,y:26,w:50,h:RIVER-26};
+const FW=360,FH=440,RIVER=112,DOCK={x:84,y:0,w:50,h:RIVER};
 const SHOP={x:16,y:150,w:58,h:34};const nearB=(B,x,y)=>x>B.x-26&&x<B.x+B.w+26&&y>B.y+4&&y<B.y+B.h+34;const nearShop=(x,y)=>nearB(SHOP,x,y);
 const FMK={x:16,y:214,w:58,h:34};const CLB={x:12,y:214,w:66,h:38};const NTS={x:12,y:362,w:66,h:38},CAS={x:12,y:282,w:66,h:38},PHB={x:262,y:346,w:66,h:42};
 const RPS_NPC={x:262,y:168},RPS_PADS=[["s",208],["r",262],["p",316]],PAD_Y=176,PAD_H=68,PAD_W=44,RZ={x:182,y:146,w:160,h:112};
@@ -1496,7 +1496,7 @@ function boatFront(c,x,y,t,sk,tl){const G=sk===2,b=boatBob(t);c.save();c.transla
   c.fillStyle=G?"#fff7ae":"#dc2626";c.beginPath();c.moveTo(-23.5,0);c.quadraticCurveTo(0,7,23.5,0);c.lineTo(22.5,2.2);c.quadraticCurveTo(0,9.2,-22.5,2.2);c.closePath();c.fill();
   c.strokeStyle="rgba(0,0,0,.25)";c.lineWidth=.8;c.beginPath();c.moveTo(-25,-3);c.quadraticCurveTo(0,4,25,-3);c.stroke();if(G){c.fillStyle="#fff";for(let k=0;k<3;k++){const a=(t/260+k*2.1)%6.28,sx=-18+k*18+Math.sin(a)*3;c.globalAlpha=.5+.5*Math.sin(a);c.fillRect(sx,2+Math.cos(a),1.6,1.6);}c.globalAlpha=1;}c.restore();}
 const inShop=(x,y)=>(x>NTS.x-6&&x<NTS.x+NTS.w+6&&y>NTS.y-4&&y<NTS.y+NTS.h+4)||(x>CAS.x-6&&x<CAS.x+CAS.w+6&&y>CAS.y-4&&y<CAS.y+CAS.h+4)||(x>SHOP.x-6&&x<SHOP.x+SHOP.w+6&&y>SHOP.y-4&&y<SHOP.y+SHOP.h+4)||(x>CLB.x-6&&x<CLB.x+CLB.w+6&&y>CLB.y-4&&y<CLB.y+CLB.h+4)||(x>PHB.x-6&&x<PHB.x+PHB.w+6&&y>PHB.y-4&&y<PHB.y+PHB.h+4);
-const inDock=(x,y)=>x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+8&&y<=RIVER+16;
+const inDock=(x,y)=>x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+16&&y<=RIVER+16;
 const walkable=(x,y)=>!inShop(x,y)&&x>=10&&x<=FW-10&&y<=FH-12&&(y>=RIVER+14||inDock(x,y));
 function fishSpot(x,y){if(inDock(x,y))return y<RIVER-6;return y<=RIVER+34&&!(x>DOCK.x-12&&x<DOCK.x+DOCK.w+12);}
 let fBoat=0,fBV={x:0,y:0},fBoatTilt=0,fWake=[],fWakeT=0;
