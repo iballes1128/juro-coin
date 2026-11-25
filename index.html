@@ -2304,7 +2304,7 @@ function fishInit(){if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCv=$("
   const pt=e=>{const r=fCv.getBoundingClientRect();return{x:(e.clientX-r.left)/fScale,y:(e.clientY-r.top)/fScale};};let down=false;
   const go=e=>{if(fstate!=="idle")return;let{x,y}=pt(e);if(!walkable(x,y)&&!inDock(x,y))y=Math.max(y,RIVER+16);fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.min(FH-12,y);fp.via=null;if(inDock(fp.tx,fp.ty)&&!inDock(fp.x,fp.y))fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+18};else if(!inDock(fp.tx,fp.ty)&&inDock(fp.x,fp.y)&&fp.ty>RIVER+18)fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+20};};
   fCv.addEventListener("pointerdown",e=>{if(TOUCH)return;const p0=pt(e),hit=fTapOther(p0.x,p0.y);if(hit){openPMenu(hit,e.clientX,e.clientY);return;}down=true;go(e);});fCv.addEventListener("click",e=>{if(!TOUCH)return;const p0=pt(e),hit=fTapOther(p0.x,p0.y);if(hit)openPMenu(hit,e.clientX,e.clientY);});fCv.addEventListener("pointermove",e=>{if(TOUCH)return;const p0=pt(e);fCv.style.cursor=fTapOther(p0.x,p0.y)?"pointer":"";});fCv.addEventListener("pointermove",e=>{if(down)go(e);});window.addEventListener("pointerup",()=>down=false);
-  window.addEventListener("keydown",e=>{if(clwOpen()||phOpen()||arcOpen()||tmOpen())return;if(!fishActive()||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if($("fMk").style.display==="flex"){if(e.key==="Escape")closeMarket();return;}if(e.key===" "){e.preventDefault();if(!e.repeat)fishAction();return;}if(e.key==="Enter"){e.preventDefault();openFChat();return;}if(e.key==="e"||e.key==="E"){if(nearShop(fp.x,fp.y))openMarket();return;}const k=e.key.length===1?e.key.toLowerCase():e.key;if(k in{ArrowUp:1,ArrowDown:1,ArrowLeft:1,ArrowRight:1,w:1,a:1,s:1,d:1}){fKeys[k]=true;e.preventDefault();}});
+  window.addEventListener("keydown",e=>{if(clwOpen()||phOpen()||arcOpen()||tmOpen()||bbOpen())return;if(!fishActive()||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if($("fMk").style.display==="flex"){if(e.key==="Escape")closeMarket();return;}if(e.key===" "){e.preventDefault();if(!e.repeat)fishAction();return;}if(e.key==="Enter"){e.preventDefault();openFChat();return;}if(e.key==="e"||e.key==="E"){if(nearShop(fp.x,fp.y))openMarket();return;}const k=e.key.length===1?e.key.toLowerCase():e.key;if(k in{ArrowUp:1,ArrowDown:1,ArrowLeft:1,ArrowRight:1,w:1,a:1,s:1,d:1}){fKeys[k]=true;e.preventDefault();}});
   window.addEventListener("keyup",e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;fKeys[k]=false;});
   $("fishBtn").onclick=fishAction;document.querySelectorAll("#fishTabs button").forEach(b=>b.onclick=()=>{fTab=b.dataset.f;if(fTab!=="dex")fDexOf=null;renderFishInfo();});
   setInterval(()=>{if(fishActive())setFishBtn();},300);
@@ -3006,8 +3006,8 @@ function openArcade(){if(!me||!me._loaded)return toast("닉네임부터 정해 �
   if(!d){d=document.createElement("div");d.id="arcMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
     d.innerHTML=`<div class="btBox" style="max-width:380px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:15.5px">🕹️ 오락실</b><button id="arcX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
       <button id="arcClw" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">🔑</span><span style="flex:1"><b style="font-size:14.5px">열쇠 뽑기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">집게로 열쇠를 집어 상품 받기 · 10만원</div></span><b style="color:var(--acc)">›</b></button>
-      <button id="arcTm" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);text-align:left"><span style="font-size:32px">⏱️</span><span style="flex:1"><b style="font-size:14.5px">시간 맞추기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">딱 10초에 멈추면 보상 · 20만원</div></span><b style="color:var(--acc)">›</b></button></div>`;
-    $("arcX").onclick=()=>{d.style.display="none";};$("arcClw").onclick=()=>{d.style.display="none";openClw();};$("arcTm").onclick=()=>{d.style.display="none";openTm();};}
+      <button id="arcTm" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">⏱️</span><span style="flex:1"><b style="font-size:14.5px">시간 맞추기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">딱 10초에 멈추면 보상 · 20만원</div></span><b style="color:var(--acc)">›</b></button><button id="arcBb" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);text-align:left"><span style="font-size:32px">🏀</span><span style="flex:1"><b style="font-size:14.5px">농구</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">3라운드 슛 대결 · 주간 순위 · 20만원</div></span><b style="color:var(--acc)">›</b></button></div>`;
+    $("arcX").onclick=()=>{d.style.display="none";};$("arcClw").onclick=()=>{d.style.display="none";openClw();};$("arcTm").onclick=()=>{d.style.display="none";openTm();};$("arcBb").onclick=()=>{d.style.display="none";openBb();};}
   d.style.display="flex";}
 /* ---------- ⏱️ 시간 맞추기 ---------- */
 function openTm(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stVisit("visitTm");let d=$("tmMod");
@@ -3037,6 +3037,124 @@ function tmStop(){if(!tm.on)return;tm.on=false;cancelAnimationFrame(tm.raf);cons
   casPay(TM_COST,pay,"tm",tier?tier[1]:0);stAdd("tmN");if(tier&&tier[1]>=8)stAdd("tmPerfect");if(pay){me.cash+=pay;stAdd("tmWinN");}
   tm.best=tm.best==null?err:Math.min(tm.best,err);tm.res={ms,pay,tier};saveMe();renderHeader();tmRender();
   if(tier&&tier[1]>=2.5)broadcast(`⏱️ ${myName()}님이 시간 맞추기에서 ${(ms/1000).toFixed(2)}초! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-TM_COST)}`);}
+/* ---------- 🏀 농구 : 3라운드 누적 · 꾹 눌러 힘 조절 · 백보드 2점 / 클린 3점 · 주간 순위 ---------- */
+const BB_COST=200000,BB_LEN=60,BB_NEED=[30,80],BB_FILL=1400,BB_PRIZE=5000000,BB_MIN=140,BB_HX=270;
+/* [누적 점수 이상, 배수, 이름] — 3라운드 모두 통과했을 때만 */
+const BB_TIERS=[[230,10,"👑 전설의 슈터"],[200,4,"🔥 에이스"],[170,2,"⭐ 주전"],[140,1,"🏀 벤치 멤버"]];
+const BBP={W:360,H:420,FLOOR:372,PX:62,G:900,ANG:70*Math.PI/180,VMIN:420,VMAX:720,BR:6,HY:170,RIMW:22,BOARDT:-46,BOARDB:10};
+const bbWk=t=>Math.floor((t+9*3600000-4*86400000)/(7*86400000));
+const bbWkEnd=w=>(w+1)*7*86400000+4*86400000-9*3600000;
+const bbTier=s=>{for(const t of BB_TIERS)if(s>=t[0])return t;return null;};
+function bbSim(p,hx){const B=BBP,th=B.ANG,v=B.VMIN+p*(B.VMAX-B.VMIN),hy=B.HY;
+  let x=B.PX+14,y=B.FLOOR-62,vx=v*Math.cos(th),vy=-v*Math.sin(th);
+  const L=[hx-B.RIMW,hy],R=[hx+B.RIMW,hy],bx=hx+B.RIMW+3,path=[];let board=false,rim=false,scored=false,pts=0,prevY=y,si=-1;const dt=1/240;
+  for(let i=0;i<1440;i++){vy+=B.G*dt;x+=vx*dt;y+=vy*dt;
+    if(vx>0&&x+B.BR>=bx&&x<bx+8&&y>hy+B.BOARDT&&y<hy+B.BOARDB){x=bx-B.BR;vx=-vx*.55;vy*=.85;board=true;}
+    for(const q of[L,R]){const dx=x-q[0],dy=y-q[1],d=Math.hypot(dx,dy);if(d<B.BR+1.6&&d>0){const nx=dx/d,ny=dy/d,dot=vx*nx+vy*ny;if(dot<0){vx=(vx-1.55*dot*nx)*.8;vy=(vy-1.55*dot*ny)*.8;x=q[0]+nx*(B.BR+1.7);y=q[1]+ny*(B.BR+1.7);rim=true;}}}
+    if(!scored&&prevY<hy&&y>=hy&&vy>0&&Math.abs(x-hx)<B.RIMW-4){scored=true;si=path.length;pts=(board||rim)?2:3;}
+    prevY=y;path.push([x,y]);
+    if(y>B.FLOOR+30||x>B.W+40||x<-30||(scored&&y>hy+60))break;}
+  return{pts,board,rim,path,si,hx};}
+const bb={on:false,phase:"idle",round:0,total:0,rs:0,t0:0,hx:BB_HX,ch:{on:false,t0:0},ball:null,cool:0,pop:[],raf:0,top:[],best:0,last:null,prev:null,q:null,wk:0,msg:""};
+const bbOpen=()=>{const d=$("bbMod");return !!d&&d.style.display==="flex";};
+function bbClaim(){if(!fdb||!myId)return;const wp=bbWk(nowS())-1;if(wp<0)return;
+  fdb.ref("market/bball/w/"+wp).orderByChild("k").limitToLast(1).once("value").then(s=>{const v=s.val();if(!v)return;const id=Object.keys(v)[0],r=v[id];bb.prev=r;bbPanel();
+    if(id!==myId||!(r.s>=BB_MIN))return;
+    fdb.ref("market/bball/paid/"+wp).transaction(c=>c?undefined:myId).then(res=>{if(!res.committed)return;me.cash+=BB_PRIZE;stAdd("bbWeekWin");saveMe();renderHeader();
+      modal(`<div style="text-align:center"><div style="font-size:44px">🏆</div><b style="font-size:16px">지난주 농구 1등!</b><div style="margin:8px 0;font-size:13px;line-height:1.6">${r.s}점으로 1등을 했어요<br><b style="color:var(--acc)">+${formatMoneyReadable(BB_PRIZE)}</b> 보상 지급 완료</div></div>`);
+      broadcast(`🏆 ${myName()}님이 지난주 농구 1등! (${r.s}점) +${formatMoneyReadable(BB_PRIZE)}`);});}).catch(()=>{});}
+function bbSubmit(total){if(!fdb||!myId||!(total>0))return;const wk=bbWk(nowS());
+  fdb.ref(`market/bball/w/${wk}/${myId}`).transaction(c=>{if(c&&c.s>=total)return;return{n:myName().slice(0,10),s:total,k:total*1e10+(1e10-Math.floor(nowS()/1000)%1e10),t:nowS()};}).catch(()=>{});}
+function bbListen(){if(!fdb)return;const wk=bbWk(nowS());if(bb.q&&bb.wk===wk)return;bbUnlisten();bb.wk=wk;bb.q=fdb.ref("market/bball/w/"+wk).orderByChild("k").limitToLast(3);
+  bb.q.on("value",s=>{const v=s.val()||{},a=Object.keys(v).map(k=>({id:k,...v[k]})).sort((x,y)=>y.k-x.k);bb.top=a;bb.best=v[myId]?v[myId].s:0;bbPanel();});}
+function bbUnlisten(){if(bb.q){try{bb.q.off();}catch(e){}bb.q=null;}}
+function bbPanel(){const el=$("bbRank");if(!el)return;const med=["🥇","🥈","🥉"];let h=`<b style="font-size:12.5px">🏅 이번 주 순위</b>`;
+  for(let i=0;i<3;i++){const r=bb.top[i];h+=`<div style="display:flex;justify-content:space-between;gap:6px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px"><span>${med[i]} ${r?esc(r.n||"?"):"-"}</span><b style="color:${r&&r.id===myId?"var(--acc)":"inherit"}">${r?r.s+"점":""}</b></div>`;}
+  const ms=Math.max(0,bbWkEnd(bbWk(nowS()))-nowS()),d=Math.floor(ms/864e5),hh=Math.floor(ms%864e5/36e5);
+  h+=`<div style="font-size:11.5px;margin-top:8px;line-height:1.6">내 최고: <b>${bb.best||0}점</b><br><span style="color:var(--sub)">월요일 0시에 초기화 · ${d}일 ${hh}시간 남음<br>주간 1등(${BB_MIN}점 이상) 보상 <b style="color:var(--acc)">${formatMoneyReadable(BB_PRIZE)}</b></span></div>`;
+  if(bb.prev)h+=`<div style="font-size:11px;color:var(--sub);margin-top:6px">지난주 1등: ${esc(bb.prev.n||"?")} ${bb.prev.s}점</div>`;
+  el.innerHTML=h;}
+function openBb(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stVisit("visitBb");let d=$("bbMod");
+  if(!d){d=document.createElement("div");d.id="bbMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)bbClose();};d.addEventListener("keydown",e=>e.stopPropagation());
+    d.innerHTML=`<div class="btBox" style="max-width:580px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:15.5px">🏀 농구</b><div style="display:flex;gap:6px"><button id="bbBack" style="padding:7px 11px;border-radius:10px;background:var(--card2);font-size:12px;font-weight:800">🕹️ 오락실</button><button id="bbX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start"><div style="flex:1 1 300px;min-width:0"><canvas id="bbCv" width="720" height="840" style="width:100%;max-width:360px;display:block;margin:0 auto;border-radius:14px;touch-action:none;background:#0f172a"></canvas>
+      <div id="bbSub" style="text-align:center;font-size:12px;line-height:1.6;margin:8px 0 4px;min-height:38px"></div>
+      <button id="bbBtn" style="width:100%;padding:18px 0;border-radius:16px;background:var(--acc);color:#111;font-weight:900;font-size:17px;touch-action:manipulation;user-select:none"></button></div>
+      <div style="flex:1 1 150px;min-width:140px"><div id="bbRank" style="padding:10px;border-radius:12px;background:var(--card2)"></div>
+      <div style="margin-top:8px;padding:10px;border-radius:12px;background:var(--card2);font-size:11.5px;line-height:1.65"><b>📋 규칙</b><br>참가비 ${formatMoneyReadable(BB_COST)} · 3라운드(각 ${BB_LEN}초) 점수 누적<br>1라운드 ${BB_NEED[0]}점, 2라운드까지 ${BB_NEED[1]}점을 넘겨야 다음으로!<br>클린샷 3점 · 백보드/림 맞고 2점<br>3라운드는 골대가 좌우로 움직여요<br><b>💰 최종 누적 보상</b><br>${BB_TIERS.map(t=>`${t[2]} ${t[0]}점↑ → <b style="color:var(--acc)">${t[1]}배</b>`).join("<br>")}</div></div></div></div>`;
+    $("bbX").onclick=bbClose;$("bbBack").onclick=()=>{if(bbBusy())return toast("🏀 게임 중에는 나갈 수 없어요");bbClose(true);openArcade();};
+    const B=$("bbBtn"),down=e=>{e.preventDefault();bbDown();},up=e=>{e.preventDefault();bbUp();};
+    B.addEventListener("pointerdown",down);["pointerup","pointerleave","pointercancel"].forEach(n=>B.addEventListener(n,up));
+    const C=$("bbCv");C.addEventListener("pointerdown",e=>{e.preventDefault();if(bb.phase==="play")bbDown();});["pointerup","pointerleave","pointercancel"].forEach(n=>C.addEventListener(n,up));
+    window.addEventListener("keydown",e=>{if(!bbOpen()||e.code!=="Space"||e.repeat)return;e.preventDefault();bbDown();});
+    window.addEventListener("keyup",e=>{if(!bbOpen()||e.code!=="Space")return;e.preventDefault();bbUp();});}
+  d.style.display="flex";bbListen();bbPanel();bbClaim();bbRender();cancelAnimationFrame(bb.raf);bbLoop();}
+const bbBusy=()=>bb.phase==="play"||bb.phase==="between";
+function bbClose(force){if(!force&&bbBusy())return toast("🏀 게임 중에는 나갈 수 없어요");const d=$("bbMod");if(d)d.style.display="none";cancelAnimationFrame(bb.raf);bbUnlisten();}
+function bbRender(){const B=$("bbBtn"),s=$("bbSub");if(!B)return;const ph=bb.phase;B.style.background="var(--acc)";B.style.color="#111";
+  if(ph==="play"){B.textContent="🏀 꾹 눌렀다 떼서 던지기 (스페이스)";B.style.background="#f97316";B.style.color="#fff";s.innerHTML=`<b>${bb.round}라운드</b> · 힘을 잘 맞춰서 골대에 넣으세요!`;}
+  else if(ph==="between"){B.textContent=`▶ ${bb.round+1}라운드 시작 (스페이스)`;s.innerHTML=bb.msg;}
+  else if(ph==="end"){B.textContent=`🔁 다시 도전 · ${formatMoneyReadable(BB_COST)} (스페이스)`;s.innerHTML=bb.msg;}
+  else{B.textContent=`🏀 시작 · ${formatMoneyReadable(BB_COST)} (스페이스)`;s.innerHTML="스페이스(또는 버튼)를 <b>꾹 눌러서</b> 힘을 모으고 <b>떼면</b> 던져요";}}
+function bbDown(){const ph=bb.phase;
+  if(ph==="idle"||ph==="end")return bbStart();
+  if(ph==="between")return bbRound();
+  if(ph==="play"&&!bb.ball&&!bb.ch.on&&performance.now()>=bb.cool&&bbLeft()>0){bb.ch={on:true,t0:performance.now()};}}
+function bbUp(){if(!bb.ch.on)return;const p=Math.min(1,(performance.now()-bb.ch.t0)/BB_FILL);bb.ch.on=false;if(bb.phase!=="play"||bb.ball)return;
+  const r=bbSim(p,bb.hx);bb.ball={...r,t0:performance.now(),got:false,fin:0};stAdd("bbShots");}
+const bbLeft=()=>BB_LEN-(performance.now()-bb.t0)/1000;
+function bbStart(){if(bb.phase==="play"||bb.phase==="between")return;if(!me||!me._loaded||sessBlocked)return toast("지금은 할 수 없어요");if(typeof casCanBet==="function"&&!casCanBet(BB_COST))return;if((me.cash|0)<BB_COST)return toast("돈이 모자라요");
+  me.cash-=BB_COST;saveMe();renderHeader();bb.round=0;bb.total=0;bb.last=null;bbRound();}
+function bbRound(){bb.round++;bb.rs=0;bb.t0=performance.now();bb.phase="play";bb.hx=BB_HX;bb.ball=null;bb.ch.on=false;bb.cool=0;bb.pop=[];bbRender();}
+function bbEndRound(){bb.ch.on=false;bb.ball=null;bb.total+=bb.rs;const need=BB_NEED[bb.round-1];
+  if(bb.round>=3)return bbFinish(true);
+  if(bb.total>=need){bb.phase="between";bb.msg=`✅ <b>${bb.round}라운드 통과!</b> 이번 ${bb.rs}점 · 누적 <b>${bb.total}점</b><br>다음 목표: 누적 ${BB_NEED[bb.round]}점 ${bb.round===2?"· 골대가 움직여요!":""}`;bbRender();}
+  else bbFinish(false);}
+function bbFinish(passed){bb.phase="end";const need=BB_NEED[bb.round-1],tier=passed?bbTier(bb.total):null,pay=tier?Math.round(BB_COST*tier[1]):0;
+  casPay(BB_COST,pay,"bb",tier?tier[1]:0);stAdd("bbN");stMax("bbBest",bb.total);if(pay){me.cash+=pay;stAdd("bbWinN");}saveMe();renderHeader();bbSubmit(bb.total);
+  bb.last={total:bb.total,pay,tier,passed};
+  bb.msg=!passed?`😢 <b>${bb.round}라운드 탈락</b> (누적 ${bb.total}점 / 목표 ${need}점)<br><span style="color:#f87171">-${formatMoneyReadable(BB_COST)}</span>`
+    :`🏁 <b>최종 ${bb.total}점</b> ${tier?tier[2]:"😢 보상 없음 (140점 미만)"}<br>${pay>0?`<b style="color:#4ade80">${pay>BB_COST?"+":""}${formatMoneyReadable(pay-BB_COST)}</b> (${tier[1]}배 ${formatMoneyReadable(pay)})`:`<span style="color:#f87171">-${formatMoneyReadable(BB_COST)}</span>`}`;
+  bbRender();if(tier&&tier[1]>=2)broadcast(`🏀 ${myName()}님이 농구 ${bb.total}점! ${tier[2]} ${tier[1]}배 → +${formatMoneyReadable(pay-BB_COST)}`);}
+function bbLoop(){if(!bbOpen())return;const now=performance.now();bbUpdate(now);bbDraw(now);bb.raf=requestAnimationFrame(bbLoop);}
+function bbUpdate(now){if(bb.phase!=="play")return;const el=(now-bb.t0)/1000;
+  if(!bb.ball)bb.hx=bb.round===3?BB_HX+26*Math.sin(el*1.4):BB_HX;
+  const b=bb.ball;
+  if(b){const i=Math.floor((now-b.t0)/1000*240);
+    if(!b.got&&b.pts&&i>=b.si){b.got=true;bb.rs+=b.pts;bb.pop.push({t:now,txt:b.pts===3?"+3 클린샷!":"+2 "+(b.board?"뱅크샷":"림샷"),col:b.pts===3?"#4ade80":"#fde047",x:b.hx,y:BBP.HY-30});stAdd(b.pts===3?"bbClean":"bbBank");}
+    if(i>=b.path.length-1){if(!b.fin)b.fin=now;if(now-b.fin>260){bb.ball=null;bb.cool=now+150;}}}
+  if(bb.ch.on&&bbLeft()<=0)bb.ch.on=false;
+  if(bbLeft()<=0&&!bb.ball)bbEndRound();}
+function bbDraw(now){const cv=$("bbCv");if(!cv)return;const c=cv.getContext("2d"),B=BBP;c.setTransform(2,0,0,2,0,0);c.clearRect(0,0,B.W,B.H);
+  let g=c.createLinearGradient(0,0,0,B.H);g.addColorStop(0,"#1e293b");g.addColorStop(1,"#0f172a");c.fillStyle=g;c.fillRect(0,0,B.W,B.H);
+  c.fillStyle="rgba(250,204,21,.06)";for(let i=0;i<6;i++)c.fillRect(10+i*60,0,26,B.FLOOR);
+  c.fillStyle="#b45309";c.fillRect(0,B.FLOOR,B.W,B.H-B.FLOOR);c.fillStyle="#d97706";c.fillRect(0,B.FLOOR,B.W,4);c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=2;c.beginPath();c.moveTo(0,B.FLOOR+22);c.lineTo(B.W,B.FLOOR+22);c.stroke();
+  const play=bb.phase==="play",hx=bb.ball?bb.ball.hx:bb.hx,hy=B.HY,bx=hx+B.RIMW+3;
+  /* 골대 */
+  c.strokeStyle="#64748b";c.lineWidth=5;c.beginPath();c.moveTo(bx+8,hy+B.BOARDB);c.lineTo(bx+8,B.FLOOR);c.stroke();
+  c.fillStyle="rgba(241,245,249,.92)";c.fillRect(bx,hy+B.BOARDT,6,B.BOARDB-B.BOARDT);c.strokeStyle="#ef4444";c.lineWidth=2;c.strokeRect(bx+.5,hy-26,5,22);
+  c.strokeStyle="rgba(255,255,255,.75)";c.lineWidth=1;for(let k=0;k<=4;k++){c.beginPath();c.moveTo(hx-B.RIMW+k*B.RIMW/2,hy);c.lineTo(hx-B.RIMW*.6+k*B.RIMW*.3,hy+26);c.stroke();}
+  c.beginPath();c.moveTo(hx-B.RIMW*.6,hy+26);c.lineTo(hx+B.RIMW*.6,hy+26);c.stroke();
+  c.strokeStyle="#f97316";c.lineWidth=4;c.lineCap="round";c.beginPath();c.moveTo(hx-B.RIMW,hy);c.lineTo(hx+B.RIMW,hy);c.stroke();
+  /* 캐릭터 */
+  const H=phSelf().H;phPerson(c,H,myName().slice(0,8),B.PX,B.FLOOR+4,1.7,now,bb.ch.on?"up":"base",1);
+  /* 공 */
+  const ball=(x,y,rot)=>{c.save();c.translate(x,y);c.rotate(rot);c.fillStyle="#f97316";c.beginPath();c.arc(0,0,7.5,0,7);c.fill();c.strokeStyle="#7c2d12";c.lineWidth=1.1;c.beginPath();c.arc(0,0,7.5,0,7);c.moveTo(-7.5,0);c.lineTo(7.5,0);c.moveTo(0,-7.5);c.lineTo(0,7.5);c.stroke();c.restore();};
+  if(bb.ball){const b=bb.ball,i=Math.min(b.path.length-1,Math.floor((now-b.t0)/1000*240)),pt=b.path[i]||b.path[b.path.length-1];ball(pt[0],pt[1],i/18);}
+  else if(play||bb.phase==="idle")ball(B.PX+14,B.FLOOR-62-(bb.ch.on?Math.sin(now/90)*1.5:0),0);
+  /* 게이지 */
+  const gx=20,gy=396,gw=320,gh=12,p=bb.ch.on?Math.min(1,(now-bb.ch.t0)/BB_FILL):0;
+  c.fillStyle="rgba(255,255,255,.12)";c.fillRect(gx,gy,gw,gh);
+  if(p>0){const gg=c.createLinearGradient(gx,0,gx+gw,0);gg.addColorStop(0,"#4ade80");gg.addColorStop(.6,"#fde047");gg.addColorStop(1,"#ef4444");c.fillStyle=gg;c.fillRect(gx,gy,gw*p,gh);}
+  c.strokeStyle="rgba(255,255,255,.35)";c.lineWidth=1;for(let k=1;k<10;k++){c.beginPath();c.moveTo(gx+gw*k/10,gy);c.lineTo(gx+gw*k/10,gy+gh);c.stroke();}c.strokeRect(gx,gy,gw,gh);
+  /* HUD */
+  c.textAlign="left";c.fillStyle="#fff";c.font="900 15px 'Noto Sans KR',sans-serif";
+  if(bb.phase==="idle"){c.fillText("🏀 농구",12,24);}
+  else{const need=BB_NEED[Math.min(2,Math.max(0,bb.round-1))],cum=bb.total+(play?bb.rs:0);c.fillText(`R${bb.round}/3`,12,24);c.font="700 12px 'Noto Sans KR',sans-serif";c.fillStyle="#cbd5e1";c.fillText(bb.round<3?`목표 누적 ${need}점`:"골대가 움직여요!",12,42);
+    c.textAlign="right";c.fillStyle="#fde047";c.font="900 20px 'Noto Sans KR',sans-serif";c.fillText(`${cum}점`,B.W-12,26);
+    if(play){const left=Math.max(0,bbLeft());c.font="900 18px 'Noto Sans KR',sans-serif";c.fillStyle=left<10?"#f87171":"#fff";c.textAlign="center";c.fillText(left.toFixed(1)+"초",B.W/2,26);}}
+  /* 점수 팝업 */
+  bb.pop=bb.pop.filter(q=>now-q.t<1100);for(const q of bb.pop){const a=1-(now-q.t)/1100;c.globalAlpha=a;c.fillStyle=q.col;c.font="900 16px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText(q.txt,q.x,q.y-(1-a)*30);c.globalAlpha=1;}}
 /* ===== 📸 인생네컷 : 방(최대 6명) → 방장이 시작 → 10초마다 한 컷씩 4컷 → 2x2 사진 ===== */
 const PH_BG=[["heart","하트 핑크"],["sky","하늘 구름"],["night","별 밤하늘"],["sunset","노을"],["sakura","벚꽃"],["neon","네온 그리드"],["check","체크"],["beach","해변"]];
 const PH_FR=[["white","흰색","#ffffff","#334155"],["black","검정","#111827","#f8fafc"],["pink","핑크","#fbcfe8","#9d174d"],["yellow","노랑","#fef08a","#854d0e"],["sky","하늘색","#bae6fd","#075985"]];
