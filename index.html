@@ -343,7 +343,7 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 /* 신규 상장 시각 (그 전엔 상장 예정) */const LIST_T={"아이리스":Date.parse("2026-11-25T07:36:00Z")};
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
-const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=20;
+const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=11,APP_V=21;
 /* 11/25 17:22(KST)부터 v10 방식으로 되돌림 (지그재그 해제) */const F12_T=Date.parse("2026-11-25T08:22:00Z");let K12=0;
 /* 11/25 17:05(KST)부터 v11: 지그재그 파동 */const F11_T=Date.parse("2026-11-25T08:05:00Z");let K11=0;
 /* 11/25 16:50(KST)부터 v10: 기본가로 꼭 안 돌아옴, 폭락 후 바닥 횡보도 */const F10_T=Date.parse("2026-11-25T07:50:00Z");let K10=0;
@@ -353,7 +353,8 @@ const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=10,APP_V=20;
 function fastInit(){K7=0;K8=0;K9=0;K10=0;K11=0;K12=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));K9=KS+Math.max(1,Math.ceil((Math.max(F9_T,TSe)-TSe)/FTICK));K10=KS+Math.max(1,Math.ceil((Math.max(F10_T,TSe)-TSe)/FTICK));K11=KS+Math.max(1,Math.ceil((Math.max(F11_T,TSe)-TSe)/FTICK));K12=KS+Math.max(1,Math.ceil((Math.max(F12_T,TSe)-TSe)/FTICK));
   LISTK=COINS.map(([n])=>LIST_T[n]?(LIST_T[n]<=TSe?Math.max(0,Math.floor((LIST_T[n]-EPOCH)/TICK)):KS+Math.ceil((LIST_T[n]-TSe)/FTICK)):0);}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
-const curTick=()=>Date.now()>=TSe?FTICK:TICK; // 지금 틱 길이
+var SRV_OFF=0;const tnow=()=>Date.now()+SRV_OFF;/* 서버 시각 기준 (폰 시계가 몇 초 틀려도 모두 같은 시세) */
+const curTick=()=>tnow()>=TSe?FTICK:TICK; // 지금 틱 길이
 const kSpan=ms=>Math.max(1,Math.round(ms/curTick())); // 이 시간 동안의 틱 수 (차트·범위용)
 const DEFAULT_EPOCH=1795440000000;
 const MIG_T=1795503651243,MIG_F={"시바이누":10/3,"리플":10};/* 시바이누 300→1000, 리플 30→300 개편: 이전에 내린 가격지정 이벤트는 같은 비율로 환산 */
@@ -589,7 +590,7 @@ function fastStep7(c,k,r,base,ci,K0){const sid=COINS[ci][5],t=k-K0,s=Math.floor(
   return pct;}
 
 const K_V2=Math.floor((K_V2_T-EPOCH)/TICK),K_V3=Math.floor((K_V3_T-EPOCH)/TICK),K_V4=Math.floor((K_V4_T-EPOCH)/TICK),K_V5=Math.floor((K_V5_T-EPOCH)/TICK);
-const nowK=()=>{const t=Date.now();return t<TSe?Math.max(0,Math.floor((t-EPOCH)/TICK)):KS+Math.floor((t-TSe)/FTICK);};
+const nowK=()=>{const t=tnow();return t<TSe?Math.max(0,Math.floor((t-EPOCH)/TICK)):KS+Math.floor((t-TSe)/FTICK);};
 /* 체크포인트: 1시간마다 시장 상태(차트 제외)를 서버에 저장 → 새로 들어온 사람은 3시간 전 체크포인트부터만 계산 (처음부터 다 계산하면 폰에서 느려짐) */
 let CKPTS={};
 function rebuild(){fastInit();const K=nowK(),want=K-kSpan(3*3600000)-10;let best=null;
@@ -1053,7 +1054,7 @@ function renderAll(){renderAttBar();renderHeader();renderMarket();renderWallet()
 function renderFTicker(){const T=$("fTicker");if(!T||!$("s-fish").classList.contains("on"))return;T.innerHTML=COINS.map(([n],ci)=>{const c=M.coins[ci];if(c.delisted)return `<span>${n}<b>상폐</b></span>`;const r=c.rate||0;return `<span><small>${n}<em class="${r>0?"up":r<0?"down":"flat"}">${r>0?"▲":r<0?"▼":""}${Math.abs(r)}%</em></small><b>${formatCoinPrice(c.price).replace("원","")}</b></span>`;}).join("");}
 
 /* ===================== 접속자 ===================== */
-let lastPres="",onlineMap={};function pushPresence(){if(sessBlocked||!fdb||!myId||!me||!me._loaded||!me.name)return;const o={name:myName(),lv:lvOf(me),ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),np:eqCos("plate"),ak:myAwk(),t:Date.now()};const j=o.name+"|"+o.lv+"|"+o.ch+"|"+o.au+"|"+o.wg+"|"+o.tt+"|"+o.np+"|"+o.ak;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();accLogIn();rodRefund();removedSkinFix();}
+let lastPres="",onlineMap={};function pushPresence(){if(sessBlocked||!fdb||!myId||!me||!me._loaded||!me.name)return;const o={av:APP_V,name:myName(),lv:lvOf(me),ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),np:eqCos("plate"),ak:myAwk(),t:Date.now()};const j=o.name+"|"+o.lv+"|"+o.ch+"|"+o.au+"|"+o.wg+"|"+o.tt+"|"+o.np+"|"+o.ak;if(j===lastPres&&Date.now()-(pushPresence.t||0)<60000)return;lastPres=j;pushPresence.t=Date.now();const r=fdb.ref("online/"+myId);r.update(o).catch(()=>{});r.onDisconnect().remove();accLogIn();rodRefund();removedSkinFix();}
 function rodRefund(){if(!me||!me._loaded||!me.gear||!me.gear.rod_pro)return;delete me.gear.rod_pro;if(me.eq)me.eq.rod="basic";me.cash+=3000000;saveMe();renderHeader();toast("🎣 고급 낚싯대가 상점에서 빠져서\n300만 원을 돌려드렸어요");}
 let accDone=false;function accLogIn(){if(accDone||!fdb||!myId)return;accDone=true;try{fdb.ref(".info/connected").on("value",c=>{if(!c.val()||sessBlocked)return;const nm=myName(),L=fdb.ref("market/accLog"),TS=firebase.database.ServerValue.TIMESTAMP;L.push({id:myId,name:nm,k:"in",t:TS}).catch(()=>{});L.push().onDisconnect().set({id:myId,name:nm,k:"out",t:TS});});}catch(e){}}
 let accLog=[],accOn=false;function accListen(){if(accOn||!fdb||!isOwner)return;accOn=true;fdb.ref("market/accLog").limitToLast(300).on("value",s=>{const v=s.val()||{};accLog=Object.values(v).filter(x=>x&&x.t).sort((a,b)=>b.t-a.t);renderAccLog();});}
@@ -1080,7 +1081,7 @@ function openPInfo(id){const p=players[id]||{},o=onlineMap[id]||{},nm=esc(String
 function openBtWith(id){if(!onlineMap[id])return toast("지금 접속 중인 사람에게만 배틀을 신청할 수 있어요");if(typeof setChatOpen==="function"&&innerWidth<940)setChatOpen(false);openBtMod();const sel=$("btTo");if([...sel.options].some(o=>o.value===id))sel.value=id;toast(`⚔️ ${(players[id]&&players[id].name)||"상대"}님에게 배틀 신청`);}
 let fbConnected=false;function updOnline(){const L=onlinePeople(),n=Math.max(1,L.length);$("dot").classList.toggle("on",fbConnected);
   $("online").innerHTML=fbConnected?`<b>${n}명</b> 접속 중 ▾`:"연결 중…";
-  const chips=L.length?L.map(p=>`<span class="ochip${p.me?' me':''}"${p.me?'':` data-bt="${p.id}" title="눌러서 정보·배틀" style="cursor:pointer"`}><i></i>${esc(p.name)}${p.me?' (나)':''}${p.lv?` <small style="color:var(--sub)">Lv.${p.lv}</small>`:''}</span>`).join(""):'<span style="color:var(--sub)">나만 있어요</span>';
+  const chips=L.length?L.map(p=>`<span class="ochip${p.me?' me':''}"${p.me?'':` data-bt="${p.id}" title="눌러서 정보·배틀" style="cursor:pointer"`}><i></i>${esc(p.name)}${p.me?' (나)':''}${p.lv?` <small style="color:var(--sub)">Lv.${p.lv}</small>`:''}${!p.me&&!((onlineMap[p.id]&&onlineMap[p.id].av)>=APP_V)?' <small style="color:#f59e0b">⚠️새로고침 필요</small>':''}</span>`).join(""):'<span style="color:var(--sub)">나만 있어요</span>';
   $("onlineList").innerHTML="<b>🟢 지금 접속 중</b>"+chips;$("chatOn").innerHTML=chips;}
 $("whoBtn").onclick=()=>{const e=$("onlineList");e.style.display=e.style.display==="none"?"block":"none";updOnline();};
 /* ===================== 🎣 낚시터 (2D) ===================== */
@@ -2054,7 +2055,7 @@ function btRender(){
   if(showWait){const b=battles[wait];$("btWaitS").textContent=`${b.toName}님 · 판돈 ${btStakeTxt(b)}`;$("btWaitC").textContent=`수락을 기다리는 중… ${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초`;}}
 
 function btInit(){
-  fdb.ref(".info/serverTimeOffset").on("value",s=>{srvOff=s.val()||0;});
+  fdb.ref(".info/serverTimeOffset").on("value",s=>{srvOff=s.val()||0;SRV_OFF=srvOff;});
   const upd=()=>{battles=Object.assign({},bFrom,bTo);btProcess();btRender();};
   fdb.ref(BT_PATH).orderByChild("from").equalTo(myId).on("value",s=>{bFrom=s.val()||{};upd();});
   fdb.ref(BT_PATH).orderByChild("to").equalTo(myId).on("value",s=>{bTo=s.val()||{};upd();});
@@ -2105,7 +2106,7 @@ function sessOwnerOn(){sessActive=false;sessBlocked=false;sessHide();try{sessRef
 
 /* ===================== 틱 루프 ===================== */
 rebuild();me=JSON.parse(JSON.stringify(local));renderAll();
-setInterval(()=>{const K=nowK(),now=Date.now(),D=curTick(),left=now>=TSe?FTICK-((now-TSe)%FTICK):TICK-((now-EPOCH)%TICK);$("tickFill").style.width=(100-left/D*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";if($("tickLbl"))$("tickLbl").textContent=(D/1000)+"초마다 시세 갱신";
+setInterval(()=>{const K=nowK(),now=tnow(),D=curTick(),left=now>=TSe?FTICK-((now-TSe)%FTICK):TICK-((now-EPOCH)%TICK);$("tickFill").style.width=(100-left/D*100)+"%";$("tickLeft").textContent=Math.ceil(left/1000)+"초 후 갱신";if($("tickLbl"))$("tickLbl").textContent=(D/1000)+"초마다 시세 갱신";
   if(K>M.k){stepTo(K);checkDelist();renderTick();ckptMaybe();}migrateMe();},250);
 
 /* ===================== Firebase 연결 ===================== */
@@ -2137,7 +2138,8 @@ function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:90
   fdb.ref("online").on("value",s=>{onlineMap=s.val()||{};const now=Date.now();for(const k in onlineMap){if(!onlineMap[k]||now-(onlineMap[k].t||0)>180000)delete onlineMap[k];}updOnline();fishSyncOthers();});
   setInterval(()=>{pushPresence.t=0;pushPresence();},60000);
   fdb.ref("market/ckpt").limitToLast(16).on("value",s=>{const had=Object.keys(CKPTS).length;CKPTS=s.val()||{};if(!had&&Object.keys(CKPTS).length){rebuild();renderAll();}});
-  fdb.ref("market/config").on("value",s=>{cfgReady=true;const v=s.val();if(v&&typeof v.appV==="number"&&v.appV>APP_V&&!/[?&]v=/.test(location.search+"")){location.replace(location.pathname+"?v="+v.appV);return;}const n=v&&typeof v.epoch==="number"?v.epoch:DEFAULT_EPOCH;if(n!==EPOCH){EPOCH=n;rebuild();renderAll();}});
+  fdb.ref(".info/serverTimeOffset").on("value",s=>{const o=s.val()||0;if(Math.abs(o-SRV_OFF)>300){SRV_OFF=o;srvOff=o;}});
+  fdb.ref("market/config").on("value",s=>{cfgReady=true;const v=s.val();if(v&&typeof v.appV==="number"){window.CUR_APPV=v.appV;const uv=+(new URLSearchParams(location.search).get("v")||0);if(v.appV>APP_V&&uv!==v.appV){location.replace(location.pathname+"?v="+v.appV);return;}}const n=v&&typeof v.epoch==="number"?v.epoch:DEFAULT_EPOCH;if(n!==EPOCH){EPOCH=n;rebuild();renderAll();}});
   fdb.ref("market/events").on("value",s=>{evReady=true;let l=[];try{const v=s.val();l=v&&v.list?JSON.parse(v.list):[];}catch(e){}EVENTS=l.filter(e=>e&&typeof e.t==="number").sort((a,b)=>a.t-b.t);rebuild();checkDelist();renderAll();});
   fdb.ref("market/kicked/"+myId).on("value",s=>{if(!s.val())return;fdb.ref("market/kicked/"+myId).remove().catch(()=>{});me._loaded=false;try{localStorage.removeItem("jc_id");localStorage.removeItem("jc_admin");}catch(e){}alert("관리자가 이 계정을 정리했어요. 닉네임을 다시 정해 주세요.");location.reload();});
   let first=true;
