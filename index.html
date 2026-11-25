@@ -1475,11 +1475,11 @@ function boatStep(dt,t,noIn){const bv=fBV,SP=.085;let ix=0,iy=0;
     const l=Math.hypot(ix,iy);if(l>0){fp.tx=null;if(l>1){ix/=l;iy/=l;}}
     else if(fp.tx!=null){const dx=fp.tx-fp.x,dy=fp.ty-fp.y,d=Math.hypot(dx,dy);if(d<5){fp.tx=null;}else{const k=Math.min(1,d/110);ix=dx/d*k;iy=dy/d*k;}}}
   const a=1-Math.exp(-dt/(fp.tx!=null?260:(ix||iy)?420:700));bv.x+=(ix*SP-bv.x)*a;bv.y+=(iy*SP-bv.y)*a;
-  let nx=fp.x+bv.x*dt,ny=fp.y+bv.y*dt;if(!boatOK(nx,fp.y)){bv.x*=-.25;nx=fp.x;}if(!boatOK(nx,ny)){bv.y*=-.25;ny=fp.y;}
+  let nx=fp.x+bv.x*dt,ny=fp.y+bv.y*dt;const X0=BOAT_X0,X1=FW-24,Y0=BOAT_Y0,Y1=RIVER-8;if(nx<X0){nx=X0;if(bv.x<0)bv.x=0;}else if(nx>X1){nx=X1;if(bv.x>0)bv.x=0;}if(ny<Y0){ny=Y0;if(bv.y<0)bv.y=0;}else if(ny>Y1){ny=Y1;if(bv.y>0)bv.y=0;}
   fp.x=nx;fp.y=ny;if(Math.abs(bv.x)>.006)fp.dir=bv.x>0?1:-1;
   fBoatTilt+=((bv.x/SP)*.13-fBoatTilt)*Math.min(1,dt/180);
   if(Math.hypot(bv.x,bv.y)>.02&&t-fWakeT>110){fWakeT=t;fWake.push({x:fp.x-bv.x*70,y:fp.y+5,t});if(fWake.length>40)fWake.shift();}}
-function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 열쇠 뽑기에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=BH.x;fp.y=BH.y;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
+function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 열쇠 뽑기에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=Math.max(BOAT_X0+10,Math.min(FW-34,fp.x));fp.y=92;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
 function boatLeave(){if(!fBoat)return;if(fstate!=="idle")return toast("낚시 중에는 내릴 수 없어요");fBoat=0;fBV.x=0;fBV.y=0;if(fp.x<DOCK.x+DOCK.w+48){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();}
 const sitW=(o,fn,t)=>{if(!o.bt||o.fs==="away")return fn();c.save();c.translate(o.x,o.y+6+boatBob(performance.now()));c.rotate(o.tl||0);c.scale(1,.85);c.translate(-o.x,-o.y);fn();c.restore();};
 function boatBack(c,x,y,t,sk,tl){const G=sk===2,b=boatBob(t);c.save();c.translate(x,y+b+2);c.rotate((tl||0)+Math.sin(t/900)*.015);
@@ -2273,7 +2273,7 @@ function fishStep(dt,t){
   else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const bid=eqOf("bait"),fx=BAIT_FX[bid]||BAIT_FX.basic;fBaitPro=fx[1];if(bid!=="basic"){const bk=baitKey(bid);me[bk]=Math.max(0,(me[bk]|0)-1);if(!me[bk]){me.eq.bait="basic";saveMe();toast(`🪱 ${({mid:"중급",pro:"고급",max:"최고급"})[bid]} 미끼를 다 썼어요! 기본 미끼로 바뀌었어요`);}}fBite=(1500+Math.random()*4000)*fx[0];setFishBtn();}
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
-  {const B=$("fBoatBtn");if(B){const own=myBoat()?1:0;if(!own&&fBoat)boatLeave();const d=own?"block":"none",tx=fBoat?"⚓ 보트 내리기":"🚤 보트 타기";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fBoat);}}}
+  {const B=$("fBoatBtn");if(B){const own=myBoat()?1:0;if(!own&&fBoat)boatLeave();const d=own&&(fBoat||(fstate==="idle"&&fp.y<=RIVER+34))?"block":"none",tx=fBoat?"⚓ 보트 내리기":"🚤 보트 타기";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fBoat);}}}
   if(fBoat&&fstate!=="idle")boatStep(dt,t,1);
   for(const id in fOthers){const o=fOthers[id];const dx=o.tx-o.x,dy=o.ty-o.y;o.walk=Math.hypot(dx,dy)>1;const mx=dx*Math.min(1,dt/120),my=dy*Math.min(1,dt/120);o.x+=mx;o.y+=my;
     if(o.bt){const vx=mx/Math.max(1,dt);o.tl=(o.tl||0)+((vx/.085)*.13-(o.tl||0))*Math.min(1,dt/180);if(Math.hypot(mx,my)/Math.max(1,dt)>.02&&t-(o.wt||0)>110){o.wt=t;fWake.push({x:o.x-mx*8,y:o.y+5,t});if(fWake.length>40)fWake.shift();}}else o.tl=0;}
