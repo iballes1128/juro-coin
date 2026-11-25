@@ -3081,7 +3081,21 @@ function openBb(){if(!me||!me._loaded)return toast("닉네임부터 정해 주�
       <div id="bbSub" style="text-align:center;font-size:12px;line-height:1.6;margin:8px 0 4px;min-height:38px"></div>
       <button id="bbBtn" style="width:100%;padding:18px 0;border-radius:16px;background:var(--acc);color:#111;font-weight:900;font-size:17px;touch-action:manipulation;user-select:none"></button></div>
       <div style="flex:1 1 150px;min-width:140px"><div id="bbRank" style="padding:10px;border-radius:12px;background:var(--card2)"></div>
-      <div style="margin-top:8px;padding:10px;border-radius:12px;background:var(--card2);font-size:11.5px;line-height:1.65"><b>📋 규칙</b><br>참가비 ${formatMoneyReadable(BB_COST)} · 3라운드(각 ${BB_LEN}초) 점수 누적<br>1라운드 ${BB_NEED[0]}점, 2라운드까지 ${BB_NEED[1]}점을 넘겨야 다음으로!<br>클린샷 3점 · 백보드/림 맞고 2점<br>🔥 클린샷 5연속 또는 연속 10골 → 다음 슛 3번은 넣으면 <b>5점</b><br>3라운드는 골대가 좌우로 움직여요<br><b>💰 최종 누적 보상</b><br>${BB_TIERS.map(t=>`${t[2]} ${t[0]}점↑ → <b style="color:var(--acc)">${t[1]}배</b>`).join("<br>")}</div></div></div></div>`;
+      <div style="margin-top:8px;padding:12px;border-radius:12px;background:var(--card2);font-size:12px;line-height:1.6">
+        <b style="font-size:13px">📋 규칙</b>
+        <div style="margin-top:6px">• 참가비 <b>${formatMoneyReadable(BB_COST)}</b></div>
+        <div>• ${BB_LEN}초 × 3라운드, 점수 누적</div>
+        <div>• 통과 기준: 1R <b>${BB_NEED[0]}점</b> · 2R 누적 <b>${BB_NEED[1]}점</b></div>
+        <div>• 3R는 골대가 움직임</div>
+        <b style="display:block;margin-top:10px;font-size:13px">🎯 점수</b>
+        <div style="margin-top:4px">• 클린샷 <b>3점</b></div>
+        <div>• 백보드·림 맞고 <b>2점</b></div>
+        <div>• 🔥 불꽃슛 <b>5점</b></div>
+        <div style="color:var(--sub);font-size:11px;padding-left:10px">클린 5연속 또는 10연속 골 → 다음 3번</div>
+        <b style="display:block;margin-top:10px;font-size:13px">💰 최종 보상</b>
+        <div style="margin-top:4px">${BB_TIERS.map(t=>`<div style="display:flex;justify-content:space-between"><span>${t[0]}점↑ ${t[2]}</span><b style="color:var(--acc)">${t[1]}배</b></div>`).join("")}</div>
+        <div style="color:var(--sub);font-size:11px;margin-top:2px">${BB_MIN}점 미만은 보상 없음</div>
+      </div></div></div></div></div>`;
     $("bbX").onclick=bbClose;$("bbBack").onclick=()=>{if(bbBusy())return toast("🏀 게임 중에는 나갈 수 없어요");bbClose(true);openArcade();};
     const B=$("bbBtn"),down=e=>{e.preventDefault();bbDown();},up=e=>{e.preventDefault();bbUp();};
     B.addEventListener("pointerdown",down);["pointerup","pointerleave","pointercancel"].forEach(n=>B.addEventListener(n,up));
