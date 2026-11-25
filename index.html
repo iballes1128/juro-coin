@@ -2802,7 +2802,7 @@ function pxd(G,k){return Math.hypot((k.x-G.cx)*Wz(G.cz),(k.z-G.cz)*FYH*1.7);}
 function startDrop(G){if(G.st!=="move")return false;G.st="down";G.tm=0;G.out=null;return true;}
 function respawn(G,n){const p=spot(G,6,.2,.8,.2,.8);const k=mkKey(n,p.x,p.z,G.rng,3);k.fall={y:70,v:0};G.keys.push(k);}
 /* 인형을 잡는 확률은 어느 인형이나 똑같아요: 집게가 인형에 얼마나 정확히 맞았는지 × 출구까지 안 떨어뜨리기(CARRY) */
-const GRAB0=.8,CARRY=.62;
+const GRAB0=.75,CARRY=.52;
 function evalGrab(G){const R=34;let best=null,bd=1e9;for(const k of G.keys){if(k.fall)continue;const d=pxd(G,k);if(d<bd){bd=d;best=k;}}
   if(!best||bd>R)return{type:"miss"};
   const sg=GRAB0*(1-.5*bd/R);
