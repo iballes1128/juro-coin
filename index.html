@@ -1116,12 +1116,12 @@ const COS={aura:{n:"오라",i:"✨",list:[["star","별빛 오라",10000000],["fi
 const ownsCos=(k,id)=>!!(isOwner||(me&&me.cos&&me.cos[k+"_"+id]));
 const eqCos=k=>{const v=me&&me.eq&&me.eq[k];return v&&ownsCos(k,v)?v:"";};
 /* ===== 악세사리 (뽑기방 상품) : me.acc[id]=true 보유, me.eq.acc 착용 ===== */
-const ACCS=[["ribbon","리본","🎀",1],["glasses","동그란 안경","👓",1],["phones","헤드폰","🎧",1],["beanie","비니","🧢",1],["scarf","목도리","🧣",1],["ears","고양이 귀","🐱",1],["flower","꽃핀","🌸",1],["shades","선글라스","🕶️",1],["wizard","마법사 모자","🎩",2],["horns","악마 뿔","😈",2],["halo","천사 링","😇",2],["crown","왕관","👑",3]];
-const ACC_TOP={ribbon:1,beanie:1,ears:1,flower:1,wizard:1,horns:1,halo:1,crown:1};
+const ACCS=[["ribbon","리본","🎀",1],["glasses","동그란 안경","👓",1],["phones","헤드폰","🎧",1],["beanie","비니","🧢",1],["scarf","목도리","🧣",1],["ears","고양이 귀","🐱",1],["flower","꽃핀","🌸",1],["shades","선글라스","🕶️",1],["wizard","마법사 모자","🎩",2],["horns","악마 뿔","😈",2],["halo","천사 링","😇",2],["crown","왕관","👑",3],["cap","야구모자","⚾",1],["bunny","토끼 귀","🐰",1],["bowtie","나비넥타이","👔",1],["sprout","새싹","🌱",1],["mustache","콧수염","🥸",1],["heartglasses","하트 안경","😍",2],["santa","산타 모자","🎅",2],["chef","요리사 모자","👨‍🍳",2],["cowboy","카우보이 모자","🤠",2],["tiara","티아라","👸",2]];
+const ACC_TOP={ribbon:1,beanie:1,ears:1,flower:1,wizard:1,horns:1,halo:1,crown:1,cap:1,bunny:1,sprout:1,santa:1,chef:1,cowboy:1,tiara:1};
 const accName=id=>(ACCS.find(x=>x[0]===id)||[0,""])[1];
 const ownsAcc=id=>!!(isOwner||(me&&me.acc&&me.acc[id]));
 const eqAcc=()=>{const v=me&&me.eq&&me.eq.acc;return v&&ownsAcc(v)&&ACCS.some(x=>x[0]===v)?v:"";};
-function accDraw(c,id,t,b){b=b||0;const DY={wizard:2.6,ears:1.8,horns:1.8,crown:1.6,halo:1.6,ribbon:1.2,beanie:.6}[id]||0;c.save();c.translate(0,b+DY);c.lineJoin="round";
+function accDraw(c,id,t,b){b=b||0;const DY={wizard:2.6,ears:1.8,horns:1.8,crown:1.6,halo:1.6,ribbon:1.2,beanie:.6,cap:.6,bunny:1.8,sprout:1.2,santa:1.4,cowboy:1.6,tiara:1.6,chef:1.2}[id]||0;c.save();c.translate(0,b+DY);c.lineJoin="round";
   const S=(f,s,lw)=>{c.fillStyle=f;c.fill();if(s){c.strokeStyle=s;c.lineWidth=lw||.7;c.stroke();}};
   if(id==="ribbon"){c.beginPath();c.moveTo(-4.5,-35.5);c.lineTo(-11,-40);c.lineTo(-11,-31.5);c.closePath();S("#f472b6","#9d174d");c.beginPath();c.moveTo(-4.5,-35.5);c.lineTo(2,-40);c.lineTo(2,-31.5);c.closePath();S("#f472b6","#9d174d");c.beginPath();c.arc(-4.5,-35.5,2.1,0,7);S("#ec4899","#9d174d");}
   else if(id==="glasses"){c.fillStyle="rgba(186,230,253,.35)";c.beginPath();c.arc(2.2,-28,3,0,7);c.fill();c.strokeStyle="#111827";c.lineWidth=1.1;c.stroke();c.beginPath();c.moveTo(-.8,-28.5);c.lineTo(-7.2,-29.6);c.stroke();c.fillStyle="#fff";c.fillRect(.8,-29.6,1,1);}
@@ -1135,6 +1135,16 @@ function accDraw(c,id,t,b){b=b||0;const DY={wizard:2.6,ears:1.8,horns:1.8,crown:
   else if(id==="horns"){for(const s of[-1,1]){const bx=s<0?-5.2:3.2;c.beginPath();c.moveTo(bx-1.6,-34.6);c.quadraticCurveTo(bx+s*4,-37,bx+s*3.6,-44.5);c.quadraticCurveTo(bx+s*.6,-39.2,bx+1.6,-34.8);c.closePath();S("#dc2626","#7f1d1d");}}
   else if(id==="halo"){c.save();c.shadowColor="#fde047";c.shadowBlur=8;c.strokeStyle="#fde047";c.lineWidth=2;c.beginPath();c.ellipse(0,-44+Math.sin(t/400)*.8,7.6,2.4,0,0,7);c.stroke();c.restore();c.strokeStyle="#fff7cc";c.lineWidth=.6;c.beginPath();c.ellipse(0,-44+Math.sin(t/400)*.8,7.6,2.4,0,0,7);c.stroke();}
   else if(id==="crown"){const g=c.createLinearGradient(0,-46,0,-35);g.addColorStop(0,"#fff7cc");g.addColorStop(1,"#d97706");c.save();c.shadowColor="#fde047";c.shadowBlur=6;c.fillStyle=g;c.beginPath();c.moveTo(-8,-35);c.lineTo(-8.6,-44.4);c.lineTo(-4.4,-39.6);c.lineTo(0,-46.6);c.lineTo(4.4,-39.6);c.lineTo(8.6,-44.4);c.lineTo(8,-35);c.closePath();c.fill();c.restore();c.strokeStyle="#92400e";c.lineWidth=.7;c.stroke();for(const[gx,gy2,gc]of[[-8.6,-45.2,"#38bdf8"],[0,-47.4,"#ef4444"],[8.6,-45.2,"#22c55e"]]){c.fillStyle=gc;c.beginPath();c.arc(gx,gy2,1.5,0,7);c.fill();}c.fillStyle="#fff7cc";for(let k=0;k<4;k++)c.fillRect(-5.4+k*3.6,-38,1.4,1.4);}
+  else if(id==="cap"){c.beginPath();c.moveTo(-7.6,-31.6);c.quadraticCurveTo(-7.8,-40.2,0,-40.2);c.quadraticCurveTo(7.8,-40.2,7.6,-31.6);c.closePath();S("#ef4444","#7f1d1d");c.beginPath();c.moveTo(1.5,-32.4);c.lineTo(11.8,-32.4);c.quadraticCurveTo(12.2,-30.2,9.6,-30.2);c.lineTo(1.5,-31);c.closePath();S("#dc2626","#7f1d1d");c.fillStyle="#fff";c.beginPath();c.arc(0,-40.2,1.2,0,7);c.fill();c.strokeStyle="rgba(255,255,255,.5)";c.lineWidth=.6;c.beginPath();c.moveTo(0,-40);c.lineTo(0,-32);c.stroke();}
+  else if(id==="bunny"){for(const[x0,r]of[[-4.6,-.12],[3.4,.12]]){c.beginPath();c.ellipse(x0,-43.2,2.3,7,r,0,7);S("#f8fafc","#94a3b8",.7);c.fillStyle="#fbcfe8";c.beginPath();c.ellipse(x0,-42.8,1.1,5,r,0,7);c.fill();}}
+  else if(id==="bowtie"){for(const s of[-1,1]){c.beginPath();c.moveTo(0,-20.6);c.lineTo(s*5.6,-24);c.lineTo(s*5.6,-17.2);c.closePath();S("#7c3aed","#3b0764");}c.beginPath();c.arc(0,-20.6,1.7,0,7);S("#a78bfa","#3b0764",.6);}
+  else if(id==="sprout"){c.strokeStyle="#15803d";c.lineWidth=1.2;c.beginPath();c.moveTo(-.5,-35);c.quadraticCurveTo(-.8,-38.4,-.4,-40);c.stroke();for(const[x0,y0,r]of[[-3.6,-41,-.5],[2.8,-41.6,.5]]){c.beginPath();c.ellipse(x0,y0,3.4,1.8,r,0,7);S("#4ade80","#166534",.6);}}
+  else if(id==="mustache"){c.beginPath();c.moveTo(4.4,-25.2);c.quadraticCurveTo(6.4,-27.2,9.4,-25);c.quadraticCurveTo(8.2,-23.4,5.8,-24.2);c.quadraticCurveTo(5,-23,4.4,-24.2);c.closePath();S("#3b2a1a","#1c1208",.5);}
+  else if(id==="heartglasses"){c.beginPath();c.moveTo(2.2,-25.4);c.bezierCurveTo(-1.2,-27.6,-.6,-31.2,2.2,-29.8);c.bezierCurveTo(5,-31.2,5.6,-27.6,2.2,-25.4);c.closePath();S("rgba(244,114,182,.8)","#9d174d",.8);c.strokeStyle="#9d174d";c.lineWidth=1;c.beginPath();c.moveTo(-.4,-28.4);c.lineTo(-7.2,-29.6);c.stroke();c.fillStyle="rgba(255,255,255,.85)";c.fillRect(.9,-29,.9,.9);}
+  else if(id==="santa"){c.beginPath();c.moveTo(-7.2,-34.4);c.quadraticCurveTo(-8,-43,-1,-45.2);c.quadraticCurveTo(5.4,-46.4,9,-40.6);c.lineTo(7.2,-34.4);c.closePath();S("#dc2626","#7f1d1d");c.beginPath();c.ellipse(0,-34.6,8.6,2.3,0,0,7);S("#f8fafc","#cbd5e1",.6);c.beginPath();c.arc(9.2,-40.2,2.3,0,7);S("#fff","#cbd5e1",.6);}
+  else if(id==="cowboy"){c.beginPath();c.ellipse(0,-34.8,11.8,2.7,0,0,7);S("#92400e","#451a03");c.beginPath();c.moveTo(-5.8,-34.8);c.quadraticCurveTo(-6.2,-41.4,-2.2,-41.6);c.quadraticCurveTo(0,-39.6,2.2,-41.6);c.quadraticCurveTo(6.2,-41.4,5.8,-34.8);c.closePath();S("#b45309","#451a03");c.fillStyle="#7c2d12";c.fillRect(-5.9,-37.2,11.8,1.7);c.fillStyle="#fde047";c.fillRect(-.8,-37.4,1.6,2);}
+  else if(id==="tiara"){const g=c.createLinearGradient(0,-43,0,-35);g.addColorStop(0,"#fff7cc");g.addColorStop(1,"#d97706");c.save();c.shadowColor="#67e8f9";c.shadowBlur=5;c.fillStyle=g;c.beginPath();c.moveTo(-6.4,-35);c.lineTo(-5.6,-39.8);c.lineTo(-2.9,-37.2);c.lineTo(0,-42.6);c.lineTo(2.9,-37.2);c.lineTo(5.6,-39.8);c.lineTo(6.4,-35);c.closePath();c.fill();c.restore();c.strokeStyle="#92400e";c.lineWidth=.6;c.stroke();for(const[x0,y0,col]of[[-5.6,-40.4,"#f472b6"],[0,-43.2,"#67e8f9"],[5.6,-40.4,"#f472b6"]]){c.fillStyle=col;c.beginPath();c.arc(x0,y0,1.2,0,7);c.fill();}}
+  else if(id==="chef"){c.beginPath();c.roundRect(-6.8,-38.2,13.6,4.4,1);S("#f8fafc","#cbd5e1",.7);for(const[x0,y0,r]of[[-4.4,-41.6,3.5],[0,-43.8,4.2],[4.4,-41.6,3.5]]){c.beginPath();c.arc(x0,y0,r,0,7);S("#fff","#cbd5e1",.6);}c.fillStyle="#fff";c.fillRect(-5.8,-39.2,11.6,2.6);}
   c.restore();}
 function spk(c,x,y,r,col){c.fillStyle=col;c.beginPath();c.moveTo(x,y-r);c.lineTo(x+r*.3,y-r*.3);c.lineTo(x+r,y);c.lineTo(x+r*.3,y+r*.3);c.lineTo(x,y+r);c.lineTo(x-r*.3,y+r*.3);c.lineTo(x-r,y);c.lineTo(x-r*.3,y-r*.3);c.closePath();c.fill();}
 function meteorAura(c,t,front){c.save();if(!front){const g=c.createRadialGradient(0,1,0,0,1,26);g.addColorStop(0,"rgba(165,180,252,.7)");g.addColorStop(1,"rgba(165,180,252,0)");c.fillStyle=g;c.beginPath();c.ellipse(0,1,26,8,0,0,7);c.fill();}
@@ -2342,7 +2352,17 @@ const PRIZES=[
  {t:2,k:"acc",id:"crown",eq:30000000,nm:"왕관",ic:"👑"},
  {t:2,k:"aura",id:"meteor",eq:50000000,nm:"유성우 오라 (뽑기 한정)",ic:"🌠"},
  {t:2,k:"wing",id:"crystal",eq:50000000,nm:"수정 날개 (뽑기 한정)",ic:"🪽"},
- {t:2,k:"cash",v:100000000,nm:"현금 1억",ic:"💰"}];
+ {t:2,k:"cash",v:100000000,nm:"현금 1억",ic:"💰"},
+ {t:0,k:"acc",id:"cap",eq:900000,nm:"야구모자",ic:"⚾"},
+ {t:0,k:"acc",id:"bunny",eq:900000,nm:"토끼 귀",ic:"🐰"},
+ {t:0,k:"acc",id:"bowtie",eq:900000,nm:"나비넥타이",ic:"👔"},
+ {t:0,k:"acc",id:"sprout",eq:900000,nm:"새싹",ic:"🌱"},
+ {t:0,k:"acc",id:"mustache",eq:900000,nm:"콧수염",ic:"🥸"},
+ {t:1,k:"acc",id:"heartglasses",eq:2400000,nm:"하트 안경",ic:"😍"},
+ {t:1,k:"acc",id:"santa",eq:2400000,nm:"산타 모자",ic:"🎅"},
+ {t:1,k:"acc",id:"chef",eq:2400000,nm:"요리사 모자",ic:"👨‍🍳"},
+ {t:1,k:"acc",id:"cowboy",eq:3000000,nm:"카우보이 모자",ic:"🤠"},
+ {t:1,k:"acc",id:"tiara",eq:3000000,nm:"티아라",ic:"👸"}];
 /* 밸런스: 상품마다 "손님 한 번 도전당 참가비의 몇 %가 이 상품으로 돌아가는지(share)"를 정하고 확률을 거기서 계산 */
 PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq;p.sh=(p.k==="cash"&&p.v>=1e8)?.15:(p.k==="aura"||p.k==="wing")?.05:p.id==="crown"?.045:[.03,.035,.05][p.t];p.p=Math.max(.002,Math.min(.7,p.sh*25*CLAW_COST/p.val));});
 const POOL=PRIZES;let BOX=PRIZES.slice();function setBox(a){BOX=a;}
@@ -2387,7 +2407,7 @@ function step(G,dt,inp){G.t+=dt;inp=inp||{};stepKeys(G,dt);
     if(G.tm>=.4&&G.held){const k=G.held;G.held=null;k.chute=1;k.fall={y:0,v:0};k.hy=0;G.winKey=k;}
     if(G.tm>=1.4){G.st="done";G.tm=0;}}
   else if(G.st==="done"){}
-  if(G.winKey&&G.st==="done"){const n=G.winKey.n;G.keys=G.keys.filter(k=>k!==G.winKey);G.winKey=null;G.res={win:true,n};respawn(G,n);}
+  if(G.winKey&&G.st==="done"){const n=G.winKey.n;G.keys=G.keys.filter(k=>k!==G.winKey);G.winKey=null;G.res={win:true,n};if(!G.noRespawn)respawn(G,n);}
   else if(G.st==="done"&&!G.res){G.res={win:false,why:G.out&&G.out.type};}
 }
 function dropKey(G){const k=G.held;if(!k)return;G.held=null;k.x=G.cx;k.z=G.cz;k.fall={y:Math.max(6,G.h*118),v:0};k.wob=.5;k.layer=3;Object.assign(k,poseOf(G.rng));G.out.dropped=true;}
@@ -2457,14 +2477,20 @@ let clw={m:null,s:null,last:null,log:[],on:false,play:false,starting:false,fin:f
 const clwOpen=()=>{const d=$("clwMod");return !!d&&d.style.display==="flex";};
 const clwPlain=k=>({n:k.n,x:+(+k.x).toFixed(3),z:+(+k.z).toFixed(3),po:k.po|0,rot:+(+k.rot||0).toFixed(2),layer:k.layer|0});
 const clwStale=s=>!s||!s.uid||nowS()-(s.hb||0)>12000;
-function clwInit(){if(!fdb||clw.initing)return;clw.initing=true;fdb.ref("market/claw/m").transaction(c=>{if(c)return;const G=CLW.newGame();return{v:1,keys:G.keys.map(clwPlain),box:Array.from({length:25},(_,i)=>i).sort(()=>Math.random()-.5)};}).catch(()=>{}).then(()=>{clw.initing=false;});}
+const clwRid=()=>Math.floor(nowS()/3600000);
+const clwNext=()=>(clwRid()+1)*3600000-nowS();
+function clwNewRound(rid){const P=CLW.POOL,idx=t=>P.map((p,i)=>[p,i]).filter(([p])=>p.t===t).map(([,i])=>i),pick=(a,n)=>a.slice().sort(()=>Math.random()-.5).slice(0,n);
+  const box=[...pick(idx(0),14),...pick(idx(1),7),...idx(2)].sort(()=>Math.random()-.5);
+  return{r:rid,v:1,keys:CLW.newGame().keys.map(clwPlain),box,taken:{}};}
+/* 1시간마다(정각) 열쇠와 상품이 새로 바뀜 · 누가 하는 중이면 끝난 뒤에 바꿈 */
+function clwEnsure(){if(!fdb||clw.initing||clw.play||clw.fin)return;const rid=clwRid();if(clw.m&&(clw.m.r|0)>=rid)return;if(clw.s&&!clwStale(clw.s))return;
+  clw.initing=true;fdb.ref("market/claw/m").transaction(c=>{if(c&&c.keys&&(c.r|0)>=clwRid())return;return clwNewRound(clwRid());}).catch(()=>{}).then(()=>{clw.initing=false;});}
 function clwSetBox(m){if(m&&m.box&&m.box.length===25)CLW.setBox(m.box.map(i=>CLW.POOL[i|0]||CLW.POOL[0]));}
 function clwListen(){if(clw.on||!fdb)return;clw.on=true;const r=fdb.ref("market/claw");
-  clw.h1=r.child("m").on("value",sn=>{const m=sn.val();if(!m||!m.keys){clw.m=null;clwInit();return;}clw.m=m;clwSetBox(m);if(!clw.play)clwSyncView();clwDraw();});
-  clw.h2=r.child("s").on("value",sn=>{clw.s=sn.val();clwUI();});
-  clw.h3=r.child("last").on("value",sn=>{clw.last=sn.val();clwUI();});
+  clw.h1=r.child("m").on("value",sn=>{const m=sn.val();if(!m||!m.keys){clw.m=null;clwEnsure();clwUI();return;}clw.m=m;clwSetBox(m);if(!clw.play){clwSyncView();clwEnsure();}clwUI();clwDraw();});
+  clw.h2=r.child("s").on("value",sn=>{clw.s=sn.val();clwUI();if(!clw.s)clwEnsure();});
   clw.h4=r.child("log").limitToLast(8).on("value",sn=>{const o=sn.val()||{};clw.log=Object.keys(o).sort().map(k=>o[k]).reverse();clwUI();});}
-function clwUnlisten(){if(!clw.on||!fdb)return;clw.on=false;const r=fdb.ref("market/claw");try{r.child("m").off("value",clw.h1);r.child("s").off("value",clw.h2);r.child("last").off("value",clw.h3);r.child("log").off("value",clw.h4);}catch(e){}}
+function clwUnlisten(){if(!clw.on||!fdb)return;clw.on=false;const r=fdb.ref("market/claw");try{r.child("m").off("value",clw.h1);r.child("s").off("value",clw.h2);r.child("log").off("value",clw.h4);}catch(e){}}
 /* 구경하는 사람(또는 대기 중)의 화면용 상태: DB의 열쇠 위치를 그대로 보여줌 */
 function clwSyncView(){if(!clw.m)return;const V=clw.V||(clw.V={keys:[],cx:.5,cz:.5,h:1,close:0,held:null,st:"move",t:0,tcx:.5,tcz:.5,th:1,tclose:0});
   const old={};V.keys.forEach(k=>old[k.n]=k);V.keys=clw.m.keys.map(k=>{const o=old[k.n],nk={...k,fall:null,wob:0};if(o){nk.fall=o.fall;nk.wob=o.wob;if(Math.hypot(o.x-k.x,o.z-k.z)>.02){nk.fall={y:70,v:0};}}else if(Object.keys(old).length)nk.fall={y:70,v:0};return nk;});
@@ -2483,17 +2509,18 @@ function clwLoop(now){if(!clwOpen()){clw.raf=0;return;}const dt=Math.min(.05,(no
     if(G.st==="done"&&!clw.fin)clwFinish();
     if(clw._tl!==Math.ceil(clw.tl)||clw._st!==G.st){clw._tl=Math.ceil(clw.tl);clw._st=G.st;clwUI();}}
   else{clwViewTick(dt);const s=clw.s,k=(s&&s.uid&&!clwStale(s))?"1"+(s.uid)+(s.st||"")+Math.ceil(s.tl||0):"0";if(clw._vk!==k){clw._vk=k;clwUI();}}
+  {const e=$("clwCd");if(e){const ms=Math.max(0,clwNext()),mm=Math.floor(ms/60000),ss=Math.floor(ms/1000)%60;const tx=`${mm}:${String(ss).padStart(2,"0")}`;if(e.textContent!==tx)e.textContent=tx;}if(now-(clw._en||0)>2500){clw._en=now;clwEnsure();}}
   clwDraw();clw.raf=requestAnimationFrame(clwLoop);}
 function openClw(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stAdd("visitClw");let d=$("clwMod");
   if(!d){d=document.createElement("div");d.id="clwMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)clwClose();};d.addEventListener("keydown",e=>e.stopPropagation());
     d.innerHTML=`<div class="btBox" style="max-width:400px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b style="font-size:15.5px">🔑 뽑기방</b><button id="clwX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
-      <div id="clwTop"></div><div id="clwShelf" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:6px 0"></div>
+      <div id="clwTop"></div><div style="text-align:center;font-size:11.5px;color:var(--sub);margin-top:6px">⏰ 열쇠·상품이 새로 바뀌기까지 <b id="clwCd" style="color:var(--acc)"></b> (매 정각)</div><div id="clwShelf" style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:6px 0"></div>
       <canvas id="clwCv" width="${CLW.CW}" height="${CLW.CH}" style="width:100%;display:block;border-radius:14px;background:#000;touch-action:none"></canvas>
       <button id="clwStart" style="width:100%;margin-top:8px;padding:13px 0;border-radius:12px;background:var(--acc);color:#111;font-weight:900;font-size:15px"></button>
       <div style="display:flex;gap:10px;align-items:center;margin:10px 0 4px"><div style="display:grid;grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,52px);gap:6px">${[["u","▲","2","1"],["l","◀","1","2"],["d","▼","2","2"],["r","▶","3","2"]].map(([k,ch,c,r])=>`<button data-clk="${k}" style="grid-column:${c};grid-row:${r};background:var(--card2);border-radius:14px;font-size:21px;font-weight:900;touch-action:none">${ch}</button>`).join("")}</div>
       <button id="clwGo" style="flex:1;height:110px;border-radius:18px;background:linear-gradient(#f87171,#dc2626);color:#fff;font-size:21px;font-weight:900;box-shadow:0 6px 0 #7f1d1d">집기!<br><span style="font-size:11px;font-weight:700">(스페이스)</span></button></div>
       <div style="text-align:center;font-size:10.5px;color:var(--sub)">PC: 방향키/WASD 이동 · 스페이스 집기 · 시작하면 10초 안에 집어야 해요</div>
-      <div id="clwLog" style="margin-top:10px"></div><div id="clwAdm"></div></div>`;
+      <div id="clwList" style="margin-top:12px"></div><div id="clwLog" style="margin-top:10px"></div><div id="clwAdm"></div></div>`;
     d.querySelector("#clwX").onclick=clwClose;d.querySelector("#clwStart").onclick=clwStart;d.querySelector("#clwGo").onclick=()=>{if(clw.play&&clw.G&&clw.G.st==="move"){CLW.startDrop(clw.G);clwUI();}};
     d.querySelectorAll("[data-clk]").forEach(b=>{const k=b.dataset.clk,on=e=>{e.preventDefault();clw.inp[k]=1;},off=e=>{if(e)e.preventDefault();clw.inp[k]=0;};b.addEventListener("pointerdown",on);["pointerup","pointerleave","pointercancel"].forEach(ev=>b.addEventListener(ev,off));});}
   d.style.display="flex";clw.lt=0;clwListen();clwSyncView();clwUI();if(!clw.raf)clw.raf=requestAnimationFrame(clwLoop);}
@@ -2504,15 +2531,18 @@ window.addEventListener("keydown",e=>{if(!clwOpen())return;const K={ArrowLeft:"l
 window.addEventListener("keyup",e=>{const K={ArrowLeft:"l",a:"l",ArrowRight:"r",d:"r",ArrowUp:"u",w:"u",ArrowDown:"d",s:"d"},k=K[e.key.length===1?e.key.toLowerCase():e.key];if(k)clw.inp[k]=0;});
 function clwUI(){const d=$("clwMod");if(!d||d.style.display!=="flex")return;const COST=CLW.CLAW_COST,s=clw.s,live=s&&s.uid&&!clwStale(s),mineLive=live&&s.uid===myId;
   $("clwTop").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 10px"><span>내 현금 <b>${formatMoneyReadable(me?me.cash:0)}</b></span><span style="color:var(--sub)">참가비 <b style="color:var(--acc)">${formatMoneyReadable(COST)}</b></span></div>`;
-  /* 상품함: 열기 전까지는 비밀 (방금 열린 상자만 잠깐 공개) */
-  const L=clw.last,showN=L&&nowS()-(L.t||0)<9000?L.n:0,LP=L?CLW.POOL[L.pz|0]:null;
-  $("clwShelf").innerHTML=Array.from({length:25},(_,i)=>{const n=i+1,op=showN===n&&LP;return op?`<div style="position:relative;background:var(--card);border:2px solid ${CLW.TIERS[LP.t].col};border-radius:9px;text-align:center;padding:12px 1px 3px;min-height:54px"><i style="position:absolute;left:3px;top:1px;font-style:normal;font-size:9.5px;font-weight:900;color:${CLW.TIERS[LP.t].col}">${n}</i><div style="font-size:18px;line-height:1.1">${LP.ic}</div><div style="font-size:8px;line-height:1.2;color:#cbd5e1;word-break:keep-all">${LP.nm}</div></div>`
-    :`<div style="position:relative;background:var(--card);border:2px solid #475569;border-radius:9px;text-align:center;padding:12px 1px 3px;min-height:54px"><i style="position:absolute;left:3px;top:1px;font-style:normal;font-size:9.5px;font-weight:900;color:#94a3b8">${n}</i><div style="font-size:18px;line-height:1.1;filter:grayscale(1) brightness(.7)">🎁</div><div style="font-size:8px;color:#64748b">???</div></div>`;}).join("");
+  const m=clw.m,tk=(m&&m.taken)||{},P=CLW.POOL;
+  $("clwShelf").innerHTML=Array.from({length:25},(_,i)=>{const n=i+1,t=tk[i],p=t&&m&&m.box?P[m.box[i]|0]:null;return p?`<div style="position:relative;background:var(--card);border:2px solid ${CLW.TIERS[p.t].col};border-radius:9px;text-align:center;padding:12px 1px 3px;min-height:58px;opacity:.9"><i style="position:absolute;left:3px;top:1px;font-style:normal;font-size:9.5px;font-weight:900;color:${CLW.TIERS[p.t].col}">${n}</i><div style="font-size:18px;line-height:1.1">${p.ic}</div><div style="font-size:8px;line-height:1.2;color:#cbd5e1;word-break:keep-all">${esc(p.nm)}</div><div style="font-size:7.5px;color:var(--acc)">${esc(String(t.name||"").slice(0,6))}</div></div>`
+    :`<div style="position:relative;background:var(--card);border:2px solid #475569;border-radius:9px;text-align:center;padding:12px 1px 3px;min-height:58px"><i style="position:absolute;left:3px;top:1px;font-style:normal;font-size:9.5px;font-weight:900;color:#94a3b8">${n}</i><div style="font-size:18px;line-height:1.1;filter:grayscale(1) brightness(.7)">🎁</div><div style="font-size:8px;color:#64748b">???</div></div>`;}).join("");
+  /* 이번 판 상품 목록 (누구나 볼 수 있음 · 어느 번호인지는 열기 전까지 비밀) */
+  if(m&&m.box){const rows=m.box.map((pi,i)=>({p:P[pi|0],t:tk[i],n:i+1})).sort((a,b)=>b.p.t-a.p.t||(a.t?1:0)-(b.t?1:0));const left=rows.filter(x=>!x.t).length;
+    $("clwList").innerHTML=`<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px"><div style="display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:6px"><b>🎁 이번 상품 목록</b><span style="color:var(--sub)">남은 상품 ${left} / 25</span></div>`+rows.map(x=>`<div style="display:flex;justify-content:space-between;gap:6px;font-size:11.5px;padding:3px 0;border-top:1px solid var(--line);${x.t?"opacity:.5":""}"><span style="${x.t?"text-decoration:line-through":""}"><span style="color:${CLW.TIERS[x.p.t].col};font-weight:800">[${CLW.TIERS[x.p.t].n}]</span> ${x.p.ic} ${esc(x.p.nm)}</span><span style="color:var(--sub);white-space:nowrap">${x.t?`${x.n}번 · ${esc(String(x.t.name||"").slice(0,8))}님`:"남음"}</span></div>`).join("")+`</div>`;}else $("clwList").innerHTML="";
   const b=$("clwStart"),go=$("clwGo");let t="",dis=false;
   if(clw.play){t=clw.G&&clw.G.st==="move"?`⏱ 남은 시간 ${Math.ceil(clw.tl)}초`:"집게가 움직이는 중…";dis=true;}
   else if(clw.starting){t="자리를 잡는 중…";dis=true;}
   else if(live){t=`👀 ${esc(s.name||"누군가")}님이 하는 중이에요 · 구경하세요`;dis=true;}
-  else if(!clw.m){t="기계를 불러오는 중…";dis=true;}
+  else if(!clw.m||(clw.m.r|0)<clwRid()){t="새 열쇠와 상품을 준비하는 중…";dis=true;}
+  else if(!clw.m.keys.length){t="🔒 상품이 모두 나갔어요 · 다음 정각에 새로 채워져요";dis=true;}
   else t=`▶ 도전하기 (${formatMoneyReadable(COST)})`;
   b.innerHTML=t;b.disabled=dis;b.style.opacity=dis?.55:1;
   const canGo=clw.play&&clw.G&&clw.G.st==="move";go.disabled=!canGo;go.style.filter=canGo?"":"grayscale(.9) brightness(.7)";
@@ -2520,14 +2550,14 @@ function clwUI(){const d=$("clwMod");if(!d||d.style.display!=="flex")return;cons
   const adm=$("clwAdm");if(isOwner){adm.innerHTML=`<button id="clwOdds" style="margin-top:10px;width:100%;padding:8px 0;border-radius:9px;background:var(--card2);font-size:11.5px">🔒 관리자용 확률표 ${clw.odds?"닫기":"열기"}</button>`+(clw.odds?clwOddsHtml():"");$("clwOdds").onclick=()=>{clw.odds=!clw.odds;clwUI();};}else adm.innerHTML="";}
 function clwOddsHtml(){const P=CLW.POOL,m=clw.m;let h=`<div style="font-size:10.5px;margin-top:8px"><table style="width:100%;border-collapse:collapse"><tr style="color:var(--sub)"><th align="left">#</th><th align="left">지금 들어 있는 상품</th><th align="right">최종 확률</th></tr>`;
   for(let i=0;i<25;i++){const p=P[(m&&m.box&&m.box[i])|0]||P[0];h+=`<tr><td>${i+1}</td><td style="color:${CLW.TIERS[p.t].col}">${p.ic} ${p.nm}</td><td align="right">${(p.p*100).toFixed(2)}%</td></tr>`;}return h+"</table></div>";}
-function clwStart(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(clw.play||clw.starting||!clw.m)return;const COST=CLW.CLAW_COST;
+function clwStart(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(clw.play||clw.starting||!clw.m)return;const COST=CLW.CLAW_COST;if((clw.m.r|0)<clwRid()){clwEnsure();return toast("새 열쇠와 상품을 준비하는 중이에요");}if(!clw.m.keys.length)return toast("상품이 모두 나갔어요 · 다음 정각에 새로 채워져요");
   if(clw.s&&!clwStale(clw.s)&&clw.s.uid!==myId)return toast(`지금 ${clw.s.name}님이 하는 중이에요`);if(me.cash<COST)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(COST)} 필요)`);
   clw.starting=true;clwUI();
   fdb.ref("market/claw/s").transaction(cur=>{const now=nowS();if(cur&&cur.uid&&cur.uid!==myId&&now-(cur.hb||0)<12000)return;return{uid:myId,name:myName(),hb:now,st:"move",cx:.5,cz:.5,h:1,close:0,held:-1,tl:10};},(err,ok)=>{
     clw.starting=false;if(err||!ok){clwUI();return toast("다른 분이 먼저 시작했어요");}
     if(!me||me.cash<COST||!clw.m){fdb.ref("market/claw/s").remove().catch(()=>{});clwUI();return toast("💸 잔액이 부족해요");}
     me.cash-=COST;stAdd("clawPlay");stAdd("clawSpent",COST);saveMe();renderHeader();
-    const G=CLW.newGame();G.keys=clw.m.keys.map(k=>({...k,fall:null,wob:0}));G.cx=.5;G.cz=.5;clw.G=G;clw.tl=10;clw.fin=false;clw.play=true;clw.cost=COST;clw._tl=-1;clwUI();},false);}
+    const G=CLW.newGame();G.keys=clw.m.keys.map(k=>({...k,fall:null,wob:0}));G.cx=.5;G.cz=.5;clw.G=G;clw.round=clw.m.r;clw.mv=clw.m.v;G.noRespawn=true;clw.tl=10;clw.fin=false;clw.play=true;clw.cost=COST;clw._tl=-1;clwUI();},false);}
 function clwGrant(p){let txt="",dup=false,note="";
   if(p.k==="cash"){me.cash+=p.v;txt=`현금 <b>${formatMoneyReadable(p.v)}</b>을 받았어요!`;}
   else if(p.k==="coin"){const ci=COINS.findIndex(c=>c[0]===p.c),pr=ci>=0?priceOf(ci):0;const cnt=pr>0?Math.floor(p.v/pr):0;
@@ -2538,12 +2568,12 @@ function clwGrant(p){let txt="",dup=false,note="";
     else{if(p.k==="acc"){me.acc=me.acc||{};me.acc[p.id]=true;}else{me.cos=me.cos||{};me.cos[(p.k==="aura"?"aura_":"wing_")+p.id]=true;}txt=`<b>${esc(p.nm)}</b> 획득!<br><span style="color:var(--sub)">🎽 마이 → 장비에서 착용할 수 있어요</span>`;}}
   return{txt,dup};}
 function clwFinish(){clw.fin=true;const G=clw.G,res=G.res||{win:false},COST=clw.cost||CLW.CLAW_COST;
-  const mine=clw.s&&clw.s.uid===myId;
-  if(!mine){me.cash+=COST;saveMe();renderHeader();clw.play=false;clw.fin=false;clw.G=null;clwSyncView();clwUI();return toast("⏱ 자리가 취소되어 참가비를 돌려 드렸어요");}
-  let pz=-1,P=null,g=null;const box=(clw.m&&clw.m.box||[]).slice();
-  if(res.win){pz=box[res.n]|0;P=CLW.POOL[pz];g=clwGrant(P);stAdd("clawWin");if(P.t>=1)stAdd("clawRare");box[res.n]=Math.floor(Math.random()*CLW.POOL.length);}
-  const up={"m":{v:((clw.m&&clw.m.v)|0)+1,keys:G.keys.map(clwPlain),box},"s":null};if(res.win)up["last"]={n:res.n+1,pz,name:myName(),t:nowS()};
-  const done=()=>{clw.play=false;clw.fin=false;clw.G=null;clw.m=clw.m?{...clw.m,keys:up.m.keys,box,v:up.m.v}:clw.m;clwSetBox(clw.m);clwSyncView();clwUI();};
+  const mine=clw.s&&clw.s.uid===myId,same=clw.m&&clw.m.r===clw.round&&clw.m.v===clw.mv;
+  if(!mine||!same){me.cash+=COST;saveMe();renderHeader();clw.play=false;clw.fin=false;clw.G=null;clwSyncView();clwUI();if(mine)fdb.ref("market/claw/s").remove().catch(()=>{});return toast("⏱ 기계가 새로 바뀌어서 참가비를 돌려 드렸어요");}
+  let pz=-1,P=null,g=null;const box=(clw.m.box||[]).slice(),taken={...(clw.m.taken||{})};
+  if(res.win){pz=box[res.n]|0;P=CLW.POOL[pz];g=clwGrant(P);stAdd("clawWin");if(P.t>=1)stAdd("clawRare");taken[res.n]={name:myName().slice(0,10),t:nowS()};}
+  const nm={r:clw.m.r,v:(clw.m.v|0)+1,keys:G.keys.map(clwPlain),box,taken},up={"m":nm,"s":null};
+  const done=()=>{clw.play=false;clw.fin=false;clw.G=null;clw.m=nm;clwSetBox(nm);clwSyncView();clwUI();};
   if(res.win){saveMe();renderHeader();}
   fdb.ref("market/claw").update(up).catch(()=>{}).then(()=>{
     if(res.win){fdb.ref("market/claw/log").push({name:myName().slice(0,10),n:res.n+1,nm:P.nm,t:nowS()}).catch(()=>{});if(P.t>=2)broadcast(`🔑 ${myName()}님이 뽑기방에서 ${P.nm} 당첨! 🎉`);}
