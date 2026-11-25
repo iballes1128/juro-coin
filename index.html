@@ -241,8 +241,8 @@ nav button.on{color:var(--tx);font-weight:700}
     <div id="fishWrap"><canvas id="fishCv"></canvas><div id="fishRes"></div><div id="fFeed"></div><button id="fTkShow">📈 시세</button>
       <div id="fJoy"><i></i></div><button id="fAct">🎣<small>던지기</small></button></div></div>
     <button id="fishBtn" class="fbtn">🎣 낚싯대 던지기</button>
-    <div class="fhelp pc">방향키·WASD 이동 · <b>스페이스</b> 낚싯대 던지기/당기기/거래소 열기 · <b>Enter</b> 오른쪽 채팅창에 입력 (말풍선으로 떠요)</div>
-    <div class="fhelp mo">왼쪽 조이스틱으로 이동 · 오른쪽 버튼으로 낚시/거래소 · 💬 채팅</div>
+    <div class="fhelp pc">방향키·WASD 이동 · <b>스페이스</b> 낚싯대 던지기/당기기/어시장 열기 · <b>Enter</b> 오른쪽 채팅창에 입력 (말풍선으로 떠요)</div>
+    <div class="fhelp mo">왼쪽 조이스틱으로 이동 · 오른쪽 버튼으로 낚시/어시장 · 💬 채팅</div>
   </section>
   <section class="sec adm" id="s-admin">
     <div class="card"><h3>📮 건의함</h3><div id="sugBox" style="max-height:340px;overflow-y:auto"></div></div>
@@ -301,7 +301,7 @@ nav button.on{color:var(--tx);font-weight:700}
   <div id="awkPvPick" style="display:flex;gap:6px;overflow-x:auto;padding:2px 14px 8px"></div><div id="awkPvRow" style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:0 14px 16px;overflow-y:auto"></div></div></div>
 <div id="fInfo"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px" id="fInfoT">📖 도감</b><button id="fInfoX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
   <div class="tabs2" id="fishTabs" style="margin:0 14px 8px;display:none"><button data-f="dex" class="on">📖 도감</button><button data-f="rank">🏆 순위</button><button data-f="hof">🐋 명예의 전당</button></div><div id="fishInfo" style="overflow-y:auto;padding:0 14px 20px"></div></div></div>
-<div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px">🏪 주로 거래소 · 어시장</b><button id="fMkX" style="font-size:20px;color:var(--sub)">✕</button></div>
+<div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px">🐟 어시장</b><button id="fMkX" style="font-size:20px;color:var(--sub)">✕</button></div>
   <div class="tabs2" id="fMkTabs" style="margin:0 14px 6px"><button data-m="quick" class="on">🐟 바로 팔기</button><button data-m="list">🛒 매물</button><button data-m="sell">📤 올리기 (판매·교환)</button></div>
   <div id="fMkInfo" style="font-size:10px;color:var(--sub);padding:0 14px 6px">잡은 물고기를 시세대로 바로 팔아요 (수수료 10%)</div><div id="fMkBody"></div></div></div>
 <aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><button id="chatClose">✕</button></div>
@@ -787,12 +787,12 @@ const ACH=[
  {g:"tut",c:"🛒 코인 사 보기",k:"t_buy",u:"회",tiers:[[1,"첫 매수",50000]]},
  {g:"tut",c:"💵 코인 팔아 보기",k:"t_sell",u:"회",tiers:[[1,"첫 매도",50000]]},
  {g:"tut",c:"🎣 낚시해 보기",k:"t_fish",u:"회",tiers:[[1,"첫 낚시",50000]]},
- {g:"tut",c:"🏪 거래소 들어가 보기",k:"t_vmkt",u:"회",tiers:[[1,"거래소 구경",50000]]},
- {g:"tut",c:"🐟 어시장 들어가 보기",k:"t_vfmk",u:"회",tiers:[[1,"어시장 구경",50000]]},
+ {g:"tut",c:"🏪 어시장 매물 탭 들어가 보기",k:"t_vmkt",u:"회",tiers:[[1,"거래소 구경",50000]]},
+ {g:"tut",c:"🐟 어시장 바로 팔기 탭 들어가 보기",k:"t_vfmk",u:"회",tiers:[[1,"어시장 구경",50000]]},
  {g:"tut",c:"🏛️ 국세청 들어가 보기",k:"t_vnts",u:"회",tiers:[[1,"국세청 구경",50000]]},
- {g:"tut",c:"🛍️ 거래소에서 물건 사 보기",k:"t_mbuy",u:"회",tiers:[[1,"첫 거래",50000]]},
- {g:"tut",c:"🤝 거래소 교환 1회 완료",k:"t_trade",u:"회",tiers:[[1,"첫 교환",50000]]},
- {g:"tut",c:"💰 거래소 판매 1회 완료 (내 물건이 팔림)",k:"t_sold",u:"회",tiers:[[1,"첫 판매",50000]]},
+ {g:"tut",c:"🛍️ 어시장에서 물건 사 보기",k:"t_mbuy",u:"회",tiers:[[1,"첫 거래",50000]]},
+ {g:"tut",c:"🤝 어시장 교환 1회 완료",k:"t_trade",u:"회",tiers:[[1,"첫 교환",50000]]},
+ {g:"tut",c:"💰 어시장 판매 1회 완료 (내 물건이 팔림)",k:"t_sold",u:"회",tiers:[[1,"첫 판매",50000]]},
  {g:"tut",c:"⚔️ 배틀 해 보기",k:"t_rps",u:"회",tiers:[[1,"첫 배틀",50000]]},
  {g:"tut",c:"✊ 가위바위보 게임 해 보기",k:"t_mc",u:"회",tiers:[[1,"MC 도전",50000]]},
  {g:"tut",c:"👕 캐릭터 바꿔 보기",k:"t_char",u:"회",tiers:[[1,"캐릭터 변경",50000]]},
@@ -806,10 +806,10 @@ const ACH=[
  {g:"play",c:"📈 코인 거래하기 (사기+팔기)",k:"p_coin",u:"회",tiers:[[10,"단타 연습생",200000,1],[30,"거래 30회",500000],[100,"차트 중독",1000000,1],[300,"거래의 달인",5000000,1]]},
  {g:"play",c:"🐟 어시장에 물고기 팔기",k:"p_fmk",u:"마리",tiers:[[30,"어시장 단골",50000,1],[100,"100마리",100000],[300,"수산 도매상",300000,1],[1000,"어시장 큰손",1000000,1]]},
  {g:"play",c:"⚒️ 낚싯대 강화하기",k:"p_enh",u:"회",tiers:[[10,"대장장이",200000,1],[30,"강화 30회",500000],[100,"장인",1000000,1],[300,"명장",5000000,1]]},
- {g:"play",c:"🏪 거래소에 판매 올리기",k:"p_list",u:"회",tiers:[[5,"좌판 상인",200000,1],[10,"10회",500000],[30,"거래소 상인",1000000,1],[100,"거래소 큰손",5000000,1]]},
- {g:"play",c:"🔁 거래소에 교환 올리기",k:"p_tlist",u:"회",tiers:[[5,"교환 상인",200000,1],[10,"10회",500000],[30,"교환의 달인",1000000,1],[100,"교환왕",5000000,1]]},
- {g:"play",c:"🛍️ 거래소에서 물건 사기",k:"p_mbuy",u:"회",tiers:[[5,"쇼핑객",200000,1],[10,"10회",500000],[30,"거래소 단골",1000000,1],[100,"거래소 VIP",5000000,1]]},
- {g:"play",c:"🤝 거래소 교환 완료하기",k:"p_trade",u:"회",tiers:[[5,"교환 친구",200000,1],[10,"10회",500000],[30,"교환 매니아",1000000,1],[100,"교환 전설",5000000,1]]},
+ {g:"play",c:"🏪 어시장에 판매 올리기",k:"p_list",u:"회",tiers:[[5,"좌판 상인",200000,1],[10,"10회",500000],[30,"거래소 상인",1000000,1],[100,"거래소 큰손",5000000,1]]},
+ {g:"play",c:"🔁 어시장에 교환 올리기",k:"p_tlist",u:"회",tiers:[[5,"교환 상인",200000,1],[10,"10회",500000],[30,"교환의 달인",1000000,1],[100,"교환왕",5000000,1]]},
+ {g:"play",c:"🛍️ 어시장에서 물건 사기",k:"p_mbuy",u:"회",tiers:[[5,"쇼핑객",200000,1],[10,"10회",500000],[30,"거래소 단골",1000000,1],[100,"거래소 VIP",5000000,1]]},
+ {g:"play",c:"🤝 어시장 교환 완료하기",k:"p_trade",u:"회",tiers:[[5,"교환 친구",200000,1],[10,"10회",500000],[30,"교환 매니아",1000000,1],[100,"교환 전설",5000000,1]]},
  {g:"play",c:"💸 친구에게 송금하기",k:"p_send",u:"회",tiers:[[5,"마음 부자",200000,1],[10,"10회",500000],[30,"기부왕",1000000,1],[100,"산타클로스",5000000,1]]},
  {g:"play",c:"⚔️ 배틀 하기",k:"p_rps",u:"판",tiers:[[10,"단골 도전자",200000,1],[30,"30판",500000],[100,"승부사",1000000,1],[300,"승부 중독자",5000000,1]]},
  {g:"play",c:"✊ MC 가바보 최고 연승 (비기면 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000,1],[3,"3연승",500000],[5,"눈치 백단",1000000,1],[7,"7연승",3000000],[10,"예언자",10000000,1],[15,"가위바위보의 신",30000000,1]]},
@@ -893,7 +893,7 @@ function setMode(m){mode=m;document.querySelectorAll(".bs button").forEach(b=>b.
 document.querySelectorAll(".bs button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 $("qty").oninput=()=>renderSheet();
 document.querySelectorAll("#ranges button").forEach(b=>b.onclick=()=>{chartN=+b.dataset.n;document.querySelectorAll("#ranges button").forEach(x=>x.classList.toggle("on",x===b));renderSheet();});
-const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",mkt:"🏪 거래소 판매 수수료",casino:"🎰 도박장"};let taxAll={},taxPre={};
+const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",mkt:"🏪 어시장 거래 수수료",casino:"🎰 도박장"};let taxAll={},taxPre={};
 function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=(me.taxPaid||0)+amt;stAdd("tax_"+k,amt);}if(fdb)fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+amt;c[k]=(c[k]||0)+amt;return c;}).catch(()=>{});}
 function openNts(){fKeys={};stAdd("visitNts");let d=$("ntsMod");if(!d){d=document.createElement("div");d.id="ntsMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
     if(fdb){fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/taxPre").on("value",s=>{taxPre=s.val()||{};if(d.style.display==="flex")renderNts();});}}d.style.display="flex";renderNts();}
@@ -1800,7 +1800,7 @@ function fishDraw(t){const c=fCtx;
     else if(d.t==="shop"||d.t==="fmk"){const S=d.t==="shop"?SHOP:FMK,fm=d.t==="fmk",X=S.x,Y=S.y,W=S.w,H=S.h;c.fillStyle="rgba(0,0,0,.25)";c.fillRect(X+4,Y+H-4,W,8);c.fillStyle="#8b5a2b";c.fillRect(X+4,Y+14,W-8,H-14);c.fillStyle="#6b4423";c.fillRect(X+8,Y+H-16,W-16,12);
       for(let i=0;i<6;i++){c.fillStyle=i%2?"#f2f2f2":(fm?"#2563eb":"#e63946");c.beginPath();c.moveTo(X+i*W/6,Y+4);c.lineTo(X+(i+1)*W/6,Y+4);c.lineTo(X+(i+1)*W/6,Y+18);c.arc(X+(i+.5)*W/6,Y+18,W/12,0,Math.PI);c.fill();}
       c.fillStyle="#5c3d22";c.fillRect(X,Y,W,5);c.font="12px sans-serif";c.textAlign="center";c.fillText(fm?"🐟💰🐠":"🐟🦀🦑",X+W/2,Y+H-6);
-      c.fillStyle="rgba(0,0,0,.55)";c.beginPath();c.roundRect(X+W/2-36,Y-16,72,16,8);c.fill();c.fillStyle="#ffcf4d";c.font="bold 9px 'Noto Sans KR',sans-serif";c.fillText(fm?"어시장":"어시장·거래소",X+W/2,Y-4.5);}
+      c.fillStyle="rgba(0,0,0,.55)";c.beginPath();c.roundRect(X+W/2-36,Y-16,72,16,8);c.fill();c.fillStyle="#ffcf4d";c.font="bold 9px 'Noto Sans KR',sans-serif";c.fillText("어시장",X+W/2,Y-4.5);}
     else if(d.t==="nts"){const X=NTS.x,Y=NTS.y,W=NTS.w,H=NTS.h;c.fillStyle="rgba(0,0,0,.25)";c.fillRect(X+4,Y+H-4,W,8);
       c.fillStyle="#cbd5e1";c.fillRect(X+2,Y+H-6,W-4,6);c.fillStyle="#e2e8f0";c.fillRect(X+5,Y+12,W-10,H-18);c.fillStyle="#f8fafc";c.beginPath();c.moveTo(X,Y+13);c.lineTo(X+W/2,Y);c.lineTo(X+W,Y+13);c.closePath();c.fill();c.strokeStyle="#94a3b8";c.lineWidth=1;c.stroke();
       c.fillStyle="#cbd5e1";for(let k=0;k<5;k++)c.fillRect(X+9+k*12.5,Y+15,4,H-21);c.fillStyle="#475569";c.fillRect(X+W/2-5,Y+H-15,10,9);
@@ -1822,7 +1822,7 @@ function fishDraw(t){const c=fCtx;
   const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p)drawBubble(c,p.x,p.y,b.text);}
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);
-  if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🏪 버튼으로 거래소·어시장 열기":"스페이스: 거래소·어시장 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):nearCas(fp.x,fp.y)?(TOUCH?"🎰 버튼으로 도박장 들어가기":"스페이스: 도박장 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
+  if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):nearCas(fp.x,fp.y)?(TOUCH?"🎰 버튼으로 도박장 들어가기":"스페이스: 도박장 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
   if(fstate==="bite"&&!TOUCH){c.font="bold 12px 'Noto Sans KR',sans-serif";c.fillStyle="#ff4757";c.textAlign="center";c.fillText("스페이스!",fp.x,fp.y+18);}}
 const TOUCH=matchMedia("(hover:none),(pointer:coarse)").matches;
 const fishBobY=(x,y)=>inDock(x,y)?Math.max(14,y-10):Math.max(14,RIVER-48);
@@ -1850,11 +1850,11 @@ function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id=
     if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if(o.fct||Date.now()-v.fc.t<8000)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=BIG_V?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
 function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
-  if(fstate==="idle"&&nearNpc(fp.x,fp.y)){ic="🎁";tx="보상";}else if(fstate==="idle"&&nearFmk(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearShop(fp.x,fp.y)){ic="🏪";tx="거래소";}else if(fstate==="idle"&&nearNts(fp.x,fp.y)){ic="🏛️";tx="국세청";}else if(fstate==="idle"&&nearCas(fp.x,fp.y)){ic="🎰";tx="도박장";}else if(fstate==="idle"){ic="🎣";tx=can?"던지기":"강가로";cl=can?"":"off";}else if(fstate==="bite"){ic="❗";tx="당겨!";cl="bite";}else{ic="⏳";tx="기다려";cl="wait";}
+  if(fstate==="idle"&&nearNpc(fp.x,fp.y)){ic="🎁";tx="보상";}else if(fstate==="idle"&&nearFmk(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearShop(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearNts(fp.x,fp.y)){ic="🏛️";tx="국세청";}else if(fstate==="idle"&&nearCas(fp.x,fp.y)){ic="🎰";tx="도박장";}else if(fstate==="idle"){ic="🎣";tx=can?"던지기":"강가로";cl=can?"":"off";}else if(fstate==="bite"){ic="❗";tx="당겨!";cl="bite";}else{ic="⏳";tx="기다려";cl="wait";}
   const h=`${ic}<small>${tx}</small>`;if(a.innerHTML!==h)a.innerHTML=h;a.className=cl;}
 function setFishBtn(){setFishAct();const b=$("fishBtn");if(!b)return;const can=fishSpot(fp.x,fp.y);
   if(fstate==="idle"&&nearFmk(fp.x,fp.y)){b.textContent="🐟 어시장 열기";b.disabled=false;b.className="fbtn";}
-  else if(fstate==="idle"&&nearShop(fp.x,fp.y)){b.textContent="🏪 거래소·어시장 열기";b.disabled=false;b.className="fbtn";}
+  else if(fstate==="idle"&&nearShop(fp.x,fp.y)){b.textContent="🐟 어시장 열기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"&&nearNts(fp.x,fp.y)){b.textContent="🏛️ 국세청 들어가기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"&&nearCas(fp.x,fp.y)){b.textContent="🎰 도박장 들어가기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"){b.textContent=can?"🎣 낚싯대 던지기":"🚶 강가로 가세요";b.disabled=!can;b.className="fbtn";}
@@ -1915,7 +1915,7 @@ const fmkUnit=i=>FISH[i][1]-Math.round(FISH[i][1]*.1);
 function renderFmk(){if($("fMk").style.display!=="flex"||fMkTab!=="quick"||!$("fSellTop"))return;const m=(me&&me.fish)||{};const L=DEX_ORDER.map(i=>[i,m[fKey(i)]||0]).filter(x=>x[1]>0);const pos=L.filter(([i])=>FISH[i][1]>0).map(([i,c])=>[i,c,c]),neg=L.filter(([i])=>FISH[i][1]<0);const posS=pos.filter(x=>x[1]>0);
   const tot=posS.reduce((s,[i,c])=>s+fmkUnit(i)*c,0);
   $("fSellTop").innerHTML=posS.length?`<button id="fSellAll" style="width:100%;background:var(--up);color:#fff;font-weight:900;border-radius:12px;padding:11px 0">전부 팔기 · +${formatMoneyReadable(tot)}</button>`:"";
-  $("fSellBody").innerHTML=L.length?`<div style="font-size:11px;color:var(--sub);margin-bottom:6px">📖 다 팔아도 도감에는 남아요 · 1마리뿐인 물고기는 거래소에 못 올려요</div>`+pos.map(([i,c,all])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${all}개 · 1개 ${formatMoneyReadable(fmkUnit(i))}</small></div>${c>0?`<input type="number" inputmode="numeric" min="1" max="${c}" value="${c}" data-qi="${i}" style="width:58px;text-align:center"><button class="buy" data-sq="${i}">팔기</button>`:`<span style="font-size:11px;color:var(--sub)">도감용 1마리</span>`}</div>`).join("")+
+  $("fSellBody").innerHTML=L.length?`<div style="font-size:11px;color:var(--sub);margin-bottom:6px">📖 다 팔아도 도감에는 남아요 · 1마리뿐인 물고기는 매물로 못 올려요</div>`+pos.map(([i,c,all])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${all}개 · 1개 ${formatMoneyReadable(fmkUnit(i))}</small></div>${c>0?`<input type="number" inputmode="numeric" min="1" max="${c}" value="${c}" data-qi="${i}" style="width:58px;text-align:center"><button class="buy" data-sq="${i}">팔기</button>`:`<span style="font-size:11px;color:var(--sub)">도감용 1마리</span>`}</div>`).join("")+
     (neg.length?`<div style="font-size:11px;color:var(--sub);margin:12px 0 4px">🗑️ 쓰레기 (팔 수 없어요 · 버리기만 가능)</div>`+neg.map(([i,c])=>`<div class="mki"><div class="w"><b>${dexNo(i)}. ${esc(FISH[i][2])}</b><small>${c}개</small></div><button data-dump="${i}">버리기</button></div>`).join(""):"")
     :'<div style="color:var(--sub);padding:30px 0;text-align:center">팔 물고기가 없어요. 낚시부터 해 보세요!</div>';
   const B=$("fSellBody");B.querySelectorAll("[data-sq]").forEach(b=>{const i=+b.dataset.sq,inp=B.querySelector(`[data-qi="${i}"]`);b.onclick=()=>{const q=parseInt(inp.value,10);if(!(q>0))return toast("⚠️ 개수를 입력해 주세요");fmkSell(i,q);};inp.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")b.click();});});
@@ -1960,24 +1960,24 @@ function renderMarketUI(){if($("fMk").style.display!=="flex")return;document.que
     B.querySelectorAll("[data-smode]").forEach(b=>b.onclick=e=>{e.stopPropagation();fSellMode=b.dataset.smode;renderMarketUI();});
     const go=$("sfGo");if(go)go.onclick=()=>{const i=fSellSel;if(fSellMode==="sell")sellFish(i,$("sfPrice").value);else listTrade(i,$("sfWant").value);fSellSel=null;};
     const pr=$("sfPrice");if(pr)pr.addEventListener("keydown",e=>{e.stopPropagation();if(e.key==="Enter")go.click();});}}
-async function listTrade(i,w){if(w==="")return toast("⚠️ 원하는 물건을 골라 주세요");w=+w;if(w===i)return toast("⚠️ 같은 물건끼리는 교환할 수 없어요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물건이 없어요");if(FISH[i][1]>0&&!(me.fish[k]>1))return toast("📖 1마리뿐인 물고기는 거래소에 올릴 수 없어요\n(어시장에는 팔 수 있어요)");
+async function listTrade(i,w){if(w==="")return toast("⚠️ 원하는 물건을 골라 주세요");w=+w;if(w===i)return toast("⚠️ 같은 물건끼리는 교환할 수 없어요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물건이 없어요");if(FISH[i][1]>0&&!(me.fish[k]>1))return toast("📖 1마리뿐인 물고기는 매물로 올릴 수 없어요\n(어시장에는 팔 수 있어요)");
   me.fish[k]--;saveMe();try{await fdb.ref("market/fishMarket").push({seller:myId,sellerName:myName(),fi:i,want:w,t:Date.now()});}catch(e){me.fish[k]++;saveMe();return toast("등록 실패");}
-  stAdd("mktTListN");saveMe();toast(`🔄 교환 등록!\n${FISH[i][2]} ↔ ${FISH[w][2]}`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${FISH[w][2]}(으)로 교환하자고 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
-async function tradeFish(id){const v=fMarket[id];if(!v||v.want==null||v.seller===myId)return;const wk=fKey(v.want);if(FISH[v.want][1]>0&&me.fish&&me.fish[wk]===1)return toast("📖 1마리뿐인 물고기는 거래소에서 교환할 수 없어요\n(어시장에는 팔 수 있어요)");if(!(me.fish&&me.fish[wk]>0))return toast(`⚠️ 교환하려면 ${FISH[v.want][2]}이(가) 있어야 해요`);
+  stAdd("mktTListN");saveMe();toast(`🔄 교환 등록!\n${FISH[i][2]} ↔ ${FISH[w][2]}`);broadcast(`📢 [어시장] ${myName()}님이 ${FISH[i][2]}을(를) ${FISH[w][2]}(으)로 교환하자고 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
+async function tradeFish(id){const v=fMarket[id];if(!v||v.want==null||v.seller===myId)return;const wk=fKey(v.want);if(FISH[v.want][1]>0&&me.fish&&me.fish[wk]===1)return toast("📖 1마리뿐인 물고기는 교환할 수 없어요\n(어시장에는 팔 수 있어요)");if(!(me.fish&&me.fish[wk]>0))return toast(`⚠️ 교환하려면 ${FISH[v.want][2]}이(가) 있어야 해요`);
   const got=await takeListing(id,c=>c.seller!==myId&&c.want!=null).catch(()=>null);if(!got)return toast("이미 교환됐거나 내려간 매물이에요");
   if(!(me.fish[fKey(got.want)]>0)){await fdb.ref("market/fishMarket/"+id).set(got).catch(()=>{});return toast("교환할 물건이 없어요");}
   me.fish[fKey(got.want)]--;const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;stAdd("mktTradeN");saveMe();
   fdb.ref("transfers").push({from:myId,fromName:myName(),to:got.seller,amount:0,net:0,fish:got.want,note:`🔄 거래소 교환 완료! ${myName()}님과 교환했어요\n(내준 것: ${FISH[got.fi][2]} ↔ 받은 것: ${FISH[got.want][2]})`,t:Date.now()}).catch(()=>{});
-  toast(`🤝 교환 완료!\n${FISH[got.want][2]} → ${FISH[got.fi][2]}${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🤝 [거래소] ${myName()}님과 ${got.sellerName||"?"}님이 교환했어요 (${FISH[got.fi][2]} ↔ ${FISH[got.want][2]})`);renderMarketUI();renderFishInfo();}
-async function sellFish(i,raw){const price=parseInt(String(raw||"").replace(/[^0-9]/g,""),10);if(!(price>0))return toast("⚠️ 판매가를 입력해 주세요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물고기가 없어요");if(!(me.fish[k]>1))return toast("📖 1마리뿐인 물고기는 거래소에 올릴 수 없어요\n(어시장에는 팔 수 있어요)");
+  toast(`🤝 교환 완료!\n${FISH[got.want][2]} → ${FISH[got.fi][2]}${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🤝 [어시장] ${myName()}님과 ${got.sellerName||"?"}님이 교환했어요 (${FISH[got.fi][2]} ↔ ${FISH[got.want][2]})`);renderMarketUI();renderFishInfo();}
+async function sellFish(i,raw){const price=parseInt(String(raw||"").replace(/[^0-9]/g,""),10);if(!(price>0))return toast("⚠️ 판매가를 입력해 주세요");const k=fKey(i);if(!(me.fish&&me.fish[k]>0))return toast("그 물고기가 없어요");if(!(me.fish[k]>1))return toast("📖 1마리뿐인 물고기는 매물로 올릴 수 없어요\n(어시장에는 팔 수 있어요)");
   me.fish[k]--;saveMe();try{await fdb.ref("market/fishMarket").push({seller:myId,sellerName:myName(),fi:i,price,t:Date.now()});}catch(e){me.fish[k]++;saveMe();return toast("등록 실패");}
-  stAdd("mktListN");stAdd("mktListAmt",price);saveMe();toast(`📤 ${FISH[i][2]} ${formatMoneyReadable(price)}에 등록!`);broadcast(`📢 [거래소] ${myName()}님이 ${FISH[i][2]}을(를) ${formatMoneyReadable(price)}에 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
+  stAdd("mktListN");stAdd("mktListAmt",price);saveMe();toast(`📤 ${FISH[i][2]} ${formatMoneyReadable(price)}에 등록!`);broadcast(`📢 [어시장] ${myName()}님이 ${FISH[i][2]}을(를) ${formatMoneyReadable(price)}에 올렸어요!`);fMkTab="list";renderMarketUI();renderFishInfo();}
 async function takeListing(id,check){let got=null;const r=await fdb.ref("market/fishMarket/"+id).transaction(cur=>{if(!cur||!check(cur))return;got=cur;return null;});return r.committed&&got?got:null;}
 async function buyFish(id){const v=fMarket[id];if(!v)return;if(v.seller===myId)return;if(me.cash<v.price)return toast("💸 잔액이 부족합니다!");
   const got=await takeListing(id,c=>c.seller!==myId&&c.want==null).catch(()=>null);if(!got)return toast("이미 팔렸거나 내려간 매물이에요");
   const fee=Math.round(got.price*.1),net=got.price-fee;me.cash-=got.price;addTax("mkt",fee);stAdd("mktBuyN");stAdd("mktBuyAmt",got.price);stAdd("spent",got.price);me.fish=me.fish||{};const k=fKey(got.fi);const first=typeof me.fish[k]!=="number";me.fish[k]=(me.fish[k]||0)+1;saveMe();
   fdb.ref("transfers").push({from:myId,fromName:myName(),to:got.seller,amount:got.price,net,note:`🐟 거래소 판매 완료! ${myName()}님이 ${FISH[got.fi][2]}을(를) 샀어요 (+${formatMoneyReadable(net)}, 수수료 10% 제외)`,t:Date.now()}).catch(()=>{});
-  toast(`🛒 ${FISH[got.fi][2]} 구매 완료!${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🛒 [거래소] ${myName()}님이 ${got.sellerName||"?"}님의 ${FISH[got.fi][2]}을(를) ${formatMoneyReadable(got.price)}에 샀어요`);renderHeader();renderMarketUI();renderFishInfo();}
+  toast(`🛒 ${FISH[got.fi][2]} 구매 완료!${first?"\n✨ 신규 도감 등록!":""}`);broadcast(`🛒 [어시장] ${myName()}님이 ${got.sellerName||"?"}님의 ${FISH[got.fi][2]}을(를) ${formatMoneyReadable(got.price)}에 샀어요`);renderHeader();renderMarketUI();renderFishInfo();}
 async function cancelFish(id){const got=await takeListing(id,c=>c.seller===myId).catch(()=>null);if(!got)return toast("이미 팔렸어요");me.fish=me.fish||{};me.fish[fKey(got.fi)]=(me.fish[fKey(got.fi)]||0)+1;saveMe();toast(`🗑️ ${FISH[got.fi][2]} 회수 완료`);renderMarketUI();renderFishInfo();}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/fishMarket").on("value",s=>{fMarket=s.val()||{};renderMarketUI();});},300);}
 
