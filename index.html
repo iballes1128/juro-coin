@@ -1492,8 +1492,8 @@ function bridgeGate(t){if(!isOwner)return;if(t-fGateT<1500)return;fGateT=t+1e9;f
     bridgeOpen=true;if(all){bridgeAll=true;if(fdb)fdb.ref("market/bridge2").set({open:true,t:Date.now(),by:myId}).then(()=>{toast("🌍 다리가 모두에게 열렸어요!");}).catch(()=>{toast("저장에 실패했어요 (나만 열렸어요)");});if(!fdb)toast("🌍 다리가 열렸어요");}else toast("🔓 다리가 열렸어요! (나만 건널 수 있어요)");done();};
   bg.querySelector("#brOk").onclick=()=>go(false);bg.querySelector("#brAll").onclick=()=>go(true);bg.querySelector("#brNo").onclick=done;bg.querySelector("#brPw").addEventListener("keydown",e=>{if(e.key==="Enter")go(false);});{const i=bg.querySelector("#brPw");let armed=0;const arm=()=>{if(armed)return;armed=1;window.removeEventListener("keyup",onUp,true);i.readOnly=false;i.value="";i.focus();};const onUp=()=>setTimeout(arm,120);
     window.addEventListener("keyup",onUp,true);i.addEventListener("pointerdown",arm);setTimeout(arm,2500);}}
-function fishArea(n,t){fArea=n;fp.tx=null;fp.via=null;fp.x=DOCK.x+DOCK.w/2;fp.y=n?FH-40:DOCK.y+36;fAreaT=t||performance.now();fLastSent="";fFloat.push({x:fp.x,y:fp.y-40,s:n?"🌲 다리 건너편":"🏙️ 주로 광장",t:performance.now(),c:"#fff"});setFishBtn();}
-function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 인형 뽑기 룰렛에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=Math.max(BOAT_X0+8,Math.min(FW-34,fp.x));fp.y=92;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
+function fishArea(n,t){fArea=n;{const F=$("fFeed");if(F)F.innerHTML="";}fp.tx=null;fp.via=null;fp.x=DOCK.x+DOCK.w/2;fp.y=n?FH-40:DOCK.y+36;fAreaT=t||performance.now();fLastSent="";fFloat.push({a:fArea,x:fp.x,y:fp.y-40,s:n?"🌲 다리 건너편":"🏙️ 주로 광장",t:performance.now(),c:"#fff"});setFishBtn();}
+function boatBoard(){if(fBoat)return;if(!myBoat())return toast("🚤 보트가 없어요 (오락실 인형 뽑기 룰렛에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");fBoat=myBoat();fBV.x=0;fBV.y=0;fBoatTilt=0;fp.x=Math.max(BOAT_X0+8,Math.min(FW-34,fp.x));fp.y=92;fp.tx=null;fp.via=null;fp.dir=1;fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"🚤 출발!",t:performance.now(),c:"#bae6fd"});fLastSent="";setFishBtn();}
 function boatLeave(){if(!fBoat)return;if(fstate!=="idle")return toast("낚시 중에는 내릴 수 없어요");fBoat=0;fBV.x=0;fBV.y=0;if(fp.x>=DOCK.x-26&&fp.x<=DOCK.x+DOCK.w+26){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();}
 function drawDock(c){c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
   c.fillStyle="#4a301b";for(const py of[DOCK.y,DOCK.y+40,DOCK.y+80]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}}
@@ -2223,7 +2223,7 @@ function fishDraw1(t){const c=fCtx;
   people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
   c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";emoSign(c,"🚧","공사 중 · 곧 열려요",FW/2+40,96,"bold 10px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.45)",20);
   emoSign(c,"🌉","다리를 건너면 주로 광장",DOCK.x+DOCK.w/2,FH-142,"bold 9px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.4)",18);
-  for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 11px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fff";c.fillText(f.s,f.x,f.y-a*24);c.globalAlpha=1;}
+  for(const f of fFloat){const a=(t-f.t)/2600;if(a>1||(f.a|0)!==fArea)continue;c.globalAlpha=1-a*a;c.font="bold 11px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fff";c.fillText(f.s,f.x,f.y-a*24);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);}
 function fishFade(t){const c=fCtx,a=1-(t-fAreaT)/520;if(a>0&&a<=1){c.fillStyle=`rgba(0,0,0,${a.toFixed(3)})`;c.fillRect(0,0,FW,FH);}}
 function fishDraw(t){const c=fCtx;if(fArea)return fishDraw1(t);
@@ -2289,7 +2289,7 @@ function fishDraw(t){const c=fCtx;if(fArea)return fishDraw1(t);
   const skL=(x,y,n,tt,ak,al)=>{if(!(n>0))return;if(tt)y-=12;y-=Math.max(awkLift(ak),al||0);c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
   skL(fp.x,fp.y,rpsN(),myTitle(),myAwkShow(),accLift(normCh(me&&me.ch),eqAcc(),myAwkShow()));for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt,o.ak,accLift(normCh(o.ch),o.ac,o.ak));}
   const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p)drawBubble(c,p.x,p.y,b.text);}
-  for(const f of fFloat){const a=(t-f.t)/2600;if(a>1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
+  for(const f of fFloat){const a=(t-f.t)/2600;if(a>1||(f.a|0)!==fArea)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(f.s).width+12;c.fillStyle="rgba(10,12,16,.82)";c.beginPath();c.roundRect(f.x-w/2,f.y-74-a*16,w,18,9);c.fill();c.fillStyle=f.c||"#fff";c.fillText(f.s,f.x,f.y-61-a*16);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);
   if(fstate==="idle"&&!(fBubbles[myId]&&Date.now()-fBubbles[myId].t<5000)){const pd=onPad(fp.x,fp.y);const tip=nearNpc(fp.x,fp.y)?(TOUCH?"🎁 버튼으로 연승 보상 받기":"스페이스: 연승 보상 받기"):nearFmk(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearShop(fp.x,fp.y)?(TOUCH?"🐟 버튼으로 어시장 열기":"스페이스: 어시장 열기"):nearNts(fp.x,fp.y)?(TOUCH?"🏛️ 버튼으로 국세청 들어가기":"스페이스: 국세청 들어가기"):nearCas(fp.x,fp.y)?(TOUCH?"🎰 버튼으로 도박장 들어가기":"스페이스: 도박장 들어가기"):nearClw(fp.x,fp.y)?(TOUCH?"🕹️ 버튼으로 오락실 들어가기":"스페이스: 오락실 들어가기"):nearPhb(fp.x,fp.y)?(TOUCH?"📸 버튼으로 인생네컷 들어가기":"스페이스: 인생네컷 들어가기"):(fishSpot(fp.x,fp.y)?(TOUCH?"🎣 버튼으로 던지기":"스페이스: 낚싯대 던지기"):"");if(tip){c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.92)";c.textAlign="center";const tw2=c.measureText(tip).width/2+4;c.fillText(tip,Math.max(tw2,Math.min(FW-tw2,fp.x)),fp.y+16);}}
   if(fstate==="bite"&&!TOUCH){c.font="bold 12px 'Noto Sans KR',sans-serif";c.fillStyle="#ff4757";c.textAlign="center";c.fillText("스페이스!",fp.x,fp.y+18);}}
@@ -2307,7 +2307,7 @@ function fishStep(dt,t){
     if(vx||vy){const l=Math.hypot(vx,vy),sp=(fBoat?.085:.11)*dt*(fJoyV?Math.max(.45,fJoyV.m):1);const nx=fp.x+vx/l*sp,ny=fp.y+vy/l*sp;if(wk(nx,ny)){fp.x=nx;fp.y=ny;}else if(wk(nx,fp.y))fp.x=nx;else if(wk(fp.x,ny))fp.y=ny;else fp.tx=null;if(vx)fp.dir=vx>0?1:-1;}}
   else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const bid=eqOf("bait"),fx=BAIT_FX[bid]||BAIT_FX.basic;fBaitPro=fx[1];if(bid!=="basic"){const bk=baitKey(bid);me[bk]=Math.max(0,(me[bk]|0)-1);if(!me[bk]){me.eq.bait="basic";saveMe();toast(`🪱 ${({mid:"중급",pro:"고급",max:"최고급"})[bid]} 미끼를 다 썼어요! 기본 미끼로 바뀌었어요`);}}fBite=(1500+Math.random()*4000)*fx[0];setFishBtn();}
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
-  else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
+  else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   {const B=$("fBoatBtn");if(B){{const L=$("fBridgeLock");if(L){const d=isOwner&&fArea&&bridgeAll?"block":"none";if(L.style.display!==d)L.style.display=d;}}
   const own=myBoat()?1:0;if(!own&&fBoat)boatLeave();const d=own&&(fBoat||(fstate==="idle"&&fp.y<=RIVER+34))?"block":"none",tx=fBoat?"⚓ 보트 내리기":"🚤 보트 타기";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fBoat);}}}
   if(fstate==="idle"&&!fBoat){if(!fArea&&fp.y<=DOCK.y+22&&fp.x>=DOCK.x+2&&fp.x<=DOCK.x+DOCK.w-2){if(bridgeAll||(isOwner&&bridgeOpen))fishArea(1,t);else if(isOwner)bridgeGate(t);}
@@ -2323,7 +2323,7 @@ function fTapOther(x,y){let best=null,bd=1e9;for(const id in fOthers){const o=fO
 function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id===myId)continue;const v=onlineMap[id];if(!v||now-(v.t||0)>180000){delete fOthers[id];continue;}
     const has=typeof v.fx==="number",sp=has?{x:v.fx,y:v.fy}:spawnOf(id);
     const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});{const pn=performance.now();if(o.tx!=null&&(sp.x!==o.tx||sp.y!==o.ty)){if((v.bt|0)>0&&o._rt!=null){const dm=Math.max(90,Math.min(450,pn-o._rt)),cl=q=>Math.max(-.12,Math.min(.12,q));o.vx=cl((sp.x-o.tx)/dm);o.vy=cl((sp.y-o.ty)/dm);}else{o.vx=0;o.vy=0;}o._rt=pn;}else if(o.tx==null)o._rt=pn;}o.tx=sp.x;o.ty=sp.y;o.dir=v.fd||1;o.bt=Math.min(2,v.bt|0);o.fa=v.fa|0;o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.rl=Math.min(50,v.rl|0);o.np=v.np||"";o.ak=Math.min(3,v.ak|0);o.ac=(typeof v.ac==="string"&&ACCS.some(x=>x[0]===v.ac))?v.ac:"";o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
-    if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if(o.fct||Date.now()-v.fc.t<8000)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=BIG_V?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
+    if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if((o.fct||Date.now()-v.fc.t<8000)&&(v.fa|0)===fArea)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({a:v.fa|0,x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=BIG_V?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
 function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
   if(fstate==="idle"&&nearNpc(fp.x,fp.y)){ic="🎁";tx="보상";}else if(fstate==="idle"&&nearFmk(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearShop(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearNts(fp.x,fp.y)){ic="🏛️";tx="국세청";}else if(fstate==="idle"&&nearCas(fp.x,fp.y)){ic="🎰";tx="도박장";}else if(fstate==="idle"&&nearClw(fp.x,fp.y)){ic="🕹️";tx="오락실";}else if(fstate==="idle"&&nearPhb(fp.x,fp.y)){ic="📸";tx="인생네컷";}else if(fstate==="idle"){ic="🎣";tx=can?"던지기":"강가로";cl=can?"":"off";}else if(fstate==="bite"){ic="❗";tx="당겨!";cl="bite";}else{ic="⏳";tx="기다려";cl="wait";}
@@ -2347,7 +2347,7 @@ function fishAction(){if(sessBlocked)return;if(!me||!me._loaded)return toast("�
   if(fstate==="idle"&&nearClw(fp.x,fp.y)){fp.tx=null;return openArcade();}
   if(fstate==="idle"&&nearPhb(fp.x,fp.y)){fp.tx=null;return openPhoto();}
   if(fstate==="idle"){if(!fishSpot(fp.x,fp.y))return;fp.tx=null;fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};setFishBtn();}
-  else if(fstate==="wait"){fstate="idle";fFloat.push({x:fp.x,y:fp.y,s:"너무 빨리 당겼다! 🐟💨",t,c:"#9fb3c8"});setFishBtn();}
+  else if(fstate==="wait"){fstate="idle";fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"너무 빨리 당겼다! 🐟💨",t,c:"#9fb3c8"});setFishBtn();}
   else if(fstate==="bite"){fstate="idle";setFishBtn();landFish(t);}}
 /* 낚시 경험치: 잡힐 확률에 반비례 (1만 원 물고기 확률 기준 5, 2배 드물면 10 …), 최소 5, 쓰레기는 0 */
 const FISH_TOTW=FISH.reduce((a,f)=>a+f[0],0);
@@ -2358,7 +2358,7 @@ function landFish(t){const i=rollFish(),[,base,name]=FISH[i];const tax=base>0?Ma
   me.fish=me.fish||{};const first=!hasSeen(me,i);me.fish[fKey(i)]=(me.fish[fKey(i)]||0)+1;me.fishN=(me.fishN||0)+1;if(base>=BIG_V)me.bigN=(me.bigN|0)+1;if(base<0){me.cash+=base;me.fishEarn=(me.fishEarn||0)+base;}
   let bonus="";if(!me.fishDone&&fishCountOf(me)===FISH.length){me.fishDone=true;me.cash+=100000000;bonus="\n🎉 도감 115종 완성! 보상 1억 원 지급!";broadcast(`🎉 ${myName()}님이 낚시 도감 115종을 모두 모았어요! (보상 1억 원)`);}
   const fx=fishExp(i);stAdd(base>0?"fishGoodN":"fishTrashN");if(base>0)stAdd("fishValue",base);stMax("fishBest",base);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
-  fFloat.push({x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":"")+(fx>0?` ⭐+${fx}`:""),t,c:base>=BIG_V?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
+  fFloat.push({a:fArea,x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":"")+(fx>0?` ⭐+${fx}`:""),t,c:base>=BIG_V?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
   fishFeed(myName(),name,base,i);if(fdb&&myId)fdb.ref("online/"+myId+"/fc").set({n:name,v:base,i,t:Date.now()}).catch(()=>{});
   const r=$("fishRes");r.innerHTML=`<div style="font-size:11px;color:var(--sub)">도감 ${dexNo(i)}번${first?' · <b style="color:#ffcf4d">✨ 신규 도감 등록!</b>':''}</div><div style="font-size:18.5px;font-weight:900;margin:4px 0">${esc(name)}</div><div class="${base<0?'down':'up'}" style="font-weight:700">${base<0?formatMoneyReadable(base)+" 손해... 💸":"시세 "+formatMoneyReadable(base)}</div>${base>0?`<div style="font-size:10px;color:var(--sub)">🐟 어시장에 팔면 ${formatMoneyReadable(got)} (수수료 10%) · <b style="color:#ffcf4d">⭐ +${fx} 경험치</b></div>`:''}${bonus?`<div style="color:#ffcf4d;font-weight:700;margin-top:4px;white-space:pre-line">${bonus.trim()}</div>`:''}`;
   r.classList.add("on");clearTimeout(landFish.t);landFish.t=setTimeout(()=>r.classList.remove("on"),2000);
@@ -2486,9 +2486,9 @@ function rpsSet(n){rpsVal=n|0;if(me)me.rps=rpsVal;if(fdb&&myId)fdb.ref("market/r
 {const w=setInterval(()=>{if(!fdb||!myId||!me||!me._loaded)return;clearInterval(w);fdb.ref("market/rps/"+myId).on("value",s=>{const v=s.val();if(v&&typeof v.n==="number"){rpsVal=v.n;if(me)me.rps=v.n;}else{const m=(me&&me.rps)|0;rpsVal=m;if(m)fdb.ref("market/rps/"+myId).set({n:m,t:Date.now()}).catch(()=>{});}});},300);}
 function rpsTick(){const rd=Math.floor(nowS()/RPS_MS);if(rpsLast===null){rpsLast=rd;return;}if(rd===rpsLast)return;const prev=rd-1;rpsLast=rd;
   if(!me||!me._loaded||!fishActive())return;const my=onPad(fp.x,fp.y);if(!my)return;stAdd("mcN");const ai=rpsPick(prev);const t=performance.now();
-  if(my===ai){fFloat.push({x:fp.x,y:fp.y,s:`🤝 비김 (${rpsN()}연승 유지)`,t,c:"#e5e7eb"});return;}
-  if(BT_BEATS[my]===ai){rpsSet(rpsN()+1);stAdd("mcWin");if(rpsN()>(me.rpsBest|0))me.rpsBest=rpsN();fFloat.push({x:fp.x,y:fp.y,s:`🎉 이겼다! ${rpsN()}연승`,t,c:"#fde047"});}
-  else{const was=rpsN();rpsSet(0);fFloat.push({x:fp.x,y:fp.y,s:was?`😢 졌다… ${was}연승 끊김`:"😢 졌다…",t,c:"#93c5fd"});}
+  if(my===ai){fFloat.push({a:fArea,x:fp.x,y:fp.y,s:`🤝 비김 (${rpsN()}연승 유지)`,t,c:"#e5e7eb"});return;}
+  if(BT_BEATS[my]===ai){rpsSet(rpsN()+1);stAdd("mcWin");if(rpsN()>(me.rpsBest|0))me.rpsBest=rpsN();fFloat.push({a:fArea,x:fp.x,y:fp.y,s:`🎉 이겼다! ${rpsN()}연승`,t,c:"#fde047"});}
+  else{const was=rpsN();rpsSet(0);fFloat.push({a:fArea,x:fp.x,y:fp.y,s:was?`😢 졌다… ${was}연승 끊김`:"😢 졌다…",t,c:"#93c5fd"});}
   fLastSent="";}
 setInterval(rpsTick,250);
 function rpsClaim(){const n=rpsN();if(!n)return toast("🎤 MC 가바보: 아직 연승이 없네요!\n발판에 서서 저를 이겨 보세요");const r=rpsReward(n);
