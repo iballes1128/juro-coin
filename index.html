@@ -520,15 +520,24 @@ function stAdd(k,v){if(!me)return;me.st=me.st||{};me.st[k]=(me.st[k]||0)+(v===un
 function stMax(k,v){if(!me)return;me.st=me.st||{};if(!(me.st[k]>=v))me.st[k]=v;}
 function stMin(k,v){if(!me)return;me.st=me.st||{};if(!(me.st[k]<=v))me.st[k]=v;}
 const ACH=[
- {g:"my",c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",100000],[7,"초심자",1000000],[30,"단골손님",3000000],[100,"개근왕",10000000],[365,"전설의 출석러",30000000]]},
- {g:"fish",c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",300000],[50,"숙련 낚시꾼",1000000],[75,"베테랑 낚시꾼",3000000],[100,"바다의 지배자",10000000]]},
- {g:"fish",c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000],[5,"월척 전문가",1000000],[10,"심해의 제왕",3000000],[30,"포세이돈",10000000]]},
- {g:"coin",c:"📈 코인 누적 수익률 (시작 자금 1000만 원 대비)",k:"pr",u:"%",tiers:[[50,"개미 투자자",300000],[100,"단타의 고수",1000000],[300,"차트 도사",3000000],[1000,"워렌 버핏",10000000],[3000,"월가의 전설",30000000]]},
- {g:"rps",c:"✊ 가위바위보 최고 연승 (무승부는 연승 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000],[3,"가위바위보 신동",500000],[5,"눈치 백단",1000000],[7,"독심술사",3000000],[10,"예언자",10000000],[15,"가위바위보의 신",30000000]]},
- {g:"rps",c:"⚔️ 가위바위보 누적 승리",k:"bwn",u:"승",tiers:[[10,"승부사",300000],[50,"배틀 마니아",1000000],[100,"결투의 달인",3000000],[300,"백전백승",10000000],[1000,"전설의 승부사",30000000]]},
- {g:"coin",c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",1000000],[1e9,"십억 부자",5000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
+ {g:"grow",c:"📅 출석",k:"att",u:"회",tiers:[[1,"뉴비",100000],[7,"초심자",1000000],[30,"단골손님",3000000],[100,"개근왕",10000000],[365,"전설의 출석러",30000000]]},
+ {g:"play",c:"📖 도감",k:"dex",u:"%",tiers:[[25,"초보 낚시꾼",300000],[50,"숙련 낚시꾼",1000000],[75,"베테랑 낚시꾼",3000000],[100,"바다의 지배자",10000000]]},
+ {g:"play",c:"🐋 대어 (1천만 원↑)",k:"big",u:"회",tiers:[[1,"대어 사냥꾼",300000],[5,"월척 전문가",1000000],[10,"심해의 제왕",3000000],[30,"포세이돈",10000000]]},
+ {g:"play",c:"📈 코인 누적 수익률 (시작 자금 1000만 원 대비)",k:"pr",u:"%",tiers:[[50,"개미 투자자",300000],[100,"단타의 고수",1000000],[300,"차트 도사",3000000],[1000,"워렌 버핏",10000000],[3000,"월가의 전설",30000000]]},
+ {g:"play",c:"✊ 가위바위보 최고 연승 (무승부는 연승 유지)",k:"bws",u:"연승",tiers:[[1,"첫 승리",100000],[3,"가위바위보 신동",500000],[5,"눈치 백단",1000000],[7,"독심술사",3000000],[10,"예언자",10000000],[15,"가위바위보의 신",30000000]]},
+ {g:"play",c:"⚔️ 가위바위보 누적 승리",k:"bwn",u:"승",tiers:[[10,"승부사",300000],[50,"배틀 마니아",1000000],[100,"결투의 달인",3000000],[300,"백전백승",10000000],[1000,"전설의 승부사",30000000]]},
+ {g:"tut",c:"🎣 처음 낚시하기",k:"t_fish",u:"회",tiers:[[1,"낚싯대 입문",50000]]},
+ {g:"tut",c:"🛒 코인 처음 사기",k:"t_buy",u:"회",tiers:[[1,"코인 입문",100000]]},
+ {g:"tut",c:"💵 코인 처음 팔기",k:"t_sell",u:"회",tiers:[[1,"매도 입문",100000]]},
+ {g:"tut",c:"🐟 어시장에 물고기 팔기",k:"t_fmk",u:"회",tiers:[[1,"생선 장수",50000]]},
+ {g:"tut",c:"⚒️ 낚싯대 처음 강화하기",k:"t_enh",u:"회",tiers:[[1,"대장장이 견습생",100000]]},
+ {g:"tut",c:"✊ 가위바위보 처음 하기",k:"t_rps",u:"회",tiers:[[1,"도전자",50000]]},
+ {g:"tut",c:"💸 친구에게 처음 송금하기",k:"t_send",u:"회",tiers:[[1,"인심 좋은 친구",50000]]},
+ {g:"tut",c:"🎖️ 칭호 달아 보기",k:"t_title",u:"회",tiers:[[1,"멋쟁이",50000]]},
+ {g:"grow",c:"💰 총자산",k:"money",u:"",tiers:[[1e8,"억만장자",1000000],[1e9,"십억 부자",5000000],[1e10,"재벌",30000000],[1e11,"거부",300000000],[1e12,"조만장자",3000000000]]}];
 const achId=(k,i)=>k+i;
-function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);if(k==="bws")return p.bwBest|0;if(k==="bwn")return p.bw|0;if(k==="money")return assetOf(p);return 0;}
+function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return Math.floor(fishCountOf(p)/FISH.length*100);if(k==="big")return p.bigN|0;if(k==="pr")return Math.floor((p.coinPnL||0)/START_CASH*100);const S=p.st||{};if(k==="t_fish")return Math.min(1,p.fishN|0);if(k==="t_buy")return(S.coinBuyN||Object.values(p.coins||{}).some(h=>h&&(h.count>0||h.cost>0))||p.coinPnL||p.bestPR)?1:0;if(k==="t_sell")return(S.coinSellN||p.coinPnL||p.bestPR)?1:0;if(k==="t_fmk")return S.fmkN?1:0;if(k==="t_enh")return(S.enhN||(p.rodLv|0)>0)?1:0;if(k==="t_rps")return((p.bw|0)+(p.bl|0)+(p.bd|0)+(S.btN|0))?1:0;if(k==="t_send")return S.sendN?1:0;if(k==="t_title")return p.title?1:0;
+  if(k==="bws")return p.bwBest|0;if(k==="bwn")return p.bw|0;if(k==="money")return assetOf(p);return 0;}
 const titleOf=id=>{for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i][1];return "";};
 const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title):"";
 const achNoted={};
@@ -542,7 +551,7 @@ setInterval(achCheck,5000);
 function fmtNeed(a,need){return a.k==="money"?formatMoneyReadable(need):need+a.u;}
 function achLeft(a,v,need){if(a.k==="dex"){const c=fishCountOf(me),nc=Math.ceil(need*FISH.length/100-1e-9);return `${Math.max(0,nc-c)}종 남음 (${nc}종 모으면 달성)`;}if(a.k==="money")return formatMoneyReadable(need-v)+" 남음";if(a.k==="pr")return `${formatMoneyReadable(need/100*START_CASH-((me&&me.coinPnL)||0))} 더 벌면 달성`;return (need-v)+a.u+" 남음";}
 /* 업적 분류: 위에 분류 버튼(마이·코인·낚시·가위바위보·기타), 누른 분류의 업적만 보임. 새 업적은 g만 정해 주면 알아서 들어감 */
-const ACH_G=[["my","👤 마이"],["coin","📈 코인"],["fish","🎣 낚시"],["rps","✊ 가위바위보"],["etc","🎲 기타"]];
+const ACH_G=[["tut","📘 튜토리얼"],["play","🎮 플레이"],["grow","🌱 성장"],["etc","🎲 기타"]];
 let achTab=(()=>{try{return localStorage.getItem("jc_achTab")||"";}catch(e){return "";}})();
 function achCard(a){const v=achVal(a.k),got=a.tiers.filter((t,i)=>me&&me.ach&&me.ach[achId(a.k,i)]),ni=a.tiers.findIndex((t,i)=>!(me&&me.ach&&me.ach[achId(a.k,i)])),nx=ni>=0?a.tiers[ni]:null;
       const pc=nx?Math.min(100,Math.floor(v/nx[0]*100)):100;const cur=a.k==="money"?formatMoneyReadable(v):a.k==="dex"?`${fishCountOf(me)}/${FISH.length}종 (${v}%)`:a.k==="pr"?`${v>=0?"+":""}${v}% (${formatMoneyReadable((me&&me.coinPnL)||0)})`:v+a.u;
@@ -552,12 +561,13 @@ function achCard(a){const v=achVal(a.k),got=a.tiers.filter((t,i)=>me&&me.ach&&me
         <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:8px;background:var(--card2);border-radius:4px;overflow:hidden"><div style="height:100%;width:${pc}%;background:var(--acc)"></div></div><b style="font-size:12px;min-width:38px;text-align:right">${pc}%</b></div>`
         :`<div style="text-align:center;font-weight:900;padding:6px 0">👑 모두 달성!</div>`)+`</div>`;}
 function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach||{});const has=me&&me.ach||{},total=ACH.reduce((n,a)=>n+a.tiers.length,0),done=ACH.reduce((n,a)=>n+a.tiers.filter((t,i)=>has[achId(a.k,i)]).length,0);
-    const G=ACH_G.filter(([gk])=>ACH.some(a=>(a.g||"etc")===gk)),rdy=gk=>ACH.filter(a=>(a.g||"etc")===gk).filter(a=>{const x=achNext(a);return x&&x.ready;}).length;
+    const G=ACH_G,rdy=gk=>ACH.filter(a=>(a.g||"etc")===gk).filter(a=>{const x=achNext(a);return x&&x.ready;}).length;
     if(!G.some(([gk])=>gk===achTab))achTab=(G.find(([gk])=>rdy(gk))||G[0]||[""])[0];
     const L=ACH.filter(a=>(a.g||"etc")===achTab);
+    S.style.minHeight="calc(86vh - 90px)";/* 분류마다 업적 수가 달라도 창 크기·버튼 위치가 안 바뀌게 */
     S.innerHTML=`<div class="card" style="text-align:center"><div style="font-size:12px;color:var(--sub)">달성한 업적</div><b style="font-size:20px">${done} / ${total}</b><div style="font-size:11px;color:var(--sub);margin-top:4px">목표를 달성하면 🎁 보상 받기 · 받은 칭호는 👤 마이 → 🎖️ 칭호에서 달 수 있어요</div></div>`+
     `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">${G.map(([gk,gn])=>{const n=rdy(gk),on=gk===achTab;return `<button data-achg="${gk}" style="position:relative;flex:1;min-width:64px;padding:10px 4px;border-radius:10px;font-weight:900;font-size:12.5px;background:${on?"var(--acc)":"var(--card2)"};color:${on?"#111":"var(--tx)"}">${gn}${n?`<span style="position:absolute;top:-5px;right:-3px;background:var(--up);color:#fff;font-size:9.5px;border-radius:9px;padding:1px 6px">${n}</span>`:""}</button>`;}).join("")}</div>`+
-    L.map(achCard).join("");
+    (L.length?L.map(achCard).join(""):`<div style="color:var(--sub);text-align:center;padding:40px 0;font-size:13px">아직 업적이 없어요</div>`);
     S.querySelectorAll("[data-achc]").forEach(b=>b.onclick=()=>achClaim(b.dataset.achc));
     S.querySelectorAll("[data-achg]").forEach(b=>b.onclick=()=>{achTab=b.dataset.achg;try{localStorage.setItem("jc_achTab",achTab);}catch(e){}renderAch();});}
   const T=$("s-title");if(T&&pgCur==="my"&&pgSub==="title"){const own=[];for(const a of ACH)a.tiers.forEach(([need,nm],i)=>{const id=achId(a.k,i);if(me&&me.ach&&me.ach[id])own.push([id,nm,a.c]);});const cur=(me&&me.title&&me.ach&&me.ach[me.title])?me.title:"";
