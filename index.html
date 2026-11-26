@@ -276,6 +276,7 @@ nav button.on{color:var(--tx);font-weight:700}
     <div class="card"><h3>💰 돈 지급</h3>
       <select id="admUser"></select>
       <div class="l"><button class="a" id="admSign" style="flex:none;width:52px">＋ 지급</button><input id="admAmt" inputmode="numeric" placeholder="금액(원)"><button class="a" id="admGive" style="flex:none;width:64px">지급</button></div>
+      <div class="l" style="margin-top:6px"><select id="admGK" style="flex:1"><option value="acc">🎀 악세사리</option><option value="aura">✨ 오라</option><option value="wing">🪽 날개</option><option value="plate">🏷️ 명찰</option><option value="skin">🧑 스킨</option></select><select id="admGI" style="flex:2"></select><button class="a" id="admGrant" style="flex:none;width:64px">🎁 지급</button></div>
       <div class="l"><button class="a" id="admOfRestore" style="flex:1">🏢 선택한 사람에게 기본 사무실 다시 지급</button></div>
     </div>
     <div class="card"><h3>👥 플레이어 관리</h3>
@@ -1099,6 +1100,17 @@ let admNeg=false;$("admSign").onclick=()=>{admNeg=!admNeg;$("admSign").textConte
 $("admGive").onclick=async()=>{const id=$("admUser").value,raw=parseInt(($("admAmt").value||"").replace(/[,\s-]/g,""),10),amt=isNaN(raw)?NaN:(admNeg?-Math.abs(raw):Math.abs(raw))*(($("admAmt").value||"").trim().startsWith("-")&&!admNeg?-1:1);if(!id||isNaN(amt))return toast("⚠️ 사람과 금액을 확인해주세요");
   if(id===myId){me.cash+=amt;saveMe();}else{const p=players[id];if(!p)return;try{await fdb.ref("players/"+id+"/cash").set((p.cash||0)+amt);}catch(e){return toast("지급 실패");}}
   $("admAmt").value="";const nm=id===myId?myName():(players[id].name||"");if(id!==myId&&fdb)fdb.ref("market/adminMsg/"+id).set({amt,t:Date.now(),k:Math.random().toString(36).slice(2,9)}).catch(()=>{});toast(amt<0?"회수 완료":"지급 완료");renderAll();};
+/* 관리자: 선택한 사람에게 악세사리·오라·날개·명찰·스킨 지급 (서버에서 한 번에 고치고 ver도 올려서, 오래된 기기가 덮어쓰지 못하게 해요) */
+function admGrantList(k){if(k==="acc")return ACCS.map(a=>[a[0],a[2]+" "+a[1]]);if(k==="skin")return CH_ORDER.map(v=>[String(v),CHARS[v][0]]);return((COS[k]||{}).list||[]).map(x=>[x[0],x[1]]);}
+function admGrantFill(){const k=$("admGK").value;$("admGI").innerHTML=admGrantList(k).map(([i,n])=>`<option value="${esc(i)}">${esc(n)}</option>`).join("");}
+function admGrantApply(d,k,i){if(k==="acc"){d.acc=d.acc||{};d.acc[i]=true;}else if(k==="skin"){d.skins=d.skins||{};d.skins["s"+i]=true;}else{d.cos=d.cos||{};d.cos[k+"_"+i]=true;}}
+$("admGK").onchange=admGrantFill;
+$("admGrant").onclick=async()=>{const id=$("admUser").value,k=$("admGK").value,i=$("admGI").value;if(!id||!i)return;const nm=($("admGI").selectedOptions[0]||{}).textContent||i;
+  if(id===myId){admGrantApply(me,k,i);saveMe();renderAll();return toast("🎁 지급 완료: "+nm);}
+  const p=players[id];if(!p)return toast("플레이어를 찾을 수 없어요");if(!fdb)return toast("서버에 연결되지 않았어요");
+  try{const r=await fdb.ref("players/"+id).transaction(cur=>{if(!cur)return cur;admGrantApply(cur,k,i);cur.ver=(cur.ver|0)+1;return cur;});
+    if(r&&r.committed&&r.snapshot&&r.snapshot.val())toast(`🎁 ${esc(p.name||"")}님께 지급 완료: ${nm}`);else toast("지급하지 못했어요. 다시 시도해 주세요");}
+  catch(e){toast("지급 실패 ("+String((e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}};
 $("admReset").onclick=async()=>{if(!confirmReset())return;const t=Date.now();
   for(const[id,p]of Object.entries(players)){if(id===myId)continue;let sum=0;for(const n in(p.coins||{}))sum+=p.coins[n].cost||0;try{await fdb.ref("players/"+id).update({cash:(p.cash||0)+sum,coins:null,t});}catch(e){}}
   let s=0;for(const n in me.coins)s+=me.coins[n].cost||0;me.cash+=s;me.coins={};saveMe();
@@ -1108,7 +1120,7 @@ let resetArm=0;function confirmReset(){if(Date.now()-resetArm<4000)return true;r
 let sugList=[],sugOn=false;function sugListen(){if(sugOn||!fdb||!isOwner)return;sugOn=true;fdb.ref("market/suggest").limitToLast(200).on("value",s=>{const v=s.val()||{};sugList=Object.entries(v).map(([k,x])=>({k,...x})).sort((a,b)=>(b.t||0)-(a.t||0));renderSug();});}
 function renderSug(){const B=$("sugBox");if(!B)return;B.innerHTML=sugList.length?sugList.map(x=>`<div style="padding:8px 2px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub)"><b style="color:var(--tx)">${esc(x.name||"?")}</b><span>${x.t?new Date(x.t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):""} <button data-sugdel="${x.k}" style="margin-left:6px;font-size:10.5px;color:var(--up)">삭제</button></span></div><div style="font-size:12.5px;white-space:pre-wrap;margin-top:3px">${esc(x.text||"")}</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">아직 건의가 없어요</div>';
   B.querySelectorAll("[data-sugdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더";return;}fdb.ref("market/suggest/"+b.dataset.sugdel).remove().catch(()=>toast("삭제 실패"));});}
-function renderAdmin(){if(!isOwner)return;sugListen();renderSug();const s=$("admCoin");if(!s.options.length)s.innerHTML=COINS.map(c=>`<option>${c[0]}</option>`).join("");
+function renderAdmin(){try{if($("admGI")&&!$("admGI").options.length)admGrantFill();}catch(e){}if(!isOwner)return;sugListen();renderSug();const s=$("admCoin");if(!s.options.length)s.innerHTML=COINS.map(c=>`<option>${c[0]}</option>`).join("");
   const u=$("admUser"),v=u.value,all={...players};if(myId)all[myId]=me;u.innerHTML='<option value="">받는 사람</option>'+Object.entries(all).map(([id,p])=>`<option value="${id}">${esc(p.name||'이름없음')}</option>`).join("");u.value=v;renderAdmPlayers();}
 let delArm={};function agoTxt(t){if(!t)return"기록 없음";const m=Math.floor((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.floor(m/60)+"시간 전":Math.floor(m/1440)+"일 전";}
 function renderAdmPlayers(){const box=$("admPlayers");if(!box)return;const all={...players};if(myId&&me)all[myId]=me;
