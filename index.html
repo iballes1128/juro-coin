@@ -1159,7 +1159,7 @@ FISH.forEach(f=>{f[0]*=f[1]>=1e8?.4:f[1]>=1e7?.5:f[1]>=1e6?.35:1;}); // 밸런�
 {const G=FISH.map((f,i)=>i).filter(i=>FISH[i][1]>0),ws=G.map(i=>FISH[i][0]).sort((a,b)=>b-a),byP=G.slice().sort((a,b)=>FISH[a][1]-FISH[b][1]||a-b);byP.forEach((i,k)=>FISH[i][0]=ws[k]);const grp={};byP.forEach(i=>(grp[FISH[i][1]]=grp[FISH[i][1]]||[]).push(i));for(const v in grp){const g=grp[v],av=g.reduce((a,i)=>a+FISH[i][0],0)/g.length;g.forEach(i=>FISH[i][0]=av);}} // 비쌀수록 드물게
 /* 대어 시세는 원래대로 (11/26 되돌림) */
 const BIG_V=10000000; // 대어 기준 (1천만 원 이상)
-FISH.forEach(f=>{if(f[1]>=1e7)f[0]*=1.15;else if(f[1]>=1e5)f[0]*=1.5;}); // 11/26: 10만~1천만 원 물고기 ×1.5, 대어(1천만↑) ×1.15 (낚싯대·미끼 보정은 그대로 얹힘)
+FISH.forEach(f=>{if(f[1]>=1e7)f[0]*=1.4;else if(f[1]>=1e5)f[0]*=1.5;}); // 11/26: 10만~1천만 원 물고기 ×1.5, 대어(1천만↑) ×1.4 (낚싯대·미끼 보정은 그대로 얹힘)
 const DEX_ORDER=FISH.map((f,i)=>i).sort((a,b)=>(FISH[a][3]||FISH[a][1])-(FISH[b][3]||FISH[b][1])||a-b),DEXNO=[];DEX_ORDER.forEach((i,k)=>DEXNO[i]=k+1);const dexNo=i=>DEXNO[i]; // 도감 번호 = 가격순
 const FISH_TOTAL=FISH.reduce((s,f)=>s+f[0],0);
 const GEAR={rod:{n:"낚싯대",i:"🎣",list:[["basic","기본 낚싯대",0,"기본으로 지급돼요"]]},bait:{n:"미끼",i:"🪱",list:[["basic","기본 미끼",0,"입질까지 1.5~5.5초"],["mid","중급 미끼",1000000,"입질 20% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.3%p · 100개 묶음",100],["pro","고급 미끼",2000000,"입질 30% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.5%p · 100개 묶음",100],["max","최고급 미끼",3000000,"입질 40% 빨라짐 · 좋은 물고기(10만 원↑) 확률 +0.7%p · 100개 묶음",100]]}};
