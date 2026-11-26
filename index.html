@@ -1069,6 +1069,57 @@ async function ltClaimTick(){if(!fdb||!me||!me._loaded||!me.lt)return;const R=lt
       const q=pr.rk||{},parts=[1,2,3,4].filter(x=>q[x]).map(x=>`${x}등 ${q[x]}장`);
       toast(pr.v?`🎟️ 세금 재원이 부족해 추첨이 취소됐어요 · ${formatMoneyReadable(pr.amt)} 환불`:pr.amt>0?`🎟️ 로또 당첨! ${parts.join(" · ")} → +${formatMoneyReadable(pr.amt)}`:`🎟️ 로또 결과: 아쉽게 꽝이에요`);
       if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();}catch(e){ltDbg="당첨금 확인 오류: "+String((e&&e.code)||(e&&e.message)||e).slice(0,60);}}}
+
+/* ===== 🎰 로또 생방송 추첨: 정각에 공이 하나씩 굴러 나와요 (10초 전 알림) ===== */
+var ltLv={r:0,on:0,raf:0,balls:null,lastR:0,banOff:0};
+const LT_COL=n=>n<=5?"#f59e0b":n<=10?"#3b82f6":n<=15?"#ef4444":"#22c55e";
+const LT_REV0=5000,LT_REVG=3500,LT_ROLL=1500;
+function ltLvB(){return (ltLv.r+1)*LT_H;}
+function ltLvInit(){const a=[];for(let n=1;n<=LT_N;n++){const g=Math.random()*6.28,d=Math.random()*70;a.push({n,x:170+Math.cos(g)*d,y:135+Math.sin(g)*d,vx:(Math.random()-.5)*4,vy:(Math.random()-.5)*4,out:0});}ltLv.balls=a;}
+function ltLvStep(){const B=ltLv.balls,cx=170,cy=135,R=104,r=13;
+  for(const b of B){if(b.out)continue;b.vy+=.12;if(b.y>cy+25)b.vy-=.5*Math.random();b.vx+=(Math.random()-.5)*.45;b.vx*=.995;b.vy*=.995;const sp=Math.hypot(b.vx,b.vy);if(sp>6){b.vx*=6/sp;b.vy*=6/sp;}b.x+=b.vx;b.y+=b.vy;
+    const dx=b.x-cx,dy=b.y-cy,d=Math.hypot(dx,dy)||1;if(d>R-r){const nx=dx/d,ny=dy/d;b.x=cx+nx*(R-r);b.y=cy+ny*(R-r);const dot=b.vx*nx+b.vy*ny;if(dot>0){b.vx-=1.8*dot*nx;b.vy-=1.8*dot*ny;}}}
+  for(let i=0;i<B.length;i++){const p=B[i];if(p.out)continue;for(let j=i+1;j<B.length;j++){const q=B[j];if(q.out)continue;const dx=q.x-p.x,dy=q.y-p.y,d=Math.hypot(dx,dy);if(d<2*r&&d>0){const nx=dx/d,ny=dy/d,ov=(2*r-d)/2;p.x-=nx*ov;p.y-=ny*ov;q.x+=nx*ov;q.y+=ny*ov;const dv=(q.vx-p.vx)*nx+(q.vy-p.vy)*ny;if(dv<0){p.vx+=dv*nx;p.vy+=dv*ny;q.vx-=dv*nx;q.vy-=dv*ny;}}}}}
+function ltLvBall(c,x,y,r,n,sc){c.save();c.translate(x,y);c.scale(sc||1,sc||1);c.beginPath();c.arc(0,0,r,0,7);c.fillStyle=LT_COL(n);c.fill();c.lineWidth=1;c.strokeStyle="rgba(0,0,0,.35)";c.stroke();c.beginPath();c.ellipse(-r*.35,-r*.4,r*.35,r*.22,-.6,0,7);c.fillStyle="rgba(255,255,255,.55)";c.fill();c.fillStyle="#fff";c.strokeStyle="rgba(0,0,0,.5)";c.lineWidth=2.4;c.font="900 "+Math.round(r*.95)+"px 'Noto Sans KR',sans-serif";c.textAlign="center";c.textBaseline="middle";c.strokeText(n,0,1);c.fillText(n,0,1);c.restore();}
+function ltLvDraw(){const cv=$("ltLvC");if(!cv)return;const c=cv.getContext("2d"),k=cv.width/340,now=bankNow(),B=ltLvB(),R=ltRes&&ltRes.r===ltLv.r?ltRes:null,seq=R&&!R.v&&Array.isArray(R.n)?R.n.concat([R.b]):null;
+  c.setTransform(k,0,0,k,0,0);c.clearRect(0,0,340,400);const bg=c.createLinearGradient(0,0,0,400);bg.addColorStop(0,"#1e1b4b");bg.addColorStop(1,"#0f172a");c.fillStyle=bg;c.fillRect(0,0,340,400);
+  /* 공이 나온 시각에 맞춰 통에서 뺌 */
+  const rev=seq?seq.map((n,i)=>({n,t:B+LT_REV0+i*LT_REVG})):[];
+  for(const v of rev)if(now>=v.t){const b=ltLv.balls.find(x=>x.n===v.n);if(b&&!b.out)b.out=1;}
+  ltLvStep();
+  /* 통 */
+  c.beginPath();c.arc(170,135,106,0,7);c.fillStyle="rgba(255,255,255,.07)";c.fill();c.lineWidth=3;c.strokeStyle="rgba(255,255,255,.35)";c.stroke();
+  for(const b of ltLv.balls)if(!b.out)ltLvBall(c,b.x,b.y,13,b.n);
+  c.beginPath();c.arc(170,135,106,3.6,4.9);c.lineWidth=4;c.strokeStyle="rgba(255,255,255,.35)";c.stroke();
+  /* 받침대와 배출구 */
+  c.fillStyle="#475569";c.beginPath();c.moveTo(120,236);c.lineTo(220,236);c.lineTo(205,262);c.lineTo(135,262);c.closePath();c.fill();c.fillStyle="#0f172a";c.fillRect(160,236,20,26);
+  /* 쟁반 */
+  const sx=[40,98,156,214,296];c.fillStyle="rgba(255,255,255,.08)";c.beginPath();c.roundRect?c.roundRect(14,300,312,70,14):c.rect(14,300,312,70);c.fill();
+  sx.forEach((x,i)=>{c.beginPath();c.arc(x,335,19,0,7);c.fillStyle="rgba(0,0,0,.35)";c.fill();c.strokeStyle=i===4?"#60a5fa":"rgba(255,255,255,.2)";c.lineWidth=1.5;c.stroke();});
+  c.fillStyle="#94a3b8";c.font="800 12px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText("+",255,340);c.font="700 9px 'Noto Sans KR',sans-serif";c.fillStyle="#60a5fa";c.fillText("보너스",296,364);
+  for(let i=0;i<rev.length;i++){const v=rev[i];if(now<v.t)continue;const p=Math.min(1,(now-v.t)/LT_ROLL);
+    if(p<1){const e=p*p*(3-2*p),x=170+(sx[i]-170)*e,y=250+(335-250)*e-Math.sin(p*3.14)*26;ltLvBall(c,x,y,13+6*e,v.n,1);}else ltLvBall(c,sx[i],335,19,v.n,1);}
+  /* 안내 문구 */
+  c.fillStyle="#fff";c.font="900 15px 'Noto Sans KR',sans-serif";c.textAlign="center";
+  const left=B-now;let msg="";if(left>0)msg=`추첨까지 ${Math.ceil(left/1000)}초`;else if(!R&&now-B<10000)msg="추첨 준비 중…";else if(!R)msg="이번 회차는 구매자가 없었어요";else if(R.v)msg="재원 부족으로 추첨이 취소됐어요";else{const done=now>=B+LT_REV0+4*LT_REVG+LT_ROLL;msg=done?"🎉 추첨 끝!":`${rev.filter(v=>now>=v.t).length}번째 공 추첨 중…`;}
+  c.fillText(msg,170,392);}
+function ltLvInfo(){const d=$("ltLvInfo");if(!d)return;const now=bankNow(),B=ltLvB(),R=ltRes&&ltRes.r===ltLv.r?ltRes:null,done=R&&!R.v&&now>=B+LT_REV0+4*LT_REVG+LT_ROLL;
+  const T=$("ltLvT");if(T)T.textContent=`🎰 ${ltNo(ltLv.r)}회차 추첨 생방송`;
+  if(!done){d.innerHTML=`<div style="font-size:11.5px;color:var(--sub);text-align:center;padding:8px 0">공이 나오는 순서대로 번호가 채워져요 · 4개 + 보너스 1개</div>`;return;}
+  const mt=ltMyOf(ltLv.r),dd={n:R.n,b:R.b},rc=[0,0,0,0,0];mt.forEach(s=>{rc[ltRank(s,dd)]++;});const nm=L=>(L||[]).map(x=>esc(typeof x==="string"?x:x.n)).join(", ");
+  d.innerHTML=`<div style="font-size:12px;line-height:1.8;margin-top:6px"><div>🥇 1등 ${R.w1||0}장${R.a1&&R.a1.length?` (${nm(R.a1)})`:""} · 🥈 2등 ${R.w2||0}장${R.a2&&R.a2.length?` (${nm(R.a2)})`:""}</div><div>🥉 3등 ${R.w3||0}장 · 4등 ${R.w4||0}장 <span style="color:var(--sub)">(모든 사람 합계)</span></div>${mt.length?`<div style="margin-top:4px;padding:8px 10px;background:var(--card);border-radius:10px">🎟️ 내 표 ${mt.length}장 → <b style="color:#fbbf24">1등 ${rc[1]}</b> · <b style="color:#fbbf24">2등 ${rc[2]}</b> · <b style="color:#4ade80">3등 ${rc[3]}</b> · <b style="color:#4ade80">4등 ${rc[4]}</b> · 꽝 ${rc[0]}</div>`:`<div style="color:var(--sub);margin-top:4px">이번 회차에 산 표가 없어요</div>`}</div>`;}
+function ltMyOf(r){const e=me&&me.lt&&me.lt["r"+r];if(e)return ltTL(e);const h=(Array.isArray(me&&me.lth)?me.lth:[]).find(x=>x&&x.r===r);return h?ltTL(h):[];}
+function ltLvLoop(){if(!ltLv.on)return;try{ltLvDraw();}catch(e){}ltLv.raf=requestAnimationFrame(ltLvLoop);}
+function ltLiveOpen(r){try{ltListen();}catch(e){}ltLv.r=r;ltLv.on=1;ltLvInit();let d=$("ltLive");if(!d){d=document.createElement("div");d.id="ltLive";d.className="btBg";d.style.zIndex=96;const k=Math.min(2,window.devicePixelRatio||1);d.innerHTML=`<div class="btBox" style="max-width:380px;padding:12px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b id="ltLvT" style="font-size:15px"></b><button id="ltLvX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div><canvas id="ltLvC" width="${340*k}" height="${400*k}" style="width:100%;max-width:340px;display:block;margin:0 auto;border-radius:14px"></canvas><div id="ltLvInfo"></div></div>`;document.body.appendChild(d);d.onclick=e=>{if(e.target===d||e.target.id==="ltLvX"){d.style.display="none";ltLv.on=0;cancelAnimationFrame(ltLv.raf);}};}
+  d.style.display="flex";const b=$("ltBan");if(b)b.style.display="none";ltLv.banOff=bankNow();ltLvInfo();cancelAnimationFrame(ltLv.raf);ltLvLoop();}
+function ltLiveTick(){try{if(!me||!me._loaded)return;const now=bankNow(),R=ltRound(now),left=(R+1)*LT_H-now;
+  if(ltLv.lastR&&ltLv.lastR!==R)setTimeout(()=>{try{ltDrawTick();}catch(e){}},Math.random()*1200);ltLv.lastR=R;
+  if(ltLv.on)ltLvInfo();
+  let tr=0;if(left<=10000)tr=R;else if(now-R*LT_H<30000)tr=R-1;if(tr<LT_R0)tr=0;
+  let b=$("ltBan");if(!tr||(ltLv.on&&ltLv.r===tr)||(ltLv.banOff&&ltLv.banOff>(tr+1)*LT_H-12000&&ltLv.banOff<(tr+1)*LT_H+40000)){if(b)b.style.display="none";return;}
+  if(!b){b=document.createElement("button");b.id="ltBan";b.style.cssText="position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:95;padding:11px 18px;border-radius:14px;background:linear-gradient(90deg,#f59e0b,#ef4444);color:#fff;font-weight:900;font-size:13.5px;box-shadow:0 6px 24px rgba(0,0,0,.5);max-width:92vw;white-space:nowrap;display:none";document.body.appendChild(b);}
+  b.onclick=()=>ltLiveOpen(+b.dataset.r);b.dataset.r=tr;const L=(tr+1)*LT_H-now;b.textContent=L>0?`🎰 ${ltNo(tr)}회차 로또 추첨 ${Math.ceil(L/1000)}초 전! 눌러서 보기`:`🎰 ${ltNo(tr)}회차 추첨 중! 눌러서 보기`;b.style.display="block";}catch(e){}}
+setInterval(ltLiveTick,500);
 setInterval(()=>{try{if(!me||!me._loaded)return;ltListen();ltWatchRound();ltDrawTick();ltClaimTick();}catch(e){}},20000);
 setTimeout(()=>{try{if(me&&me._loaded){ltListen();ltWatchRound();ltDrawTick();ltClaimTick();}}catch(e){}},6000);
 /* 사기 */
