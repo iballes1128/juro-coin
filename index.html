@@ -4501,7 +4501,7 @@ function ofDrawFloorItem(c,it,seatMap,t){const d=OF_IM[it.k];const f=ofFt(it);co
   if(cat==="c"&&sm!==undefined)r=sm.dir;
   if(cat==="m"&&sm!==undefined)r=sm.dir;/* 모니터 화면은 앉은 사람 쪽 */
   /* 모니터를 직원 맞은편에서 본 모습(뒷면) */
-  if(cat==="m"&&sm!==undefined&&sm.dir===2){ofSpriteDraw(c,it.k,p.x,p.y,w,h,0);c.fillStyle="#222836";for(let i=0;i<f.w;i++){c.beginPath();c.roundRect(p.x+i*OF_CS+6,p.y+7,OF_CS-12,OF_CS*.62,3);c.fill();c.fillStyle="#58627a";c.beginPath();c.arc(p.x+i*OF_CS+OF_CS/2,p.y+OF_CS*.38,2.4,0,7);c.fill();c.fillStyle="#222836";}return;}
+  if(cat==="m"&&sm!==undefined&&sm.dir===2){for(let i=0;i<f.w;i++){const bx=p.x+i*OF_CS;c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.roundRect(bx+7,p.y+OF_CS*.78,OF_CS-14,5,2);c.fill();c.fillStyle="#6b7490";c.fillRect(bx+OF_CS/2-4,p.y+OF_CS*.55,8,OF_CS*.25);c.fillStyle="#4f5875";c.strokeStyle="#161b28";c.lineWidth=1.4;c.beginPath();c.roundRect(bx+3,p.y+4,OF_CS-6,OF_CS*.6,4);c.fill();c.stroke();c.fillStyle="#7f89a8";c.beginPath();c.arc(bx+OF_CS/2,p.y+4+OF_CS*.3,2.8,0,7);c.fill();c.strokeStyle="rgba(0,0,0,.3)";c.lineWidth=1;c.beginPath();for(let k=0;k<3;k++){c.moveTo(bx+8,p.y+OF_CS*.5+k*2.2-1);c.lineTo(bx+OF_CS-8,p.y+OF_CS*.5+k*2.2-1);}c.stroke();}return;}
   if(cat==="c")r=(r+2)%4;/* 등받이는 앉은 사람 뒤쪽 */
   ofSpriteDraw(c,it.k,p.x,p.y,w,h,r);
   if(ofS.mode==="place"&&(cat==="c"||cat==="m"))ofFaceArrow(c,p.x+w/2,p.y+h/2,cat==="c"?(it.r|0):((it.r|0)+2)%4,cat==="c"?"#fde047":"#67e8f9");}
