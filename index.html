@@ -3808,7 +3808,7 @@ function ofListHtml(){const L=ofAll(),mi=L.find(x=>x.mine),rent=!!(me&&me.of);
   if(mi)h+=`<div style="font-size:12px;font-weight:800;color:#fde68a;margin:12px 0 6px">⭐ 내 사무실</div>`+ofRowHtml(mi,true);
   h+=`<div style="font-size:12px;font-weight:800;color:var(--sub);margin:12px 0 6px">🏆 전체 순위</div>`;
   const R=L.filter(x=>!x.mine);h+=R.length?R.map(x=>ofRowHtml(x,false)).join(""):`<div style="padding:18px;text-align:center;color:var(--sub);font-size:12.5px">${mi?"아직 다른 사무실이 없어요":"아직 임대한 사무실이 없어요"}</div>`;return h;}
-function openOfficeList(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};let d=$("ofListMod");
+function openOfficeList(){if(!isOwner)return toast("🚧 주로컴퍼니는 아직 구현 중이에요");if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};let d=$("ofListMod");
   if(!d){d=document.createElement("div");d.id="ofListMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.addEventListener("keydown",e=>e.stopPropagation());
     d.onclick=e=>{if(e.target===d)d.style.display="none";};d.innerHTML='<div class="btBox" style="max-width:420px" id="ofListBox"></div>';}
   ofListRender();d.style.display="flex";}
@@ -4049,7 +4049,7 @@ function ofChips(){const o=ofS.o,c=$("ofChips");if(!o||!c)return;const L=ofL(o);
   const pi=$("ofPaintInfo");if(pi)pi.textContent="칠하는 중 · 쓴 돈 "+formatMoneyReadable(ofS.paintCost|0);}
 /* ---------- 들어가기 / 나가기 ---------- */
 function ofVisitorsN(id){return Object.keys(onlineMap||{}).filter(k=>k!==id&&k!==myId&&onlineMap[k]&&onlineMap[k].fo===id&&Date.now()-(onlineMap[k].t||0)<180000).length;}
-function ofEnterScene(id){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const mine=id===myId,p=mine?me:players[id];if(!mine)return toast("🚧 다른 사람의 사무실 방문은 아직 구현 중이에요");if(!p||!p.of)return toast("사무실이 없어요");
+function ofEnterScene(id){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const mine=id===myId,p=mine?me:players[id];if(!isOwner||!mine)return toast("🚧 주로컴퍼니는 아직 구현 중이에요");if(!p||!p.of)return toast("사무실이 없어요");
   if(!mine&&ofVisitorsN(id)>=OF_VIS)return toast(`🏢 방문자가 가득 찼어요 (최대 ${OF_VIS}명)`);
   fKeys={};ofBuildDom();ofS.own=id;ofS.mine=mine;ofS.o=p.of;ofS.mode="view";ofS.ghost=null;ofS.held=null;ofS.tx=null;ofS.want=null;ofS.keys={};ofS.dir=1;
   if(mine)ofSettle(me.of,ofNow());const sp=ofSpawn(p.of);ofS.px=sp.x;ofS.py=sp.y;ofIn=id;$("ofMod").style.display="flex";$("ofChips").dataset.h="";
