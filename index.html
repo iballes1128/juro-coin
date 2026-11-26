@@ -960,11 +960,11 @@ function setMode(m){mode=m;document.querySelectorAll(".bs button").forEach(b=>b.
 document.querySelectorAll(".bs button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 $("qty").oninput=()=>renderSheet();
 document.querySelectorAll("#ranges button").forEach(b=>b.onclick=()=>{chartN=+b.dataset.n;document.querySelectorAll("#ranges button").forEach(x=>x.classList.toggle("on",x===b));renderSheet();});
-const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",mkt:"🏪 어시장 거래 수수료",casino:"🎰 도박장"};let taxAll={},taxPre={};
+const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",lotto:"🎟️ 로또 판매금",mkt:"🏪 어시장 거래 수수료",casino:"🎰 도박장"};let taxAll={},taxPre={};
 function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=(me.taxPaid||0)+amt;stAdd("tax_"+k,amt);}if(fdb)fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+amt;c[k]=(c[k]||0)+amt;return c;}).catch(()=>{});}
 /* ===== 💝 복지 지원금: 걷힌 세금에서 자산 1000만원 이하인 사람에게 300만원 (1시간에 1번) ===== */
 const WEL_AMT=3000000,WEL_MAX=10000000,WEL_CD=3600000;let welAll={},welLog=[];
-const welAvail=()=>Math.max(0,(taxAll.total||0)-(welAll.paid||0));
+const welAvail=()=>Math.max(0,(taxAll.total||0)-(welAll.paid||0)-(typeof ltSt==="object"?(ltSt.paid||0)+(ltSt.rsv||0):0));
 const welLeft=()=>Math.max(0,((welAll.u&&welAll.u[myId])||0)+WEL_CD-nowS());
 const welTm=t=>{const d=new Date(t);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;};
 function welState(){if(!me||!me._loaded)return{ok:false,msg:"닉네임부터 정해 주세요"};if(taxAll.total==null)return{ok:false,msg:"불러오는 중…"};const a=Math.round(assetOf(me));
@@ -974,7 +974,7 @@ function welState(){if(!me||!me._loaded)return{ok:false,msg:"닉네임부터 정
 function welHtml(){const st=welState();return `<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900"><span>💝 복지 지원금</span><span style="color:var(--sub);font-weight:500;font-size:11px">재원 ${taxAll.total==null?"…":formatMoneyReadable(welAvail())}</span></div><div style="font-size:11px;color:var(--sub);margin:4px 0 8px;line-height:1.5">걷힌 세금으로 자산 ${formatMoneyReadable(WEL_MAX)} 이하인 분께 ${formatMoneyReadable(WEL_AMT)}을 드려요 · 1시간에 한 번</div><button id="welBtn" ${st.ok?"":"disabled"} style="width:100%;padding:11px 0;border-radius:10px;background:${st.ok?"var(--acc)":"var(--card2)"};color:${st.ok?"#111":"var(--sub)"};font-weight:900;font-size:12.5px">${st.msg}</button>
   <div style="font-size:11.5px;font-weight:900;margin:10px 0 2px">📜 지급 기록</div>`+(welLog.length?welLog.map(v=>`<div style="display:flex;justify-content:space-between;gap:6px;padding:4px 0;border-top:1px solid var(--line);font-size:11px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(String(v.name||"?").slice(0,10))} · ${formatMoneyReadable(v.amt||0)}</span><span style="color:var(--sub);flex:none">${welTm(v.t||0)}</span></div>`).join(""):'<div style="color:var(--sub);font-size:11px;padding:4px 0">아직 지급 기록이 없어요</div>')+`</div>`;}
 function claimWelfare(){const st=welState();if(!st.ok)return toast(st.msg);if(!fdb)return;const b=$("welBtn");if(b)b.disabled=true;const asset=Math.round(assetOf(me));
-  fdb.ref("market/welfare").transaction(c=>{c=c||{};c.u=c.u||{};const now=nowS();if(now-(c.u[myId]||0)<WEL_CD)return;if((c.paid||0)+WEL_AMT>(taxAll.total||0))return;c.paid=(c.paid||0)+WEL_AMT;c.n=(c.n|0)+1;c.u[myId]=now;return c;},(err,ok)=>{
+  fdb.ref("market/welfare").transaction(c=>{c=c||{};c.u=c.u||{};const now=nowS();if(now-(c.u[myId]||0)<WEL_CD)return;if((c.paid||0)+WEL_AMT>(taxAll.total||0)-(typeof ltSt==="object"?(ltSt.paid||0)+(ltSt.rsv||0):0))return;c.paid=(c.paid||0)+WEL_AMT;c.n=(c.n|0)+1;c.u[myId]=now;return c;},(err,ok)=>{
     if(err||!ok){toast("지금은 받을 수 없어요");renderNts();return;}
     me.cash+=WEL_AMT;me.welAt=nowS();stAdd("welfare");saveMe();renderHeader();
     fdb.ref("market/welfareLog").push({name:myName().slice(0,10),amt:WEL_AMT,t:nowS(),as:asset}).catch(()=>{});
@@ -983,7 +983,92 @@ function openNts(){fKeys={};stVisit("visitNts");let d=$("ntsMod");if(!d){d=docum
     if(fdb){fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/taxPre").on("value",s=>{taxPre=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/welfare").on("value",s=>{welAll=s.val()||{};if(d.style.display==="flex")renderNts();});fdb.ref("market/welfareLog").limitToLast(10).on("value",s=>{const o=s.val()||{};welLog=Object.keys(o).sort().map(k=>o[k]).reverse();if(d.style.display==="flex")renderNts();});}
     setInterval(()=>{if(d.style.display!=="flex")return;const b=$("welBtn");if(!b)return;const st=welState();if(b.textContent!==st.msg)b.textContent=st.msg;b.disabled=!st.ok;b.style.background=st.ok?"var(--acc)":"var(--card2)";b.style.color=st.ok?"#111":"var(--sub)";},1000);}ntsTab="in";d.style.display="flex";renderNts();}
 var ntsTab="in";
-function lottoHtml(){return `<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900"><span>🎟️ 로또</span><span style="color:#fbbf24;font-weight:800;font-size:11px">준비 중</span></div><div style="font-size:11px;color:var(--sub);margin-top:4px;line-height:1.6">걷힌 세금이 당첨금이 되는 로또예요.<br>곧 열 예정이에요!</div></div>`;}
+/* ===== 🎟️ 로또: 20개 중 4개 + 보너스 · 1시간마다 추첨 · 한 장 5만원 · 1인 50장 · 당첨금은 국세청 재원 ===== */
+var LT_P=50000,LT_MAX=50,LT_H=3600000,LT_N=20,LT_K=4,LT_BASE=100000000,LT_P3=1000000,LT_P4=200000,LT_R1=.85,LT_UP=1.1;
+var ltSt={},ltRes=null,ltCur=null,ltCurR=0,ltInit=0,ltSel=[],ltBusy=0,ltBuyBusy=0,ltTRef=null,ltTRefR=0;
+const ltRound=t=>Math.floor(t/LT_H);
+function ltPick(){const a=[];for(let i=1;i<=LT_N;i++)a.push(i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,LT_K).sort((x,y)=>x-y);}
+function ltDraw(){const a=[];for(let i=1;i<=LT_N;i++)a.push(i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return{n:a.slice(0,LT_K).sort((x,y)=>x-y),b:a[LT_K]};}
+const ltStr=a=>a.join("-"),ltArr=s=>String(s).split("-").map(Number);
+function ltRank(t,d){const T=Array.isArray(t)?t:ltArr(t);let m=0;for(const x of T)if(d.n.indexOf(x)>=0)m++;if(m===4)return 1;if(m===3)return T.indexOf(d.b)>=0?2:3;if(m===2)return 4;return 0;}
+/* 한 회차 결과 계산: tk=[{u,nm,t:[문자열...]}], base=기본금, avail=쓸 수 있는 재원 */
+function ltPlan(tk,base,avail,draw){let n=0,pc=0;const W={1:[],2:[],3:0,4:0};for(const o of tk){const L=o.t||[];n+=L.length;if(L.length)pc++;const best={};for(const s of L){const r=ltRank(s,draw);if(r===1||r===2)best[r]=(best[r]||0)+1;if(r===3)W[3]++;if(r===4)W[4]++;}
+  if(best[1])W[1].push({u:o.u,nm:o.nm||"?",c:best[1]});if(best[2])W[2].push({u:o.u,nm:o.nm||"?",c:best[2]});}
+  const w1=W[1].reduce((a,x)=>a+x.c,0),w2=W[2].reduce((a,x)=>a+x.c,0),sales=n*LT_P,pot=base+sales;
+  const p1=w1?Math.floor(pot*LT_R1/w1):0,p2=w2?Math.floor(pot*(1-LT_R1)/w2):0;
+  const total=p1*w1+p2*w2+W[3]*LT_P3+W[4]*LT_P4,f=total>avail&&total>0?avail/total:1;
+  const res={n:draw.n,b:draw.b,base,sales,pot,tk:n,pc,w1,w2,w3:W[3],w4:W[4],p1,p2,f:+f.toFixed(6),total:Math.floor(total*f),a1:W[1].slice(0,3).map(x=>x.nm),a2:W[2].slice(0,3).map(x=>x.nm),t:Date.now()};
+  res.nb=(!w1&&pc>=2)?Math.max(LT_BASE,Math.min(Math.round(pot*LT_UP),Math.floor(avail-res.total))):LT_BASE;
+  return res;}
+function ltPrize(res,L){if(res.v)return{v:1,amt:L.length*LT_P,rk:{}};const d={n:res.n,b:res.b},rk={1:0,2:0,3:0,4:0};let amt=0;for(const s of L){const r=ltRank(s,d);if(r){rk[r]++;amt+=r===1?res.p1:r===2?res.p2:r===3?LT_P3:LT_P4;}}return{amt:Math.floor(amt*(res.f||1)),rk};}
+function ltAvail(){return Math.max(0,(taxAll.total||0)-(welAll.paid||0)-(ltSt.paid||0)-(ltSt.rsv||0));}
+function ltBaseNow(){return Math.max(LT_BASE,ltSt.base||LT_BASE);}
+function ltOpen(){return taxAll.total!=null&&ltAvail()>=ltBaseNow();}
+function ltLeft(){return (ltRound(bankNow())+1)*LT_H-bankNow();}
+function ltListen(){if(ltInit||!fdb||!me||!me._loaded)return;ltInit=1;
+  fdb.ref("market/lotto/st").on("value",s=>{ltSt=s.val()||{};});
+  fdb.ref("market/lotto/res").limitToLast(1).on("value",s=>{const o=s.val();ltRes=null;if(o){const k=Object.keys(o)[0];ltRes=Object.assign({r:+k},o[k]);}if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();});
+  fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};});fdb.ref("market/welfare").on("value",s=>{welAll=s.val()||{};});}
+function ltWatchRound(){const R=ltRound(bankNow());if(ltTRefR===R||!fdb)return;try{if(ltTRef)ltTRef.off();}catch(e){}ltTRefR=R;ltCur=null;ltTRef=fdb.ref("market/lottoT/"+R);ltTRef.on("value",s=>{ltCur=s.val()||{};if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();});}
+function ltMy(){const R=ltRound(bankNow());return(me.lt&&me.lt["r"+R]&&me.lt["r"+R].t)||[];}
+/* 추첨: 끝난 회차 중 아직 안 한 것을 가장 먼저 본 사람이 한 번만 실행해요 */
+async function ltDrawTick(){if(ltBusy||!fdb||!me||!me._loaded)return;ltBusy=1;try{const R=ltRound(bankNow()),st0=(await fdb.ref("market/lotto/st").once("value")).val()||{};let d=st0.d||0;if(!d)d=R-2;
+    for(let r=d+1;r<R&&r<=d+24;r++){const tv=(await fdb.ref("market/lottoT/"+r).once("value")).val();
+      if(!tv){await fdb.ref("market/lotto/st").transaction(c=>{c=c||{};if((c.d||0)>=r)return;c.d=r;return c;});continue;}
+      let ex=(await fdb.ref("market/lotto/res/"+r).once("value")).val();
+      if(!ex){const st=(await fdb.ref("market/lotto/st").once("value")).val()||{},tx=(await fdb.ref("market/tax/total").once("value")).val()||0,wp=(await fdb.ref("market/welfare/paid").once("value")).val()||0;
+        const base=Math.max(LT_BASE,st.base||LT_BASE),avail=Math.max(0,tx-wp-(st.paid||0)-(st.rsv||0)),tk=Object.keys(tv).map(u=>({u,nm:tv[u].nm,t:tv[u].t||[]}));
+        let res;if(avail<base){res={v:1,tk:tk.reduce((a,x)=>a+x.t.length,0),total:0,nb:base,t:Date.now()};}else res=ltPlan(tk,base,avail,ltDraw());
+        await fdb.ref("market/lotto/res/"+r).transaction(c=>{if(c)return;return res;});ex=(await fdb.ref("market/lotto/res/"+r).once("value")).val();}
+      if(ex)await fdb.ref("market/lotto/st").transaction(c=>{c=c||{};if((c.d||0)>=r)return;c.d=r;c.rsv=(c.rsv||0)+(ex.total||0);c.base=ex.nb||LT_BASE;return c;});}
+  }catch(e){}ltBusy=0;}
+/* 내 당첨금 받기 */
+async function ltClaimTick(){if(!fdb||!me||!me._loaded||!me.lt)return;const R=ltRound(bankNow());
+  for(const k of Object.keys(me.lt)){const r=+String(k).slice(1);if(r>=R)continue;const L=(me.lt[k]&&me.lt[k].t)||[];if(!L.length){delete me.lt[k];continue;}
+    try{const res=(await fdb.ref("market/lotto/res/"+r).once("value")).val();if(!res){if(R-r>48){delete me.lt[k];saveMe();}continue;}
+      const pr=ltPrize(res,L);
+      const cr=await fdb.ref("market/lotto/cl/"+r+"/"+myId).transaction(c=>{if(c)return;return 1;});const got=!!(cr&&cr.committed);
+      if(!got){delete me.lt[k];saveMe();continue;}
+      if(pr.amt>0){me.cash+=pr.amt;}
+      delete me.lt[k];saveMe();renderHeader();
+      if(pr.amt>0)fdb.ref("market/lotto/st").transaction(c=>{c=c||{};c.rsv=Math.max(0,(c.rsv||0)-pr.amt);c.paid=(c.paid||0)+pr.amt;return c;});
+      const q=pr.rk||{},parts=[1,2,3,4].filter(x=>q[x]).map(x=>`${x}등 ${q[x]}장`);
+      toast(pr.v?`🎟️ 세금 재원이 부족해 추첨이 취소됐어요 · ${formatMoneyReadable(pr.amt)} 환불`:pr.amt>0?`🎟️ 로또 당첨! ${parts.join(" · ")} → +${formatMoneyReadable(pr.amt)}`:`🎟️ 로또 결과: 아쉽게 꽝이에요`);
+      if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();}catch(e){}}}
+setInterval(()=>{try{if(!me||!me._loaded)return;ltListen();ltWatchRound();ltDrawTick();ltClaimTick();}catch(e){}},20000);
+setTimeout(()=>{try{if(me&&me._loaded){ltListen();ltWatchRound();ltDrawTick();ltClaimTick();}}catch(e){}},6000);
+/* 사기 */
+async function ltBuy(list){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(!fdb)return toast("서버에 연결되지 않았어요");if(!ltOpen())return toast(taxAll.total==null?"불러오는 중이에요":`국세청 재원이 ${formatMoneyReadable(ltBaseNow())} 이상 모이면 열려요`);
+  const R=ltRound(bankNow()),have=ltMy().length;if(ltLeft()<5000)return toast("곧 추첨이에요 · 다음 회차에 사 주세요");if(have+list.length>LT_MAX)return toast(`한 회차에 최대 ${LT_MAX}장까지예요 (지금 ${have}장)`);
+  const cost=list.length*LT_P;if(me.cash<cost)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);if(ltBuyBusy)return;ltBuyBusy=1;
+  try{const strs=list.map(ltStr);
+    const br=await fdb.ref("market/lottoT/"+R+"/"+myId).transaction(c=>{c=c||{nm:myName().slice(0,10),t:[]};c.t=c.t||[];if(c.t.length+strs.length>LT_MAX)return;c.t=c.t.concat(strs);return c;});const ok=!!(br&&br.committed);
+    if(!ok)toast("살 수 없어요 (한도 초과)");
+    else{if(ltRound(bankNow())!==R)toast("⏰ 회차가 바뀌어 다음 회차 표로 들어갔을 수 있어요");me.cash-=cost;me.lt=me.lt||{};const e=me.lt["r"+R]||{t:[]};e.t=(e.t||[]).concat(strs);me.lt["r"+R]=e;fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+cost;c.lotto=(c.lotto||0)+cost;return c;}).catch(()=>{});stAdd("spent",cost);saveMe();renderHeader();toast(`🎟️ ${list.length}장을 샀어요 (-${formatMoneyReadable(cost)})`);ltSel=[];}
+  }catch(e){toast("구매 실패 ("+String((e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}
+  ltBuyBusy=0;ltRender();}
+/* 화면 */
+function ltInfo(){let n=0,pc=0;if(ltCur)for(const u of Object.keys(ltCur)){const c=(ltCur[u]&&ltCur[u].t||[]).length;n+=c;if(c)pc++;}return{n,pc,pot:ltBaseNow()+n*LT_P};}
+function ltMoney(a){return formatMoneyReadable(a);}
+function lottoHtml(){const i=ltInfo(),op=ltOpen();return `<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900"><span>🎟️ 로또</span><span style="color:${op?"var(--ok)":"#fbbf24"};font-weight:800;font-size:11px">${taxAll.total==null?"…":op?"판매 중":"재원 모으는 중"}</span></div><div style="font-size:11px;color:var(--sub);margin:4px 0 8px;line-height:1.6">20개 중 4개 + 보너스 · 1시간마다 추첨 · 한 장 ${ltMoney(LT_P)}<br>이번 회차 당첨금 <b style="color:var(--acc)">${ltMoney(i.pot)}</b></div><button id="ltOpenBtn" style="width:100%;padding:11px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:12.5px">🎟️ 로또 사러 가기</button></div>`;}
+function openLotto(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");ltListen();ltWatchRound();let d=$("ltMod");if(!d){d=document.createElement("div");d.id="ltMod";d.className="btBg";d.style.zIndex=46;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};setInterval(()=>{if(d.style.display==="flex"){const t=$("ltLeft");if(t)t.textContent=bankLeft(ltLeft());}},1000);}ltSel=[];d.style.display="flex";ltRender();}
+function ltRender(){const d=$("ltMod");if(!d)return;const i=ltInfo(),my=ltMy(),op=ltOpen(),R=ltRes;
+  const grid=Array.from({length:LT_N},(_,k)=>k+1).map(n=>`<button data-ln="${n}" style="aspect-ratio:1;border-radius:10px;font-weight:900;font-size:13px;background:${ltSel.includes(n)?"var(--acc)":"var(--card2)"};color:${ltSel.includes(n)?"#111":"inherit"}">${n}</button>`).join("");
+  const rtxt=R?(R.v?`회차 취소 (재원 부족) · 환불됨`:`<b style="color:var(--acc)">${R.n.join(" · ")}</b> + 보너스 <b style="color:#fbbf24">${R.b}</b><br>1등 ${R.w1}장${R.a1&&R.a1.length?` (${R.a1.map(esc).join(", ")})`:""} · 2등 ${R.w2}장${R.a2&&R.a2.length?` (${R.a2.map(esc).join(", ")})`:""} · 3등 ${R.w3}장 · 4등 ${R.w4}장`):"아직 추첨 기록이 없어요";
+  d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">🎟️ 로또</b><button id="ltX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
+  <div style="text-align:center;margin:6px 0 10px"><div style="font-size:11px;color:var(--sub)">이번 회차 당첨금</div><div style="font-size:24px;font-weight:900;color:var(--acc)">${ltMoney(i.pot)}</div><div style="font-size:10.5px;color:var(--sub);margin-top:2px">기본 ${ltMoney(ltBaseNow())} + 판매 ${ltMoney(i.n*LT_P)} · ${i.n}장 · ${i.pc}명 · 추첨까지 <b id="ltLeft" style="color:var(--tx)">${bankLeft(ltLeft())}</b></div></div>
+  <div style="font-size:11px;color:var(--sub);line-height:1.7;background:var(--card);border-radius:10px;padding:8px 10px;margin-bottom:10px">1등 4개 일치 · 당첨금 85% / 2등 3개+보너스 · 15% (여러 명이면 나눠요)<br>3등 3개 일치 ${ltMoney(LT_P3)} / 4등 2개 일치 ${ltMoney(LT_P4)}<br>1등이 없으면 다음 회차로 이월돼요 (2명 이상 참여 시 전회차의 ${LT_UP}배)</div>`+
+  (op?`<div style="font-size:12px;font-weight:900;margin-bottom:6px">번호 고르기 <span style="color:var(--sub);font-weight:500">(${ltSel.length}/${LT_K})</span></div><div style="display:grid;grid-template-columns:repeat(10,1fr);gap:5px;margin-bottom:8px">${grid}</div>
+  <div style="display:flex;gap:6px;margin-bottom:8px"><button id="ltRnd" style="flex:1;padding:10px 0;border-radius:10px;background:var(--card2);font-weight:800;font-size:12px">🎲 자동 채우기</button><button id="ltOne" style="flex:1.4;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:12px">이 번호로 1장 (${ltMoney(LT_P)})</button></div>
+  <div style="display:flex;gap:6px;margin-bottom:6px">${[1,5,10,50].map(n=>`<button data-la="${n}" style="flex:1;padding:9px 0;border-radius:10px;background:var(--card2);font-weight:800;font-size:12px">자동 ${n}장</button>`).join("")}</div>
+  <div style="font-size:10.5px;color:var(--sub);margin-bottom:8px">한 회차에 1인 최대 ${LT_MAX}장 · 내가 산 표 ${my.length}장</div>`:`<div style="padding:14px;text-align:center;color:var(--sub);font-size:12.5px;line-height:1.7;background:var(--card);border-radius:10px;margin-bottom:10px">${taxAll.total==null?"불러오는 중…":`국세청 재원이 ${ltMoney(ltBaseNow())} 이상 모이면 열려요<br>지금 ${ltMoney(ltAvail())}`}</div>`)+
+  `<div style="font-size:12px;font-weight:900;margin:8px 0 4px">🎫 내 표 (이번 회차)</div>`+(my.length?`<div style="display:flex;flex-wrap:wrap;gap:4px;max-height:110px;overflow-y:auto">${my.map(s=>`<span style="padding:3px 7px;border-radius:8px;background:var(--card2);font-size:10.5px">${s.split("-").join(" ")}</span>`).join("")}</div>`:`<div style="color:var(--sub);font-size:11.5px">아직 없어요</div>`)+
+  `<div style="font-size:12px;font-weight:900;margin:12px 0 4px">📢 지난 추첨${R?` (${new Date((R.r+1)*LT_H).getHours()}시)`:""}</div><div style="font-size:11.5px;line-height:1.7">${rtxt}</div></div>`;
+  $("ltX").onclick=()=>d.style.display="none";
+  d.querySelectorAll("[data-ln]").forEach(b=>b.onclick=()=>{const n=+b.dataset.ln,k=ltSel.indexOf(n);if(k>=0)ltSel.splice(k,1);else if(ltSel.length<LT_K)ltSel.push(n);else toast(`${LT_K}개까지 고를 수 있어요`);ltSel.sort((a,b)=>a-b);ltRender();});
+  d.querySelectorAll("[data-la]").forEach(b=>b.onclick=()=>{const n=+b.dataset.la,l=[];for(let k=0;k<n;k++)l.push(ltPick());ltBuy(l);});
+  const rb=$("ltRnd");if(rb)rb.onclick=()=>{const keep=ltSel.slice(),pool=[];for(let n=1;n<=LT_N;n++)if(!keep.includes(n))pool.push(n);while(keep.length<LT_K&&pool.length){keep.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0]);}ltSel=keep.sort((a,b)=>a-b);ltRender();};
+  const ob=$("ltOne");if(ob)ob.onclick=()=>{if(ltSel.length!==LT_K)return toast(`번호 ${LT_K}개를 골라 주세요`);ltBuy([ltSel.slice()]);};}
 function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(me&&myId)all[myId]=me;const top=Object.entries(all).map(([id,p])=>({id,n:(p&&p.name)||"?",v:((p&&p.taxPaid)||0)+(taxPre[id]||0)})).filter(x=>x.v>0).sort((a,b)=>b.v-a.v).slice(0,5);
   const row=(a,b,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--sub)">${a}</span><b${c?` style="color:${c}"`:""}>${b}</b></div>`;
   const tb=(k,t)=>`<button data-ntab="${k}" style="flex:1;padding:9px 0;border-radius:10px;font-size:12.5px;font-weight:900;background:${ntsTab===k?"var(--acc)":"var(--card2)"};color:${ntsTab===k?"#111":"var(--tx)"}">${t}</button>`;
@@ -996,7 +1081,7 @@ function renderNts(){const d=$("ntsMod");if(!d)return;const all={...players};if(
     `<div style="font-size:10px;color:var(--sub);margin-top:10px;text-align:center">걷힌 세금은 이렇게 다시 돌아가요</div>`;
   d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">🏛️ 국세청</b><button id="ntsX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
     <div style="display:flex;gap:6px;margin:8px 0 4px">${tb("in","💰 걷힌 세금")}${tb("out","🎁 세금 쓰임새")}</div>`+(ntsTab==="out"?outHtml:inHtml)+`</div>`;
-  $("ntsX").onclick=()=>d.style.display="none";d.querySelectorAll("[data-ntab]").forEach(b=>b.onclick=()=>{ntsTab=b.dataset.ntab;renderNts();const bx=d.querySelector(".btBox");if(bx)bx.scrollTop=0;});const wb=$("welBtn");if(wb)wb.onclick=claimWelfare;}
+  $("ntsX").onclick=()=>d.style.display="none";d.querySelectorAll("[data-ntab]").forEach(b=>b.onclick=()=>{ntsTab=b.dataset.ntab;renderNts();const bx=d.querySelector(".btBox");if(bx)bx.scrollTop=0;});const wb=$("welBtn");if(wb)wb.onclick=claimWelfare;const lb=$("ltOpenBtn");if(lb)lb.onclick=openLotto;}
 function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,name:"25% + 복권·로또 각 10조"};if(asset>=1e14)return{fee:Math.round(raw*.25),name:"25%"};if(asset>=1e13)return{fee:Math.round(raw*.2),name:"20%"};if(asset>=1e12)return{fee:Math.round(raw*.15),name:"15%"};if(asset>1e8)return{fee:Math.round(raw*.1),name:"10%"};return{fee:Math.round(raw*.05),name:"5% · 자산 1억 이하"};}
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
   $("shName").innerHTML=esc(n)+badges(ci);$("shPrice").textContent=c.delisted?"거래 정지":formatCoinPrice(p);$("shPrice").className="big "+(c.rate>0?"up":c.rate<0?"down":"");
