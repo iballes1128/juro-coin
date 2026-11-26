@@ -1148,7 +1148,7 @@ async function scBuy(y){if(scBusy)return;if(!me||!me._loaded)return scNote("닉�
     saveMe();renderHeader();scCur={c:card,done:0};scBusy=0;scRender();}catch(e){scBusy=0;scNote("구매 실패 ("+String((e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}}
 
 const JrSim=(()=>{function jrMk(seed){let s=seed;return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
-var FL=.65;var RV=.0004;var PS=.52;var CP=.3,PU=.6;var SP=.45,SL=.3;var RP=.3,RL=.2;var DR=.0006;function JrSimF(seed){const r=jrMk(seed),gs=()=>{let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());};
+var FL=.65;var RV=0;var PS=.52;var CP=.3,PU=.6;var SP=.45,SL=.3;var RP=.3,RL=.2;var DR=0;function JrSimF(seed){const r=jrMk(seed),gs=()=>{let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());};
  const o={lp:0,st:"calm",left:30,dr:0,sg:.003,ev:null,reb:0,rdr:0,rbk:0};
  o.step=function(){o.ev=null;
   if(o.left<=0){
@@ -1170,11 +1170,17 @@ var FL=.65;var RV=.0004;var PS=.52;var CP=.3,PU=.6;var SP=.45,SL=.3;var RP=.3,RL
  return o;}
 
 return JrSimF;})();
-/* ===== ⚠️ 주로코인: 코인 목록 맨 아래 위험 구역 (0.005초마다 움직임 · 최대 10개 · 3초 안에 안 팔면 자동 매도 · 수수료 5% · 세금 없음 · 손익 ±30% 상한) ===== */
-const JR_FEE=.05,JR_CAP=.3,JR_MAX=10,JR_HOLD=3000,JR_TK=5,JR_W=900,JR_B=50000;
-var jrS=null,jrP=[JR_B],jrCur=0,jrT0=0,jrTimer=0,jrHold=null,jrEvT=0,jrRes="";
-function jrStart(){jrS=JrSim(Math.floor(Math.random()*1e9));jrP=[JR_B];jrCur=0;jrT0=performance.now();}
-function jrMount(){if($("jrBox"))return;const L=$("coinList");if(!L||!L.parentNode)return;const b=document.createElement("div");b.id="jrBox";b.innerHTML=`<div style="text-align:center;font-size:11px;color:#f87171;font-weight:800;margin:14px 0 8px;letter-spacing:.5px">━━━ ⚠️ 위험 구역 ━━━</div><div class="row" id="jrRow" style="border:2px solid #ef4444;border-radius:14px;background:linear-gradient(90deg,rgba(239,68,68,.16),rgba(239,68,68,.04));box-shadow:0 0 18px rgba(239,68,68,.3);cursor:pointer"><div class="ic" style="background:#7f1d1d;color:#fecaca">주</div><div class="nm"><b>주로코인</b><span class="bd"><span class="badge" style="background:#ef4444;color:#fff">⚠️ 초고위험</span></span></div><div class="pr"><b id="jrRowP" style="color:#f87171">50,000원</b></div></div>`;L.parentNode.insertBefore(b,L.nextSibling);$("jrRow").onclick=jrOpen;}
+/* ===== ⚠️ 주로코인: 코인 목록 맨 아래 위험 구역 (모두 같은 가격 · 0.005초마다 움직임 · 1~10개 · 3초 안에 안 팔면 자동 매도 · 수수료 5% 세금 없음 · 손익 ±30% 상한) ===== */
+const JR_FEE=.05,JR_CAP=.3,JR_MAX=10,JR_HOLD=3000,JR_TK=5,JR_W=900,JR_B=50000,JR_T=6000;
+var jrP=[JR_B],jrCur=0,jrTimer=0,jrHold=null,jrEvT=0,jrQty=10,jrBC={},jrLg=[],jrLast=null;
+function jrR(seed){let s=seed;return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function jrAnchor(b){const r=jrR(b*7919+13);r();let u=0;while(!u)u=r();const g=Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());return Math.max(-1.6,Math.min(1.6,g*.6));}
+function jrBlock(b){let B=jrBC[b];if(B)return B;const s=JrSim(b*104729+17),M=new Float64Array(JR_T+1),E=new Array(JR_T+1).fill(null);for(let j=1;j<=JR_T;j++){s.step();M[j]=s.lp;if(s.ev)E[j]=s.ev;}const e=M[JR_T];for(let j=0;j<=JR_T;j++)M[j]-=j/JR_T*e;B={M,E,a:jrAnchor(b),a2:jrAnchor(b+1)};const ks=Object.keys(jrBC);if(ks.length>3)delete jrBC[ks[0]];jrBC[b]=B;return B;}
+function jrAt(k){const b=Math.floor(k/JR_T),j=k-b*JR_T,B=jrBlock(b),p=Math.round(JR_B*Math.exp(B.a+(B.a2-B.a)*j/JR_T+B.M[j]));return p<1000?1000:p>2500000?2500000:p;}
+function jrEvAt(k){const b=Math.floor(k/JR_T);return jrBlock(b).E[k-b*JR_T];}
+const jrK=()=>Math.floor(bankNow()/JR_TK);
+function jrStart(){const k0=jrK();jrP=[];for(let k=k0-JR_W+1;k<=k0;k++)jrP.push(jrAt(k));jrCur=k0;}
+function jrMount(){if($("jrBox"))return;const L=$("coinList");if(!L||!L.parentNode)return;const b=document.createElement("div");b.id="jrBox";b.innerHTML=`<div style="text-align:center;font-size:11px;color:#f87171;font-weight:800;margin:14px 0 8px;letter-spacing:.5px">━━━ ⚠️ 위험 구역 ━━━</div><div class="row" id="jrRow" style="border:2px solid #ef4444;border-radius:14px;background:linear-gradient(90deg,rgba(239,68,68,.16),rgba(239,68,68,.04));box-shadow:0 0 18px rgba(239,68,68,.3);cursor:pointer"><div class="ic" style="background:#7f1d1d;color:#fecaca">주</div><div class="nm"><b>주로코인</b><span class="bd"><span class="badge" style="background:#ef4444;color:#fff">⚠️ 초고위험</span></span></div><div class="pr"><b id="jrRowP" style="color:#f87171">50,000원</b></div></div>`;L.parentNode.insertBefore(b,L.nextSibling);$("jrRow").onclick=jrOpen;try{$("jrRowP").textContent=jrAt(jrK()).toLocaleString()+"원";}catch(e){}}
 function jrWarn(){let d=$("jrWarn");if(!d){d=document.createElement("div");d.id="jrWarn";d.className="btBg";d.style.zIndex=90;document.body.appendChild(d);}
   d.innerHTML=`<div class="btBox" style="border:2px solid #ef4444;box-shadow:0 0 40px rgba(239,68,68,.4)"><div style="font-size:40px;text-align:center">⚠️</div><h3 style="margin:4px 0 8px;text-align:center;color:#fecaca;font-size:17px">주로코인은 초고위험 코인이에요</h3><div style="font-size:12.5px;line-height:1.7;text-align:center;margin-bottom:8px">가격이 아주 빠르고 크게 움직여서, 다른 코인과는 완전히 달라요.</div>
   <div style="display:grid;gap:6px;margin-bottom:10px"><div style="padding:8px 10px;border-radius:9px;background:#1f1416;color:#fecaca;font-size:12.5px;font-weight:700">📈 몇 초 만에 20~30%씩 오를 수 있어요</div><div style="padding:8px 10px;border-radius:9px;background:#1f1416;color:#fecaca;font-size:12.5px;font-weight:700">📉 갑자기 30~40%씩 떨어질 수도 있어요</div><div style="padding:8px 10px;border-radius:9px;background:#1f1416;color:#fecaca;font-size:12.5px;font-weight:700">💸 한 번에 큰돈을 잃을 수 있어요</div></div>
@@ -1184,16 +1190,19 @@ function jrOpen(){if(!me||!me._loaded)return toast("닉네임부터 정해 주�
 function jrTrade(){let d=$("jrMod");if(!d){d=document.createElement("div");d.id="jrMod";d.className="btBg";d.style.zIndex=85;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)jrClose();};
   d.innerHTML=`<div class="btBox" style="border:2px solid #ef4444"><div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px"><div style="font-weight:900;font-size:16px">주로코인 <span style="background:#ef4444;color:#fff;border-radius:7px;padding:2px 7px;font-size:10.5px;margin-left:4px">⚠️ 초고위험</span></div><button id="jrX" style="font-size:20px;color:var(--sub);width:36px;height:30px">✕</button></div>
   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px"><div id="jrEv" style="font-size:13px;font-weight:900;height:18px"></div><div style="text-align:right"><div id="jrPr" style="font-size:26px;font-weight:900">50,000원</div><div id="jrCh" style="font-size:12.5px;font-weight:800"></div></div></div>
-  <canvas id="jrCv" width="800" height="360" style="width:100%;height:210px;background:#0f1117;border:2px solid #ef4444;border-radius:14px;display:block"></canvas>
-  <div id="jrPos" style="display:none;margin-top:8px;padding:9px 11px;border-radius:12px;background:#1f1416;border:1px solid #ef4444;font-size:12.5px;font-weight:800"></div><div id="jrRs" style="min-height:22px;margin-top:8px;text-align:center;font-size:15px;font-weight:900"></div>
-  <div style="display:flex;gap:8px;margin-top:6px"><button id="jrBuy" style="flex:1;padding:13px 0;border-radius:12px;background:#ef4444;color:#fff;font-weight:900;font-size:13.5px"></button><button id="jrSell" style="flex:1;padding:13px 0;border-radius:12px;background:#3b82f6;color:#fff;font-weight:900;font-size:13.5px">지금 팔기</button></div></div>`;
-  $("jrX").onclick=jrClose;$("jrBuy").onclick=jrBuy;$("jrSell").onclick=()=>jrSell(0);}
-  d.style.display="flex";jrRes="";$("jrRs").textContent="";if(!jrS)jrStart();else if(!jrHold){jrStart();}jrRun();jrUi();}
+  <canvas id="jrCv" width="800" height="360" style="width:100%;height:200px;background:#0f1117;border:2px solid #ef4444;border-radius:14px;display:block"></canvas>
+  <div id="jrPos" style="display:none;margin-top:8px;padding:10px 12px;border-radius:12px;background:#1f1416;border:1px solid #ef4444;font-size:12.5px;font-weight:800;line-height:1.7"></div>
+  <div id="jrRs" style="display:none;margin-top:8px;padding:11px 12px;border-radius:12px;font-size:12.5px;font-weight:800;line-height:1.7"></div>
+  <div style="display:flex;align-items:center;gap:6px;margin-top:10px"><button id="jrMi" style="width:38px;height:38px;border-radius:10px;background:var(--card2);font-size:18px;font-weight:900">−</button><div id="jrQ" style="flex:1;text-align:center;font-size:15px;font-weight:900"></div><button id="jrPl" style="width:38px;height:38px;border-radius:10px;background:var(--card2);font-size:18px;font-weight:900">+</button></div>
+  <div id="jrChips" style="display:flex;gap:5px;margin-top:6px">${[1,3,5,10].map(n=>`<button data-jq="${n}" style="flex:1;padding:7px 0;border-radius:9px;background:var(--card2);font-size:12px;font-weight:900">${n}개</button>`).join("")}</div>
+  <div style="display:flex;gap:8px;margin-top:8px"><button id="jrBuy" style="flex:1.4;padding:13px 0;border-radius:12px;background:#ef4444;color:#fff;font-weight:900;font-size:13.5px"></button><button id="jrSell" style="flex:1;padding:13px 0;border-radius:12px;background:#3b82f6;color:#fff;font-weight:900;font-size:13.5px">지금 팔기</button></div><div id="jrLg" style="margin-top:10px;font-size:11px;color:var(--sub);line-height:1.7"></div></div>`;
+  $("jrX").onclick=jrClose;$("jrBuy").onclick=jrBuy;$("jrSell").onclick=()=>jrSell(0);$("jrMi").onclick=()=>{jrQty=Math.max(1,jrQty-1);jrUi();};$("jrPl").onclick=()=>{jrQty=Math.min(JR_MAX,jrQty+1);jrUi();};d.querySelectorAll("[data-jq]").forEach(b=>b.onclick=()=>{jrQty=+b.dataset.jq;jrUi();});}
+  d.style.display="flex";if(!jrHold){jrStart();jrLast=null;}jrRun();jrUi();}
 function jrClose(){const d=$("jrMod");if(d)d.style.display="none";}
 function jrRun(){if(jrTimer)return;jrTimer=setInterval(jrTick,40);}
 function jrNote(t,c){const e=$("jrEv");if(!e)return;e.textContent=t;e.style.color=c;clearTimeout(jrEvT);jrEvT=setTimeout(()=>{e.textContent="";},1500);}
-function jrTick(){try{const n=performance.now(),target=Math.floor((n-jrT0)/JR_TK);let g=0;if(target-jrCur>4000)jrCur=target-4000;while(jrCur<target&&g<4000){jrP.push(jrS.step());if(jrS.ev==="crash")jrNote("💥 급락!","#f87171");else if(jrS.ev==="pump")jrNote("🚀 급등!","#34d399");if(jrP.length>JR_W)jrP.shift();jrCur++;g++;}
-  if(jrHold&&n-jrHold.t>=JR_HOLD)jrSell(1);
+function jrTick(){try{const target=jrK();if(target-jrCur>4000)jrStart();else{let g=0;while(jrCur<target&&g<4000){jrCur++;jrP.push(jrAt(jrCur));const ev=jrEvAt(jrCur);if(ev==="crash")jrNote("💥 급락!","#f87171");else if(ev==="pump")jrNote("🚀 급등!","#34d399");if(jrP.length>JR_W)jrP.shift();g++;}}
+  if(jrHold&&performance.now()-jrHold.t>=JR_HOLD)jrSell(1);
   const d=$("jrMod"),vis=d&&d.style.display==="flex";if(vis){jrDraw();jrUi();}
   if(!vis&&!jrHold){clearInterval(jrTimer);jrTimer=0;}}catch(e){clearInterval(jrTimer);jrTimer=0;}}
 function jrDraw(){const cv=$("jrCv");if(!cv)return;const x=cv.getContext("2d"),w=cv.width,h=cv.height,P=jrP;x.clearRect(0,0,w,h);let lo=1e12,hi=0;for(let i=0;i<P.length;i++){const v=P[i];if(v<lo)lo=v;if(v>hi)hi=v;}const pad=(hi-lo)*.08||50;lo-=pad;hi+=pad;
@@ -1201,18 +1210,22 @@ function jrDraw(){const cv=$("jrCv");if(!cv)return;const x=cv.getContext("2d"),w
   const last=P[P.length-1],up=last>=P[0];x.strokeStyle=up?"#34d399":"#f87171";x.lineWidth=2.2;x.beginPath();P.forEach((v,i)=>{const px=i/(JR_W-1)*w,py=h-(v-lo)/(hi-lo)*h;i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();
   if(jrHold){const by=h-(jrHold.avg-lo)/(hi-lo)*h;x.strokeStyle="#fbbf24";x.setLineDash([8,6]);x.beginPath();x.moveTo(0,by);x.lineTo(w,by);x.stroke();x.setLineDash([]);}
   const ly=h-(last-lo)/(hi-lo)*h,lx=(P.length-1)/(JR_W-1)*w;x.fillStyle=up?"#34d399":"#f87171";x.beginPath();x.arc(lx,ly,5,0,7);x.fill();}
-function jrRet(p,avg){return Math.max(-JR_CAP,Math.min(JR_CAP,p/avg*(1-JR_FEE)-1));}
+function jrCalc(p,h){const raw=h.q*p,fee=Math.floor(raw*JR_FEE),cost=h.q*h.avg;let got=raw-fee,capped=0;const hi=Math.floor(cost*(1+JR_CAP)),lo=Math.ceil(cost*(1-JR_CAP));if(got>hi){got=hi;capped=1;}else if(got<lo){got=lo;capped=1;}return{raw,fee,got,cost,pnl:got-cost,capped};}
+const jrM=n=>(n<0?"-":"")+formatMoneyReadable(Math.abs(n));
 function jrUi(){const P=jrP,last=P[P.length-1],r=(last/P[0]-1)*100;if($("jrPr")){$("jrPr").textContent=last.toLocaleString()+"원";const c=$("jrCh");c.textContent=(r>=0?"+":"")+r.toFixed(1)+"%";c.style.color=r>=0?"#34d399":"#f87171";}
-  const b=$("jrBuy");if(b){const q=Math.min(JR_MAX,Math.floor((me.cash||0)/last));b.textContent=`${JR_MAX}개 사기`;b.style.opacity=jrHold||q<1?".45":"1";}
-  const ps=$("jrPos");if(ps){if(jrHold){const rr=jrRet(last,jrHold.avg),v=Math.floor(jrHold.q*jrHold.avg*rr),left=Math.max(0,JR_HOLD-(performance.now()-jrHold.t));ps.style.display="block";ps.innerHTML=`보유 ${jrHold.q}개 · 평균 ${jrHold.avg.toLocaleString()}원 · <span style="color:${v>=0?"#34d399":"#f87171"}">${v>=0?"+":""}${formatMoneyReadable(Math.abs(v)).replace(/^/,v<0?"-":"")}</span> · <span style="color:#fbbf24">${(left/1000).toFixed(1)}초 뒤 자동 매도</span>`;}else ps.style.display="none";}
+  const mx=Math.max(0,Math.min(JR_MAX,Math.floor((me.cash||0)/last)));if(jrQty>Math.max(1,mx))jrQty=Math.max(1,mx);const q=$("jrQ");if(q)q.textContent=`${jrQty}개 · ${formatMoneyReadable(jrQty*last)}`;
+  const b=$("jrBuy");if(b){b.textContent=`${jrQty}개 사기`;b.style.opacity=jrHold||mx<1?".45":"1";}const sl=$("jrSell");if(sl)sl.style.opacity=jrHold?"1":".45";
+  const ps=$("jrPos");if(ps){if(jrHold){const c=jrCalc(last,jrHold),left=Math.max(0,JR_HOLD-(performance.now()-jrHold.t));ps.style.display="block";ps.innerHTML=`보유 ${jrHold.q}개 · 산 가격 ${jrHold.avg.toLocaleString()}원 (총 ${formatMoneyReadable(c.cost)})<br>지금 팔면 <span style="font-size:15px;color:#fde68a">${formatMoneyReadable(c.got)} 입금</span> <span style="color:var(--sub)">(수수료 5% ${formatMoneyReadable(c.fee)} 뺌)</span><br><span style="color:${c.pnl>=0?"#34d399":"#f87171"}">${c.pnl>=0?"+":""}${jrM(c.pnl)}</span> · <span style="color:#fbbf24">${(left/1000).toFixed(1)}초 뒤 자동 매도</span>`;}else ps.style.display="none";}
+  const rs=$("jrRs");if(rs){if(jrLast&&!jrHold){const c=jrLast;rs.style.display="block";rs.style.background=c.pnl>0?"rgba(52,211,153,.14)":"rgba(248,113,113,.14)";rs.style.border="1px solid "+(c.pnl>0?"#34d399":"#f87171");rs.innerHTML=`<div style="font-size:14px">${c.auto?"⏱ 자동 매도 완료":"✅ 매도 완료"} · ${c.q}개</div>산 가격 ${c.avg.toLocaleString()}원 → 판 가격 ${c.p.toLocaleString()}원<br>판 금액 ${formatMoneyReadable(c.raw)} − 수수료 ${formatMoneyReadable(c.fee)}${c.capped?" (손익 상한 ±30% 적용)":""}<br><span style="font-size:16px;color:#fde68a">💰 ${formatMoneyReadable(c.got)} 입금됐어요</span><br><span style="color:${c.pnl>=0?"#34d399":"#f87171"}">손익 ${c.pnl>=0?"+":""}${jrM(c.pnl)}</span>`;}else rs.style.display="none";}
+  const lg=$("jrLg");if(lg)lg.innerHTML=jrLg.map(c=>`${c.pnl>=0?"🟢":"🔴"} ${c.q}개 ${c.avg.toLocaleString()}→${c.p.toLocaleString()}원 · 입금 ${formatMoneyReadable(c.got)} (${c.pnl>=0?"+":""}${jrM(c.pnl)})`).join("<br>");
   const rp=$("jrRowP");if(rp)rp.textContent=last.toLocaleString()+"원";}
-function jrBuy(){if(!me||!me._loaded)return;if(jrHold)return;if(!canTrade())return toast("지금은 거래할 수 없어요");const p=jrP[jrP.length-1],q=Math.min(JR_MAX,Math.floor((me.cash||0)/p));if(q<1)return toast("💸 잔액이 부족해요");
-  me.cash-=q*p;jrHold={q,avg:p,t:performance.now()};me.jrPos={q,avg:p};stAdd("jrN");saveMe();renderHeader();jrRes="";if($("jrRs"))$("jrRs").textContent="";jrUi();}
-function jrSell(auto){if(!jrHold)return;const h=jrHold,p=jrP[jrP.length-1],rr=jrRet(p,h.avg),cost=h.q*h.avg,got=Math.floor(cost*(1+rr)),pnl=got-cost;jrHold=null;me.jrPos=null;me.cash+=got;if(pnl>0){stAdd("jrWin");}saveMe();renderHeader();
-  const e=$("jrRs");if(e){e.textContent=pnl>=0?`🎉 +${formatMoneyReadable(pnl)}`:`-${formatMoneyReadable(-pnl)}`;e.style.color=pnl>0?"#34d399":pnl<0?"#f87171":"var(--sub)";}
-  if(pnl>0&&typeof scFx==="function"&&pnl>=cost*.15)scFx(5);jrUi();}
+function jrBuy(){if(!me||!me._loaded)return;if(jrHold)return;if(!canTrade())return toast("지금은 거래할 수 없어요");const p=jrP[jrP.length-1],q=Math.min(jrQty,Math.floor((me.cash||0)/p));if(q<1)return toast("💸 잔액이 부족해요");
+  me.cash-=q*p;jrHold={q,avg:p,t:performance.now()};me.jrPos={q,avg:p};stAdd("jrN");saveMe();renderHeader();jrLast=null;jrUi();}
+function jrSell(auto){if(!jrHold)return;const h=jrHold,p=jrP[jrP.length-1],c=jrCalc(p,h);jrHold=null;me.jrPos=null;me.cash+=c.got;if(c.pnl>0){stAdd("jrWin");}saveMe();renderHeader();
+  jrLast=Object.assign({q:h.q,avg:h.avg,p,auto},c);jrLg.unshift(jrLast);if(jrLg.length>5)jrLg.pop();try{toast(`💰 ${formatMoneyReadable(c.got)} 입금 (${c.pnl>=0?"+":""}${jrM(c.pnl)})`);}catch(e){}
+  if(c.pnl>0&&typeof scFx==="function"&&c.pnl>=c.cost*.15)scFx(5);jrUi();}
 function jrRecover(){if(!me||!me._loaded||jrHold||!me.jrPos)return;const o=me.jrPos;me.jrPos=null;me.cash+=Math.floor(o.q*o.avg*(1-JR_FEE));saveMe();renderHeader();toast("진행 중이던 주로코인 거래를 정리했어요");}
-try{jrMount();}catch(e){}setInterval(()=>{try{jrMount();jrRecover();}catch(e){}},3000);
+try{jrMount();}catch(e){}setInterval(()=>{try{jrMount();jrRecover();const rp=$("jrRowP");if(rp&&!jrTimer)rp.textContent=jrAt(jrK()).toLocaleString()+"원";}catch(e){}},3000);
 
 /* ===== 🎰 로또 생방송 추첨: 정각에 공이 하나씩 굴러 나와요 (10초 전 알림) ===== */
 var ltLv={r:0,on:0,raf:0,balls:null,lastR:0,banOff:0};
