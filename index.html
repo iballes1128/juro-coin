@@ -2999,11 +2999,11 @@ const clwStale=s=>!s||!s.uid||nowS()-(s.hb||0)>12000||(s.t0>0&&nowS()-s.t0>45000
 const CLW_LEN=1800000,clwRid=()=>Math.floor(nowS()/CLW_LEN);
 const clwT0=m=>m?(m.t0||((m.r|0)*CLW_LEN)):0;
 const clwNext=()=>(clwRid()+1)*CLW_LEN-nowS();
-const clwDue=m=>!m||!m.keys||m.dl!==3||!m.box||clwRid()>Math.floor(clwT0(m)/CLW_LEN);/* 정각·30분마다 룰렛 칸·인형이 새로 바뀜 (예전 판도 교체) */
+const clwDue=m=>!m||!m.keys||m.dl!==2||!m.box||clwRid()>Math.floor(clwT0(m)/CLW_LEN);/* 정각·30분마다 룰렛 칸·인형이 새로 바뀜 (예전 판도 교체) */
 function clwNewRound(rid){const P=CLW.POOL,idx=f=>P.map((q,i)=>[q,i]).filter(([q])=>f(q)).map(([,i])=>i),pick=(a,n)=>a.slice().sort(()=>Math.random()-.5).slice(0,n);/* 전설은 무게(w)에 비례해서 후보로 뽑혀요 (귀한 상품은 판에 잘 안 들어옴) */const wpick=(a,n)=>{const r=[],c=a.slice();while(r.length<n&&c.length){const tw=c.reduce((t,i)=>t+P[i].w,0);let x=Math.random()*tw,k=0;for(;k<c.length-1;k++){x-=P[c[k]].w;if(x<0)break;}r.push(c.splice(k,1)[0]);}return r;};
   const cs=pick(idx(q=>q.t===0&&(q.k==="cash"||q.k==="coin")),6),cn=[],used=new Set(cs),rest=pick(idx(q=>q.t===0).filter(i=>!used.has(i)),8);
   const box=[...cs,...cn,...rest,...pick(idx(q=>q.t===1),8),...wpick(idx(q=>q.t===2),3)].sort(()=>Math.random()-.5);
-  return{r:rid,t0:nowS(),v:1,dl:3,box,keys:CLW.newGame().keys.map(clwPlain)};}
+  return{r:rid,t0:nowS(),v:1,dl:2,box,keys:CLW.newGame().keys.map(clwPlain)};}
 /* 정각·30분마다(또는 예전 판일 때) 새로 채움 · 누가 하는 중이면 끝난 뒤에 */
 function clwEnsure(){if(!fdb||clw.initing||clw.play||clw.fin)return;if(clw.m&&!clwDue(clw.m))return;if(clw.s&&!clwStale(clw.s))return;
   clw.initing=true;fdb.ref("market/claw/m").transaction(c=>{if(c&&c.keys&&!clwDue(c))return;return clwNewRound(Math.max(clwRid(),((c&&c.r)|0)+1));}).catch(()=>{}).then(()=>{clw.initing=false;});}
