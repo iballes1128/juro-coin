@@ -2807,7 +2807,7 @@ A(2,{k:"boat",id:"gold",eq:3000000,w:1,nm:"황금 보트 (뽑기 한정)",ic:"�
 PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq||0;});
 const POOL=PRIZES;
 /* 룰렛 한 판은 25칸: 일반 15 · 희귀 8 · 전설 2. 한 번 돌릴 때 등급 확률이 정해지고, 같은 등급 안에서는 w에 비례 */
-const TP=[.85,.149,.001];
+const TP=[.85,.145,.005];
 function slotProbs(box){const tw=[0,0,0];box.forEach(i=>{tw[PRIZES[i].t]+=PRIZES[i].w;});return box.map(i=>{const q=PRIZES[i];return tw[q.t]?TP[q.t]*q.w/tw[q.t]:0;});}
 /* 당첨된 칸에 들어올 새 상품: 같은 등급, 지금 판에 없는 것 (현금 칸은 다른 금액의 현금) */
 function refill(box,pos,rng){rng=rng||Math.random;const old=PRIZES[box[pos]],cur=new Set(box),pk=a=>a[Math.floor(rng()*a.length)],all=PRIZES.map((q,i)=>i);
