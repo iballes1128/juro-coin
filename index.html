@@ -4040,7 +4040,7 @@ function ofGhostAt(p){const g=ofS.ghost;if(!g)return;const f=ofFt(g);if(ofIsWall
 function ofItemAt(o,gx,gy,wallY){let best=null;for(const it of o.it||[]){const wall=ofIsWall(it.k);if(wallY){if(!wall)continue;const f=ofFt(it);if(gx>=it.x&&gx<it.x+f.w)best=it;continue;}if(wall)continue;const f=ofFt(it);if(gx>=it.x&&gx<it.x+f.w&&gy>=it.y&&gy<it.y+f.h){if(!best||ofCatOf(it.k)==="m")best=it;}}return best;}
 function ofPointer(p,ph){const o=ofS.o;if(!o)return;
   if(ofS.mode==="paint"){if(ph==="down"||ph==="drag"){const c=ofCellAt(p),L=ofL(o);if(p.y>=0&&c.x>=0&&c.y>=0&&c.x<L.c&&c.y<L.r&&ofS.paint!=null){ofS.pend=ofS.pend||{};const k=c.x+","+c.y;if(ph==="down")ofS.pdrag=ofS.pend[k]?"del":"add";if(ofS.pdrag==="del")delete ofS.pend[k];else ofS.pend[k]=1;ofBar();}}return;}
-  if(ofS.mode==="place"){if(ofS.ghost){if(ph==="down"||ph==="drag"||ph==="hover"){ofGhostAt(p);if(ph==="down"&&ofS.ptype==="mouse")ofPutGhost();}return;}
+  if(ofS.mode==="place"){if(ofS.ghost){if(ph==="down"||ph==="drag"){ofGhostAt(p);}return;}/* 누르고 있을 때만 가구가 움직여요 (마우스 올리기만으론 안 따라와요) */
     if(ph==="down"){const c=ofCellAt(p),wallY=p.y<0;const it=ofItemAt(o,c.x,c.y,wallY);if(!it||it.k==="box")return;ofPick(it.u);}return;}
   return;/* 보기 모드: 화면 터치로는 움직이거나 누르지 않아요 (조이스틱 + 상호작용 버튼) */
   if(ph!=="down")return;const wx=p.x,wy=p.y+OF_WH;
@@ -4057,7 +4057,7 @@ function ofGoTo(it,fn){const f=ofFt(it);const x=it.x*OF_CS+f.w*OF_CS/2,y=it.y*OF
 /* ---------- 배치 모드 ---------- */
 function ofModeSet(m){ofS.mode=m;ofS.ghost=null;ofS.held=null;ofS.paint=null;ofS.wallSel=null;ofS.pend={};ofS.paintCost=0;ofS.tx=null;ofS.want=null;ofBar();ofHint();}
 function ofModeEnd(){ofModeSet("view");}
-function ofHint(){const h=$("ofHint");if(!h)return;h.textContent=ofS.mode==="place"?(ofS.ghost?"끌어서 자리를 정하고 ↻로 방향을 돌려요":"옮기거나 보관할 가구를 눌러요"):ofS.mode==="paint"?"칸을 눌러(끌어서) 고르고 [구매]를 눌러요 · 가구는 반투명이에요":ofS.mode==="wall"?"벽을 미리 보고 [구매]를 눌러요":"";}
+function ofHint(){const h=$("ofHint");if(!h)return;h.textContent=ofS.mode==="place"?(ofS.ghost?"누른 채로 끌어서 자리를 정하고 ✔로 두세요 · ↻ 회전":"옮기거나 보관할 가구를 눌러요"):ofS.mode==="paint"?"칸을 눌러(끌어서) 고르고 [구매]를 눌러요 · 가구는 반투명이에요":ofS.mode==="wall"?"벽을 미리 보고 [구매]를 눌러요":"";}
 function ofPick(u,solo){const o=me.of,it=ofItemBy(o,u);if(!it)return;
   let att=null;if(ofCatOf(it.k)==="m")solo=true;
   if(!solo){let desk=it;if(ofCatOf(it.k)==="m"){const mc=ofCells(it).map(a=>a.join(","));desk=(o.it||[]).find(d=>ofCatOf(d.k)==="d"&&mc.every(k=>ofCells(d).some(b=>b.join(",")===k)))||it;}
