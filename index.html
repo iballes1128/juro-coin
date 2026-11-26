@@ -4049,7 +4049,7 @@ function ofChips(){const o=ofS.o,c=$("ofChips");if(!o||!c)return;const L=ofL(o);
   const pi=$("ofPaintInfo");if(pi)pi.textContent="칠하는 중 · 쓴 돈 "+formatMoneyReadable(ofS.paintCost|0);}
 /* ---------- 들어가기 / 나가기 ---------- */
 function ofVisitorsN(id){return Object.keys(onlineMap||{}).filter(k=>k!==id&&k!==myId&&onlineMap[k]&&onlineMap[k].fo===id&&Date.now()-(onlineMap[k].t||0)<180000).length;}
-function ofEnterScene(id){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const mine=id===myId,p=mine?me:players[id];if(!p||!p.of)return toast("사무실이 없어요");
+function ofEnterScene(id){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const mine=id===myId,p=mine?me:players[id];if(!mine)return toast("🚧 다른 사람의 사무실 방문은 아직 구현 중이에요");if(!p||!p.of)return toast("사무실이 없어요");
   if(!mine&&ofVisitorsN(id)>=OF_VIS)return toast(`🏢 방문자가 가득 찼어요 (최대 ${OF_VIS}명)`);
   fKeys={};ofBuildDom();ofS.own=id;ofS.mine=mine;ofS.o=p.of;ofS.mode="view";ofS.ghost=null;ofS.held=null;ofS.tx=null;ofS.want=null;ofS.keys={};ofS.dir=1;
   if(mine)ofSettle(me.of,ofNow());const sp=ofSpawn(p.of);ofS.px=sp.x;ofS.py=sp.y;ofIn=id;$("ofMod").style.display="flex";$("ofChips").dataset.h="";
