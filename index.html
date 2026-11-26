@@ -1484,7 +1484,7 @@ const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
 const enhBase=L=>Math.max(5,90-L*1.85);
 const ENH_DROP_LV=25,enhDropP=L=>L<ENH_DROP_LV?0:Math.min(.5,.15+(L-ENH_DROP_LV)*.008);/* 하락 확률: +25에서 15%, 한 단계마다 +0.8%p (+49에서 약 34%) */
 const ENH_ITEMS={n:{nm:"일반 강화권",ic:"🔨",price:500000,t:"up"},a:{nm:"고급 강화권",ic:"⚒️",price:2000000,t:"up"},rn:{nm:"일반 복구권",ic:"🩹",price:1000000,t:"rc"},ra:{nm:"고급 복구권",ic:"💊",price:3000000,t:"rc"}};
-const eiBoost=(k,L)=>{const b=L<20?3:L<30?2.5:L<40?2:1.5;return k==="n"?b:k==="a"?b*2.5:0;};/* 강화권 1장당 올라가는 성공 확률(%p) */
+const eiBoost=(k,L)=>{const b=L<20?3:L<30?2.5:L<40?1.8:L<45?1.3:1;return k==="n"?b:k==="a"?Math.round(b*20)/10:0;};/* 강화권 1장당 올라가는 성공 확률(%p) */
 const eiRecov=(k,L)=>k==="rn"?(L<35?6:L<45?5:4):k==="ra"?(L<35?15:L<45?12:10):0;/* 복구권 1장당 '하락을 막을' 확률(%p) */
 const eiHave=k=>((me&&me.enhI&&me.enhI[k])|0);let enhUse={n:0,a:0,rn:0,ra:0};const enhSlotItems=()=>[...Array(enhUse.n).fill("n"),...Array(enhUse.a).fill("a")],enhRecItems=()=>[...Array(enhUse.ra).fill("ra"),...Array(enhUse.rn).fill("rn")];
 const eiSum=(L,use)=>{const u=use||enhUse,ib=u.n*eiBoost("n",L)+u.a*eiBoost("a",L),prot=L>=ENH_DROP_LV?Math.min(1,(u.rn*eiRecov("rn",L)+u.ra*eiRecov("ra",L))/100):0;return{ib,prot};};
