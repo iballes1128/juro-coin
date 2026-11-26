@@ -646,9 +646,21 @@ const $=id=>document.getElementById(id);
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),2600);}
 const myName=()=>(me&&me.name)||"나";
 function assetOf(p){let s=p.cash||0;for(const d of(p.bk||[]))s+=d.a|0;if(p.of&&p.of.bx)s+=Math.floor(p.of.bx.a||0);for(const n in(p.coins||{})){const ci=COINS.findIndex(c=>c[0]===n);if(ci>=0)s+=(p.coins[n].count||0)*priceOf(ci);}return s;}
+function adoptServerMe(v){me=JSON.parse(JSON.stringify(v));me.coins=me.coins||{};me.claimed=me.claimed||[];me.log=me.log||[];me.att=me.att||0;me._loaded=true;try{renderAll();}catch(e){}}
 async function saveMe(){if(sessBlocked)return;if(localMode){try{const{_loaded,...o}=me;localStorage.setItem(LKEY,JSON.stringify(o));}catch(e){}return;}if(!fdb||!myId||!me||!me._loaded){return;}if(saving){dirty=true;return;}saving=true;
-  try{const{_loaded,...o}=me;if(o.of){try{localStorage.setItem("jc_ofbak_"+myId,JSON.stringify(o.of));}catch(_){}}await fdb.ref("players/"+myId).set(JSON.parse(JSON.stringify({...o,t:Date.now()})));}catch(e){const cd=e&&(e.code||e.message)||"?";try{console.error("saveMe",e);}catch(_){}toast("저장 실패 ("+String(cd).slice(0,40)+"): 인터넷 연결을 확인해 주세요");}
+  try{const{_loaded,...o}=me;if(o.of){try{localStorage.setItem("jc_ofbak_"+myId,JSON.stringify(o.of));}catch(_){}}
+    /* 다른 기기가 먼저 저장한 게 있으면(버전이 다르면) 덮어쓰지 않고 최신 상태를 불러와요 → 예전 시점으로 되돌아가는 문제 방지 */
+    const base=me.ver|0,nv=base+1,data=JSON.parse(JSON.stringify({...o,ver:nv,t:Date.now()}));
+    let r;
+    if(window._verOff){delete data.ver;await fdb.ref("players/"+myId).set(data);r={committed:true};}
+    else{try{r=await fdb.ref("players/"+myId).transaction(cur=>{if(cur&&(cur.ver|0)!==base)return;return data;});}
+      catch(e2){if(e2&&/PERMISSION/i.test(String(e2.code||e2.message))){window._verOff=1;delete data.ver;await fdb.ref("players/"+myId).set(data);r={committed:true};}else throw e2;}}
+    if(r&&r.committed){if(!window._verOff)me.ver=nv;}
+    else{dirty=false;const sn=await fdb.ref("players/"+myId).once("value"),v=sn.val();if(v){adoptServerMe(v);toast("☁️ 다른 기기에서 바뀐 내용이 있어서 최신 상태로 불러왔어요");}}
+  }catch(e){const cd=e&&(e.code||e.message)||"?";try{console.error("saveMe",e);}catch(_){}toast("저장 실패 ("+String(cd).slice(0,40)+"): 인터넷 연결을 확인해 주세요");}
   saving=false;if(dirty){dirty=false;saveMe();}}
+/* 앱으로 돌아왔을 때 서버가 더 최신이면 먼저 불러와요 */
+document.addEventListener("visibilitychange",async()=>{if(document.hidden||!fdb||!myId||!me||!me._loaded||saving||localMode)return;try{const sn=await fdb.ref("players/"+myId).once("value"),v=sn.val();if(v&&!saving&&(v.ver|0)>(me.ver|0)){adoptServerMe(v);toast("☁️ 최신 상태로 불러왔어요");}}catch(e){}});
 
 /* ===================== 시바이누·리플 개편: 보유 수량 병합 (가치 유지) ===================== */
 let cfgReady=false,evReady=false;
