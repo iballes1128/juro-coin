@@ -2083,7 +2083,7 @@ const dragonRider=o=>{for(const id in fOthers){const q=fOthers[id];if(q&&q.bt===
 function driverOf(o){let best=null,bd=60;if(fBoat===5){const d=Math.hypot(o.x-(fp.x-24),o.y-fp.y);if(d<bd){bd=d;best={x:fp.x,y:fp.y,tl:fBoatTilt};}}for(const id in fOthers){const q=fOthers[id];if(!q||q===o||q.bt!==5||q.fs==="away"||(q.fa|0)!==(o.fa|0))continue;const d=Math.hypot(o.x-(q.x-24),o.y-q.y);if(d<bd){bd=d;best=q;}}return best;}
 function rideCand(){if(fBoat||fRide||fstate!=="idle")return null;let best=null,bd=62;for(const id in fOthers){const o=fOthers[id];if(!o||o.bt!==5||o.fs==="away"||(o.fa|0)!==fArea)continue;const d=Math.hypot(o.x-fp.x,o.y-fp.y);if(d<bd&&!dragonRider(o)){bd=d;best=id;}}return best;}
 function boatRide(id){const o=fOthers[id];if(!o||o.bt!==5||fBoat||fRide)return;if(dragonRider(o))return toast("🐉 이미 뒷자리에 누가 타고 있어요");if(Math.hypot(o.x-fp.x,o.y-fp.y)>70)return toast("보트 가까이 가야 탈 수 있어요");fRide=id;fp.tx=null;fp.via=null;fp.x=o.x-24;fp.y=o.y;fp.dir=o.dir||1;fBoatTilt=o.tl||0;fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"🐉 동승!",t:performance.now(),c:"#a5f3fc"});fLastSent="";setFishBtn();}
-function rideStep(){const d=fOthers[fRide];if(!d||d.bt!==5||d.fs==="away"||(d.fa|0)!==fArea){const nm=d&&d.name?d.name:"운전자";fBoat=0;fRide="";if(fp.x>=DOCK.x-26&&fp.x<=DOCK.x+DOCK.w+26){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();return toast("🐉 보트가 멈춰서 내렸어요");}fp.x=d.x-24;fp.y=d.y;fp.dir=d.dir||1;fBoatTilt=d.tl||0;}
+function rideStep(){const d=fOthers[fRide];if(!d||d.bt!==5||d.fs==="away"||(d.fa|0)!==fArea){fstate="idle";fBoat=0;fRide="";if(fp.x>=DOCK.x-26&&fp.x<=DOCK.x+DOCK.w+26){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();return toast("🐉 보트가 멈춰서 내렸어요");}fp.x=d.x-24;fp.y=d.y;fp.dir=d.dir||1;fBoatTilt=d.tl||0;}
 function drawDock(c){c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
   c.fillStyle="#4a301b";for(const py of[DOCK.y,DOCK.y+40,DOCK.y+80]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}}
 /* 보트가 선착장 밑을 지나갈 때: 보트가 있는 부분만 선착장 판자를 위에 다시 덮어서 '다리 밑'처럼 보이게 */
@@ -3004,8 +3004,9 @@ function autoCardHtml(){const n=me?(me.autoN|0):0,k=autoK();return `<div class="
 const fKeysOn=()=>fKeys.ArrowUp||fKeys.ArrowDown||fKeys.ArrowLeft||fKeys.ArrowRight||fKeys.w||fKeys.a||fKeys.s||fKeys.d;
 function fishStep(dt,t){
   autoStep(t);
+  if(fRide)rideStep();
   if(fstate==="idle"&&fBoat){boatStep(dt,t);}
-  else if(fRide){rideStep();}
+  else if(fstate==="idle"&&fRide){}
   else if(fstate==="idle"){const wk=fArea?walk1:walkable;let vx=0,vy=0;if(fKeys.ArrowLeft||fKeys.a)vx--;if(fKeys.ArrowRight||fKeys.d)vx++;if(fKeys.ArrowUp||fKeys.w)vy--;if(fKeys.ArrowDown||fKeys.s)vy++;
     if(fJoyV){vx=fJoyV.x;vy=fJoyV.y;}if(vx||vy){fp.tx=null;fp.via=null;}else if(fp.tx!=null){const gx=fp.via?fp.via.x:fp.tx,gy=fp.via?fp.via.y:fp.ty;const dx=gx-fp.x,dy=gy-fp.y,dd=Math.hypot(dx,dy);if(dd<=Math.max(2,.11*dt)){fp.x=gx;fp.y=gy;if(fp.via)fp.via=null;else fp.tx=null;}else{vx=dx/dd;vy=dy/dd;}}
     if(vx||vy){const l=Math.hypot(vx,vy),sp=(fBoat?.085:.11)*dt*(fJoyV?Math.max(.45,fJoyV.m):1);const nx=fp.x+vx/l*sp,ny=fp.y+vy/l*sp;if(wk(nx,ny)){fp.x=nx;fp.y=ny;}else if(wk(nx,fp.y))fp.x=nx;else if(wk(fp.x,ny))fp.y=ny;else fp.tx=null;if(vx)fp.dir=vx>0?1:-1;}}
@@ -3057,7 +3058,7 @@ function fishAction(){if(sessBlocked)return;if(!me||!me._loaded)return toast("�
   if(fstate==="idle"&&nearClw(fp.x,fp.y)){fp.tx=null;return openArcade();}
   if(fstate==="idle"&&nearPhb(fp.x,fp.y)){fp.tx=null;return openPhoto();}
   if(fstate==="idle"&&nearBnk(fp.x,fp.y)){fp.tx=null;return openBank();}if(fstate==="idle"&&nearOfb(fp.x,fp.y)){fp.tx=null;return openOfficeList();}if(fstate==="idle"&&nearLtb(fp.x,fp.y)){fp.tx=null;return openLotto();}
-  if(fstate==="idle"){if(fRide)return toast("🐉 동승 중에는 낚시할 수 없어요");if(!fishSpot(fp.x,fp.y))return;fp.tx=null;fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};setFishBtn();}
+  if(fstate==="idle"){if(!fishSpot(fp.x,fp.y))return;fp.tx=null;fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};setFishBtn();}
   else if(fstate==="wait"){fstate="idle";fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"너무 빨리 당겼다! 🐟💨",t,c:"#9fb3c8"});setFishBtn();}
   else if(fstate==="bite"){fstate="idle";setFishBtn();landFish(t);}}
 /* 낚시 경험치: 잡힐 확률에 반비례 (1만 원 물고기 확률 기준 5, 2배 드물면 10 …), 최소 5, 쓰레기는 0 */
