@@ -161,6 +161,7 @@ nav button.on{color:var(--tx);font-weight:700}
 #fTkCol{flex:none;width:128px}#fTkHide{width:100%;background:var(--card2);border-radius:8px;padding:4px 0;font-size:10px;color:var(--sub);margin-bottom:4px}
 #fBoatBtn{position:absolute;left:50%;transform:translateX(-50%);top:8px;display:none;background:rgba(14,116,144,.88);color:#fff;font-size:11.5px;font-weight:800;border-radius:12px;padding:6px 13px;z-index:3}#fBoatBtn.on{background:rgba(71,85,105,.9)}
 #fBridgeLock{position:absolute;left:50%;transform:translateX(-50%);top:8px;display:none;background:rgba(127,29,29,.9);color:#fff;font-size:11.5px;font-weight:800;border-radius:12px;padding:6px 13px;z-index:3}
+#fAutoBtn{position:absolute;right:8px;top:8px;display:none;background:rgba(180,83,9,.9);color:#fff;font-size:11px;font-weight:800;border-radius:12px;padding:6px 11px;z-index:3}#fAutoBtn.on{background:rgba(71,85,105,.92)}
 #fTkShow{position:absolute;left:8px;top:8px;display:none;background:rgba(10,12,16,.6);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:4px 9px}
 #fRow.tkoff #fTkCol{display:none}#fRow.tkoff #fTkShow{display:block}
 @media (max-width:600px){#fRow{gap:5px}#fTkCol{width:86px}#fTicker{width:auto;gap:3px}#fTicker span{padding:2px 5px;line-height:1.2;border-radius:7px}#fTicker small{font-size:8px}#fTicker b{font-size:9px}#fTicker em{font-size:8px}#fTkHide{font-size:9px}}
@@ -253,7 +254,7 @@ nav button.on{color:var(--tx);font-weight:700}
   </section>
   <section class="sec" id="s-fish">
     <div id="fRow"><div id="fTkCol"><button id="fTkHide">◀ 시세 접기</button><div id="fTicker"></div></div>
-    <div id="fishWrap"><canvas id="fishCv"></canvas><div id="fishRes"></div><div id="fFeed"></div><button id="fTkShow">📈 시세</button><button id="fBoatBtn">🚤 보트 타기</button><button id="fBridgeLock">🔒 다리 닫기</button>
+    <div id="fishWrap"><canvas id="fishCv"></canvas><div id="fishRes"></div><div id="fFeed"></div><button id="fTkShow">📈 시세</button><button id="fBoatBtn">🚤 보트 타기</button><button id="fAutoBtn">🤖 자동낚시</button><button id="fBridgeLock">🔒 다리 닫기</button>
       <div id="fJoy"><i></i></div><button id="fAct">🎣<small>던지기</small></button></div></div>
     <button id="fishBtn" class="fbtn">🎣 낚싯대 던지기</button>
     <div class="fhelp pc">방향키·WASD 이동 · <b>스페이스</b> 낚싯대 던지기/당기기/어시장 열기 · <b>Enter</b> 오른쪽 채팅창에 입력 (말풍선으로 떠요)</div>
@@ -764,7 +765,7 @@ function renderMisc(){const S=$("s-shop");if(pgCur!=="shop"||pgSub!=="misc")retu
   const mqSet=(k,v)=>{v=Math.max(1,Math.min(999,v|0||1));miscQ[k]=v;const i=S.querySelector(`[data-mi="${k}"]`),B=S.querySelector(`[data-mb="${k}"]`);if(i&&i.value!==String(v))i.value=v;if(B)B.textContent=`${v}장 · ${dealTxt("misc|"+k,ENH_ITEMS[k].price,v)}`;};
   S.querySelectorAll("[data-mq]").forEach(b=>b.onclick=()=>{const[k,d]=b.dataset.mq.split("|");mqSet(k,miscQ[k]+(+d));});
   S.querySelectorAll("[data-mi]").forEach(i=>{i.oninput=()=>{const t=i.value.replace(/[^0-9]/g,"");if(t==="")return;mqSet(i.dataset.mi,+t);i.value=String(miscQ[i.dataset.mi]);};i.onblur=()=>mqSet(i.dataset.mi,+i.value.replace(/[^0-9]/g,"")||1);});
-  S.querySelectorAll("[data-mb]").forEach(b=>b.onclick=()=>{const k=b.dataset.mb,I=ENH_ITEMS[k],q=miscQ[k],dkm="misc|"+k,c0=dealCalc(dkm,I.price,q);askBuy(`${I.nm} ${q}장`,c0.total,()=>{const dc=dealCalc(dkm,I.price,q),pr=dc.total;if(me.cash<pr){renderMisc();return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(pr)} 필요)`);}me.cash-=pr;dealUse(dkm,dc.dq);stAdd("spent",pr);stAdd("shopMiscN");me.enhI=me.enhI||{};me.enhI[k]=eiHave(k)+q;saveMe();renderHeader();renderMisc();toast(`🛍️ ${I.nm} ${q}장 구매!`);},c0.save>0?`🏷️ 10% 할인 ${c0.dq}장 적용 (-${formatMoneyReadable(c0.save)}) · 낚싯대 강화에서 쓸 수 있어요`:"낚싯대 강화에서 쓸 수 있어요");});}
+  S.querySelectorAll("[data-mb]").forEach(b=>b.onclick=()=>{const k=b.dataset.mb,I=ENH_ITEMS[k],q=miscQ[k],dkm="misc|"+k,c0=dealCalc(dkm,I.price,q);askBuy(`${I.nm} ${q}장`,c0.total,()=>{const dc=dealCalc(dkm,I.price,q),pr=dc.total;if(me.cash<pr){renderMisc();return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(pr)} 필요)`);}me.cash-=pr;dealUse(dkm,dc.dq);stAdd("spent",pr);stAdd("shopMiscN");me.enhI=me.enhI||{};me.enhI[k]=eiHave(k)+q;saveMe();renderHeader();renderMisc();toast(`🛍️ ${I.nm} ${q}장 구매!`);},c0.save>0?`🏷️ 10% 할인 ${c0.dq}장 적용 (-${formatMoneyReadable(c0.save)}) · 낚싯대 강화에서 쓸 수 있어요`:"낚싯대 강화에서 쓸 수 있어요");});S.insertAdjacentHTML("beforeend",autoCardHtml());const ab=S.querySelector("[data-abuy]");if(ab)ab.onclick=autoBuy;}
 let cosArm=null,enhMat=[],enhBusy=false;
 function cosPreview(cv,k,id,ch){const g=cv.getContext("2d"),t=performance.now();g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,cv.width,cv.height);g.scale(2.2,2.2);const x=cv.width/4.4,y=cv.height/2.2-8;
   if(k==="aura")drawAura(g,x,y,id,t,0);if(k==="wing")drawWing(g,x,y,1,id,t,0);drawChar(g,x,y,ch,0,1,0,0);if(k==="acc")drawAccFor(g,x,y,ch,id,t,0,1,0);if(k==="aura")drawAura(g,x,y,id,t,1);if(k==="plate")drawPlate(g,x,y+4,String(myName()).slice(0,6),id,t,true);}
@@ -2399,8 +2400,30 @@ const fishBobX=(x,y,dir)=>boatOK(x,y)&&!inDock(x,y)?Math.max(12,Math.min(FW-12,x
 let fBubbles={};function fishBubble(id,text){if(!id)return;fBubbles[id]={text:String(text).slice(0,60),t:Date.now()};}
 function drawBubble(c,x,y,text){c.font="8.5px 'Noto Sans KR',sans-serif";const words=[...text],lines=[];let cur="";for(const ch of words){if(c.measureText(cur+ch).width>110){lines.push(cur);cur=ch;}else cur+=ch;}if(cur)lines.push(cur);const ls=lines.slice(0,3),w=Math.max(...ls.map(l=>c.measureText(l).width))+10,h=ls.length*12+6,bx=Math.max(4,Math.min(FW-w-4,x-w/2)),by=y-58-h;
   c.fillStyle="rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,w,h,8);c.fill();c.beginPath();c.moveTo(x-5,by+h);c.lineTo(x+5,by+h);c.lineTo(x,by+h+6);c.fill();c.fillStyle="#111";c.textAlign="left";ls.forEach((l,i)=>c.fillText(l,bx+5,by+12.5+i*12));c.textAlign="center";}
+/* ===== 🤖 자동낚시: 이용권(me.autoN회)을 쓰면 수동 낚시처럼 던지고 기다렸다가 알아서 당겨 줘요 · 움직이거나 낚시터를 벗어나면 취소 ===== */
+var AUTO_PRICE=15000000,AUTO_N=100,fAuto=0,fAutoT=0,fAutoR=0;
+function autoBtnUpd(){const B=$("fAutoBtn");if(!B)return;const n=me?(me.autoN|0):0,show=(n>0||fAuto)&&!fBoat&&(fAuto||fstate==="idle"),tx=fAuto?`⏹ 자동낚시 끄기 (${n}회)`:`🤖 자동낚시 (${n}회)`,d=show?"block":"none";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fAuto);}}
+function autoStop(msg){if(!fAuto)return;fAuto=0;if(msg)toast(msg);setFishBtn();autoBtnUpd();}
+function autoToggle(){if(sessBlocked)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");
+  if(fAuto){autoStop("🤖 자동낚시를 껐어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
+  if((me.autoN|0)<=0)return toast("🤖 자동낚시 이용권이 없어요\n🛍️ 상점 → 기타에서 살 수 있어요");if(fBoat)return toast("🚤 보트에서는 쓸 수 없어요");
+  if(fstate!=="idle"||!fishSpot(fp.x,fp.y))return toast("🎣 낚시할 수 있는 강가에 서서 눌러 주세요");
+  fp.tx=null;fAuto=1;fAutoT=0;toast(`🤖 자동낚시 시작! (${me.autoN|0}회 남음)\n움직이거나 낚시터를 벗어나면 취소돼요`);setFishBtn();autoBtnUpd();}
+function autoStep(t){if(!fAuto)return;
+  if(sessBlocked||!me||!me._loaded||fBoat){fAuto=0;autoBtnUpd();return;}
+  const away=!fishSpot(fp.x,fp.y);
+  if(away||fKeysOn()||fJoyV||fp.tx!=null){autoStop(away?"🤖 낚시터를 벗어나서 자동낚시를 취소했어요":"🤖 움직여서 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
+  if(fstate==="idle"){if(t>=fAutoT){if((me.autoN|0)<=0){autoStop("🤖 자동낚시 이용권을 다 썼어요");return;}
+    fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};fAutoR=420+Math.random()*520;setFishBtn();}}
+  else if(fstate==="bite"&&t-fT>=fAutoR){fstate="idle";me.autoN=Math.max(0,(me.autoN|0)-1);fAutoT=t+650+Math.random()*450;landFish(t);
+    if((me.autoN|0)<=0)autoStop("🤖 자동낚시 이용권을 모두 썼어요!");else{setFishBtn();autoBtnUpd();}}}
+function autoBuy(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(me.autoBuy===todayKey())return toast("🤖 자동낚시 이용권은 하루에 한 번만 살 수 있어요");
+  askBuy(`자동낚시 이용권 ${AUTO_N}회`,AUTO_PRICE,()=>{if(me.autoBuy===todayKey())return toast("오늘은 이미 샀어요");if(me.cash<AUTO_PRICE)return toast(`💸 잔액이 부족해요 (${formatMoneyReadable(AUTO_PRICE)} 필요)`);
+    me.cash-=AUTO_PRICE;stAdd("spent",AUTO_PRICE);stAdd("shopMiscN");me.autoN=(me.autoN|0)+AUTO_N;me.autoBuy=todayKey();saveMe();renderHeader();renderMisc();toast(`🤖 자동낚시 ${AUTO_N}회권 구매!\n낚시터의 🤖 버튼으로 써요`);},"낚시터 오른쪽 위 🤖 버튼으로 써요 · 하루 1번만 살 수 있어요");}
+function autoCardHtml(){const n=me?(me.autoN|0):0,got=!!(me&&me.autoBuy===todayKey());return `<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:28px">🤖</span><div style="flex:1;min-width:0"><b>자동낚시 이용권 ${AUTO_N}회</b> <span style="color:var(--sub);font-size:11px">남은 ${n}회</span><div style="font-size:10.5px;color:var(--ok);margin-top:2px;line-height:1.5">낚시터에서 🤖 버튼을 누르면 알아서 던지고 당겨 줘요 · 내 낚싯대·미끼 그대로(미끼는 소모) · 움직이거나 낚시터를 벗어나면 취소돼요(남은 횟수는 유지) · 하루 1번만 살 수 있어요</div></div></div><button data-abuy style="width:100%;margin-top:8px;height:36px;border-radius:10px;background:${got?"var(--card2)":"var(--acc)"};color:${got?"var(--sub)":"#111"};font-weight:900;font-size:12.5px">${got?"오늘은 이미 샀어요 (내일 또 살 수 있어요)":formatMoneyReadable(AUTO_PRICE)+" · 구매"}</button></div>`;}
 const fKeysOn=()=>fKeys.ArrowUp||fKeys.ArrowDown||fKeys.ArrowLeft||fKeys.ArrowRight||fKeys.w||fKeys.a||fKeys.s||fKeys.d;
 function fishStep(dt,t){
+  autoStep(t);
   if(fstate==="idle"&&fBoat){boatStep(dt,t);}
   else if(fstate==="idle"){const wk=fArea?walk1:walkable;let vx=0,vy=0;if(fKeys.ArrowLeft||fKeys.a)vx--;if(fKeys.ArrowRight||fKeys.d)vx++;if(fKeys.ArrowUp||fKeys.w)vy--;if(fKeys.ArrowDown||fKeys.s)vy++;
     if(fJoyV){vx=fJoyV.x;vy=fJoyV.y;}if(vx||vy){fp.tx=null;fp.via=null;}else if(fp.tx!=null){const gx=fp.via?fp.via.x:fp.tx,gy=fp.via?fp.via.y:fp.ty;const dx=gx-fp.x,dy=gy-fp.y,dd=Math.hypot(dx,dy);if(dd<=Math.max(2,.11*dt)){fp.x=gx;fp.y=gy;if(fp.via)fp.via=null;else fp.tx=null;}else{vx=dx/dd;vy=dy/dd;}}
@@ -2408,6 +2431,7 @@ function fishStep(dt,t){
   else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const bid=eqOf("bait"),fx=BAIT_FX[bid]||BAIT_FX.basic;fBaitPro=fx[1];if(bid!=="basic"){const bk=baitKey(bid);me[bk]=Math.max(0,(me[bk]|0)-1);if(!me[bk]){me.eq.bait="basic";saveMe();toast(`🪱 ${({mid:"중급",pro:"고급",max:"최고급"})[bid]} 미끼를 다 썼어요! 기본 미끼로 바뀌었어요`);}}fBite=(1500+Math.random()*4000)*fx[0];setFishBtn();}
   else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
+  autoBtnUpd();
   {const B=$("fBoatBtn");if(B){{const L=$("fBridgeLock");if(L){const d=isOwner&&fArea&&bridgeAll?"block":"none";if(L.style.display!==d)L.style.display=d;}}
   const own=myBoat()?1:0;if(!own&&fBoat)boatLeave();const d=own&&(fBoat||(fstate==="idle"&&fp.y<=RIVER+34))?"block":"none",tx=fBoat?"⚓ 보트 내리기":"🚤 보트 타기";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fBoat);}}}
   if(fstate==="idle"&&!fBoat){if(!fArea&&fp.y<=DOCK.y+22&&fp.x>=DOCK.x+2&&fp.x<=DOCK.x+DOCK.w-2){if(bridgeAll||(isOwner&&bridgeOpen))fishArea(1,t);else if(isOwner)bridgeGate(t);}
@@ -2427,9 +2451,10 @@ function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id=
     if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if((o.fct||Date.now()-v.fc.t<8000)&&(v.fa|0)===fArea)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({a:v.fa|0,x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=BIG_V?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
 function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
-  if(fstate==="idle"&&nearNpc(fp.x,fp.y)){ic="🎁";tx="보상";}else if(fstate==="idle"&&nearFmk(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearShop(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearNts(fp.x,fp.y)){ic="🏛️";tx="국세청";}else if(fstate==="idle"&&nearCas(fp.x,fp.y)){ic="🎰";tx="도박장";}else if(fstate==="idle"&&nearClw(fp.x,fp.y)){ic="🕹️";tx="오락실";}else if(fstate==="idle"&&nearPhb(fp.x,fp.y)){ic="📸";tx="인생네컷";}else if(fstate==="idle"&&nearBnk(fp.x,fp.y)){ic="🏦";tx="은행";}else if(fstate==="idle"){ic="🎣";tx=can?"던지기":"강가로";cl=can?"":"off";}else if(fstate==="bite"){ic="❗";tx="당겨!";cl="bite";}else{ic="⏳";tx="기다려";cl="wait";}
+  if(fAuto){ic="🤖";tx="취소";cl="wait";}else if(fstate==="idle"&&nearNpc(fp.x,fp.y)){ic="🎁";tx="보상";}else if(fstate==="idle"&&nearFmk(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearShop(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearNts(fp.x,fp.y)){ic="🏛️";tx="국세청";}else if(fstate==="idle"&&nearCas(fp.x,fp.y)){ic="🎰";tx="도박장";}else if(fstate==="idle"&&nearClw(fp.x,fp.y)){ic="🕹️";tx="오락실";}else if(fstate==="idle"&&nearPhb(fp.x,fp.y)){ic="📸";tx="인생네컷";}else if(fstate==="idle"&&nearBnk(fp.x,fp.y)){ic="🏦";tx="은행";}else if(fstate==="idle"){ic="🎣";tx=can?"던지기":"강가로";cl=can?"":"off";}else if(fstate==="bite"){ic="❗";tx="당겨!";cl="bite";}else{ic="⏳";tx="기다려";cl="wait";}
   const h=`${ic}<small>${tx}</small>`;if(a.innerHTML!==h)a.innerHTML=h;a.className=cl;}
 function setFishBtn(){setFishAct();const b=$("fishBtn");if(!b)return;const can=fishSpot(fp.x,fp.y);
+  if(fAuto){b.textContent=`🤖 자동낚시 중… ${me.autoN|0}회 남음 (누르면 취소)`;b.disabled=false;b.className="fbtn wait";return;}
   if(fstate==="idle"&&nearFmk(fp.x,fp.y)){b.textContent="🐟 어시장 열기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"&&nearShop(fp.x,fp.y)){b.textContent="🐟 어시장 열기";b.disabled=false;b.className="fbtn";}
   else if(fstate==="idle"&&nearNts(fp.x,fp.y)){b.textContent="🏛️ 국세청 들어가기";b.disabled=false;b.className="fbtn";}
@@ -2441,6 +2466,7 @@ function setFishBtn(){setFishAct();const b=$("fishBtn");if(!b)return;const can=f
   else if(fstate==="cast"||fstate==="wait"){b.textContent="… 입질 기다리는 중";b.disabled=false;b.className="fbtn wait";}
   else{b.textContent="❗ 지금 당겨!";b.disabled=false;b.className="fbtn bite";}}
 function fishAction(){if(sessBlocked)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const t=performance.now();
+  if(fAuto){autoStop("🤖 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
   if(fstate==="idle"&&nearNpc(fp.x,fp.y)){fp.tx=null;return rpsClaim();}
   if(fstate==="idle"&&nearFmk(fp.x,fp.y)){fp.tx=null;return openFmk();}
   if(fstate==="idle"&&nearShop(fp.x,fp.y)){fp.tx=null;return openMarket();}
@@ -2495,7 +2521,7 @@ function renderFishInfo(){const box=$("fishInfo");if(!box||!($("pgMod").style.di
 /* 명예의 전당 금액은 지금 물고기 시세로 보여줘요 (예전에 시세를 낮췄을 때 기록된 값도 현재 시세로) */const hofV=h=>{const f=FISH.find(x=>x[2]===h.fish);return f&&f[1]>0?f[1]:h.v;};
 function hofHtml(){return `<div class="card"><h3>🏆 대어 명예의 전당 (1,000만 원 이상)</h3>${fHof.length?fHof.slice().reverse().map(h=>{const d=new Date(h.t);return `<div class="rk"><div class="w"><b>${esc(h.fish)}</b><small>${esc(h.name)} · ${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,"0")}</small></div><div class="v up">${formatMoneyReadable(hofV(h))}</div></div>`;}).join(""):'<div style="color:var(--sub);font-size:12px">아직 대어를 낚은 사람이 없어요</div>'}</div>`;}
 function fishInit(){{let armT=0;$("fBridgeLock").onclick=()=>{const b=$("fBridgeLock");if(Date.now()-armT>3000){armT=Date.now();b.textContent="한 번 더 누르면 모두에게 닫혀요";return;}armT=0;b.textContent="🔒 다리 닫기";bridgeOpen=false;bridgeAll=false;if(fdb)fdb.ref("market/bridge2").set({open:false,t:Date.now(),by:myId}).then(()=>toast("🔒 다리를 닫았어요")).catch(()=>toast("실패"));};}
-  $("fBoatBtn").onclick=()=>fBoat?boatLeave():boatBoard();if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCam=camT();fCamY=camTY();fCv=$("fishCv");fCtx=fCv.getContext("2d");fishResize();window.addEventListener("resize",fishResize);
+  $("fBoatBtn").onclick=()=>fBoat?boatLeave():boatBoard();$("fAutoBtn").onclick=autoToggle;if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCam=camT();fCamY=camTY();fCv=$("fishCv");fCtx=fCv.getContext("2d");fishResize();window.addEventListener("resize",fishResize);
   const pt=e=>{const r=fCv.getBoundingClientRect();return{x:(e.clientX-r.left)/fScale+fCam,y:(e.clientY-r.top)/fScale+fCamY};};let down=false;
   const go=e=>{if(fstate!=="idle")return;let{x,y}=pt(e);if(fArea){fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.max(76,Math.min(FH-12,y));fp.via=null;return;}if(fBoat){fp.tx=Math.max(BOAT_X0,Math.min(FW-24,x));fp.ty=Math.max(BOAT_Y0,Math.min(RIVER-8,y));fp.via=null;return;}if(!walkable(x,y)&&!inDock(x,y))y=Math.max(y,RIVER+16);fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.min(FH-12,y);fp.via=null;if(inDock(fp.tx,fp.ty)&&!inDock(fp.x,fp.y))fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+18};else if(!inDock(fp.tx,fp.ty)&&inDock(fp.x,fp.y)&&fp.ty>RIVER+18)fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+20};};
   fCv.addEventListener("pointerdown",e=>{if(TOUCH)return;const p0=pt(e),hit=fTapOther(p0.x,p0.y);if(hit){openPMenu(hit,e.clientX,e.clientY);return;}down=true;go(e);});fCv.addEventListener("click",e=>{if(!TOUCH)return;const p0=pt(e),hit=fTapOther(p0.x,p0.y);if(hit)openPMenu(hit,e.clientX,e.clientY);});fCv.addEventListener("pointermove",e=>{if(TOUCH)return;const p0=pt(e);fCv.style.cursor=fTapOther(p0.x,p0.y)?"pointer":"";});fCv.addEventListener("pointermove",e=>{if(down)go(e);});window.addEventListener("pointerup",()=>down=false);
