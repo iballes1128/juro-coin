@@ -789,7 +789,7 @@ function renderEnh(){const S=$("s-enh");if(!S||pgCur!=="enh")return;if(pgSub==="
     <div style="font-size:11px;color:var(--sub);margin:14px 0 2px">🎟️ 강화권 (종류마다 최대 5장 · 쓰면 사라져요)</div>${eiRow("n")}${eiRow("a")}
     ${L>=ENH_DROP_LV?`<div style="font-size:11px;color:var(--sub);margin:10px 0 2px">🩹 복구권 (실패해서 레벨이 떨어질 때만 써요 · 종류마다 최대 5장)</div>${eiRow("rn")}${eiRow("ra")}<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:8px"><span>실패했을 때 레벨 하락 확률</span><b style="color:var(--up)">${(dp*100).toFixed(1)}%${prot>0?` → <span style="color:var(--ok)">${(dp*(1-prot)*100).toFixed(1)}%</span>`:""}</b></div>`:""}
     <button class="go buy" id="enhGo" style="margin-top:12px;width:100%;border-radius:12px;padding:13px 0;font-weight:900;${enhBusy?"opacity:.6":""}">⚒️ 강화하기 · ${formatMoneyReadable(cost)}</button>
-    <div style="font-size:10px;color:${L>=ENH_DROP_LV?"var(--up)":"var(--sub)"};margin-top:6px;text-align:center">${L>=ENH_DROP_LV?`⚠️ 실패하면 ${(dp*100).toFixed(1)}% 확률로 레벨이 1 떨어져요 (레벨이 오를수록 높아져요 · 복구권으로 막을 수 있어요)`:"실패하면 돈과 재료만 사라지고 레벨은 그대로예요 (+25부터는 10% 확률로 하락)"}</div></div>
+    <div style="font-size:10px;color:${L>=ENH_DROP_LV?"var(--up)":"var(--sub)"};margin-top:6px;text-align:center">${L>=ENH_DROP_LV?`⚠️ 실패하면 ${(dp*100).toFixed(1)}% 확률로 레벨이 1 떨어져요 (레벨이 오를수록 높아져요 · 복구권으로 막을 수 있어요)`:"실패하면 돈과 재료만 사라지고 레벨은 그대로예요 (+25부터는 15% 이상 확률로 하락)"}</div></div>
   <div class="card"><h3>🐟 재료로 넣을 물고기</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">비싼 물고기일수록 많이 올라요 · 레벨이 높아지면 싼 물고기는 거의 효과가 없어요</div>${fishes.length?fishes.map(([i,c])=>`<div class="rk" data-madd="${i}" style="cursor:pointer;padding:8px 2px"><div class="w"><b>${esc(FISH[i][2])}</b><small>${c}개 · ${formatMoneyReadable(FISH[i][1])}</small></div><div class="v" style="color:var(--ok);font-weight:900">+${matBonus(i,L).toFixed(1)}%</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">넣을 물고기가 없어요 · 재료로 다 써도 도감에는 남아요</div>'}</div>`);
   {const cv=$("enhRodCv");if(cv){clearInterval(renderEnh.tm);renderEnh.tm=setInterval(()=>{if(!document.body.contains(cv))return clearInterval(renderEnh.tm);const g=cv.getContext("2d");g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,240,60);g.scale(1.5,1.5);drawRod(g,14,34,146,8,rodLv(),performance.now());},60);}}
   S.querySelectorAll("[data-mrm]").forEach(b=>b.onclick=()=>{enhMat.splice(+b.dataset.mrm,1);renderEnh();});
@@ -1475,7 +1475,7 @@ const rodLv=()=>Math.min(50,(me&&me.rodLv)|0);
 const rodBonus=L=>.006*Math.pow(Math.min(50,L)/50,1.5);
 const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
 const enhBase=L=>Math.max(5,90-L*1.85);
-const ENH_DROP_LV=25,enhDropP=L=>L<ENH_DROP_LV?0:Math.min(.4,.10+(L-ENH_DROP_LV)*.004);/* 하락 확률: +25에서 10%, 한 단계마다 +0.4%p (+49에서 약 19.6%) */
+const ENH_DROP_LV=25,enhDropP=L=>L<ENH_DROP_LV?0:Math.min(.5,.15+(L-ENH_DROP_LV)*.008);/* 하락 확률: +25에서 15%, 한 단계마다 +0.8%p (+49에서 약 34%) */
 const ENH_ITEMS={n:{nm:"일반 강화권",ic:"🔨",price:300000,t:"up"},a:{nm:"고급 강화권",ic:"⚒️",price:900000,t:"up"},rn:{nm:"일반 복구권",ic:"🩹",price:1500000,t:"rc"},ra:{nm:"고급 복구권",ic:"💊",price:4000000,t:"rc"}};
 const eiBoost=(k,L)=>{const b=L<20?3:L<30?2.5:L<40?2:1.5;return k==="n"?b:k==="a"?b*2.5:0;};/* 강화권 1장당 올라가는 성공 확률(%p) */
 const eiRecov=(k,L)=>k==="rn"?(L<35?10:L<45?8:6):k==="ra"?(L<35?25:L<45?20:15):0;/* 복구권 1장당 '하락을 막을' 확률(%p) */
