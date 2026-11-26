@@ -1479,7 +1479,7 @@ const rodBonus=L=>.006*Math.pow(Math.min(50,L)/50,1.5);
 const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
 const enhBase=L=>Math.max(5,90-L*1.85);
 const ENH_DROP_LV=25,enhDropP=L=>L<ENH_DROP_LV?0:Math.min(.5,.15+(L-ENH_DROP_LV)*.008);/* 하락 확률: +25에서 15%, 한 단계마다 +0.8%p (+49에서 약 34%) */
-const ENH_ITEMS={n:{nm:"일반 강화권",ic:"🔨",price:300000,t:"up"},a:{nm:"고급 강화권",ic:"⚒️",price:900000,t:"up"},rn:{nm:"일반 복구권",ic:"🩹",price:1500000,t:"rc"},ra:{nm:"고급 복구권",ic:"💊",price:4000000,t:"rc"}};
+const ENH_ITEMS={n:{nm:"일반 강화권",ic:"🔨",price:500000,t:"up"},a:{nm:"고급 강화권",ic:"⚒️",price:2000000,t:"up"},rn:{nm:"일반 복구권",ic:"🩹",price:1000000,t:"rc"},ra:{nm:"고급 복구권",ic:"💊",price:3000000,t:"rc"}};
 const eiBoost=(k,L)=>{const b=L<20?3:L<30?2.5:L<40?2:1.5;return k==="n"?b:k==="a"?b*2.5:0;};/* 강화권 1장당 올라가는 성공 확률(%p) */
 const eiRecov=(k,L)=>k==="rn"?(L<35?6:L<45?5:4):k==="ra"?(L<35?15:L<45?12:10):0;/* 복구권 1장당 '하락을 막을' 확률(%p) */
 const eiHave=k=>((me&&me.enhI&&me.enhI[k])|0);let enhUse={n:0,a:0,rn:0,ra:0};const enhSlotItems=()=>[...Array(enhUse.n).fill("n"),...Array(enhUse.a).fill("a")],enhRecItems=()=>[...Array(enhUse.ra).fill("ra"),...Array(enhUse.rn).fill("rn")];
@@ -2812,16 +2812,16 @@ const cashTx=v=>"현금 "+(v/10000)+"만";
 A(0,{k:"bait",id:"mid",cnt:30,eq:90000,w:.6,nm:"중급 미끼 30개",ic:"🪱"});A(0,{k:"bait",id:"pro",cnt:50,eq:250000,w:.3,nm:"고급 미끼 50개",ic:"🪱"});
 [["ribbon","리본","🎀"],["glasses","동그란 안경","👓"],["phones","헤드폰","🎧"],["beanie","비니","🧢"],["scarf","목도리","🧣"],["ears","고양이 귀","🐱"],["flower","꽃핀","🌸"],["cap","야구모자","⚾"],["bunny","토끼 귀","🐰"],["bowtie","나비넥타이","👔"],["sprout","새싹","🌱"],["mustache","콧수염","🥸"],["headband","머리띠","🎽"]].forEach(([id,nm,ic])=>A(0,{k:"acc",id,eq:400000,w:.25,nm,ic}));
 [["aura","bubble","비눗방울 오라 (뽑기 한정)","🫧"],["aura","leaf","나뭇잎 오라 (뽑기 한정)","🍃"],["wing","cloud","구름 날개 (뽑기 한정)","☁️"],["wing","leafw","나뭇잎 날개 (뽑기 한정)","🍃"],["plate","sky","하늘 명찰 (뽑기 한정)","🏷️"],["plate","grass","풀잎 명찰 (뽑기 한정)","🌿"],["aura","firefly","반딧불 오라 (뽑기 한정)","✨"],["plate","sunset","노을 명찰 (뽑기 한정)","🌇"]].forEach(([ck,id,nm,ic])=>A(0,{k:"cosm",ck,id,eq:400000,w:.25,nm,ic}));
-A(0,{k:"eitem",it:"n",cnt:1,eq:300000,w:.5,nm:"일반 강화권 1장",ic:"🔨"});
+A(0,{k:"eitem",it:"n",cnt:1,eq:500000,w:.5,nm:"일반 강화권 1장",ic:"🔨"});
 /* 희귀: 8칸 랜덤 */
-A(1,{k:"eitem",it:"a",cnt:1,eq:900000,w:1,nm:"고급 강화권 1장",ic:"⚒️"});A(1,{k:"eitem",it:"rn",cnt:1,eq:1500000,w:1,nm:"일반 복구권 1장",ic:"🩹"});
+A(1,{k:"eitem",it:"a",cnt:1,eq:2000000,w:1,nm:"고급 강화권 1장",ic:"⚒️"});A(1,{k:"eitem",it:"rn",cnt:1,eq:1000000,w:1,nm:"일반 복구권 1장",ic:"🩹"});
 A(1,{k:"cash",v:600000,w:1,nm:"현금 60만",ic:"💴"});A(1,{k:"cash",v:450000,w:1,nm:"현금 45만",ic:"💴"});
 [["shades","선글라스","🕶️"],["wizard","마법사 모자","🎩"],["horns","악마 뿔","😈"],["halo","천사 링","😇"],["heartglasses","하트 안경","😍"],["santa","산타 모자","🎅"],["chef","요리사 모자","👨‍🍳"],["cowboy","카우보이 모자","🤠"],["tiara","티아라","👸"],["eyepatch","해적 안대","🏴‍☠️"],["partyhat","파티 고깔","🎉"]].forEach(([id,nm,ic])=>A(1,{k:"acc",id,eq:650000,w:1,nm,ic}));
 A(1,{k:"coin",c:"이더리움",v:600000,w:1,nm:"이더리움 60만원어치",ic:"💎"});A(1,{k:"coin",c:"테더골드",v:600000,w:1,nm:"테더골드 60만원어치",ic:"🪙"});
 A(1,{k:"bait",id:"max",cnt:200,eq:1000000,w:1,nm:"최고급 미끼 200개",ic:"🪱"});A(1,{k:"boat",id:"wood",eq:700000,w:1,nm:"나무 보트 (뽑기 한정)",ic:"🚤"});
 [["aura","star","별빛 오라","✨"],["wing","angel","천사 날개","🪽"],["plate","wood","브론즈 명찰","🏷️"],["aura","fire","불꽃 오라","🔥"],["wing","butterfly","나비 날개","🦋"],["aura","heart","하트 오라 (뽑기 한정)","💖"],["aura","thunder","번개 오라 (뽑기 한정)","⚡"],["wing","ice","얼음 날개 (뽑기 한정)","❄️"],["wing","flame","화염 날개 (뽑기 한정)","🔥"],["plate","ember","불꽃 명찰 (뽑기 한정)","🏷️"],["plate","frost","서리 명찰 (뽑기 한정)","🧊"],["aura","sakura","벚꽃 오라 (뽑기 한정)","🌸"],["wing","bat","박쥐 날개 (뽑기 한정)","🦇"],["plate","sakurap","벚꽃 명찰 (뽑기 한정)","🌸"]].forEach(([ck,id,nm,ic])=>A(1,{k:"cosm",ck,id,eq:850000,w:1,nm,ic}));
 /* 전설: 2칸 랜덤 (현금 1억도 다른 것과 똑같이 후보 중 하나) */
-A(2,{k:"eitem",it:"ra",cnt:1,eq:4000000,w:1,nm:"고급 복구권 1장",ic:"💊"});A(2,{k:"acc",id:"crown",eq:3000000,w:1,nm:"왕관",ic:"👑"});A(2,{k:"acc",id:"starhalo",eq:3000000,w:1,nm:"별무리 후광",ic:"🌟"});
+A(2,{k:"eitem",it:"ra",cnt:1,eq:3000000,w:1,nm:"고급 복구권 1장",ic:"💊"});A(2,{k:"acc",id:"crown",eq:3000000,w:1,nm:"왕관",ic:"👑"});A(2,{k:"acc",id:"starhalo",eq:3000000,w:1,nm:"별무리 후광",ic:"🌟"});
 A(2,{k:"aura",id:"meteor",eq:4000000,w:1,nm:"유성우 오라 (뽑기 한정)",ic:"🌠"});A(2,{k:"wing",id:"crystal",eq:4000000,w:1,nm:"수정 날개 (뽑기 한정)",ic:"🪽"});
 [["aura","aurora","오로라 오라 (뽑기 한정)","🌌"],["wing","rainwing","무지개 날개 (뽑기 한정)","🌈"],["plate","galaxy","은하 명찰 (뽑기 한정)","🌠"],["wing","goldwing","황금 날개 (뽑기 한정)","🪽"],["aura","inferno","용암 오라 (뽑기 한정)","🌋"]].forEach(([ck,id,nm,ic])=>A(2,{k:"cosm",ck,id,eq:4000000,w:1,nm,ic}));
 A(2,{k:"boat",id:"gold",eq:3000000,w:1,nm:"황금 보트 (뽑기 한정)",ic:"🛥️"});A(2,{k:"cash",v:100000000,w:.1,nm:"현금 1억",ic:"💰"});
