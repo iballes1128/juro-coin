@@ -985,7 +985,7 @@ function openNts(){fKeys={};stVisit("visitNts");let d=$("ntsMod");if(!d){d=docum
 var ntsTab="in";
 /* ===== 🎟️ 로또: 20개 중 4개 + 보너스 · 1시간마다 추첨 · 한 장 5만원 · 1인 50장 · 당첨금은 국세청 재원 ===== */
 var LT_P=50000,LT_MAX=50,LT_H=3600000,LT_N=20,LT_K=4,LT_BASE=100000000,LT_P3=1000000,LT_P4=200000,LT_R1=.85,LT_UP=1.1,LT_TAX=.1;
-var ltDbg="",LT_R0=Math.floor(Date.UTC(2026,10,26,12,0,0)/3600000),ltView=0,ltMsg="",ltMsgT=0,ltQ1=1,ltQa=1,ltHof=[],ltSt={},ltRes=null,ltCur=null,ltCurR=0,ltInit=0,ltSel=[],ltBusy=0,ltBuyBusy=0,ltTRef=null,ltTRefR=0;
+var ltLoaded=0,ltDbg="",LT_R0=Math.floor(Date.UTC(2026,10,26,12,0,0)/3600000),ltView=0,ltMsg="",ltMsgT=0,ltQ1=1,ltQa=1,ltHof=[],ltSt={},ltRes=null,ltCur=null,ltCurR=0,ltInit=0,ltSel=[],ltBusy=0,ltBuyBusy=0,ltTRef=null,ltTRefR=0;
 const ltRound=t=>Math.floor(t/LT_H),ltNo=r=>r-LT_R0+1,ltHr=r=>new Date((r+1)*LT_H).getHours();
 function ltPick(){const a=[];for(let i=1;i<=LT_N;i++)a.push(i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,LT_K).sort((x,y)=>x-y);}
 function ltDraw(){const a=[];for(let i=1;i<=LT_N;i++)a.push(i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return{n:a.slice(0,LT_K).sort((x,y)=>x-y),b:a[LT_K]};}
@@ -1003,16 +1003,20 @@ function ltPlan(tk,base,avail,draw){let n=0,pc=0;const W={1:[],2:[],3:0,4:0};for
 function ltPrize(res,L){if(res.v)return{v:1,amt:L.length*LT_P,rk:{}};const d={n:res.n,b:res.b},rk={1:0,2:0,3:0,4:0};let amt=0;for(const s of L){const r=ltRank(s,d);if(r){rk[r]++;amt+=r===1?res.p1:r===2?res.p2:r===3?LT_P3:LT_P4;}}return{amt:Math.floor(amt*(res.f||1)),rk};}
 function ltAvail(){return Math.max(0,(taxAll.total||0)-(welAll.paid||0)-(ltSt.paid||0)-(ltSt.rsv||0));}
 function ltBaseNow(){return Math.max(LT_BASE,ltSt.base||LT_BASE);}
-function ltOpen(){return taxAll.total!=null&&ltAvail()>=ltBaseNow();}
+function ltOpen(){return !!ltLoaded&&ltAvail()>=ltBaseNow();}
 function ltLeft(){return (ltRound(bankNow())+1)*LT_H-bankNow();}
 function ltListen(){if(ltInit||!fdb||!me||!me._loaded)return;ltInit=1;
   const rf=()=>{try{if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();}catch(e){}};
   fdb.ref("market/lotto/st").on("value",s=>{ltSt=s.val()||{};rf();},()=>{});
   fdb.ref("market/lotto/res").limitToLast(1).on("value",s=>{const o=s.val();ltRes=null;if(o){const k=Object.keys(o)[0];ltRes=Object.assign({r:+k},o[k]);}if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();});
-  fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};rf();});fdb.ref("market/welfare").on("value",s=>{welAll=s.val()||{};rf();});
+  fdb.ref("market/tax").on("value",s=>{taxAll=s.val()||{};ltLoaded=1;rf();},e=>{ltDbg="국세청 재원 읽기 실패: "+String((e&&e.code)||e).slice(0,40);rf();});fdb.ref("market/welfare").on("value",s=>{welAll=s.val()||{};rf();},()=>{});
   fdb.ref("market/lottoHof").limitToLast(30).on("value",s=>{const o=s.val()||{};ltHof=Object.values(o).filter(x=>x&&x.t).sort((a,b)=>a.t-b.t);if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();});}
 function ltWatchRound(){const R=ltRound(bankNow());if(ltTRefR===R||!fdb)return;try{if(ltTRef)ltTRef.off();}catch(e){}ltTRefR=R;ltCur=null;ltTRef=fdb.ref("market/lottoT/"+R);ltTRef.on("value",s=>{ltCur=s.val()||{};if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();});}
 function ltMy(){const R=ltRound(bankNow());return(me.lt&&me.lt["r"+R]&&me.lt["r"+R].t)||[];}
+async function ltLoad(){if(!fdb)return;try{const t=(await fdb.ref("market/tax").once("value")).val()||{};taxAll=t;ltLoaded=1;
+    try{welAll=(await fdb.ref("market/welfare").once("value")).val()||{};}catch(e){}
+    try{ltSt=(await fdb.ref("market/lotto/st").once("value")).val()||{};}catch(e){ltDbg="로또 정보 읽기 실패: "+String((e&&e.code)||e).slice(0,40);}
+    if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();}catch(e){ltDbg="국세청 재원 읽기 실패: "+String((e&&e.code)||(e&&e.message)||e).slice(0,40);if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();}}
 /* 추첨: 끝난 회차 중 아직 안 한 것을 가장 먼저 본 사람이 한 번만 실행해요 */
 async function ltDrawTick(){if(ltBusy||!fdb||!me||!me._loaded)return;ltBusy=1;try{const R=ltRound(bankNow()),st0=(await fdb.ref("market/lotto/st").once("value")).val()||{};let d=st0.d||0;if(!d)d=R-2;
     for(let r=d+1;r<R&&r<=d+24;r++){const tv=(await fdb.ref("market/lottoT/"+r).once("value")).val();
@@ -1045,7 +1049,7 @@ async function ltClaimTick(){if(!fdb||!me||!me._loaded||!me.lt)return;const R=lt
 setInterval(()=>{try{if(!me||!me._loaded)return;ltListen();ltWatchRound();ltDrawTick();ltClaimTick();}catch(e){}},20000);
 setTimeout(()=>{try{if(me&&me._loaded){ltListen();ltWatchRound();ltDrawTick();ltClaimTick();}}catch(e){}},6000);
 /* 사기 */
-async function ltBuy(list){if(!me||!me._loaded)return ltNote("닉네임부터 정해 주세요");if(!fdb)return ltNote("서버에 연결되지 않았어요");if(!ltOpen())return ltNote(taxAll.total==null?"불러오는 중이에요":`국세청 재원이 ${formatMoneyReadable(ltBaseNow())} 이상 모이면 열려요`);
+async function ltBuy(list){if(!me||!me._loaded)return ltNote("닉네임부터 정해 주세요");if(!fdb)return ltNote("서버에 연결되지 않았어요");if(!ltOpen())return ltNote(!ltLoaded?"불러오는 중이에요":`국세청 재원이 ${formatMoneyReadable(ltBaseNow())} 이상 모이면 열려요`);
   const R=ltRound(bankNow()),have=ltMy().length;if(ltLeft()<5000)return ltNote("곧 추첨이에요 · 다음 회차에 사 주세요");if(have+list.length>LT_MAX)return ltNote(`한 회차에 최대 ${LT_MAX}장까지예요 (지금 ${have}장)`);
   const cost=list.length*LT_P;if(me.cash<cost)return ltNote(`💸 잔액이 부족해요 (${formatMoneyReadable(cost)} 필요)`);if(ltBuyBusy)return;ltBuyBusy=1;
   try{const strs=list.map(ltStr);
@@ -1074,8 +1078,8 @@ function ltMyHtml(){const R=ltRound(bankNow()),map={};
   return `<div style="display:flex;align-items:center;justify-content:space-between;margin:12px 0 4px"><b style="font-size:12px">🎫 내 표</b><select id="ltView" style="max-width:230px;padding:6px 8px;border-radius:8px;font-size:11.5px">${opt}</select></div>${head}<div style="max-height:190px;overflow-y:auto">${e.t.length?e.t.map(s=>ltTicketHtml(s,d)).join(""):'<div style="color:var(--sub);font-size:11.5px">산 표가 없어요</div>'}</div>`;}
 function ltInfo(){let n=0,pc=0;if(ltCur)for(const u of Object.keys(ltCur)){const c=(ltCur[u]&&ltCur[u].t||[]).length;n+=c;if(c)pc++;}return{n,pc,pot:ltBaseNow()+(pc>=2?n*LT_P:0)};}
 function ltMoney(a){return formatMoneyReadable(a);}
-function lottoHtml(){const i=ltInfo(),op=ltOpen();return `<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900"><span>🎟️ 로또</span><span style="color:${op?"var(--ok)":"#fbbf24"};font-weight:800;font-size:11px">${taxAll.total==null?"…":op?"판매 중":"재원 모으는 중"}</span></div><div style="font-size:11px;color:var(--sub);margin:4px 0 8px;line-height:1.6">20개 중 4개 + 보너스 · 1시간마다 추첨 · 한 장 ${ltMoney(LT_P)}<br>이번 회차 당첨금 <b style="color:var(--acc)">${ltMoney(i.pot)}</b></div><div style="padding:9px;border-radius:10px;background:var(--card2);text-align:center;font-size:12px;font-weight:800">🎟️ 광장의 <b>복권판매점</b>에서 살 수 있어요</div></div>`;}
-function openLotto(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");ltListen();ltWatchRound();let d=$("ltMod");if(!d){d=document.createElement("div");d.id="ltMod";d.className="btBg";d.style.zIndex=46;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};setInterval(()=>{if(d.style.display==="flex"){const t=$("ltLeft");if(t)t.textContent=bankLeft(ltLeft());}},1000);}ltSel=[];ltView=0;d.style.display="flex";ltRender();setTimeout(()=>{try{ltDrawTick();ltClaimTick();}catch(e){}},500);}
+function lottoHtml(){const i=ltInfo(),op=ltOpen();return `<div style="background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:900"><span>🎟️ 로또</span><span style="color:${op?"var(--ok)":"#fbbf24"};font-weight:800;font-size:11px">${!ltLoaded&&taxAll.total==null?"…":op?"판매 중":"재원 모으는 중"}</span></div><div style="font-size:11px;color:var(--sub);margin:4px 0 8px;line-height:1.6">20개 중 4개 + 보너스 · 1시간마다 추첨 · 한 장 ${ltMoney(LT_P)}<br>이번 회차 당첨금 <b style="color:var(--acc)">${ltMoney(i.pot)}</b></div><div style="padding:9px;border-radius:10px;background:var(--card2);text-align:center;font-size:12px;font-weight:800">🎟️ 광장의 <b>복권판매점</b>에서 살 수 있어요</div></div>`;}
+function openLotto(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");ltListen();ltWatchRound();let d=$("ltMod");if(!d){d=document.createElement("div");d.id="ltMod";d.className="btBg";d.style.zIndex=46;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};setInterval(()=>{if(d.style.display==="flex"){const t=$("ltLeft");if(t)t.textContent=bankLeft(ltLeft());}},1000);}ltSel=[];ltView=0;d.style.display="flex";ltRender();ltLoad();setTimeout(()=>{try{ltDrawTick();ltClaimTick();}catch(e){}},500);}
 function ltRender(force){const d=$("ltMod");if(!d)return;if(!force){const ae=document.activeElement;if(ae&&ae.tagName==="INPUT"&&d.contains(ae))return;}const i=ltInfo(),my=ltMy(),op=ltOpen(),R=ltRes;
   const grid=Array.from({length:LT_N},(_,k)=>k+1).map(n=>`<button data-ln="${n}" style="aspect-ratio:1;border-radius:10px;font-weight:900;font-size:13px;background:${ltSel.includes(n)?"var(--acc)":"var(--card2)"};color:${ltSel.includes(n)?"#111":"inherit"}">${n}</button>`).join("");
   const nmL=L=>(L||[]).map(x=>esc(typeof x==="string"?x:x.n)).join(", "),rtxt=R?(R.v?`회차 취소 (재원 부족) · 환불됨`:`${ltDrawBalls(R)}<br>1등 ${R.w1}장${R.a1&&R.a1.length?` (${nmL(R.a1)})`:""} · 2등 ${R.w2}장${R.a2&&R.a2.length?` (${nmL(R.a2)})`:""} · 3등 ${R.w3}장 · 4등 ${R.w4}장`):"아직 추첨 기록이 없어요";
@@ -1086,7 +1090,7 @@ function ltRender(force){const d=$("ltMod");if(!d)return;if(!force){const ae=doc
   <div style="display:flex;gap:6px;margin-bottom:8px"><button id="ltRnd" style="flex:1;padding:10px 0;border-radius:10px;background:var(--card2);font-weight:800;font-size:12px">🎲 남은 번호 자동으로 채우기</button></div>
   <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px"><input id="ltQ1" type="number" min="1" max="${LT_MAX}" value="${ltQ1}" style="width:62px;padding:9px 6px;border-radius:10px;text-align:center"><span style="font-size:12px">장</span><button id="ltOne" style="flex:1;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900;font-size:12px">이 번호로 사기 <span id="ltC1" style="font-weight:700"></span></button></div>
   <div style="display:flex;gap:6px;align-items:center;margin-bottom:6px"><input id="ltQa" type="number" min="1" max="${LT_MAX}" value="${ltQa}" style="width:62px;padding:9px 6px;border-radius:10px;text-align:center"><span style="font-size:12px">장</span><button id="ltAuto" style="flex:1;padding:10px 0;border-radius:10px;background:#7c3aed;color:#fff;font-weight:900;font-size:12px">🎲 자동으로 사기 <span id="ltCa" style="font-weight:700"></span></button></div>
-  <div style="font-size:10.5px;color:var(--sub);margin-bottom:8px">한 회차에 1인 최대 ${LT_MAX}장 · 내가 산 표 ${my.length}장</div>`:`<div style="padding:14px;text-align:center;color:var(--sub);font-size:12.5px;line-height:1.7;background:var(--card);border-radius:10px;margin-bottom:10px">${taxAll.total==null?"불러오는 중…":`국세청 재원이 ${ltMoney(ltBaseNow())} 이상 모이면 열려요<br>지금 ${ltMoney(ltAvail())}`}</div>`)+
+  <div style="font-size:10.5px;color:var(--sub);margin-bottom:8px">한 회차에 1인 최대 ${LT_MAX}장 · 내가 산 표 ${my.length}장</div>`:`<div style="padding:14px;text-align:center;color:var(--sub);font-size:12.5px;line-height:1.7;background:var(--card);border-radius:10px;margin-bottom:10px">${!ltLoaded?"불러오는 중…":`국세청 재원이 ${ltMoney(ltBaseNow())} 이상 모이면 열려요<br>지금 ${ltMoney(ltAvail())}`}</div>`)+
   `${ltMyHtml()}<div style="font-size:12px;font-weight:900;margin:12px 0 4px">📢 지난 추첨${R?` (${ltNo(R.r)}회차 · ${ltHr(R.r)}시)`:""}</div><div style="font-size:11.5px;line-height:1.7">${rtxt}</div><div style="margin-top:12px">${ltHofHtml()}</div></div>`;
   $("ltX").onclick=()=>d.style.display="none";
   const vs=$("ltView");if(vs)vs.onchange=()=>{ltView=+vs.value||0;ltRender(1);};
