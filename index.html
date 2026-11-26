@@ -2842,24 +2842,24 @@ function renderCas(){const d=$("casMod");if(!d||d.style.display!=="flex")return;
 
 /* ===== 뽑기방 엔진 (집게 · 인형 더미 · 룰렛 확률) ===== */
 const CLW=(()=>{
-const CLAW_COST=300000;
+const CLAW_COST=200000;
 const TIERS=[{n:"일반",col:"#94a3b8"},{n:"희귀",col:"#60a5fa"},{n:"전설",col:"#fbbf24"}];
 const PRIZES=[];
 const A=(t,o)=>{PRIZES.push(Object.assign({t},o));};
 const cashTx=v=>"현금 "+(v/10000)+"만";
-/* 일반 14칸: 현금(20·25·30·35·40만)+코인(20·30·40만어치) 합쳐서 최소 6칸은 항상 들어가고, 나머지 8칸은 아래 상품 중에서 랜덤 */
-[[200000,30],[250000,24],[300000,18],[350000,12],[400000,6]].forEach(([v,w])=>A(0,{k:"cash",v,fx:1,w,nm:cashTx(v),ic:"💵"}));
-[["도지코인",200000],["리플",200000],["시바이누",300000],["솔라나",300000],["페페",400000],["플라즈마",400000]].forEach(([c,v])=>A(0,{k:"coin",c,v,w:.6,nm:c+" "+(v/10000)+"만원어치",ic:"🪙"}));
-A(0,{k:"bait",id:"mid",cnt:30,eq:90000,w:.6,nm:"중급 미끼 30개",ic:"🪱"});A(0,{k:"bait",id:"pro",cnt:50,eq:250000,w:.3,nm:"고급 미끼 50개",ic:"🪱"});
-[["ribbon","리본","🎀"],["glasses","동그란 안경","👓"],["phones","헤드폰","🎧"],["beanie","비니","🧢"],["scarf","목도리","🧣"],["ears","고양이 귀","🐱"],["flower","꽃핀","🌸"],["cap","야구모자","⚾"],["bunny","토끼 귀","🐰"],["bowtie","나비넥타이","👔"],["sprout","새싹","🌱"],["mustache","콧수염","🥸"],["headband","머리띠","🎽"]].forEach(([id,nm,ic])=>A(0,{k:"acc",id,eq:400000,w:.25,nm,ic}));
-[["aura","bubble","비눗방울 오라 (뽑기 한정)","🫧"],["aura","leaf","나뭇잎 오라 (뽑기 한정)","🍃"],["wing","cloud","구름 날개 (뽑기 한정)","☁️"],["wing","leafw","나뭇잎 날개 (뽑기 한정)","🍃"],["plate","sky","하늘 명찰 (뽑기 한정)","🏷️"],["plate","grass","풀잎 명찰 (뽑기 한정)","🌿"],["aura","firefly","반딧불 오라 (뽑기 한정)","✨"],["plate","sunset","노을 명찰 (뽑기 한정)","🌇"]].forEach(([ck,id,nm,ic])=>A(0,{k:"cosm",ck,id,eq:400000,w:.25,nm,ic}));
-A(0,{k:"eitem",it:"n",cnt:1,eq:500000,w:.5,nm:"일반 강화권 1장",ic:"🔨"});
+/* 일반 14칸: 현금(10·15·20·25·30·40만)+코인(15·20·30만어치) 모두 같은 확률 합쳐서 최소 6칸은 항상 들어가고, 나머지 8칸은 아래 상품 중에서 랜덤 */
+[[100000,1],[150000,1],[200000,1],[250000,1],[300000,1],[400000,1]].forEach(([v,w])=>A(0,{k:"cash",v,fx:1,w,nm:cashTx(v),ic:"💵"}));
+[["도지코인",150000],["리플",150000],["시바이누",200000],["솔라나",200000],["페페",300000],["플라즈마",300000]].forEach(([c,v])=>A(0,{k:"coin",c,v,w:1,nm:c+" "+(v/10000)+"만원어치",ic:"🪙"}));
+A(0,{k:"bait",id:"mid",cnt:30,eq:90000,w:.15,nm:"중급 미끼 30개",ic:"🪱"});A(0,{k:"bait",id:"pro",cnt:50,eq:250000,w:.08,nm:"고급 미끼 50개",ic:"🪱"});
+[["ribbon","리본","🎀"],["glasses","동그란 안경","👓"],["phones","헤드폰","🎧"],["beanie","비니","🧢"],["scarf","목도리","🧣"],["ears","고양이 귀","🐱"],["flower","꽃핀","🌸"],["cap","야구모자","⚾"],["bunny","토끼 귀","🐰"],["bowtie","나비넥타이","👔"],["sprout","새싹","🌱"],["mustache","콧수염","🥸"],["headband","머리띠","🎽"]].forEach(([id,nm,ic])=>A(0,{k:"acc",id,eq:400000,w:.06,nm,ic}));
+[["aura","bubble","비눗방울 오라 (뽑기 한정)","🫧"],["aura","leaf","나뭇잎 오라 (뽑기 한정)","🍃"],["wing","cloud","구름 날개 (뽑기 한정)","☁️"],["wing","leafw","나뭇잎 날개 (뽑기 한정)","🍃"],["plate","sky","하늘 명찰 (뽑기 한정)","🏷️"],["plate","grass","풀잎 명찰 (뽑기 한정)","🌿"],["aura","firefly","반딧불 오라 (뽑기 한정)","✨"],["plate","sunset","노을 명찰 (뽑기 한정)","🌇"]].forEach(([ck,id,nm,ic])=>A(0,{k:"cosm",ck,id,eq:400000,w:.06,nm,ic}));
+A(0,{k:"eitem",it:"n",cnt:1,eq:500000,w:.12,nm:"일반 강화권 1장",ic:"🔨"});
 /* 희귀: 8칸 랜덤 */
-A(1,{k:"eitem",it:"a",cnt:1,eq:2000000,w:.6,nm:"고급 강화권 1장",ic:"⚒️"});A(0,{k:"eitem",it:"rn",cnt:1,eq:1000000,w:.25,nm:"일반 복구권 1장",ic:"🩹"});
-A(1,{k:"cash",v:1200000,w:1,nm:"현금 120만",ic:"💴"});A(1,{k:"cash",v:900000,w:1,nm:"현금 90만",ic:"💴"});
+A(1,{k:"eitem",it:"a",cnt:1,eq:2000000,w:.6,nm:"고급 강화권 1장",ic:"⚒️"});A(0,{k:"eitem",it:"rn",cnt:1,eq:1000000,w:.06,nm:"일반 복구권 1장",ic:"🩹"});
+A(1,{k:"cash",v:1000000,w:1,nm:"현금 100만",ic:"💴"});A(1,{k:"cash",v:700000,w:1,nm:"현금 70만",ic:"💴"});
 [["shades","선글라스","🕶️"],["wizard","마법사 모자","🎩"],["horns","악마 뿔","😈"],["halo","천사 링","😇"],["heartglasses","하트 안경","😍"],["santa","산타 모자","🎅"],["chef","요리사 모자","👨‍🍳"],["cowboy","카우보이 모자","🤠"],["tiara","티아라","👸"],["eyepatch","해적 안대","🏴‍☠️"],["partyhat","파티 고깔","🎉"]].forEach(([id,nm,ic])=>A(1,{k:"acc",id,eq:650000,w:1,nm,ic}));
-A(1,{k:"coin",c:"이더리움",v:1200000,w:1,nm:"이더리움 120만원어치",ic:"💎"});A(1,{k:"coin",c:"테더골드",v:1200000,w:1,nm:"테더골드 120만원어치",ic:"🪙"});
-A(1,{k:"bait",id:"max",cnt:200,eq:1000000,w:1,nm:"최고급 미끼 200개",ic:"🪱"});A(0,{k:"boat",id:"wood",eq:700000,w:.15,nm:"나무 보트 (뽑기 한정)",ic:"🚤"});
+A(1,{k:"coin",c:"이더리움",v:1000000,w:1,nm:"이더리움 100만원어치",ic:"💎"});A(1,{k:"coin",c:"테더골드",v:1000000,w:1,nm:"테더골드 100만원어치",ic:"🪙"});
+A(1,{k:"bait",id:"max",cnt:200,eq:1000000,w:1,nm:"최고급 미끼 200개",ic:"🪱"});A(0,{k:"boat",id:"wood",eq:700000,w:.04,nm:"나무 보트 (뽑기 한정)",ic:"🚤"});
 [["aura","star","별빛 오라","✨"],["wing","angel","천사 날개","🪽"],["plate","wood","브론즈 명찰","🏷️"],["aura","fire","불꽃 오라","🔥"],["wing","butterfly","나비 날개","🦋"],["aura","heart","하트 오라 (뽑기 한정)","💖"],["aura","thunder","번개 오라 (뽑기 한정)","⚡"],["wing","ice","얼음 날개 (뽑기 한정)","❄️"],["wing","flame","화염 날개 (뽑기 한정)","🔥"],["plate","ember","불꽃 명찰 (뽑기 한정)","🏷️"],["plate","frost","서리 명찰 (뽑기 한정)","🧊"],["aura","sakura","벚꽃 오라 (뽑기 한정)","🌸"],["wing","bat","박쥐 날개 (뽑기 한정)","🦇"],["plate","sakurap","벚꽃 명찰 (뽑기 한정)","🌸"]].forEach(([ck,id,nm,ic])=>A(1,{k:"cosm",ck,id,eq:850000,w:1,nm,ic}));
 /* 전설: 3칸 (무게에 비례해 후보로 뽑힘) */
 A(1,{k:"eitem",it:"ra",cnt:1,eq:3000000,w:.5,nm:"고급 복구권 1장",ic:"💊"});A(2,{k:"eitem",it:"sn",cnt:1,eq:10000000,w:.5,nm:"최고급 강화권 1장",ic:"🏆"});A(2,{k:"eitem",it:"sr",cnt:1,eq:15000000,w:.4,nm:"최고급 복구권 1장",ic:"🧿"});A(2,{k:"acc",id:"crown",eq:3000000,w:1,nm:"왕관",ic:"👑"});A(2,{k:"acc",id:"starhalo",eq:3000000,w:1,nm:"별무리 후광",ic:"🌟"});
@@ -3167,7 +3167,7 @@ const tmOpen=()=>{const d=$("tmMod");return !!d&&d.style.display==="flex";};
 function openArcade(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");fKeys={};stVisit("visitArc");let d=$("arcMod");
   if(!d){d=document.createElement("div");d.id="arcMod";d.className="btBg";d.style.zIndex=44;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)d.style.display="none";};
     d.innerHTML=`<div class="btBox" style="max-width:380px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:15.5px">🕹️ 오락실</b><button id="arcX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
-      <button id="arcClw" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">🧸</span><span style="flex:1"><b style="font-size:14.5px">인형 뽑기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">인형을 뽑아 티켓 모으고 룰렛 돌리기 · 30만원</div></span><b style="color:var(--acc)">›</b></button>
+      <button id="arcClw" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">🧸</span><span style="flex:1"><b style="font-size:14.5px">인형 뽑기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">인형을 뽑아 티켓 모으고 룰렛 돌리기 · 20만원</div></span><b style="color:var(--acc)">›</b></button>
       <button id="arcTm" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);margin-bottom:8px;text-align:left"><span style="font-size:32px">⏱️</span><span style="flex:1"><b style="font-size:14.5px">시간 맞추기</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">딱 10초에 멈추면 보상 · 주간 순위 · 20만원</div></span><b style="color:var(--acc)">›</b></button><button id="arcBb" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px;border-radius:14px;background:var(--card2);text-align:left"><span style="font-size:32px">🏀</span><span style="flex:1"><b style="font-size:14.5px">농구</b><div style="font-size:11.5px;color:var(--sub);margin-top:2px">3라운드 슛 대결 · 주간 순위 · 20만원</div></span><b style="color:var(--acc)">›</b></button><div id="arcLive"></div></div>`;
     $("arcX").onclick=()=>{d.style.display="none";};$("arcClw").onclick=()=>{d.style.display="none";openClw();};$("arcTm").onclick=()=>{d.style.display="none";openTm();};$("arcBb").onclick=()=>{d.style.display="none";openBb();};$("arcLive").onclick=e=>{const b=e.target.closest("[data-lv]");if(b){d.style.display="none";openLive(b.dataset.lv);}};}
   d.style.display="flex";liveListen();arcLiveRender();}
