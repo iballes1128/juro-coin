@@ -3933,7 +3933,10 @@ function ofDrawFloorItem(c,it,seatMap,t){const d=OF_IM[it.k];const f=ofFt(it);co
   if(cat==="m"&&sm!==undefined)r=sm.dir;/* 모니터 화면은 앉은 사람 쪽 */
   /* 모니터를 직원 맞은편에서 본 모습(뒷면) */
   if(cat==="m"&&sm!==undefined&&sm.dir===2){ofSpriteDraw(c,it.k,p.x,p.y,w,h,0);c.fillStyle="#222836";for(let i=0;i<f.w;i++){c.beginPath();c.roundRect(p.x+i*OF_CS+6,p.y+7,OF_CS-12,OF_CS*.62,3);c.fill();c.fillStyle="#58627a";c.beginPath();c.arc(p.x+i*OF_CS+OF_CS/2,p.y+OF_CS*.38,2.4,0,7);c.fill();c.fillStyle="#222836";}return;}
-  ofSpriteDraw(c,it.k,p.x,p.y,w,h,r);}
+  if(cat==="c")r=(r+2)%4;/* 등받이는 앉은 사람 뒤쪽 */
+  ofSpriteDraw(c,it.k,p.x,p.y,w,h,r);
+  if(ofS.mode==="place"&&(cat==="c"||cat==="m"))ofFaceArrow(c,p.x+w/2,p.y+h/2,cat==="c"?(it.r|0):((it.r|0)+2)%4,cat==="c"?"#fde047":"#67e8f9");}
+function ofFaceArrow(c,x,y,r,col){c.save();c.translate(x,y);c.rotate(((r%4+4)%4)*Math.PI/2);c.fillStyle=col;c.strokeStyle="rgba(0,0,0,.7)";c.lineWidth=1.2;c.beginPath();c.moveTo(0,-11);c.lineTo(6.5,-2);c.lineTo(-6.5,-2);c.closePath();c.fill();c.stroke();c.restore();}
 function ofDrawBox(c,x,y,t){const S=OF_CS;c.fillStyle="rgba(0,0,0,.28)";c.fillRect(x+3,y+S-5,S-4,6);c.fillStyle="#2d4a3a";c.strokeStyle="#0f2219";c.lineWidth=1.3;c.beginPath();c.roundRect(x+3,y+8,S-6,S-12,4);c.fill();c.stroke();
   c.fillStyle="#3b6a50";c.beginPath();c.roundRect(x+6,y+11,S-12,S-18,3);c.fill();c.fillStyle="#fde047";c.strokeStyle="#8a5a05";c.beginPath();c.arc(x+S/2+4,y+S/2+3,3.6,0,7);c.fill();c.stroke();c.fillStyle="#0f2219";c.fillRect(x+8,y+13,9,3);
   const o=ofS.o,full=o&&ofCap(o)>0&&(ofPeek(o,ofNow())/ofCap(o));const n=full?Math.min(6,1+Math.floor(full*6)):0;for(let i=0;i<n;i++){c.fillStyle=i%2?"#f6d56a":"#e7b92a";c.strokeStyle="#8a5a05";c.lineWidth=.8;c.beginPath();c.arc(x+9+i*3.6,y+6-(i%2)*2,3.2,0,7);c.fill();c.stroke();}
@@ -3945,7 +3948,7 @@ function ofDraw(t){const c=ofS.cx,o=ofS.o;if(!c||!o)return;const L=ofL(o),CS=OF_
   if(nl){c.fillStyle="#1b1f2a";c.fillRect(0,WH,tc*CS,tr*CS);c.fillStyle="#232837";for(let y=0;y<tr;y++)for(let x=0;x<tc;x++)if(x>=L.c||y>=L.r){if((x+y)%2===0)c.fillRect(x*CS,WH+y*CS,CS,CS);}
     c.fillStyle="rgba(124,134,158,.9)";c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText("🔒 Lv."+(ofLv(o)+1),L.c*CS+(tc-L.c)*CS/2,WH+L.r*CS/2);}
   /* 벽 */
-  const wl=OF_WLM[o.wl||"0"]||OF_WLM["0"];
+  const wl=OF_WLM[(ofS.mode==="wall"&&ofS.wallSel!=null)?ofS.wallSel:(o.wl||"0")]||OF_WLM["0"];
   if(wl[2]){const im=ofImg("f_"+wl[2]);for(let x=0;x<L.c;x++){if(ofReady(im))c.drawImage(im,x*CS,WH-CS-2,CS,CS+2);else{c.fillStyle="#2a2018";c.fillRect(x*CS,WH-CS-2,CS,CS+2);}}c.fillStyle="#d4a62a";c.fillRect(0,WH-3,L.c*CS,2);}
   else{c.fillStyle="#cdbf9f";c.fillRect(0,WH-CS-2,L.c*CS,CS+2);c.fillStyle="#8a7a58";c.fillRect(0,WH-6,L.c*CS,6);}
   /* 바닥 */
@@ -3972,7 +3975,7 @@ function ofDraw(t){const c=ofS.cx,o=ofS.o;if(!c||!o)return;const L=ofL(o),CS=OF_
   if(ofS.mine){const iss=ofIssues(o),pu=.6+.4*Math.sin(t/260);for(const u in iss){const ch=ofItemBy(o,+u);if(!ch)continue;const p=ofCell(ch.x,ch.y);c.fillStyle=`rgba(239,68,68,${.75+.25*pu})`;c.strokeStyle="#fff";c.lineWidth=1.4;c.beginPath();c.arc(p.x+CS-6,p.y+7,8,0,7);c.fill();c.stroke();c.fillStyle="#fff";c.font="900 12px sans-serif";c.textAlign="center";c.fillText("!",p.x+CS-6,p.y+11.5);}}
   /* 놓는 중인 가구 (유령) */
   const g=ofS.ghost;if(g){const err=ofGhostErr(o,g),f=ofFt(g),wall=ofIsWall(g.k),p=wall?{x:g.x*CS,y:-CS-1}:ofCell(g.x,g.y);
-    c.globalAlpha=.78;ofSpriteDraw(c,g.k,p.x,p.y,f.w*CS,f.h*CS,wall?0:g.r);if(g.att)for(const a of ofAttPos(g)){const q=ofCell(a.x,a.y),mf=ofFt(a);ofSpriteDraw(c,a.k,q.x,q.y,mf.w*CS,mf.h*CS,a.r);}c.globalAlpha=1;c.fillStyle=err?"rgba(239,68,68,.35)":"rgba(34,197,94,.3)";c.strokeStyle=err?"#ef4444":"#22c55e";c.lineWidth=2;
+    c.globalAlpha=.78;ofSpriteDraw(c,g.k,p.x,p.y,f.w*CS,f.h*CS,wall?0:(ofCatOf(g.k)==="c"?(g.r+2)%4:g.r));{const gc=ofCatOf(g.k);if(gc==="c"||gc==="m"){c.globalAlpha=1;ofFaceArrow(c,p.x+f.w*CS/2,p.y+f.h*CS/2,gc==="c"?g.r:(g.r+2)%4,gc==="c"?"#fde047":"#67e8f9");c.globalAlpha=.78;}}if(g.att)for(const a of ofAttPos(g)){const q=ofCell(a.x,a.y),mf=ofFt(a);ofSpriteDraw(c,a.k,q.x,q.y,mf.w*CS,mf.h*CS,a.r);}c.globalAlpha=1;c.fillStyle=err?"rgba(239,68,68,.35)":"rgba(34,197,94,.3)";c.strokeStyle=err?"#ef4444":"#22c55e";c.lineWidth=2;
     if(wall){c.fillRect(p.x,p.y,f.w*CS,CS+1);c.strokeRect(p.x,p.y,f.w*CS,CS+1);}else{c.fillRect(p.x,p.y,f.w*CS,f.h*CS);c.strokeRect(p.x,p.y,f.w*CS,f.h*CS);}}
   {const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000)continue;const q=id===myId?{x:ofS.px,y:ofS.py}:(fOthers[id]&&fOthers[id].fo&&fOthers[id].fo===ofS.own&&fOthers[id].px!=null?{x:fOthers[id].px,y:fOthers[id].py}:null);if(q)drawBubble(c,q.x,q.y,b.text);}}
   c.restore();
@@ -3982,16 +3985,16 @@ function ofDraw(t){const c=ofS.cx,o=ofS.o;if(!c||!o)return;const L=ofL(o),CS=OF_
 function ofBuildDom(){let d=$("ofMod");if(d)return d;d=document.createElement("div");d.id="ofMod";d.style.cssText="position:fixed;inset:0;z-index:46;background:#10131b;display:none;flex-direction:column;user-select:none;-webkit-user-select:none;touch-action:none";
   d.innerHTML=`<div style="display:flex;align-items:center;gap:8px;padding:8px 10px 4px"><b id="ofTitle" style="font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></b><button id="ofChat" style="padding:7px 10px;border-radius:10px;background:var(--card2);font-size:12px;font-weight:800">💬</button><button id="ofExit" style="padding:7px 12px;border-radius:10px;background:#3a4258;font-size:12.5px;font-weight:800">나가기</button></div>
     <div id="ofChips" style="display:flex;flex-wrap:wrap;gap:5px;padding:0 10px 6px"></div>
-    <div id="ofWrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative"><canvas id="ofCv" style="touch-action:none"></canvas><div id="ofHint" style="position:absolute;left:0;right:0;top:6px;text-align:center;font-size:11.5px;font-weight:800;color:#fde68a;pointer-events:none"></div><div id="ofJoy" style="position:absolute;left:10px;bottom:10px;width:92px;height:92px;border-radius:50%;background:rgba(0,0,0,.32);border:2px solid rgba(255,255,255,.25);touch-action:none;display:none"><i style="position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none"></i></div><button id="ofAct" style="position:absolute;right:10px;bottom:10px;width:70px;height:70px;border-radius:50%;background:rgba(40,44,54,.75);color:#9aa4b8;font-size:20px;font-weight:900;display:none;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;box-shadow:0 3px 10px rgba(0,0,0,.4);touch-action:none">✋<small style="font-size:10px;font-weight:800">상호작용</small></button></div>
+    <div id="ofWrap" style="flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative"><canvas id="ofCv" style="touch-action:none"></canvas><div id="ofHint" style="position:absolute;left:0;right:0;top:6px;text-align:center;font-size:11.5px;font-weight:800;color:#fde68a;pointer-events:none"></div><div id="ofJoy" style="position:absolute;left:10px;bottom:10px;width:92px;height:92px;border-radius:50%;background:rgba(0,0,0,.32);border:2px solid rgba(255,255,255,.25);touch-action:none;display:none"><i style="position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 2px 8px rgba(0,0,0,.35);pointer-events:none"></i></div><div id="ofFloat" style="position:absolute;display:none;gap:6px;z-index:6;touch-action:none"></div><button id="ofAct" style="position:absolute;right:10px;bottom:10px;width:70px;height:70px;border-radius:50%;background:rgba(40,44,54,.75);color:#9aa4b8;font-size:20px;font-weight:900;display:none;flex-direction:column;align-items:center;justify-content:center;line-height:1.15;box-shadow:0 3px 10px rgba(0,0,0,.4);touch-action:none">✋<small style="font-size:10px;font-weight:800">상호작용</small></button></div>
     <div id="ofBar" style="display:flex;gap:6px;padding:8px 10px calc(10px + env(safe-area-inset-bottom))"></div>`;
   document.body.appendChild(d);
-  d.addEventListener("contextmenu",e=>e.preventDefault());
+  d.addEventListener("contextmenu",e=>{e.preventDefault();if(ofS.ghost){ofS.ghost=null;ofS.held=null;ofBar();ofHint();}});
   $("ofExit").onclick=ofLeave;$("ofChat").onclick=ofChatOpen;
   {const st=document.createElement("style");st.textContent="body.ofOn #chatSide{z-index:60}body.ofOn #chatFab{display:none}";document.head.appendChild(st);}
   const cv=$("ofCv");ofS.cv=cv;ofS.cx=cv.getContext("2d");
   const pt=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)/ofS.sc,y:(e.clientY-r.top)/ofS.sc-OF_WH};};
   let down=false;
-  cv.addEventListener("pointerdown",e=>{e.preventDefault();down=true;try{cv.setPointerCapture(e.pointerId);}catch(_){}ofPointer(pt(e),"down");});
+  cv.addEventListener("pointerdown",e=>{e.preventDefault();ofS.ptype=e.pointerType;down=true;try{cv.setPointerCapture(e.pointerId);}catch(_){}ofPointer(pt(e),"down");});
   cv.addEventListener("pointermove",e=>{if(down||ofS.mode!=="view")ofPointer(pt(e),down?"drag":"hover");});
   cv.addEventListener("pointerup",e=>{down=false;ofPointer(pt(e),"up");});cv.addEventListener("pointercancel",()=>{down=false;});
   window.addEventListener("keydown",e=>{if(!ofIn||/INPUT|TEXTAREA|SELECT/.test((document.activeElement||{}).tagName||""))return;const k=e.key;
@@ -4037,7 +4040,7 @@ function ofGhostAt(p){const g=ofS.ghost;if(!g)return;const f=ofFt(g);if(ofIsWall
 function ofItemAt(o,gx,gy,wallY){let best=null;for(const it of o.it||[]){const wall=ofIsWall(it.k);if(wallY){if(!wall)continue;const f=ofFt(it);if(gx>=it.x&&gx<it.x+f.w)best=it;continue;}if(wall)continue;const f=ofFt(it);if(gx>=it.x&&gx<it.x+f.w&&gy>=it.y&&gy<it.y+f.h){if(!best||ofCatOf(it.k)==="m")best=it;}}return best;}
 function ofPointer(p,ph){const o=ofS.o;if(!o)return;
   if(ofS.mode==="paint"){if(ph==="down"||ph==="drag"){const c=ofCellAt(p),L=ofL(o);if(p.y>=0&&c.x>=0&&c.y>=0&&c.x<L.c&&c.y<L.r&&ofS.paint!=null){ofS.pend=ofS.pend||{};const k=c.x+","+c.y;if(ph==="down")ofS.pdrag=ofS.pend[k]?"del":"add";if(ofS.pdrag==="del")delete ofS.pend[k];else ofS.pend[k]=1;ofBar();}}return;}
-  if(ofS.mode==="place"){if(ofS.ghost){if(ph==="down"||ph==="drag"||ph==="hover"){ofGhostAt(p);}return;}
+  if(ofS.mode==="place"){if(ofS.ghost){if(ph==="down"||ph==="drag"||ph==="hover"){ofGhostAt(p);if(ph==="down"&&ofS.ptype==="mouse")ofPutGhost();}return;}
     if(ph==="down"){const c=ofCellAt(p),wallY=p.y<0;const it=ofItemAt(o,c.x,c.y,wallY);if(!it||it.k==="box")return;ofPick(it.u);}return;}
   return;/* 보기 모드: 화면 터치로는 움직이거나 누르지 않아요 (조이스틱 + 상호작용 버튼) */
   if(ph!=="down")return;const wx=p.x,wy=p.y+OF_WH;
@@ -4052,9 +4055,9 @@ function ofGoTo(it,fn){const f=ofFt(it);const x=it.x*OF_CS+f.w*OF_CS/2,y=it.y*OF
   const o=ofS.o;/* 가까운 빈 칸으로 걸어가기 */let best=null,bd=1e9;for(const[dx,dy]of[[0,1],[0,-1],[1,0],[-1,0],[1,1],[-1,1],[1,-1],[-1,-1]]){const gx=it.x+(dx>0?f.w:dx<0?-1:Math.floor(f.w/2)),gy=it.y+(dy>0?f.h:dy<0?-1:Math.floor(f.h/2));if(gx<0||gy<0||gx>=ofL(o).c||gy>=ofL(o).r||ofSolid(o,gx,gy))continue;const d=Math.hypot(gx*OF_CS+OF_CS/2-ofS.px,gy*OF_CS+OF_CS/2-ofS.py);if(d<bd){bd=d;best=[gx,gy];}}
   if(!best){fn();return;}ofS.tx=best[0]*OF_CS+OF_CS/2;ofS.ty=best[1]*OF_CS+OF_CS/2+8;ofS.want={x,y,fn};}
 /* ---------- 배치 모드 ---------- */
-function ofModeSet(m){ofS.mode=m;ofS.ghost=null;ofS.held=null;ofS.paint=null;ofS.pend={};ofS.paintCost=0;ofS.tx=null;ofS.want=null;ofBar();ofHint();}
+function ofModeSet(m){ofS.mode=m;ofS.ghost=null;ofS.held=null;ofS.paint=null;ofS.wallSel=null;ofS.pend={};ofS.paintCost=0;ofS.tx=null;ofS.want=null;ofBar();ofHint();}
 function ofModeEnd(){ofModeSet("view");}
-function ofHint(){const h=$("ofHint");if(!h)return;h.textContent=ofS.mode==="place"?(ofS.ghost?"끌어서 자리를 정하고 ↻로 방향을 돌려요":"옮기거나 보관할 가구를 눌러요"):ofS.mode==="paint"?"칸을 눌러(끌어서) 고르고 [구매]를 눌러요 · 가구는 반투명이에요":"";}
+function ofHint(){const h=$("ofHint");if(!h)return;h.textContent=ofS.mode==="place"?(ofS.ghost?"끌어서 자리를 정하고 ↻로 방향을 돌려요":"옮기거나 보관할 가구를 눌러요"):ofS.mode==="paint"?"칸을 눌러(끌어서) 고르고 [구매]를 눌러요 · 가구는 반투명이에요":ofS.mode==="wall"?"벽을 미리 보고 [구매]를 눌러요":"";}
 function ofPick(u,solo){const o=me.of,it=ofItemBy(o,u);if(!it)return;
   let att=null;if(ofCatOf(it.k)==="m")solo=true;
   if(!solo){let desk=it;if(ofCatOf(it.k)==="m"){const mc=ofCells(it).map(a=>a.join(","));desk=(o.it||[]).find(d=>ofCatOf(d.k)==="d"&&mc.every(k=>ofCells(d).some(b=>b.join(",")===k)))||it;}
@@ -4070,7 +4073,7 @@ function ofStartInv(k){const o=me.of;if(!(o.inv&&o.inv[k]>0))return;ofSheetClose
   ofS.ghost={k,x:gx,y:gy,r:0,fromInv:1};ofBar();ofHint();}
 function ofRotate(){const g=ofS.ghost;if(!g||ofIsWall(g.k))return;g.r=((g.r|0)+1)%4;const f=ofFt(g),L=ofL(ofS.o);g.x=Math.max(0,Math.min(L.c-f.w,g.x));g.y=Math.max(0,Math.min(L.r-f.h,g.y));}
 function ofPutGhost(){const g=ofS.ghost;if(!g)return;if(ofCommit(g)){ofS.ghost=null;ofS.held=null;if(g.fromInv&&(me.of.inv&&me.of.inv[g.k]>0)){ofStartInv(g.k);}ofBar();ofHint();ofChips();}}
-function ofGhostStore(){const g=ofS.ghost;if(!g)return;if(g.u){if(g.att&&g.att.length){for(const m of g.att)ofStore(m.u);}if(ofStore(g.u)){ofS.ghost=null;ofS.held=null;ofBar();ofHint();ofChips();toast("📦 보관함에 넣었어요");}}else{ofS.ghost=null;ofBar();ofHint();}}
+function ofGhostStore(){const g=ofS.ghost;if(!g)return;if(g.u){if(g.att&&g.att.length){for(const m of g.att)ofStore(m.u);}if(ofStore(g.u)){ofS.ghost=null;ofS.held=null;ofBar();ofHint();ofChips();toast("📦 보관함에 넣었어요");}}else{ofS.ghost=null;ofBar();ofHint();toast("📦 보관함에 넣어 뒀어요");}}
 function ofGhostSell(){const g=ofS.ghost;if(!g||!g.u)return;const d=OF_IM[g.k],v=Math.floor(d[5]*OF_SELL);
   const bg=modal(`<div style="font-size:16px;font-weight:900;margin-bottom:10px">💰 팔까요?</div><div style="font-size:13px;line-height:1.8">${d[1]}을(를) <b style="color:var(--acc)">${formatMoneyReadable(v)}</b>에 팔아요 (산 값의 50%)</div><div style="display:flex;gap:8px;margin-top:12px"><button id="sNo" style="flex:1;height:44px;border-radius:12px;background:var(--card2)">취소</button><button id="sYes" style="flex:1;height:44px;border-radius:12px;background:#ef4444;color:#fff;font-weight:900">팔기</button></div>`);
   bg.style.zIndex=95;const close=()=>{try{bg.remove();}catch(e){}};bg.onclick=e=>{if(e.target===bg)close();};bg.querySelector("#sNo").onclick=close;bg.querySelector("#sYes").onclick=()=>{close();if(ofSellPlaced(g.u)){ofS.ghost=null;ofS.held=null;ofBar();ofHint();ofChips();}};}
@@ -4079,12 +4082,13 @@ function ofBtn(id,txt,bg,col,flex){return `<button id="${id}" style="flex:${flex
 function ofBar(){const b=$("ofBar");if(!b)return;let h="";
   if(!ofS.mine){h=`<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12.5px;height:46px;border-radius:12px;background:var(--card2)">👀 구경 중이에요 · 수금함을 눌러 보세요</div>`;}
   else if(ofS.mode==="view")h=ofBtn("ofB1","🛒 가구 상점","#26405f","#cfe6ff")+ofBtn("ofB2","🔄 배치 모드","#2c3446","#e6edf7")+ofBtn("ofB3","📦 보관함","#3a2f4a","#e7d6ff");
-  else if(ofS.mode==="place"){h=ofS.ghost?ofBtn("ofGR","↻ 회전","#26405f","#cfe6ff")+ofBtn("ofGP","✔ 두기","#14532d","#bbf7d0")+ofBtn("ofGS","📦 보관","#3a2f4a","#e7d6ff")+(ofS.ghost.u&&!ofS.ghost.att?ofBtn("ofGD","💰 판매","#3a2a12","#fde68a"):"")+ofBtn("ofGX","✕ 취소","#3a2430","#fecdd3"):ofBtn("ofGI","📦 보관함에서 꺼내기","#3a2f4a","#e7d6ff",1.5)+ofBtn("ofGE","✔ 끝내기","#2c3446","#e6edf7");}
+  else if(ofS.mode==="place"){h=ofS.ghost?ofBtn("ofGR","↻ 회전","#26405f","#cfe6ff")+ofBtn("ofGP","✔ 두기","#14532d","#bbf7d0")+ofBtn("ofGS","📦 보관함에 넣기","#3a2f4a","#e7d6ff")+(ofS.ghost.u&&!ofS.ghost.att?ofBtn("ofGD","💰 판매","#3a2a12","#fde68a"):"")+ofBtn("ofGX","✕ 취소","#3a2430","#fecdd3"):ofBtn("ofGI","📦 보관함에서 꺼내기","#3a2f4a","#e7d6ff",1.5)+ofBtn("ofGE","✔ 끝내기","#2c3446","#e6edf7");}
+  else if(ofS.mode==="wall"){const L=ofL(ofS.o),nf=OF_WLM[ofS.wallSel||"0"],cf=OF_WLM[ofS.o.wl||"0"],cost=(nf[3]-Math.floor(cf[3]*OF_SELL))*L.c;h=`<div style="flex:1.3;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11.5px;line-height:1.35;color:var(--sub);height:46px;border-radius:12px;background:var(--card2)">${nf[1]} · ${cost>=0?"비용 "+formatMoneyReadable(cost):"환급 "+formatMoneyReadable(-cost)}</div>`+ofBtn("ofWB","💰 구매","#14532d","#bbf7d0",.8)+ofBtn("ofGE","✕ 취소","#3a2430","#fecdd3",.7);}
   else if(ofS.mode==="paint"){const pc=ofPaintCalc();h=`<div style="flex:1.3;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11.5px;line-height:1.35;color:var(--sub);height:46px;border-radius:12px;background:var(--card2)" id="ofPaintInfo">${pc.n?`${pc.n}칸 선택 · ${pc.cost>=0?"비용 "+formatMoneyReadable(pc.cost):"환급 "+formatMoneyReadable(-pc.cost)}`:"바꿀 칸을 눌러 고르세요"}</div>`+ofBtn("ofPB",pc.n?"💰 구매":"💰 구매",pc.n?"#14532d":"#2c3446",pc.n?"#bbf7d0":"var(--sub)",.8)+ofBtn("ofPC","↺ 선택 해제","#3a2f4a","#e7d6ff",.8)+ofBtn("ofGE","✕ 끝내기","#3a2430","#fecdd3",.7);}
   b.innerHTML=h;const g=id=>$(id);
   if(g("ofB1"))g("ofB1").onclick=()=>ofShop();if(g("ofB2"))g("ofB2").onclick=()=>ofModeSet("place");if(g("ofB3"))g("ofB3").onclick=()=>ofInv();
   if(g("ofGR"))g("ofGR").onclick=ofRotate;if(g("ofGP"))g("ofGP").onclick=ofPutGhost;if(g("ofGS"))g("ofGS").onclick=ofGhostStore;if(g("ofGD"))g("ofGD").onclick=ofGhostSell;
-  if(g("ofGX"))g("ofGX").onclick=()=>{ofS.ghost=null;ofS.held=null;ofBar();ofHint();};if(g("ofGE"))g("ofGE").onclick=ofModeEnd;if(g("ofGI"))g("ofGI").onclick=()=>ofInv();if(g("ofPB"))g("ofPB").onclick=ofPaintBuy;if(g("ofPC"))g("ofPC").onclick=()=>{ofS.pend={};ofBar();};}
+  if(g("ofGX"))g("ofGX").onclick=()=>{ofS.ghost=null;ofS.held=null;ofBar();ofHint();};if(g("ofGE"))g("ofGE").onclick=ofModeEnd;if(g("ofGI"))g("ofGI").onclick=()=>ofInv();if(g("ofPB"))g("ofPB").onclick=ofPaintBuy;if(g("ofWB"))g("ofWB").onclick=()=>{const ch=ofS.wallSel;if(ch==null)return;if((me.of.wl||"0")===ch)return ofModeEnd();if(ofPaintWall(ch)){ofModeEnd();ofChips();}};if(g("ofPC"))g("ofPC").onclick=()=>{ofS.pend={};ofBar();};}
 function ofChips(){const o=ofS.o,c=$("ofChips");if(!o||!c)return;const L=ofL(o);const chip=(t,col,bg)=>`<span style="padding:5px 10px;border-radius:14px;font-size:11.5px;font-weight:800;color:${col};background:${bg};border:1px solid ${col}55">${t}</span>`;
   const sc=ofScore(o),bn=Math.round(ofBonus(o)*100);const emN=(o.em||[]).length;
   const nm=ofS.mine?"🏢 내 사무실":"🏢 "+esc(String((players[ofS.own]||{}).name||"?").slice(0,10))+"님의 사무실";
@@ -4117,9 +4121,9 @@ function ofShop(tab){const _old=ofS.sheetEl,_sv=_old&&_old.firstChild?{l:(_old.q
   else{const cat=ofS.tab,cap=ofCapOf(o,cat),have=ofCount(o,cat);h+=`<div style="font-size:11.5px;margin-bottom:6px">${OF_CATN[cat]} <b style="color:${have>=cap?"#f87171":"var(--ok)"}">${have}/${cap}</b>개 (놓은 것 + 보관함)</div>`;
     for(const d of OF_ITEMS){if(d[2]!==cat)continue;h+=`<div class="rk" style="align-items:center;padding:8px 2px"><div style="width:76px;height:46px;display:flex;align-items:center;justify-content:center;flex:none;margin-right:8px;background:#12151c;border-radius:8px">${ofSprImg(d[0],40)}</div><div class="w"><b>${d[1]}</b><small>${d[3]}×${d[4]}칸${d[7]?" · 벽":""} · 인테리어 +${d[6]}점</small></div><button data-buy="${d[0]}" style="padding:8px 11px;border-radius:12px;background:${me.cash>=d[5]?"var(--acc)":"var(--card2)"};color:${me.cash>=d[5]?"#111":"var(--sub)"};font-weight:900;font-size:11.5px;white-space:nowrap">${formatMoneyReadable(d[5])}</button></div>`;}}
   const bg=ofSheet(h);ofS.shopTab=ofS.tab;if(_sv){const tr=bg.querySelector("[data-tabs]");if(tr)tr.scrollLeft=_sv.l;if(_sv.tab===ofS.tab)bg.firstChild.scrollTop=_sv.t;}bg.querySelector("[data-x]").onclick=ofSheetClose;bg.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>ofShop(b.dataset.tab));
-  bg.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{ofBuy(b.dataset.buy);const sc=bg.firstChild.scrollTop;ofShop(ofS.tab);if(ofS.sheetEl&&ofS.sheetEl.firstChild)ofS.sheetEl.firstChild.scrollTop=sc;ofChips();});
+  bg.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{const id=b.dataset.buy,had=(o.inv&&o.inv[id])|0;ofBuy(id);ofChips();if(((o.inv&&o.inv[id])|0)>had){ofStartInv(id);toast("🛒 산 가구를 바로 놓아 보세요\n(📦를 누르면 보관함에 넣어요)");}else ofShop(ofS.tab);});
   bg.querySelectorAll("[data-pf]").forEach(b=>b.onclick=()=>{ofSheetClose();ofS.mode="paint";ofS.paint=b.dataset.pf;ofS.pend={};ofS.paintCost=0;ofS.ghost=null;ofBar();ofHint();});
-  bg.querySelectorAll("[data-pw]").forEach(b=>b.onclick=()=>{if(ofPaintWall(b.dataset.pw)){ofShop("f");ofChips();}});
+  bg.querySelectorAll("[data-pw]").forEach(b=>b.onclick=()=>{ofSheetClose();ofS.mode="wall";ofS.wallSel=b.dataset.pw;ofS.ghost=null;ofS.held=null;ofS.tx=null;ofBar();ofHint();});
   const ex=bg.querySelector("[data-expand]");if(ex)ex.onclick=()=>{ofSheetClose();ofExpand();};}
 function ofInv(){const o=me.of;const ks=Object.keys(o.inv||{}).filter(k=>OF_IM[k]&&o.inv[k]>0);
   let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">📦 보관함</b><button data-x style="font-size:20px;color:var(--sub);width:34px;height:34px">✕</button></div><div style="font-size:11px;color:var(--sub);margin-bottom:8px">가구를 누르면 배치 모드로 바뀌어요 · 위치를 정하고 ↻로 방향을 돌려서 두세요</div>`;
@@ -4138,7 +4142,15 @@ function ofNearTarget(){const o=ofS.o;if(!o||ofS.mode!=="view")return null;let b
   else{cand(bx,"🤫|금고",()=>{if(typeof ofStealPanel==="function")ofStealPanel();});for(const s of ofSeats(o)){const e=(o.em||[]).find(x=>x.u===s.u);const ch=ofItemBy(o,s.u);if(e&&ch)cand(ch,"👔|정보",()=>ofEmpViewPanel(e));}}
   return best;}
 function ofInteract(){if(!ofIn||ofS.sheetEl)return;const t=ofNearTarget();if(t)t.fn();}
-function ofActUpdate(){const b=$("ofAct"),j=$("ofJoy");if(!b||!j)return;const show=ofIn&&ofS.mode==="view"&&!ofS.sheetEl;j.style.display=show?"block":"none";b.style.display=show?"flex":"none";if(!show)return;
+function ofFloatUpdate(){const fl=$("ofFloat");if(!fl)return;const g=ofS.ghost,show=ofIn&&ofS.mode==="place"&&g;if(!show){fl.style.display="none";fl.dataset.k="";return;}
+  const key=(g.u?"u":"n")+(ofIsWall(g.k)?"w":"");
+  if(fl.dataset.k!==key){fl.dataset.k=key;const B=(id,t,bg)=>`<button id="${id}" style="width:42px;height:42px;border-radius:50%;background:${bg};color:#fff;font-size:19px;font-weight:900;box-shadow:0 3px 10px rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.55)">${t}</button>`;
+    fl.innerHTML=B("ofFP","✔","#16a34a")+(ofIsWall(g.k)?"":B("ofFR","↻","#2563eb"))+B("ofFS","📦","#7c3aed")+B("ofFX","✕","#dc2626");
+    $("ofFP").onclick=ofPutGhost;if($("ofFR"))$("ofFR").onclick=ofRotate;$("ofFS").onclick=ofGhostStore;$("ofFX").onclick=()=>{ofS.ghost=null;ofS.held=null;ofBar();ofHint();};}
+  const wrap=$("ofWrap"),cv=ofS.cv;if(!wrap||!cv)return;const wr=wrap.getBoundingClientRect(),cr=cv.getBoundingClientRect(),f=ofFt(g),wall=ofIsWall(g.k),sc=ofS.sc;
+  const gx=(g.x*OF_CS+f.w*OF_CS/2)*sc+(cr.left-wr.left),top=(wall?OF_WH-OF_CS-1:OF_WH+g.y*OF_CS)*sc+(cr.top-wr.top),bot=(wall?OF_WH:OF_WH+(g.y+f.h)*OF_CS)*sc+(cr.top-wr.top);
+  fl.style.display="flex";const w=fl.offsetWidth||150,h=fl.offsetHeight||42;let x=Math.max(4,Math.min(wr.width-w-4,gx-w/2)),y=top-h-6;if(y<30)y=bot+6;y=Math.max(30,Math.min(wr.height-h-4,y));fl.style.left=x+"px";fl.style.top=y+"px";}
+function ofActUpdate(){ofFloatUpdate();const b=$("ofAct"),j=$("ofJoy");if(!b||!j)return;const show=ofIn&&ofS.mode==="view"&&!ofS.sheetEl;j.style.display=show?"block":"none";b.style.display=show?"flex":"none";if(!show)return;
   const t=ofNearTarget(),key=t?t.label:"";if(b._k===key)return;b._k=key;
   if(t){const[a,c]=t.label.split("|");b.innerHTML=a+`<small style="font-size:10px;font-weight:800">${c}</small>`;b.style.background="rgba(31,122,77,.95)";b.style.color="#fff";}
   else{b.innerHTML='✋<small style="font-size:10px;font-weight:800">상호작용</small>';b.style.background="rgba(40,44,54,.75)";b.style.color="#9aa4b8";}}
