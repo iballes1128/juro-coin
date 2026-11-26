@@ -4125,7 +4125,7 @@ function ofChips(){const o=ofS.o,c=$("ofChips");if(!o||!c)return;const L=ofL(o);
   const nm=ofS.mine?"🏢 내 사무실":"🏢 "+esc(String((players[ofS.own]||{}).name||"?").slice(0,10))+"님의 사무실";
   {const cb=$("ofChat");if(cb){const n=(typeof chatUnread==="number"&&chatUnread>0)?(chatUnread>99?"99+":chatUnread):0;cb.innerHTML=n?`💬 <span style="color:#ff8a96">${n}</span>`:"💬";}}
   $("ofTitle").innerHTML=nm+` <span style="color:var(--sub);font-weight:700;font-size:12px">Lv.${ofLv(o)} · ${L.c}×${L.r}칸</span>`;
-  let h=chip(`✨ 인테리어 ${sc}점 · 수입 +${bn}%`,"#fde68a","#3a3320")+chip(`👔 직원 ${emN}/${L.n}`,"#9cc8f5","#26405f")+chip(`🧾 세금 ${Math.round(L.tax*100)}%`,"#cfd8e8","#2c3446");
+  let h=chip(`💵 내 돈 ${formatMoneyReadable(me.cash)}`,"#bbf7d0","#14532d")+chip(`✨ 인테리어 ${sc}점 · 수입 +${bn}%`,"#fde68a","#3a3320")+chip(`👔 직원 ${emN}/${L.n}`,"#9cc8f5","#26405f")+chip(`🧾 세금 ${Math.round(L.tax*100)}%`,"#cfd8e8","#2c3446");
   if(!ofS.mine){const n=Object.keys(onlineMap||{}).filter(k=>onlineMap[k]&&onlineMap[k].fo===ofS.own&&k!==ofS.own).length;h+=chip(`👥 방문 ${n}/${OF_VIS}`,"#bbf7d0","#14532d")+chip(`💰 수금함 ${formatMoneyReadable(ofPeek(o,ofNow()))}`,"#fde68a","#3a3320");}
   if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h;}
   }
