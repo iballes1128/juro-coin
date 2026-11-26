@@ -1110,18 +1110,19 @@ function scRender(){const d=$("ltMod");if(!d||ltTab!=="sc")return;scCss();try{sc
   d.querySelectorAll("[data-scbuy]").forEach(b=>b.onclick=()=>scBuy(b.dataset.scbuy));const rb=$("scResume");if(rb)rb.onclick=()=>{scCur={c:me.scc[0],done:0};scRender();};}
 function scCardRender(d){const s=scCur,c=s.c,T=SC_T[c.y],isA=c.y==="a",pc=c.g.map(x=>x[0]);
   const hit=i=>c.k>0&&(isA?c.g[i][0]===c.w:pc.filter(p=>p===c.g[i][0]).length===2);
-  const cell=i=>`<div class="scCell${hit(i)?" hit":""}"><div class="n">${c.g[i][0]}</div><div class="p">${scShort(c.g[i][1])}</div><canvas class="scv"></canvas></div>`;
+  const cell=i=>`<div class="scCell"${hit(i)?" data-hit=\"1\"":""}><div class="n">${c.g[i][0]}</div><div class="p">${scShort(c.g[i][1])}</div><canvas class="scv"></canvas></div>`;
   d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">${T.ic} ${T.nm}</b><button id="ltX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div><div id="scMsgBox" style="display:none;margin:6px 0;padding:9px 11px;border-radius:10px;font-size:12px;font-weight:800;background:#7f1d1d;color:#fff"></div>
   <div class="scCard" id="scCard" style="margin-top:8px;background:${T.g}">${isA?`<div class="scWin"><b>⭐ 당첨 숫자</b><div class="scWb"><span>${c.w}</span><canvas class="scv"></canvas></div></div>`:`<div class="scWin" style="padding:6px"><b style="margin:0">그림 두 개가 같으면 당첨!</b></div>`}<div class="scGrid">${[0,1,2,3,4,5].map(cell).join("")}</div></div>
   <div id="scBot" style="margin-top:10px"></div></div>`;
   $("ltX").onclick=()=>{d.style.display="none";};scCur.cv=[...d.querySelectorAll("canvas.scv")];scCur.done=s.done||0;
-  if(s.done){scCur.cv.forEach(x=>x.remove());scShowRes();return;}
-  $("scBot").innerHTML=`<button id="scAll" style="width:100%;padding:11px 0;border-radius:11px;background:var(--card2);font-weight:900;font-size:12.5px">✨ 전부 긁기</button><div style="font-size:10.5px;color:var(--sub);text-align:center;margin-top:6px">절반쯤 긁으면 나머지는 저절로 벗겨져요 · 나가도 복권은 보관돼요</div>`;$("scAll").onclick=scReveal;
+  if(s.done){scCur.cv.forEach(x=>x.remove());scMark();scShowRes();return;}
+  $("scBot").innerHTML=`<button id="scAll" style="width:100%;padding:11px 0;border-radius:11px;background:var(--card2);font-weight:900;font-size:12.5px">✨ 전부 긁기</button><div style="font-size:10.5px;color:var(--sub);text-align:center;margin-top:6px">75%쯤 긁으면 나머지는 저절로 벗겨져요 · 나가도 복권은 보관돼요</div>`;$("scAll").onclick=scReveal;
   scCur.cv.forEach(cv=>{const p=cv.parentNode,w=p.clientWidth,h=p.clientHeight,dp=2;cv.width=w*dp;cv.height=h*dp;const x=cv.getContext("2d");x.scale(dp,dp);const g=x.createLinearGradient(0,0,w,h);g.addColorStop(0,"#d1d5db");g.addColorStop(.5,"#f3f4f6");g.addColorStop(1,"#9ca3af");x.fillStyle=g;x.fillRect(0,0,w,h);for(let i=0;i<Math.max(80,w*h/40);i++){x.fillStyle="rgba(255,255,255,"+Math.random()*.35+")";x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);x.fillStyle="rgba(0,0,0,"+Math.random()*.12+")";x.fillRect(Math.random()*w,Math.random()*h,1.5,1.5);}x.fillStyle="#6b7280";x.font="900 10px sans-serif";x.textAlign="center";x.fillText("긁어 보세요",w/2,h/2+4);
     let dn=0,lx=0,ly=0;const pos=e=>{const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top];},er=(a,b,c2,e2)=>{x.save();x.globalCompositeOperation="destination-out";x.lineCap="round";x.lineWidth=24;x.beginPath();x.moveTo(a,b);x.lineTo(c2,e2);x.stroke();x.restore();};
     cv.onpointerdown=e=>{if(s.done)return;dn=1;try{cv.setPointerCapture(e.pointerId);}catch(_){}const q=pos(e);lx=q[0];ly=q[1];er(lx,ly,lx,ly);e.preventDefault();};
     cv.onpointermove=e=>{if(!dn)return;const q=pos(e);er(lx,ly,q[0],q[1]);lx=q[0];ly=q[1];};cv.onpointerup=cv.onpointercancel=()=>{dn=0;scChk();};});}
-function scChk(){const s=scCur;if(!s||s.done)return;let cl=0,tot=0;try{for(const cv of s.cv){const x=cv.getContext("2d"),im=x.getImageData(0,0,cv.width,cv.height).data;for(let i=3;i<im.length;i+=64){tot++;if(im[i]<128)cl++;}}}catch(e){return;}if(tot&&cl/tot>=.5)scReveal();}
+function scMark(){document.querySelectorAll("#scCard [data-hit]").forEach(x=>x.classList.add("hit"));}
+function scChk(){const s=scCur;if(!s||s.done)return;let cl=0,tot=0;try{for(const cv of s.cv){const x=cv.getContext("2d"),im=x.getImageData(0,0,cv.width,cv.height).data;for(let i=3;i<im.length;i+=64){tot++;if(im[i]<128)cl++;}}}catch(e){return;}if(tot&&cl/tot>=.75)scReveal();}
 function scReveal(){const s=scCur;if(!s||s.done)return;s.cv.forEach(cv=>{cv.style.transition="opacity .35s";cv.style.opacity=0;setTimeout(()=>{try{cv.remove();}catch(e){}},400);});setTimeout(()=>{try{scFinish();}catch(e){toast("복권 처리 오류");}},380);}
 function scFinish(){const s=scCur;if(!s||s.done)return;s.done=1;const c=s.c,T=SC_T[c.y],k=c.k,gross=T.pz[k];let net=k===6?gross:Math.floor(gross*.9);s.net=0;s.cut=0;
   me.scc=(me.scc||[]).filter(x=>x.id!==c.id);
@@ -1129,7 +1130,7 @@ function scFinish(){const s=scCur;if(!s||s.done)return;s.done=1;const c=s.c,T=SC
   saveMe();renderHeader();
   if(k>0&&s.net>0&&fdb){fdb.ref("market/lotto/st/paid").transaction(v=>(v||0)+s.net).catch(()=>{});}
   if(k>0&&k<=2){try{chatPush({sys:true,text:`🎉🎫 ${myName()}님이 즉석복권 ${k}등에 당첨됐어요! (${formatMoneyReadable(gross)})`,kind:"lotto"});fdb.ref("market/lottoHof").push({r:c.R,rk:k,nm:myName().slice(0,10),amt:gross,sc:1,t:Date.now()}).catch(()=>{});}catch(e){}}
-  if(k>0){scFx(k);const cd=$("scCard");if(cd)cd.classList.add("scGlow");}
+  scMark();if(k>0){scFx(k);const cd=$("scCard");if(cd)cd.classList.add("scGlow");}
   scShowRes();}
 function scShowRes(){const s=scCur,c=s.c,T=SC_T[c.y],k=c.k,gross=T.pz[k],bot=$("scBot");if(!bot)return;const o=scPool[c.y]||scFull(c.y),sd=me.scd&&me.scd.d===todayKey()?me.scd:{a:0,b:0},more=SC_DAY-(sd[c.y]||0);
   const res=k>0?`<div style="text-align:center;border-radius:14px;padding:12px;background:linear-gradient(90deg,#f59e0b,#ef4444);color:#fff"><b style="font-size:20px;display:block">🎉 당첨! +${formatMoneyReadable(s.net)}</b><span style="font-size:11px;opacity:.95">${k===6?"":`당첨금 ${formatMoneyReadable(gross)} − 세금 10%`}${s.cut?" · 국세청 재원이 부족해 일부만 지급됐어요":""}</span></div>`:`<div style="text-align:center;border-radius:14px;padding:12px;background:#1f2937;color:#9ca3af;font-weight:800;font-size:13px">아쉽지만 꽝이에요 · 다음 장은 행운이 있길!</div>`;
