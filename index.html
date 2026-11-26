@@ -1146,6 +1146,73 @@ async function scBuy(y){if(scBusy)return;if(!me||!me._loaded)return scNote("닉�
     fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+T.p;c.scr=(c.scr||0)+T.p;return c;}).catch(()=>{});
     saveMe();renderHeader();scCur={c:card,done:0};scBusy=0;scRender();}catch(e){scBusy=0;scNote("구매 실패 ("+String((e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}}
 
+const JrSim=(()=>{function jrMk(seed){let s=seed;return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+var FL=.65;var RV=.0004;var PS=.52;var CP=.3,PU=.6;var SP=.45,SL=.3;var RP=.3,RL=.2;var DR=.0006;function JrSimF(seed){const r=jrMk(seed),gs=()=>{let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());};
+ const o={lp:0,st:"calm",left:30,dr:0,sg:.003,ev:null,reb:0,rdr:0,rbk:0};
+ o.step=function(){o.ev=null;
+  if(o.left<=0){
+   if(o.st==="pump"&&r()<CP){o.st="crash";o.left=8+Math.floor(r()*20);const t=-(.15+r()*.15);o.dr=Math.log(1+t)/o.left;o.sg=.004;o.ev="crash";o.drop=t;}
+   else if(o.st!=="calm"){o.st="calm";o.left=20+Math.floor(r()*80);o.dr=0;o.sg=.003;}
+   else{const x=r();
+    if(x<.5){o.st="pump";o.left=30+Math.floor(r()*100);o.len=o.left;o.flipChk=0;const t=.15+r()*.25;o.dr=Math.log(1+t)/o.left;o.sg=.005;o.ev="pump";}
+    else if(x<.8){o.st="fall";o.left=25+Math.floor(r()*80);o.len=o.left;o.flipChk=0;const t=-(.072+r()*.108);o.dr=Math.log(1+t)/o.left;o.sg=.005;}
+    else{o.st="calm";o.left=20+Math.floor(r()*60);o.dr=0;o.sg=.003;}}}
+  o.left--;if(o.st==='pump'||o.st==='fall'){if(!o.flipChk&&o.left<o.len/2){o.flipChk=1;if(r()<FL)o.dr=-o.dr*.8;}}let d=o.dr+o.sg*gs()-DR-RV*o.lp;
+  if(o.reb>0){d+=o.rdr;o.reb--;if(o.reb===0&&o.rbk){o.st="fall";o.left=20+Math.floor(r()*40);o.dr=Math.log(1-.1-r()*.15)/o.left;o.sg=.005;}}
+  const afterCrash=(drop)=>{const x=r();if(x<RP){o.reb=10+Math.floor(r()*40);const rec=-drop*(RL+r()*.2);o.rdr=Math.log(1+rec)/o.reb;o.rbk=r()<.3;}else if(x<RP+SP){o.reb=10+Math.floor(r()*40);const rec=drop*(SL+r()*.3);o.rdr=Math.log(1+rec)/o.reb;o.rbk=0;}};
+  if(o.ev==="crash"){o.rb=o.drop;}
+  if(o.st==="crash"&&o.left===0&&o.rb!==undefined){afterCrash(o.rb);o.rb=undefined;}
+  if(r()<.008){const m=.01+Math.pow(r(),1.8)*.24,sgn=r()<PS?1:-1;d+=Math.log(1+sgn*m);if(sgn<0&&m>.1){o.ev="crash";afterCrash(-m);}else if(m>.1)o.ev="pump";}
+  if(r()<1/450){const m=.78+r()*.25;d+=Math.log(m);o.ev="crash";afterCrash(m-1);}
+  if(r()<1/450){d+=Math.log(1.2+r()*PU);o.ev="pump";}
+  o.lp+=d;const a=Math.abs(o.lp);if(a>2.3)o.lp-=Math.sign(o.lp)*.01*(a-2.3)*10;if(o.lp>3.9)o.lp=3.9;if(o.lp<-3.9)o.lp=-3.9;return Math.round(50000*Math.exp(o.lp));};
+ return o;}
+
+return JrSimF;})();
+/* ===== ⚠️ 주로코인: 코인 목록 맨 아래 위험 구역 (0.005초마다 움직임 · 최대 10개 · 3초 안에 안 팔면 자동 매도 · 수수료 5% · 세금 없음 · 손익 ±30% 상한) ===== */
+const JR_FEE=.05,JR_CAP=.3,JR_MAX=10,JR_HOLD=3000,JR_TK=5,JR_W=900,JR_B=50000;
+var jrS=null,jrP=[JR_B],jrCur=0,jrT0=0,jrTimer=0,jrHold=null,jrEvT=0,jrRes="";
+function jrStart(){jrS=JrSim(Math.floor(Math.random()*1e9));jrP=[JR_B];jrCur=0;jrT0=performance.now();}
+function jrMount(){if($("jrBox"))return;const L=$("coinList");if(!L||!L.parentNode)return;const b=document.createElement("div");b.id="jrBox";b.innerHTML=`<div style="text-align:center;font-size:11px;color:#f87171;font-weight:800;margin:14px 0 8px;letter-spacing:.5px">━━━ ⚠️ 위험 구역 ━━━</div><div class="row" id="jrRow" style="border:2px solid #ef4444;border-radius:14px;background:linear-gradient(90deg,rgba(239,68,68,.16),rgba(239,68,68,.04));box-shadow:0 0 18px rgba(239,68,68,.3);cursor:pointer"><div class="ic" style="background:#7f1d1d;color:#fecaca">주</div><div class="nm"><b>주로코인</b><span class="bd"><span class="badge" style="background:#ef4444;color:#fff">⚠️ 초고위험</span></span></div><div class="pr"><b id="jrRowP" style="color:#f87171">50,000원</b></div></div>`;L.parentNode.insertBefore(b,L.nextSibling);$("jrRow").onclick=jrOpen;}
+function jrWarn(){let d=$("jrWarn");if(!d){d=document.createElement("div");d.id="jrWarn";d.className="btBg";d.style.zIndex=90;document.body.appendChild(d);}
+  d.innerHTML=`<div class="btBox" style="border:2px solid #ef4444;box-shadow:0 0 40px rgba(239,68,68,.4)"><div style="font-size:40px;text-align:center">⚠️</div><h3 style="margin:4px 0 8px;text-align:center;color:#fecaca;font-size:17px">주로코인은 초고위험 코인이에요</h3><div style="font-size:12.5px;line-height:1.7;text-align:center;margin-bottom:8px">가격이 아주 빠르고 크게 움직여서, 다른 코인과는 완전히 달라요.</div>
+  <div style="display:grid;gap:6px;margin-bottom:10px"><div style="padding:8px 10px;border-radius:9px;background:#1f1416;color:#fecaca;font-size:12.5px;font-weight:700">📈 몇 초 만에 20~30%씩 오를 수 있어요</div><div style="padding:8px 10px;border-radius:9px;background:#1f1416;color:#fecaca;font-size:12.5px;font-weight:700">📉 갑자기 30~40%씩 떨어질 수도 있어요</div><div style="padding:8px 10px;border-radius:9px;background:#1f1416;color:#fecaca;font-size:12.5px;font-weight:700">💸 한 번에 큰돈을 잃을 수 있어요</div></div>
+  <div style="font-size:12px;color:var(--sub);text-align:center;margin-bottom:12px">잃어도 괜찮은 만큼만 거래하세요</div><div style="display:flex;gap:8px"><button id="jrNo" style="flex:1;padding:12px 0;border-radius:12px;background:var(--card2);font-weight:900;font-size:13px">그만둘래요</button><button id="jrYes" style="flex:1;padding:12px 0;border-radius:12px;background:#ef4444;color:#fff;font-weight:900;font-size:13px">알겠어요, 들어갈게요</button></div></div>`;
+  d.style.display="flex";$("jrNo").onclick=()=>d.style.display="none";$("jrYes").onclick=()=>{d.style.display="none";me.jrOk=1;try{saveMe();}catch(e){}jrTrade();};}
+function jrOpen(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(!me.jrOk)return jrWarn();jrTrade();}
+function jrTrade(){let d=$("jrMod");if(!d){d=document.createElement("div");d.id="jrMod";d.className="btBg";d.style.zIndex=85;document.body.appendChild(d);d.onclick=e=>{if(e.target===d)jrClose();};
+  d.innerHTML=`<div class="btBox" style="border:2px solid #ef4444"><div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:8px"><div style="font-weight:900;font-size:16px">주로코인 <span style="background:#ef4444;color:#fff;border-radius:7px;padding:2px 7px;font-size:10.5px;margin-left:4px">⚠️ 초고위험</span></div><button id="jrX" style="font-size:20px;color:var(--sub);width:36px;height:30px">✕</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px"><div id="jrEv" style="font-size:13px;font-weight:900;height:18px"></div><div style="text-align:right"><div id="jrPr" style="font-size:26px;font-weight:900">50,000원</div><div id="jrCh" style="font-size:12.5px;font-weight:800"></div></div></div>
+  <canvas id="jrCv" width="800" height="360" style="width:100%;height:210px;background:#0f1117;border:2px solid #ef4444;border-radius:14px;display:block"></canvas>
+  <div id="jrPos" style="display:none;margin-top:8px;padding:9px 11px;border-radius:12px;background:#1f1416;border:1px solid #ef4444;font-size:12.5px;font-weight:800"></div><div id="jrRs" style="min-height:22px;margin-top:8px;text-align:center;font-size:15px;font-weight:900"></div>
+  <div style="display:flex;gap:8px;margin-top:6px"><button id="jrBuy" style="flex:1;padding:13px 0;border-radius:12px;background:#ef4444;color:#fff;font-weight:900;font-size:13.5px"></button><button id="jrSell" style="flex:1;padding:13px 0;border-radius:12px;background:#3b82f6;color:#fff;font-weight:900;font-size:13.5px">지금 팔기</button></div></div>`;
+  $("jrX").onclick=jrClose;$("jrBuy").onclick=jrBuy;$("jrSell").onclick=()=>jrSell(0);}
+  d.style.display="flex";jrRes="";$("jrRs").textContent="";if(!jrS)jrStart();else if(!jrHold){jrStart();}jrRun();jrUi();}
+function jrClose(){const d=$("jrMod");if(d)d.style.display="none";}
+function jrRun(){if(jrTimer)return;jrTimer=setInterval(jrTick,40);}
+function jrNote(t,c){const e=$("jrEv");if(!e)return;e.textContent=t;e.style.color=c;clearTimeout(jrEvT);jrEvT=setTimeout(()=>{e.textContent="";},1500);}
+function jrTick(){try{const n=performance.now(),target=Math.floor((n-jrT0)/JR_TK);let g=0;if(target-jrCur>4000)jrCur=target-4000;while(jrCur<target&&g<4000){jrP.push(jrS.step());if(jrS.ev==="crash")jrNote("💥 급락!","#f87171");else if(jrS.ev==="pump")jrNote("🚀 급등!","#34d399");if(jrP.length>JR_W)jrP.shift();jrCur++;g++;}
+  if(jrHold&&n-jrHold.t>=JR_HOLD)jrSell(1);
+  const d=$("jrMod"),vis=d&&d.style.display==="flex";if(vis){jrDraw();jrUi();}
+  if(!vis&&!jrHold){clearInterval(jrTimer);jrTimer=0;}}catch(e){clearInterval(jrTimer);jrTimer=0;}}
+function jrDraw(){const cv=$("jrCv");if(!cv)return;const x=cv.getContext("2d"),w=cv.width,h=cv.height,P=jrP;x.clearRect(0,0,w,h);let lo=1e12,hi=0;for(let i=0;i<P.length;i++){const v=P[i];if(v<lo)lo=v;if(v>hi)hi=v;}const pad=(hi-lo)*.08||50;lo-=pad;hi+=pad;
+  x.strokeStyle="#1f2937";x.lineWidth=1;for(let i=1;i<4;i++){x.beginPath();x.moveTo(0,h*i/4);x.lineTo(w,h*i/4);x.stroke();}x.fillStyle="#6b7280";x.font="18px sans-serif";x.fillText(Math.round(hi).toLocaleString(),6,20);x.fillText(Math.round(lo).toLocaleString(),6,h-8);
+  const last=P[P.length-1],up=last>=P[0];x.strokeStyle=up?"#34d399":"#f87171";x.lineWidth=2.2;x.beginPath();P.forEach((v,i)=>{const px=i/(JR_W-1)*w,py=h-(v-lo)/(hi-lo)*h;i?x.lineTo(px,py):x.moveTo(px,py);});x.stroke();
+  if(jrHold){const by=h-(jrHold.avg-lo)/(hi-lo)*h;x.strokeStyle="#fbbf24";x.setLineDash([8,6]);x.beginPath();x.moveTo(0,by);x.lineTo(w,by);x.stroke();x.setLineDash([]);}
+  const ly=h-(last-lo)/(hi-lo)*h,lx=(P.length-1)/(JR_W-1)*w;x.fillStyle=up?"#34d399":"#f87171";x.beginPath();x.arc(lx,ly,5,0,7);x.fill();}
+function jrRet(p,avg){return Math.max(-JR_CAP,Math.min(JR_CAP,p/avg*(1-JR_FEE)-1));}
+function jrUi(){const P=jrP,last=P[P.length-1],r=(last/P[0]-1)*100;if($("jrPr")){$("jrPr").textContent=last.toLocaleString()+"원";const c=$("jrCh");c.textContent=(r>=0?"+":"")+r.toFixed(1)+"%";c.style.color=r>=0?"#34d399":"#f87171";}
+  const b=$("jrBuy");if(b){const q=Math.min(JR_MAX,Math.floor((me.cash||0)/last));b.textContent=`${JR_MAX}개 사기`;b.style.opacity=jrHold||q<1?".45":"1";}
+  const ps=$("jrPos");if(ps){if(jrHold){const rr=jrRet(last,jrHold.avg),v=Math.floor(jrHold.q*jrHold.avg*rr),left=Math.max(0,JR_HOLD-(performance.now()-jrHold.t));ps.style.display="block";ps.innerHTML=`보유 ${jrHold.q}개 · 평균 ${jrHold.avg.toLocaleString()}원 · <span style="color:${v>=0?"#34d399":"#f87171"}">${v>=0?"+":""}${formatMoneyReadable(Math.abs(v)).replace(/^/,v<0?"-":"")}</span> · <span style="color:#fbbf24">${(left/1000).toFixed(1)}초 뒤 자동 매도</span>`;}else ps.style.display="none";}
+  const rp=$("jrRowP");if(rp)rp.textContent=last.toLocaleString()+"원";}
+function jrBuy(){if(!me||!me._loaded)return;if(jrHold)return;if(!canTrade())return toast("지금은 거래할 수 없어요");const p=jrP[jrP.length-1],q=Math.min(JR_MAX,Math.floor((me.cash||0)/p));if(q<1)return toast("💸 잔액이 부족해요");
+  me.cash-=q*p;jrHold={q,avg:p,t:performance.now()};me.jrPos={q,avg:p};stAdd("jrN");saveMe();renderHeader();jrRes="";if($("jrRs"))$("jrRs").textContent="";jrUi();}
+function jrSell(auto){if(!jrHold)return;const h=jrHold,p=jrP[jrP.length-1],rr=jrRet(p,h.avg),cost=h.q*h.avg,got=Math.floor(cost*(1+rr)),pnl=got-cost;jrHold=null;me.jrPos=null;me.cash+=got;if(pnl>0){stAdd("jrWin");}saveMe();renderHeader();
+  const e=$("jrRs");if(e){e.textContent=pnl>=0?`🎉 +${formatMoneyReadable(pnl)}`:`-${formatMoneyReadable(-pnl)}`;e.style.color=pnl>0?"#34d399":pnl<0?"#f87171":"var(--sub)";}
+  if(pnl>0&&typeof scFx==="function"&&pnl>=cost*.15)scFx(5);jrUi();}
+function jrRecover(){if(!me||!me._loaded||jrHold||!me.jrPos)return;const o=me.jrPos;me.jrPos=null;me.cash+=Math.floor(o.q*o.avg*(1-JR_FEE));saveMe();renderHeader();toast("진행 중이던 주로코인 거래를 정리했어요");}
+try{jrMount();}catch(e){}setInterval(()=>{try{jrMount();jrRecover();}catch(e){}},3000);
+
 /* ===== 🎰 로또 생방송 추첨: 정각에 공이 하나씩 굴러 나와요 (10초 전 알림) ===== */
 var ltLv={r:0,on:0,raf:0,balls:null,lastR:0,banOff:0};
 const LT_COL=n=>n<=5?"#f59e0b":n<=10?"#3b82f6":n<=15?"#ef4444":"#22c55e";
