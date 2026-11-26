@@ -3632,7 +3632,7 @@ setInterval(dealTick,1000);
 /* ===== 은행(예금): 기간이 길수록 이자↑ · 만기 시 자동 입금 · 만기 전 해지는 원금의 90%만 ===== */
 var BANK_MIN=10000000,BANK_MAXN=3,BANK_CANCEL=.9,bankNotified={};
 function openBank(){if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");openPg("bank");}
-var BANK_P=[{id:"h12",nm:"12시간",ms:43200000,r:.03},{id:"d1",nm:"1일",ms:86400000,r:.1},{id:"d7",nm:"7일",ms:604800000,r:.35}];
+var BANK_P=[{id:"h12",nm:"12시간",ms:43200000,r:.03},{id:"d1",nm:"1일",ms:86400000,r:.1},{id:"d3",nm:"3일",ms:259200000,r:.35},{id:"d7",nm:"7일",ms:604800000,r:.35,old:1}];
 var bankSel="d1",bankAmt=0;
 function bankNow(){return Date.now()+dealOff();}
 function bankPct(r){return +(r*100).toFixed(2)+"%";}
@@ -3647,7 +3647,7 @@ function renderBank(){const S=$("s-bank");if(!S||pgCur!=="bank")return;
   bankPeriods();bankSync(1);}
 function bankSync(setInput){const I=$("bkAmt");if(!I)return;if(setInput)I.value=bankAmt?bankAmt.toLocaleString("ko-KR"):"";bankRefresh();}
 function bankPeriods(){const P=$("bkPer");if(!P)return;
-  P.innerHTML=BANK_P.map(x=>`<button data-bp="${x.id}" style="flex:1;padding:7px 2px;border-radius:10px;font-weight:800;font-size:11px;line-height:1.35;background:${x.id===bankSel?"var(--acc)":"var(--card2)"};color:${x.id===bankSel?"#111":"inherit"}">${x.nm}<br><span style="font-size:13px;font-weight:900">+${bankPct(x.r)}</span></button>`).join("");
+  P.innerHTML=BANK_P.filter(x=>!x.old).map(x=>`<button data-bp="${x.id}" style="flex:1;padding:7px 2px;border-radius:10px;font-weight:800;font-size:11px;line-height:1.35;background:${x.id===bankSel?"var(--acc)":"var(--card2)"};color:${x.id===bankSel?"#111":"inherit"}">${x.nm}<br><span style="font-size:13px;font-weight:900">+${bankPct(x.r)}</span></button>`).join("");
   P.querySelectorAll("[data-bp]").forEach(b=>b.onclick=()=>{bankSel=b.dataset.bp;bankPeriods();bankRefresh();});}
 function bankRefresh(){if(!$("bkPer"))return;
   const per=bankPer(),a=Math.floor(bankAmt),pv=$("bkPrev");
