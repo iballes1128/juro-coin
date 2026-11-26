@@ -161,7 +161,7 @@ nav button.on{color:var(--tx);font-weight:700}
 #fTkCol{flex:none;width:128px}#fTkHide{width:100%;background:var(--card2);border-radius:8px;padding:4px 0;font-size:10px;color:var(--sub);margin-bottom:4px}
 #fBoatBtn{position:absolute;left:50%;transform:translateX(-50%);top:8px;display:none;background:rgba(14,116,144,.88);color:#fff;font-size:11.5px;font-weight:800;border-radius:12px;padding:6px 13px;z-index:3}#fBoatBtn.on{background:rgba(71,85,105,.9)}
 #fBridgeLock{position:absolute;left:50%;transform:translateX(-50%);top:8px;display:none;background:rgba(127,29,29,.9);color:#fff;font-size:11.5px;font-weight:800;border-radius:12px;padding:6px 13px;z-index:3}
-#fAutoBtn{position:absolute;right:8px;top:8px;display:none;background:rgba(180,83,9,.9);color:#fff;font-size:11px;font-weight:800;border-radius:12px;padding:6px 11px;z-index:3}#fAutoBtn.on{background:rgba(71,85,105,.92)}
+#fAutoBtn{position:absolute;left:50%;transform:translateX(-50%);bottom:10px;display:none;background:rgba(180,83,9,.9);color:#fff;font-size:10px;font-weight:800;border-radius:10px;padding:4px 9px;z-index:3;white-space:nowrap}#fAutoBtn.on{background:rgba(71,85,105,.92)}
 #fTkShow{position:absolute;left:8px;top:8px;display:none;background:rgba(10,12,16,.6);color:#fff;font-size:10px;font-weight:700;border-radius:9px;padding:4px 9px}
 #fRow.tkoff #fTkCol{display:none}#fRow.tkoff #fTkShow{display:block}
 @media (max-width:600px){#fRow{gap:5px}#fTkCol{width:86px}#fTicker{width:auto;gap:3px}#fTicker span{padding:2px 5px;line-height:1.2;border-radius:7px}#fTicker small{font-size:8px}#fTicker b{font-size:9px}#fTicker em{font-size:8px}#fTkHide{font-size:9px}}
@@ -2402,7 +2402,7 @@ function drawBubble(c,x,y,text){c.font="8.5px 'Noto Sans KR',sans-serif";const w
   c.fillStyle="rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,w,h,8);c.fill();c.beginPath();c.moveTo(x-5,by+h);c.lineTo(x+5,by+h);c.lineTo(x,by+h+6);c.fill();c.fillStyle="#111";c.textAlign="left";ls.forEach((l,i)=>c.fillText(l,bx+5,by+12.5+i*12));c.textAlign="center";}
 /* ===== 🤖 자동낚시: 이용권(me.autoN회)을 쓰면 수동 낚시처럼 던지고 기다렸다가 알아서 당겨 줘요 · 움직이거나 낚시터를 벗어나면 취소 ===== */
 var AUTO_PRICE=10000000,AUTO_N=100,fAuto=0,fAutoT=0,fAutoR=0,fAutoCatch=0,fAutoLog=null;
-function autoBtnUpd(){const B=$("fAutoBtn");if(!B)return;const n=me?(me.autoN|0):0,show=(n>0||fAuto)&&!fBoat&&(fAuto||fstate==="idle"),tx=fAuto?`⏹ 자동낚시 끄기 (${n}회)`:`🤖 자동낚시 (${n}회)`,d=show?"block":"none";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fAuto);}}
+function autoBtnUpd(){const B=$("fAutoBtn");if(!B)return;const n=me?(me.autoN|0):0,show=(n>0||fAuto)&&!fBoat&&(fAuto||fstate==="idle"),tx=fAuto?`⏹ 끄기 (${n}회)`:`🤖 자동낚시 ${n}회`,d=show?"block":"none";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fAuto);}}
 function autoStop(msg){if(!fAuto)return;fAuto=0;if(msg)toast(msg);setFishBtn();autoBtnUpd();autoSummary();}
 function autoRec(i,base,name,first,fx){const G=fAutoLog;if(!G)return;G.n++;const e=G.L[name]||(G.L[name]={c:0,v:base,i});e.c++;if(base>0){G.pos+=base;G.sell+=base-Math.round(base*.1);}else G.loss+=base;if(first)G.newN++;G.exp+=fx||0;}
 function autoSummary(){const G=fAutoLog;fAutoLog=null;if(!G||!G.n)return;const rows=Object.entries(G.L).sort((a,b)=>b[1].v-a[1].v),big=rows.filter(r=>r[1].v>=BIG_V);
