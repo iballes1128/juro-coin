@@ -3751,9 +3751,9 @@ const OFS={"d0":"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"68\" height=\
 /* ===== 🏢 컴퍼니 · 사무실 임대 ===== */
 var OF_RENT=10000000,OF_SLOT=600000,OF_HOURS=8,OF_VIS=10,OF_STEAL=.01,OF_STEAL_MS=28800000,OF_SELL=.5,OF_SEV=.1,OF_MAXC=16,OF_MAXR=14;
 /* 단계: c열 x r행, p=확장비(이 단계로 올리는 값), n=직원 수, tax=세율, rk=뽑을 수 있는 직급 수 */
-var OF_LV=[{c:8,r:6,p:0,n:3,tax:.10,rk:4},{c:10,r:8,p:100000000,n:4,tax:.15,rk:6},{c:12,r:10,p:300000000,n:6,tax:.30,rk:8},{c:14,r:12,p:1000000000,n:8,tax:.40,rk:10},{c:16,r:14,p:3000000000,n:10,tax:.50,rk:12}];
+var OF_LV=[{c:8,r:6,p:0,n:6,tax:.10,rk:4},{c:10,r:8,p:100000000,n:10,tax:.15,rk:6},{c:12,r:10,p:300000000,n:15,tax:.30,rk:8},{c:14,r:12,p:1000000000,n:20,tax:.40,rk:10},{c:16,r:14,p:3000000000,n:25,tax:.50,rk:12}];
 /* 직급: [이름, 10분당 수입(세전), 채용비] */
-var OF_RANK=[["인턴",25000,6000000],["사원",40000,10000000],["주임",60000,16000000],["대리",80000,22000000],["과장",100000,30000000],["차장",120000,36000000],["부장",150000,48000000],["이사",180000,60000000],["상무",220000,78000000],["전무",260000,96000000],["부사장",300000,120000000],["사장",350000,152000000]];
+var OF_RANK=[["인턴",9000,6000000],["사원",14000,10000000],["주임",21000,16000000],["대리",28000,22000000],["과장",35000,30000000],["차장",42000,36000000],["부장",52000,48000000],["이사",63000,60000000],["상무",77000,78000000],["전무",91000,96000000],["부사장",105000,120000000],["사장",122000,152000000]];
 var OF_CAPN={d:[3,4,6,8,10],c:[3,4,6,8,10],m:[3,4,6,8,10],s:[3,5,7,9,12],r:[2,3,4,5,6],x:[4,6,8,12,16]};
 var OF_CATN={d:"책상",c:"의자",m:"모니터",s:"수납·장비",r:"휴게",x:"장식"};
 /* 가구: [id, 이름, 분류, 가로, 세로, 가격, 인테리어 점수, 벽(1)] */
@@ -3796,7 +3796,7 @@ function ofPeek(o,now){if(!o||!o.bx)return 0;const arr=ofRates(o),tot=arr.reduce
   const cap=tot*OF_HOURS*6;return Math.floor(Math.min(cap,(o.bx.a||0)+tot*Math.max(0,now-(o.bx.t||now))/OF_SLOT));}
 const ofCap=o=>Math.floor(ofRateSum(o)*OF_HOURS*6);
 /* 단계별 개수 한도 */
-const ofCapOf=(o,cat)=>(OF_CAPN[cat]||[0])[ofLv(o)-1];
+const ofCapOf=(o,cat)=>(cat==="d"||cat==="c"||cat==="m")?Infinity:(OF_CAPN[cat]||[0])[ofLv(o)-1];/* 책상·의자·모니터는 개수 제한 없음 (직원 수만 제한) */
 function ofCount(o,cat){let n=0;for(const it of(o.it||[]))if(ofCatOf(it.k)===cat)n++;for(const k in(o.inv||{}))if(ofCatOf(k)===cat)n+=o.inv[k]|0;return n;}
 /* 사무실 임대 */
 function ofStarter(){return[{u:1,k:"d0",x:1,y:2,r:0},{u:2,k:"m0",x:1,y:2,r:0},{u:3,k:"c0",x:1,y:3,r:0},{u:4,k:"box",x:7,y:1,r:0}];}
@@ -4006,7 +4006,7 @@ function ofDraw(t){const c=ofS.cx,o=ofS.o;if(!c||!o)return;const L=ofL(o),CS=OF_
   if(ofS.mine){const iss=ofIssues(o),pu=.6+.4*Math.sin(t/260);for(const u in iss){const ch=ofItemBy(o,+u);if(!ch)continue;const p=ofCell(ch.x,ch.y);c.fillStyle=`rgba(239,68,68,${.75+.25*pu})`;c.strokeStyle="#fff";c.lineWidth=1.4;c.beginPath();c.arc(p.x+CS-6,p.y+7,8,0,7);c.fill();c.stroke();c.fillStyle="#fff";c.font="900 12px sans-serif";c.textAlign="center";c.fillText("!",p.x+CS-6,p.y+11.5);}}
   /* 놓는 중인 가구 (유령) */
   const g=ofS.ghost;if(g){const err=ofGhostErr(o,g),f=ofFt(g),wall=ofIsWall(g.k),p=wall?{x:g.x*CS,y:-CS-1}:ofCell(g.x,g.y);
-    c.globalAlpha=.78;ofSpriteDraw(c,g.k,p.x,p.y,f.w*CS,f.h*CS,wall?0:(ofCatOf(g.k)==="c"?(g.r+2)%4:g.r));{const gc=ofCatOf(g.k);if(gc==="c"||gc==="m"){c.globalAlpha=1;ofFaceArrow(c,p.x+f.w*CS/2,p.y+f.h*CS/2,gc==="c"?g.r:(g.r+2)%4,gc==="c"?"#fde047":"#67e8f9");c.globalAlpha=.78;}}if(g.att)for(const a of ofAttPos(g)){const q=ofCell(a.x,a.y),mf=ofFt(a);ofSpriteDraw(c,a.k,q.x,q.y,mf.w*CS,mf.h*CS,a.r);}c.globalAlpha=1;c.fillStyle=err?"rgba(239,68,68,.35)":"rgba(34,197,94,.3)";c.strokeStyle=err?"#ef4444":"#22c55e";c.lineWidth=2;
+    c.globalAlpha=.78;if(g.k==="box")ofDrawBox(c,p.x,p.y,t);else ofSpriteDraw(c,g.k,p.x,p.y,f.w*CS,f.h*CS,wall?0:(ofCatOf(g.k)==="c"?(g.r+2)%4:g.r));{const gc=ofCatOf(g.k);if(gc==="c"||gc==="m"){c.globalAlpha=1;ofFaceArrow(c,p.x+f.w*CS/2,p.y+f.h*CS/2,gc==="c"?g.r:(g.r+2)%4,gc==="c"?"#fde047":"#67e8f9");c.globalAlpha=.78;}}if(g.att)for(const a of ofAttPos(g)){const q=ofCell(a.x,a.y),mf=ofFt(a);ofSpriteDraw(c,a.k,q.x,q.y,mf.w*CS,mf.h*CS,a.r);}c.globalAlpha=1;c.fillStyle=err?"rgba(239,68,68,.35)":"rgba(34,197,94,.3)";c.strokeStyle=err?"#ef4444":"#22c55e";c.lineWidth=2;
     if(wall){c.fillRect(p.x,p.y,f.w*CS,CS+1);c.strokeRect(p.x,p.y,f.w*CS,CS+1);}else{c.fillRect(p.x,p.y,f.w*CS,f.h*CS);c.strokeRect(p.x,p.y,f.w*CS,f.h*CS);}}
   {const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000)continue;const q=id===myId?{x:ofS.px,y:ofS.py}:(fOthers[id]&&fOthers[id].fo&&fOthers[id].fo===ofS.own&&fOthers[id].px!=null?{x:fOthers[id].px,y:fOthers[id].py}:null);if(q)drawBubble(c,q.x,q.y,b.text);}}
   c.restore();
@@ -4072,7 +4072,7 @@ function ofItemAt(o,gx,gy,wallY){let best=null;for(const it of o.it||[]){const w
 function ofPointer(p,ph){const o=ofS.o;if(!o)return;
   if(ofS.mode==="paint"){if(ph==="down"||ph==="drag"){const c=ofCellAt(p),L=ofL(o);if(p.y>=0&&c.x>=0&&c.y>=0&&c.x<L.c&&c.y<L.r&&ofS.paint!=null){ofS.pend=ofS.pend||{};const k=c.x+","+c.y;if(ph==="down")ofS.pdrag=ofS.pend[k]?"del":"add";if(ofS.pdrag==="del")delete ofS.pend[k];else ofS.pend[k]=1;ofBar();}}return;}
   if(ofS.mode==="place"){if(ofS.ghost){if(ph==="down"||ph==="drag"){ofGhostAt(p);}return;}/* 누르고 있을 때만 가구가 움직여요 (마우스 올리기만으론 안 따라와요) */
-    if(ph==="down"){const c=ofCellAt(p),wallY=p.y<0;const it=ofItemAt(o,c.x,c.y,wallY);if(!it||it.k==="box")return;ofPick(it.u);}return;}
+    if(ph==="down"){const c=ofCellAt(p),wallY=p.y<0;const it=ofItemAt(o,c.x,c.y,wallY);if(!it)return;ofPick(it.u);}return;}
   return;/* 보기 모드: 화면 터치로는 움직이거나 누르지 않아요 (조이스틱 + 상호작용 버튼) */
   if(ph!=="down")return;const wx=p.x,wy=p.y+OF_WH;
   if(p.y<0){return;}const c=ofCellAt(p);const it=ofItemAt(o,c.x,c.y,false);
@@ -4102,9 +4102,9 @@ function ofPick(u,solo){const o=me.of,it=ofItemBy(o,u);if(!it)return;
 function ofStartInv(k){const o=me.of;if(!(o.inv&&o.inv[k]>0))return;ofSheetClose();ofS.mode="place";ofS.held=null;const L=ofL(o),f=ofFoot({k,r:0});const wall=ofIsWall(k);
   let gx=Math.floor((L.c-f.w)/2),gy=Math.floor((L.r-f.h)/2);if(wall){gy=-1;}
   ofS.ghost={k,x:gx,y:gy,r:0,fromInv:1};ofBar();ofHint();}
-function ofRotate(){const g=ofS.ghost;if(!g||ofIsWall(g.k))return;g.r=((g.r|0)+1)%4;const f=ofFt(g),L=ofL(ofS.o);g.x=Math.max(0,Math.min(L.c-f.w,g.x));g.y=Math.max(0,Math.min(L.r-f.h,g.y));}
+function ofRotate(){const g=ofS.ghost;if(!g||ofIsWall(g.k)||g.k==="box")return;g.r=((g.r|0)+1)%4;const f=ofFt(g),L=ofL(ofS.o);g.x=Math.max(0,Math.min(L.c-f.w,g.x));g.y=Math.max(0,Math.min(L.r-f.h,g.y));}
 function ofPutGhost(){const g=ofS.ghost;if(!g)return;if(ofCommit(g)){ofS.ghost=null;ofS.held=null;if(g.fromInv&&(me.of.inv&&me.of.inv[g.k]>0)){ofStartInv(g.k);}ofBar();ofHint();ofChips();}}
-function ofGhostStore(){const g=ofS.ghost;if(!g)return;if(g.u){if(g.att&&g.att.length){for(const m of g.att)ofStore(m.u);}if(ofStore(g.u)){ofS.ghost=null;ofS.held=null;ofBar();ofHint();ofChips();toast("📦 보관함에 넣었어요");}}else{ofS.ghost=null;ofBar();ofHint();toast("📦 보관함에 넣어 뒀어요");}}
+function ofGhostStore(){const g=ofS.ghost;if(!g)return;if(g.k==="box")return toast("💰 수금함은 보관할 수 없어요 (자리만 옮길 수 있어요)");if(g.u){if(g.att&&g.att.length){for(const m of g.att)ofStore(m.u);}if(ofStore(g.u)){ofS.ghost=null;ofS.held=null;ofBar();ofHint();ofChips();toast("📦 보관함에 넣었어요");}}else{ofS.ghost=null;ofBar();ofHint();toast("📦 보관함에 넣어 뒀어요");}}
 function ofGhostSell(){const g=ofS.ghost;if(!g||!g.u)return;const d=OF_IM[g.k],v=Math.floor(d[5]*OF_SELL);
   const bg=modal(`<div style="font-size:16px;font-weight:900;margin-bottom:10px">💰 팔까요?</div><div style="font-size:13px;line-height:1.8">${d[1]}을(를) <b style="color:var(--acc)">${formatMoneyReadable(v)}</b>에 팔아요 (산 값의 50%)</div><div style="display:flex;gap:8px;margin-top:12px"><button id="sNo" style="flex:1;height:44px;border-radius:12px;background:var(--card2)">취소</button><button id="sYes" style="flex:1;height:44px;border-radius:12px;background:#ef4444;color:#fff;font-weight:900">팔기</button></div>`);
   bg.style.zIndex=95;const close=()=>{try{bg.remove();}catch(e){}};bg.onclick=e=>{if(e.target===bg)close();};bg.querySelector("#sNo").onclick=close;bg.querySelector("#sYes").onclick=()=>{close();if(ofSellPlaced(g.u)){ofS.ghost=null;ofS.held=null;ofBar();ofHint();ofChips();}};}
@@ -4113,7 +4113,7 @@ function ofBtn(id,txt,bg,col,flex){return `<button id="${id}" style="flex:${flex
 function ofBar(){const b=$("ofBar");if(!b)return;let h="";
   if(!ofS.mine){h=`<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12.5px;height:46px;border-radius:12px;background:var(--card2)">👀 구경 중이에요 · 수금함을 눌러 보세요</div>`;}
   else if(ofS.mode==="view")h=ofBtn("ofB1","🛒 가구 상점","#26405f","#cfe6ff")+ofBtn("ofB2","🔄 배치 모드","#2c3446","#e6edf7")+ofBtn("ofB3","📦 보관함","#3a2f4a","#e7d6ff");
-  else if(ofS.mode==="place"){h=ofS.ghost?ofBtn("ofGR","↻ 회전","#26405f","#cfe6ff")+ofBtn("ofGP","✔ 두기","#14532d","#bbf7d0")+ofBtn("ofGS","📦 보관함에 넣기","#3a2f4a","#e7d6ff")+(ofS.ghost.u&&!ofS.ghost.att?ofBtn("ofGD","💰 판매","#3a2a12","#fde68a"):"")+ofBtn("ofGX","✕ 취소","#3a2430","#fecdd3"):ofBtn("ofGI","📦 보관함에서 꺼내기","#3a2f4a","#e7d6ff",1.5)+ofBtn("ofGE","✔ 끝내기","#2c3446","#e6edf7");}
+  else if(ofS.mode==="place"){h=ofS.ghost?(ofS.ghost.k==="box"?"":ofBtn("ofGR","↻ 회전","#26405f","#cfe6ff"))+ofBtn("ofGP","✔ 두기","#14532d","#bbf7d0")+(ofS.ghost.k==="box"?"":ofBtn("ofGS","📦 보관함에 넣기","#3a2f4a","#e7d6ff"))+(ofS.ghost.u&&!ofS.ghost.att&&ofS.ghost.k!=="box"?ofBtn("ofGD","💰 판매","#3a2a12","#fde68a"):"")+ofBtn("ofGX","✕ 취소","#3a2430","#fecdd3"):ofBtn("ofGI","📦 보관함에서 꺼내기","#3a2f4a","#e7d6ff",1.5)+ofBtn("ofGE","✔ 끝내기","#2c3446","#e6edf7");}
   else if(ofS.mode==="wall"){const L=ofL(ofS.o),nf=OF_WLM[ofS.wallSel||"0"],cf=OF_WLM[ofS.o.wl||"0"],cost=(nf[3]-Math.floor(cf[3]*OF_SELL))*L.c;h=`<div style="flex:1.3;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11.5px;line-height:1.35;color:var(--sub);height:46px;border-radius:12px;background:var(--card2)">${nf[1]} · ${cost>=0?"비용 "+formatMoneyReadable(cost):"환급 "+formatMoneyReadable(-cost)}</div>`+ofBtn("ofWB","💰 구매","#14532d","#bbf7d0",.8)+ofBtn("ofGE","✕ 취소","#3a2430","#fecdd3",.7);}
   else if(ofS.mode==="paint"){const pc=ofPaintCalc();h=`<div style="flex:1.3;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11.5px;line-height:1.35;color:var(--sub);height:46px;border-radius:12px;background:var(--card2)" id="ofPaintInfo">${pc.n?`${pc.n}칸 선택 · ${pc.cost>=0?"비용 "+formatMoneyReadable(pc.cost):"환급 "+formatMoneyReadable(-pc.cost)}`:"바꿀 칸을 눌러 고르세요"}</div>`+ofBtn("ofPB",pc.n?"💰 구매":"💰 구매",pc.n?"#14532d":"#2c3446",pc.n?"#bbf7d0":"var(--sub)",.8)+ofBtn("ofPC","↺ 선택 해제","#3a2f4a","#e7d6ff",.8)+ofBtn("ofGE","✕ 끝내기","#3a2430","#fecdd3",.7);}
   b.innerHTML=h;const g=id=>$(id);
@@ -4125,7 +4125,7 @@ function ofChips(){const o=ofS.o,c=$("ofChips");if(!o||!c)return;const L=ofL(o);
   const nm=ofS.mine?"🏢 내 사무실":"🏢 "+esc(String((players[ofS.own]||{}).name||"?").slice(0,10))+"님의 사무실";
   {const cb=$("ofChat");if(cb){const n=(typeof chatUnread==="number"&&chatUnread>0)?(chatUnread>99?"99+":chatUnread):0;cb.innerHTML=n?`💬 <span style="color:#ff8a96">${n}</span>`:"💬";}}
   $("ofTitle").innerHTML=nm+` <span style="color:var(--sub);font-weight:700;font-size:12px">Lv.${ofLv(o)} · ${L.c}×${L.r}칸</span>`;
-  let h=chip(`✨ 인테리어 ${sc}점 · 수입 +${bn}%`,"#fde68a","#3a3320")+chip(`👔 직원 ${emN}/${L.n}`,"#9cc8f5","#26405f")+chip(`🪑 책상 ${(o.it||[]).filter(i=>ofCatOf(i.k)==="d").length}/${ofCapOf(o,"d")}`,"#9cc8f5","#26405f")+chip(`🧾 세금 ${Math.round(L.tax*100)}%`,"#cfd8e8","#2c3446");
+  let h=chip(`✨ 인테리어 ${sc}점 · 수입 +${bn}%`,"#fde68a","#3a3320")+chip(`👔 직원 ${emN}/${L.n}`,"#9cc8f5","#26405f")+chip(`🧾 세금 ${Math.round(L.tax*100)}%`,"#cfd8e8","#2c3446");
   if(!ofS.mine){const n=Object.keys(onlineMap||{}).filter(k=>onlineMap[k]&&onlineMap[k].fo===ofS.own&&k!==ofS.own).length;h+=chip(`👥 방문 ${n}/${OF_VIS}`,"#bbf7d0","#14532d")+chip(`💰 수금함 ${formatMoneyReadable(ofPeek(o,ofNow()))}`,"#fde68a","#3a3320");}
   if(c.dataset.h!==h){c.dataset.h=h;c.innerHTML=h;}
   }
@@ -4149,7 +4149,7 @@ function ofShop(tab){const _old=ofS.sheetEl,_sv=_old&&_old.firstChild?{l:(_old.q
   else if(ofS.tab==="f"){h+=`<div style="font-size:12px;font-weight:800;margin:4px 0 6px">바닥 (칸당 · 눌러서 칠하기)</div>`;for(const f of OF_FL){if(f[0]==="0")continue;h+=`<div class="rk" style="align-items:center;padding:7px 2px"><div style="width:44px;height:44px;border-radius:8px;overflow:hidden;flex:none;margin-right:10px;background:#000">${ofSprImg("f_"+f[2],44)}</div><div class="w"><b>${f[1]}</b><small>칸당 ${formatMoneyReadable(f[3])} · +${f[4]}점</small></div><button data-pf="${f[0]}" style="padding:8px 12px;border-radius:12px;background:var(--acc);color:#111;font-weight:900;font-size:12px">칠하기</button></div>`;}
     h+=`<div class="rk" style="align-items:center;padding:7px 2px"><div style="width:44px;height:44px;border-radius:8px;overflow:hidden;flex:none;margin-right:10px;background:#000">${ofSprImg("f_dirt",44)}</div><div class="w"><b>흙으로 되돌리기</b><small>칠한 값의 50% 돌려받아요</small></div><button data-pf="0" style="padding:8px 12px;border-radius:12px;background:var(--card2);font-weight:900;font-size:12px">되돌리기</button></div>`;
     h+=`<div style="font-size:12px;font-weight:800;margin:12px 0 6px">벽 (한 줄 전체)</div>`;for(const f of OF_WL){const cur=(o.wl||"0")===f[0];h+=`<div class="rk" style="align-items:center;padding:7px 2px"><div style="width:44px;height:44px;border-radius:8px;overflow:hidden;flex:none;margin-right:10px;background:${f[2]?"#000":"#cdbf9f"}">${f[2]?ofSprImg("f_"+f[2],44):""}</div><div class="w"><b>${f[1]}${cur?" (적용 중)":""}</b><small>${f[3]?`칸당 ${formatMoneyReadable(f[3])} × ${ofL(o).c}칸 · +${f[4]*ofL(o).c}점`:"무료"}</small></div><button data-pw="${f[0]}" ${cur?"disabled":""} style="padding:8px 12px;border-radius:12px;background:${cur?"var(--card2)":"var(--acc)"};color:${cur?"var(--sub)":"#111"};font-weight:900;font-size:12px">${cur?"적용 중":"바꾸기"}</button></div>`;}}
-  else{const cat=ofS.tab,cap=ofCapOf(o,cat),have=ofCount(o,cat);h+=`<div style="font-size:11.5px;margin-bottom:6px">${OF_CATN[cat]} <b style="color:${have>=cap?"#f87171":"var(--ok)"}">${have}/${cap}</b>개 (놓은 것 + 보관함)</div>`;
+  else{const cat=ofS.tab,cap=ofCapOf(o,cat),have=ofCount(o,cat);h+=cap===Infinity?`<div style="font-size:11.5px;margin-bottom:6px">${OF_CATN[cat]} <b style="color:var(--ok)">${have}개</b> · 개수 제한 없음 (직원 수만 제한돼요)</div>`:`<div style="font-size:11.5px;margin-bottom:6px">${OF_CATN[cat]} <b style="color:${have>=cap?"#f87171":"var(--ok)"}">${have}/${cap}</b>개 (놓은 것 + 보관함)</div>`;
     for(const d of OF_ITEMS){if(d[2]!==cat)continue;h+=`<div class="rk" style="align-items:center;padding:8px 2px"><div style="width:76px;height:46px;display:flex;align-items:center;justify-content:center;flex:none;margin-right:8px;background:#12151c;border-radius:8px">${ofSprImg(d[0],40)}</div><div class="w"><b>${d[1]}</b><small>${d[3]}×${d[4]}칸${d[7]?" · 벽":""} · 인테리어 +${d[6]}점</small></div><button data-buy="${d[0]}" style="padding:8px 11px;border-radius:12px;background:${me.cash>=d[5]?"var(--acc)":"var(--card2)"};color:${me.cash>=d[5]?"#111":"var(--sub)"};font-weight:900;font-size:11.5px;white-space:nowrap">${formatMoneyReadable(d[5])}</button></div>`;}}
   const bg=ofSheet(h);ofS.shopTab=ofS.tab;if(_sv){const tr=bg.querySelector("[data-tabs]");if(tr)tr.scrollLeft=_sv.l;if(_sv.tab===ofS.tab)bg.firstChild.scrollTop=_sv.t;}bg.querySelector("[data-x]").onclick=ofSheetClose;bg.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>ofShop(b.dataset.tab));
   bg.querySelectorAll("[data-buy]").forEach(b=>b.onclick=()=>{const id=b.dataset.buy,had=(o.inv&&o.inv[id])|0;ofBuy(id);ofChips();if(((o.inv&&o.inv[id])|0)>had){ofStartInv(id);toast("🛒 산 가구를 바로 놓아 보세요\n(📦를 누르면 보관함에 넣어요)");}else ofShop(ofS.tab);});
@@ -4174,10 +4174,10 @@ function ofNearTarget(){const o=ofS.o;if(!o||ofS.mode!=="view")return null;let b
   return best;}
 function ofInteract(){if(!ofIn||ofS.sheetEl)return;const t=ofNearTarget();if(t)t.fn();}
 function ofFloatUpdate(){const fl=$("ofFloat");if(!fl)return;const g=ofS.ghost,show=ofIn&&ofS.mode==="place"&&g;if(!show){fl.style.display="none";fl.dataset.k="";return;}
-  const key=(g.u?"u":"n")+(ofIsWall(g.k)?"w":"");
+  const key=(g.u?"u":"n")+(ofIsWall(g.k)?"w":"")+(g.k==="box"?"b":"");
   if(fl.dataset.k!==key){fl.dataset.k=key;const B=(id,t,bg)=>`<button id="${id}" style="width:42px;height:42px;border-radius:50%;background:${bg};color:#fff;font-size:19px;font-weight:900;box-shadow:0 3px 10px rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.55)">${t}</button>`;
-    fl.innerHTML=B("ofFP","✔","#16a34a")+(ofIsWall(g.k)?"":B("ofFR","↻","#2563eb"))+B("ofFS","📦","#7c3aed")+B("ofFX","✕","#dc2626");
-    $("ofFP").onclick=ofPutGhost;if($("ofFR"))$("ofFR").onclick=ofRotate;$("ofFS").onclick=ofGhostStore;$("ofFX").onclick=()=>{ofS.ghost=null;ofS.held=null;ofBar();ofHint();};}
+    fl.innerHTML=B("ofFP","✔","#16a34a")+(ofIsWall(g.k)||g.k==="box"?"":B("ofFR","↻","#2563eb"))+(g.k==="box"?"":B("ofFS","📦","#7c3aed"))+B("ofFX","✕","#dc2626");
+    $("ofFP").onclick=ofPutGhost;if($("ofFR"))$("ofFR").onclick=ofRotate;if($("ofFS"))$("ofFS").onclick=ofGhostStore;$("ofFX").onclick=()=>{ofS.ghost=null;ofS.held=null;ofBar();ofHint();};}
   const wrap=$("ofWrap"),cv=ofS.cv;if(!wrap||!cv)return;const wr=wrap.getBoundingClientRect(),cr=cv.getBoundingClientRect(),f=ofFt(g),wall=ofIsWall(g.k),sc=ofS.sc;
   const gx=(g.x*OF_CS+f.w*OF_CS/2)*sc+(cr.left-wr.left),top=(wall?OF_WH-OF_CS-1:OF_WH+g.y*OF_CS)*sc+(cr.top-wr.top),bot=(wall?OF_WH:OF_WH+(g.y+f.h)*OF_CS)*sc+(cr.top-wr.top);
   fl.style.display="flex";const w=fl.offsetWidth||150,h=fl.offsetHeight||42;let x=Math.max(4,Math.min(wr.width-w-4,gx-w/2)),y=top-h-6;if(y<30)y=bot+6;y=Math.max(30,Math.min(wr.height-h-4,y));fl.style.left=x+"px";fl.style.top=y+"px";}
@@ -4230,15 +4230,29 @@ var ofFullNoted=0;
 function ofTick(){try{if(!me||!me._loaded||!me.of)return;const o=me.of,cap=ofCap(o);if(!(cap>0)){ofFullNoted=0;return;}const full=ofPeek(o,ofNow())>=cap;if(full&&!ofFullNoted){ofFullNoted=1;if(!ofIn)toast("🏢 사무실 수금함이 가득 찼어요!\n컴퍼니에 가서 돈을 가져가세요");}else if(!full)ofFullNoted=0;}catch(e){}}
 setInterval(ofTick,5000);
 /* ---------- 방문 · 수금함 훔치기 (8시간마다, 금액의 1%) ---------- */
-function ofStealLeft(owner){const t=(me.ofstl||{})[owner]||0;return Math.max(0,t+OF_STEAL_MS-nowS());}
+function ofStealLeft(owner){const p=(typeof players!=="undefined"&&players[owner])||null,sv=p&&p.of&&p.of.stl?p.of.stl[myId]|0:0,lc=(me.ofstl||{})[owner]||0,t=Math.max(sv,lc);return Math.max(0,t+OF_STEAL_MS-nowS());}
 function ofStealPanel(){const owner=ofS.own,p=(typeof players!=="undefined"&&players[owner])||null;if(!p||!p.of||!p.of.bx)return toast("수금함을 볼 수 없어요");
-  const a=Math.floor(ofPeek(p.of,ofNow())),amt=Math.floor(a*OF_STEAL),left=ofStealLeft(owner),nm=esc(p.name||"주인");
+  const a=Math.floor(ofPeek(p.of,ofNow())),amt=Math.floor(a*OF_STEAL),left=ofStealLeft(owner),nm=esc(p.name||"주인"),can=!(left>0||amt<=0);
   const h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">💰 ${nm}님의 수금함</b><button data-x style="font-size:20px;color:var(--sub);width:34px;height:34px">✕</button></div>
-  <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--sub)">지금 쌓인 돈</span><b style="color:var(--acc);font-size:15px">${formatMoneyReadable(a)}</b></div><div style="font-size:12.5px;line-height:1.8;color:var(--sub)">구경만 해도 좋아요. 몰래 가져가면 쌓인 돈의 ${Math.round(OF_STEAL*100)}%를 훔칠 수 있어요.<br>같은 사무실은 ${OF_STEAL_MS/3600000}시간에 한 번만 가능해요.</div>
-  <button data-st ${left>0||amt<=0?"disabled":""} style="width:100%;height:46px;border-radius:12px;margin-top:12px;background:${left>0||amt<=0?"var(--card2)":"#ef4444"};color:${left>0||amt<=0?"var(--sub)":"#fff"};font-weight:900">${left>0?`⏳ ${Math.ceil(left/60000)}분 뒤에 가능`:amt<=0?"훔칠 돈이 없어요":"🤫 몰래 가져가기"}</button>`;
+  <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="color:var(--sub)">지금 쌓인 돈</span><b style="color:var(--acc);font-size:15px">${formatMoneyReadable(a)}</b></div><div style="font-size:12.5px;line-height:1.8;color:var(--sub)">구경만 해도 좋아요. 몰래 가져가면 쌓인 돈의 ${Math.round(OF_STEAL*100)}%(${formatMoneyReadable(amt)})를 훔칠 수 있어요.<br>같은 사무실은 ${OF_STEAL_MS/3600000}시간에 한 번만 가능해요.</div>
+  <button data-st style="width:100%;height:46px;border-radius:12px;margin-top:12px;background:${can?"#ef4444":"var(--card2)"};color:${can?"#fff":"var(--sub)"};font-weight:900">${left>0?`⏳ ${Math.ceil(left/60000)}분 뒤에 가능`:amt<=0?"훔칠 돈이 아직 없어요":"🤫 몰래 가져가기"}</button>`;
   const bg=ofSheet(h);bg.querySelector("[data-x]").onclick=ofSheetClose;
-  bg.querySelector("[data-st]").onclick=()=>{if(ofStealLeft(owner)>0)return;
-    try{fdb.ref(`ofsteal/${owner}`).push({by:myId,n:myName().slice(0,10),amt,t:nowS()}).then(()=>{me.ofstl=me.ofstl||{};me.ofstl[owner]=nowS();me.cash+=amt;stAdd("ofSteal",amt);saveMe();renderHeader();toast(`🤫 ${formatMoneyReadable(amt)}을(를) 몰래 챙겼어요!`);ofSheetClose();}).catch(()=>toast("지금은 훔칠 수 없어요"));}catch(e){toast("지금은 훔칠 수 없어요");}};}
+  bg.querySelector("[data-st]").onclick=()=>{if(!can)return toast(left>0?`⏳ ${Math.ceil(left/60000)}분 뒤에 다시 가능해요`:"훔칠 돈이 아직 없어요");ofStealDo(owner);};}
+let ofStealBusy=0;
+async function ofStealDo(owner){if(ofStealBusy)return;if(!fdb)return toast("서버에 연결되지 않았어요");ofStealBusy=1;let got=0;
+  try{const r=await fdb.ref("players/"+owner).transaction(cur=>{got=0;if(!cur||!cur.of||!cur.of.bx)return;const o=cur.of,now=nowS();o.stl=o.stl||{};if(now-(o.stl[myId]|0)<OF_STEAL_MS)return;
+      ofSettle(o,ofNow());const amt=Math.floor((o.bx.a||0)*OF_STEAL);if(amt<=0)return;o.bx.a-=amt;o.stl[myId]=now;o.sl=(o.sl||[]).concat([{n:myName().slice(0,10),a:amt,t:now}]).slice(-5);cur.ver=(cur.ver|0)+1;got=amt;return cur;});
+    if(r&&r.committed&&got>0){me.cash+=got;me.ofstl=me.ofstl||{};me.ofstl[owner]=nowS();stAdd("ofSteal",got);saveMe();renderHeader();toast(`🤫 ${formatMoneyReadable(got)}을(를) 몰래 챙겼어요!`);ofSheetClose();}
+    else toast("지금은 훔칠 수 없어요 (이미 훔쳤거나 돈이 없어요)");}
+  catch(e){/* 서버 규칙 때문에 직접 못 쓰면 쪽지 방식으로 대신해요 */
+    try{const p=players[owner],amt=Math.floor(Math.floor(ofPeek(p.of,ofNow()))*OF_STEAL);if(amt<=0||ofStealLeft(owner)>0)throw 0;
+      await fdb.ref("ofsteal/"+owner).push({by:myId,n:myName().slice(0,10),amt,t:nowS()});me.cash+=amt;me.ofstl=me.ofstl||{};me.ofstl[owner]=nowS();stAdd("ofSteal",amt);saveMe();renderHeader();toast(`🤫 ${formatMoneyReadable(amt)}을(를) 몰래 챙겼어요!`);ofSheetClose();}
+    catch(e2){toast("훔치기 실패 ("+String((e2&&e2.code)||(e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}}
+  ofStealBusy=0;}
+/* 내 사무실에서 누가 훔쳐 갔는지 알려줘요 */
+function ofStealNotify(){try{const o=me&&me.of;if(!o||!o.sl||!o.sl.length)return;const key="jc_slseen_"+myId;let seen=0;try{seen=+localStorage.getItem(key)||0;}catch(e){}if(!seen){try{localStorage.setItem(key,String(Math.max(...o.sl.map(x=>x.t|0))));}catch(e){}return;}
+  const fresh=o.sl.filter(x=>(x.t|0)>seen).sort((a,b)=>a.t-b.t);if(!fresh.length)return;try{localStorage.setItem(key,String(fresh[fresh.length-1].t));}catch(e){}for(const x of fresh)toast(`😱 ${esc(x.n||"누군가")}님이 수금함에서 ${formatMoneyReadable(x.a|0)}을(를) 훔쳐갔어요!`);}catch(e){}}
+setInterval(ofStealNotify,6000);
 var ofStealOn=0;
 function ofStealListen(){if(ofStealOn||!myId||typeof fdb==="undefined"||!me||!me._loaded)return;ofStealOn=1;
   try{const r=fdb.ref(`ofsteal/${myId}`);r.on("child_added",s=>{const v=s.val();try{s.ref.remove();}catch(e){}if(!v||!me.of||!me.of.bx)return;const o=me.of;ofSettle(o,ofNow());const a=Math.min(Math.floor(v.amt||0),Math.floor(o.bx.a));if(a<=0)return;o.bx.a-=a;saveMe();ofChips&&ofChips();toast(`😱 ${esc(v.n||"누군가")}님이 수금함에서 ${formatMoneyReadable(a)}을(를) 훔쳐갔어요!`);});}catch(e){ofStealOn=0;}}
