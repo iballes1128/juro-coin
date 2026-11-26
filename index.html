@@ -1485,6 +1485,7 @@ const myBoat=()=>isOwner||(me&&me.boat&&me.boat.gold)?2:(me&&me.boat&&me.boat.wo
 const BH={x:DOCK.x+DOCK.w+56,y:88},BOAT_X0=22,BOAT_Y0=54;
 const boatOK=(x,y)=>x>=BOAT_X0&&x<=FW-24&&y>=BOAT_Y0&&y<=RIVER-8;
 const boatBob=t=>Math.sin(t/650)*1.4;
+function fDrawErr(e){if(!fDrawErr.n){fDrawErr.n=1;try{console.error("광장 그리기 오류",e);}catch(_){}}}
 function boatStep(dt,t,noIn){const bv=fBV,SP=.085;let ix=0,iy=0;
   if(!noIn){if(fKeys.ArrowLeft||fKeys.a)ix--;if(fKeys.ArrowRight||fKeys.d)ix++;if(fKeys.ArrowUp||fKeys.w)iy--;if(fKeys.ArrowDown||fKeys.s)iy++;
     if(fJoyV){ix=fJoyV.x*Math.max(.45,fJoyV.m);iy=fJoyV.y*Math.max(.45,fJoyV.m);}
@@ -2241,7 +2242,7 @@ function fishDraw1(t){const c=fCtx,SH=FH-RV1;
   const people=[];const tr=mulberry(4242);for(let i=0;i<16;i++){const tx=14+tr()*(FW-28),ty=90+tr()*(FH-RV1-170);if(Math.abs(tx-FW/2-40)<70&&Math.abs(ty-150)<60)continue;if(tx>DOCK.x-14&&tx<DOCK.x+DOCK.w+14)continue;people.push({y:ty,f:()=>{c.fillStyle="rgba(0,0,0,.2)";c.beginPath();c.ellipse(tx,ty+2,13,4.5,0,0,7);c.fill();c.fillStyle="#6b4423";c.fillRect(tx-3,ty-14,6,15);c.fillStyle="#2f8a45";c.beginPath();c.arc(tx,ty-22,14,0,7);c.fill();c.fillStyle="#3aa557";c.beginPath();c.arc(tx-4,ty-26,9,0,7);c.fill();}});}
   people.push({y:fp.y,f:()=>drawPerson(c,fp.x,fp.y,myName(),chOf(myId),fp.dir,fp.tx!=null||fKeysOn()||!!fJoyV,null,"idle",true,t)});
   for(const id in fOthers){const o=fOthers[id];if((o.fa|0)!==fArea||o.fs==="away")continue;people.push({y:o.y,f:()=>drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t)});}
-  people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());
+  people.sort((a,b)=>a.y-b.y).forEach(p=>{c.save();try{p.f();}catch(e){fDrawErr(e);}c.restore();});
   c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";emoSign(c,"🚧","공사 중 · 곧 열려요",FW/2+40,96,"bold 10px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.45)",20);
   emoSign(c,"🌉","다리를 건너면 주로 광장",DOCK.x+DOCK.w/2,SH-40,"bold 9px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.4)",18);
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1||(f.a|0)!==fArea)continue;c.globalAlpha=1-a*a;c.font="bold 11px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fff";c.fillText(f.s,f.x,f.y-a*24);c.globalAlpha=1;}
@@ -2267,7 +2268,7 @@ function fishDrawW(t){const c=fCtx;if(fArea)return fishDraw1(t);
   // 사람과 장식은 y순서로
   {
     for(const w of fWake){const age=(t-w.t)/950;if(age>=1||age<0)continue;c.strokeStyle=`rgba(255,255,255,${(.55*(1-age)).toFixed(3)})`;c.lineWidth=1.1;c.beginPath();c.ellipse(w.x,w.y,5+age*17,1.8+age*5,0,0,7);c.stroke();}
-    if(fBoat)boatBack(c,fp.x,fp.y,t,fBoat,fBoatTilt);for(const id in fOthers){const o=fOthers[id];if(o&&o.bt&&o.fs!=="away")boatBack(c,o.x,o.y,t,o.bt,o.tl);}}
+    try{if(fBoat)boatBack(c,fp.x,fp.y,t,fBoat,fBoatTilt);for(const id in fOthers){const o=fOthers[id];if(o&&o.bt&&o.fs!=="away")boatBack(c,o.x,o.y,t,o.bt,o.tl);}}catch(e){fDrawErr(e);}}
   const people=[{y:RPS_NPC.y,f:()=>{human(c,RPS_NPC.x,RPS_NPC.y,-1,0,0,{shirt:"#b91c1c",pants:"#111827",hair:"#1f1410",hs:"side"});c.fillStyle="#fde047";c.beginPath();c.moveTo(RPS_NPC.x-4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x-4,RPS_NPC.y-23);c.fill();c.beginPath();c.moveTo(RPS_NPC.x+4,RPS_NPC.y-27);c.lineTo(RPS_NPC.x,RPS_NPC.y-25);c.lineTo(RPS_NPC.x+4,RPS_NPC.y-23);c.fill();c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const w=c.measureText(RPS_HOST).width+12;c.fillStyle="rgba(185,28,28,.9)";c.beginPath();c.roundRect(RPS_NPC.x-w/2,RPS_NPC.y-58,w,13,6);c.fill();c.fillStyle="#fff";c.fillText(RPS_HOST,RPS_NPC.x,RPS_NPC.y-48.5);}}];for(const id in fOthers){const o=fOthers[id];if((o.fa|0)!==fArea)continue;people.push({y:o.y,f:()=>sitW(o,()=>{if(o.fs==="away"){c.globalAlpha=.55;drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.bt?false:o.walk,null,"idle",false,t);c.globalAlpha=1;c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(0,0,0,.5)";c.beginPath();c.roundRect(o.x-24,o.y+4,48,13,6);c.fill();c.fillStyle="#cbd5e1";c.fillText("📈 코인",o.x,o.y+13.5);return;}if(o.fs&&o.fs!=="idle"){const bx=fishBobX(o.x,o.y,o.dir||1),by=fishBobY(o.x,o.y);drawLine(c,o.x+(o.dir||1)*18,o.y-36,bx,by,o.fs==="bite",t);drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,false,{x0:o.x+(o.dir||1)*18,y0:o.y-36},o.fs,false,t);}else drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.bt?false:o.walk,null,"idle",false,t);})});}
   if(fBoat)people.push({y:fp.y+.2,f:()=>boatFront(c,fp.x,fp.y,t,fBoat,fBoatTilt)});for(const id in fOthers){const o=fOthers[id];if(o&&o.bt&&o.fs!=="away")people.push({y:o.y+.2,f:()=>boatFront(c,o.x,o.y,t,o.bt,o.tl)});}
   people.push({y:fp.y,f:()=>{const fishing=fstate!=="idle";const rx=fp.x+fp.dir*18,ry=fp.y-36;if(fishing&&fstate!=="cast")drawLine(c,rx,ry,fBob.x,fBob.y,fstate==="bite",t);
@@ -2306,7 +2307,7 @@ function fishDrawW(t){const c=fCtx;if(fArea)return fishDraw1(t);
       emoSign(c,"","인생네컷",X+W/2,Y-6,"bold 9px 'Noto Sans KR',sans-serif","#fbcfe8","rgba(131,24,67,.92)",16);}
     else if(d.t==="bush"){c.fillStyle=`hsl(${100+d.c*30},40%,32%)`;c.beginPath();c.arc(d.x,d.y-5,7,0,7);c.arc(d.x+7,d.y-3,6,0,7);c.arc(d.x-7,d.y-3,6,0,7);c.fill();}
     else{c.fillStyle=["#ffd166","#ef476f","#ffffff","#c77dff"][Math.floor(d.c*4)];c.beginPath();c.arc(d.x,d.y-2,2.2,0,7);c.fill();}}});
-  people.sort((a,b)=>a.y-b.y).forEach(p=>p.f());dockOver(c);
+  people.sort((a,b)=>a.y-b.y).forEach(p=>{c.save();try{p.f();}catch(e){fDrawErr(e);}c.restore();});dockOver(c);
   {const st=rpsState();/* 이모지는 폰마다 폭이 달라서 글자와 따로 그림 (쏠림 방지) */const em=st.emo||"",tx=st.text;c.font="bold 10px 'Noto Sans KR',sans-serif";const txw=c.measureText(tx).width,ew=em?13:0,gap=em?3:0,cw=ew+gap+txw,tw=cw+16,bx=RPS_NPC.x-tw/2,by=RPS_NPC.y-84,x0=RPS_NPC.x-cw/2;c.fillStyle=st.hot?"#fde047":"rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,tw,20,9);c.fill();c.beginPath();c.moveTo(RPS_NPC.x-4,by+20);c.lineTo(RPS_NPC.x+4,by+20);c.lineTo(RPS_NPC.x,by+26);c.fill();c.textBaseline="middle";if(em){c.font="11px sans-serif";c.textAlign="center";c.fillText(em,x0+ew/2,by+10.5);}c.font="bold 10px 'Noto Sans KR',sans-serif";c.fillStyle="#111";c.textAlign="left";c.fillText(tx,x0+ew+gap,by+10.5);c.textBaseline="alphabetic";c.textAlign="center";}
   const skL=(x,y,n,tt,ak,al)=>{if(!(n>0))return;if(tt)y-=12;y-=Math.max(awkLift(ak),al||0);c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx=`🔥${n}연승`,w=c.measureText(tx).width+8;c.fillStyle="rgba(220,38,38,.9)";c.beginPath();c.roundRect(x-w/2,y-67,w,12,6);c.fill();c.fillStyle="#fff";c.fillText(tx,x,y-58);};
   skL(fp.x,fp.y,rpsN(),myTitle(),myAwkShow(),accLift(normCh(me&&me.ch),eqAcc(),myAwkShow()));for(const id in fOthers){const o=fOthers[id];if(o.fs!=="away")skL(o.x,o.y,o.sk,o.tt,o.ak,accLift(normCh(o.ch),o.ac,o.ak));}
