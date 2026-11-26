@@ -276,6 +276,7 @@ nav button.on{color:var(--tx);font-weight:700}
     <div class="card"><h3>💰 돈 지급</h3>
       <select id="admUser"></select>
       <div class="l"><button class="a" id="admSign" style="flex:none;width:52px">＋ 지급</button><input id="admAmt" inputmode="numeric" placeholder="금액(원)"><button class="a" id="admGive" style="flex:none;width:64px">지급</button></div>
+      <div class="l"><button class="a" id="admOfRestore" style="flex:1">🏢 선택한 사람에게 기본 사무실 다시 지급</button></div>
     </div>
     <div class="card"><h3>👥 플레이어 관리</h3>
       <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">같은 이름이 여러 개면 <b style="color:#ffb020">중복</b>으로 표시돼요. 삭제하면 그 사람 기록이 사라지고, 그 기기에서는 닉네임부터 다시 시작해요.</div>
@@ -646,7 +647,7 @@ function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clear
 const myName=()=>(me&&me.name)||"나";
 function assetOf(p){let s=p.cash||0;for(const d of(p.bk||[]))s+=d.a|0;if(p.of&&p.of.bx)s+=Math.floor(p.of.bx.a||0);for(const n in(p.coins||{})){const ci=COINS.findIndex(c=>c[0]===n);if(ci>=0)s+=(p.coins[n].count||0)*priceOf(ci);}return s;}
 async function saveMe(){if(sessBlocked)return;if(localMode){try{const{_loaded,...o}=me;localStorage.setItem(LKEY,JSON.stringify(o));}catch(e){}return;}if(!fdb||!myId||!me||!me._loaded){return;}if(saving){dirty=true;return;}saving=true;
-  try{const{_loaded,...o}=me;await fdb.ref("players/"+myId).set(JSON.parse(JSON.stringify({...o,t:Date.now()})));}catch(e){toast("저장 실패: 인터넷 연결을 확인해 주세요");}
+  try{const{_loaded,...o}=me;if(o.of){try{localStorage.setItem("jc_ofbak_"+myId,JSON.stringify(o.of));}catch(_){}}await fdb.ref("players/"+myId).set(JSON.parse(JSON.stringify({...o,t:Date.now()})));}catch(e){const cd=e&&(e.code||e.message)||"?";try{console.error("saveMe",e);}catch(_){}toast("저장 실패 ("+String(cd).slice(0,40)+"): 인터넷 연결을 확인해 주세요");}
   saving=false;if(dirty){dirty=false;saveMe();}}
 
 /* ===================== 시바이누·리플 개편: 보유 수량 병합 (가치 유지) ===================== */
@@ -3779,7 +3780,7 @@ function ofRentDo(){if(!me||!me._loaded)return toast("닉네임부터 정해 주
   const t=ofNow();me.cash-=OF_RENT;me.of={lv:1,fl:"",wl:"0",it:ofStarter(),nu:5,inv:{},em:[],bx:{a:0,t},rt:t};saveMe();renderHeader();return true;}
 /* 목록 데이터: 모든 사람의 사무실 (수입 높은 순) */
 function ofAll(){const all={...players};if(me&&myId)all[myId]=me;const L=[];const now=ofNow();for(const id in all){const p=all[id];if(!p||!p.of)continue;const o=p.of;
-    L.push({id,mine:id===myId,name:String(p.name||"?").slice(0,10),net:ofNet(o),n:(o.em||[]).length,sc:ofScore(o),lv:ofLv(o)});}
+    try{L.push({id,mine:id===myId,name:String(p.name||"?").slice(0,10),net:ofNet(o),n:(o.em||[]).length,sc:ofScore(o),lv:ofLv(o)});}catch(e){L.push({id,mine:id===myId,name:String(p.name||"?").slice(0,10),net:0,n:0,sc:0,lv:1});}}
   L.sort((a,b)=>b.net-a.net||b.sc-a.sc||(a.name<b.name?-1:1));L.forEach((x,i)=>x.rank=i+1);return L;}
 /* 광장 건물 그리기 */
 function drawOfficeBldg(c,X,Y,W,H,t){const R=(x,y,w,h,f)=>{c.fillStyle=f;c.fillRect(X+x,Y+y,w,h);},Ci=(x,y,r,f)=>{c.fillStyle=f;c.beginPath();c.arc(X+x,Y+y,r,0,7);c.fill();};
@@ -4235,6 +4236,11 @@ function fWhere(){try{if(ofIn)return"";const v=id=>{const d=document.getElementB
   if(v("ntsMod"))return"nts";if(v("casMod"))return"cas";if(v("arcMod")||v("clwMod")||v("tmMod")||v("bbMod"))return"arc";if(v("phMod"))return"ph";if(v("fMk"))return"mkt";if(v("pgMod")&&pgCur==="bank")return"bank";}catch(e){}return"";}
 const ofWhLabel=o=>o.fo?"🏢 컴퍼니":(OF_WH_L[o.wh]||"📈 코인");
 
+/* 관리자: 사무실이 사라진 사람에게 기본 사무실을 다시 지급 */
+{const b=document.getElementById("admOfRestore");if(b)b.onclick=async()=>{const id=$("admUser").value;if(!id)return toast("⚠️ 사람을 먼저 골라 주세요");if(!isOwner||!fdb)return;const p=id===myId?me:players[id];if(!p)return toast("사람을 찾을 수 없어요");if(p.of)return toast("이미 사무실이 있어요");
+  const t=ofNow(),of={lv:1,fl:"",wl:"0",it:ofStarter(),nu:5,inv:{},em:[],bx:{a:0,t},rt:t};
+  try{if(id===myId){me.of=of;saveMe();}else await fdb.ref("players/"+id+"/of").set(of);toast("🏢 기본 사무실을 다시 지급했어요\n(가구·직원은 필요하면 현금으로 보상해 주세요)");}catch(e){toast("복구 실패 ("+((e&&e.code)||"?")+")");}};}
+
 /*OFFICE_END*/
 const btDone=id=>(me.bdone||[]).includes(id);
 function btMarkDone(id){me.bdone=(me.bdone||[]).concat(id).slice(-80);}
@@ -4452,7 +4458,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:90
   fdb.ref("market/kicked/"+myId).on("value",s=>{if(!s.val())return;fdb.ref("market/kicked/"+myId).remove().catch(()=>{});me._loaded=false;try{localStorage.removeItem("jc_id");localStorage.removeItem("jc_admin");}catch(e){}alert("관리자가 이 계정을 정리했어요. 닉네임을 다시 정해 주세요.");location.reload();});
   let first=true;
   fdb.ref("players").on("value",s=>{const p=s.val()||{};
-    if(p[myId]){if(!me._loaded||!saving){const mine=p[myId];me=JSON.parse(JSON.stringify(mine));me.coins=me.coins||{};me.claimed=me.claimed||[];me.log=me.log||[];me.att=me.att||0;me._loaded=true;
+    if(p[myId]){if(!me._loaded||!saving){const mine=p[myId];me=JSON.parse(JSON.stringify(mine));me.coins=me.coins||{};me.claimed=me.claimed||[];me.log=me.log||[];me.att=me.att||0;me._loaded=true;if(!me.of){try{const bk=JSON.parse(localStorage.getItem("jc_ofbak_"+myId)||"null");if(bk&&bk.it&&bk.it.length&&Date.now()-(window._ofRestT||0)>30000){window._ofRestT=Date.now();me.of=bk;setTimeout(()=>{saveMe();toast("🏢 사라졌던 사무실을 복구했어요");},400);}}catch(e){}}
       if(me.skinRV!==1){me.skinRV=1;me.ch=11;me.skins={};setTimeout(()=>{saveMe();if(fdb)fdb.ref("online/"+myId).update({ch:11}).catch(()=>{});},500);}}}
     delete p[myId];players=p;if(me._loaded&&!pushPresence.ok){pushPresence.ok=1;lastPres="";pushPresence();}
     if(first){first=false;if(me._loaded&&!me.pinH)askSetPin();if(!me._loaded){showAuth((nm,pinH)=>{me=JSON.parse(JSON.stringify(local));me.name=nm;me.pinH=pinH;me.mig=1;me.skinRV=1;me.ch=11;me._loaded=true;saveMe();pushPresence();renderAll();broadcast(`👋 ${nm}님이 거래소에 처음 들어왔어요!`);});}}
