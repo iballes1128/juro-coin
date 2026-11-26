@@ -1071,9 +1071,9 @@ async function ltClaimTick(){if(!fdb||!me||!me._loaded||!me.lt)return;const R=lt
       toast(pr.v?`🎟️ 세금 재원이 부족해 추첨이 취소됐어요 · ${formatMoneyReadable(pr.amt)} 환불`:pr.amt>0?`🎟️ 로또 당첨! ${parts.join(" · ")} → +${formatMoneyReadable(pr.amt)}`:`🎟️ 로또 결과: 아쉽게 꽝이에요`);
       if($("ltMod")&&$("ltMod").style.display==="flex")ltRender();}catch(e){ltDbg="당첨금 확인 오류: "+String((e&&e.code)||(e&&e.message)||e).slice(0,60);}}}
 
-/* ===== 🎫 즉석복권: 한 장씩 사서 긁어요 · 6시간마다 새 회차(판)로 초기화 ===== */
+/* ===== 🎫 즉석복권: 한 장씩 사서 긁어요 · 12시간마다(오전 10시·오후 10시) 새 회차(판)로 초기화 ===== */
 var ltTab="lt",scCur=null,scPool={a:null,b:null},scWR=-1,scRefs=[],scMsg="",scBusy=0,scInit0=0;
-const SC_H=6*3600000,SC_R0=Date.UTC(2026,10,26,15,0,0),SC_N=50000,SC_DAY=1000;
+const SC_H=12*3600000,SC_R0=Date.UTC(2026,10,26,13,0,0),SC_N=50000,SC_DAY=1000;
 const SC_T={a:{nm:"행운의 숫자",ic:"🎟️",p:50000,pz:[0,3e8,5e7,1e7,1e6,1e5,5e4],cnt:[0,1,3,20,100,2750,12500],ds:"당첨 숫자와 같은 숫자가 나오면 당첨!",g:"linear-gradient(160deg,#b91c1c,#7f1d1d)"},
  b:{nm:"같은 그림 찾기",ic:"🖼️",p:200000,pz:[0,1e9,2e8,5e7,5e6,5e5,2e5],cnt:[0,1,3,20,100,2800,12500],ds:"그림 두 개가 같으면 당첨!",g:"linear-gradient(160deg,#1d4ed8,#312e81)"}};
 const SC_PIC=["🍎","🍋","🍇","🍒","⭐","🔔","🍀","💎","🎈","🐟","🌙","🎁"];
