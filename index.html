@@ -4530,7 +4530,7 @@ function ofDraw(t){const c=ofS.cx,o=ofS.o;if(!c||!o)return;const L=ofL(o),CS=OF_
   const seats=ofSeats(o),seatMap={};for(const s of seats){seatMap[s.u]={dir:s.dir};seatMap[s.mon]={dir:s.dir};}
   for(const it of o.it||[])if(ofIsWall(it.k)&&!(ofS.held&&ofS.held.u===it.u)){const f=ofFt(it);ofSpriteDraw(c,it.k,it.x*CS,-CS-1,f.w*CS,f.h*CS,0);}
   /* 바닥 가구 (아래쪽일수록 앞) */
-  const list=[];for(const it of o.it||[]){if(ofIsWall(it.k))continue;if(ofS.held&&ofS.held.u===it.u)continue;if(ofS.ghost&&ofS.ghost.att&&ofS.ghost.att.some(a=>a.u===it.u))continue;const f=ofFt(it);const cat=ofCatOf(it.k);list.push({y:it.y+f.h+(cat==="m"?.02:cat==="d"?-.02:0),f:()=>ofDrawFloorItem(c,it,seatMap,t)});}
+  const list=[];for(const it of o.it||[]){if(ofIsWall(it.k))continue;if(ofS.held&&ofS.held.u===it.u)continue;if(ofS.ghost&&ofS.ghost.att&&ofS.ghost.att.some(a=>a.u===it.u))continue;const f=ofFt(it);const cat=ofCatOf(it.k);let yy=it.y+f.h+(cat==="m"?.02:cat==="d"?-.02:0);if(cat==="m"){const mc=ofCells(it);for(const d of o.it||[]){if(ofCatOf(d.k)!=="d")continue;const dc=ofCells(d);if(mc.every(a=>dc.some(b=>a[0]===b[0]&&a[1]===b[1])))yy=Math.max(yy,d.y+ofFt(d).h+.01);}}list.push({y:yy,f:()=>ofDrawFloorItem(c,it,seatMap,t)});}
   /* 직원 */
   for(const e of(ofS.mode==="place"?[]:(o.em||[]))){const s=seats.find(q=>q.u===e.u);const ch=ofItemBy(o,e.u);if(!ch)continue;if(!s){list.push({y:ch.y+1.01,f:()=>{const p=ofCell(ch.x,ch.y);c.globalAlpha=.4;ofWorker(c,p.x+CS/2,p.y+CS/2+1,e.rk,true,2);c.globalAlpha=1;}});continue;}list.push({y:ch.y+1.01,f:()=>{const p=ofCell(ch.x,ch.y);ofWorker(c,p.x+CS/2,p.y+CS/2+(s.dir===2?0:1),e.rk,s.dir===2,s.dir);}});}
   /* 사람 */
