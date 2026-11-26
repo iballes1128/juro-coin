@@ -995,7 +995,7 @@ function ltRank(t,d){const T=Array.isArray(t)?t:ltArr(t);let m=0;for(const x of 
 function ltPlan(tk,base,avail,draw){let n=0,pc=0;const W={1:[],2:[],3:0,4:0};for(const o of tk){const L=o.t||[];n+=L.length;if(L.length)pc++;const best={};for(const s of L){const r=ltRank(s,draw);if(r===1||r===2)best[r]=(best[r]||0)+1;if(r===3)W[3]++;if(r===4)W[4]++;}
   if(best[1])W[1].push({u:o.u,nm:o.nm||"?",c:best[1]});if(best[2])W[2].push({u:o.u,nm:o.nm||"?",c:best[2]});}
   const w1=W[1].reduce((a,x)=>a+x.c,0),w2=W[2].reduce((a,x)=>a+x.c,0),sales=n*LT_P,pot=base+sales;
-  if(pc<2)return{solo:1,tk:n,pc,base,sales,total:0,nb:base,t:Date.now()};
+  if(pc<2)return{solo:1,tk:n,pc,base,sales,total:0,nb:LT_BASE,t:Date.now()};
   const p1=w1?Math.floor(Math.floor(pot*LT_R1/w1)*(1-LT_TAX)):0,p2=w2?Math.floor(Math.floor(pot*(1-LT_R1)/w2)*(1-LT_TAX)):0;
   const total=p1*w1+p2*w2+W[3]*LT_P3+W[4]*LT_P4,f=total>avail&&total>0?avail/total:1;
   const res={n:draw.n,b:draw.b,base,sales,pot,tk:n,pc,w1,w2,w3:W[3],w4:W[4],p1,p2,f:+f.toFixed(6),total:Math.floor(total*f),a1:W[1].slice(0,5).map(x=>({n:x.nm,c:x.c})),a2:W[2].slice(0,5).map(x=>({n:x.nm,c:x.c})),t:Date.now()};
