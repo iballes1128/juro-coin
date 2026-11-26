@@ -3476,9 +3476,11 @@ A(2,{k:"aura",id:"meteor",eq:100000000,w:.12,nm:"유성우 오라 (뽑기 한정
 [["aura","aurora","오로라 오라 (뽑기 한정)","🌌"],["wing","rainwing","무지개 날개 (뽑기 한정)","🌈"],["plate","galaxy","은하 명찰 (뽑기 한정)","🌠"],["wing","goldwing","황금 날개 (뽑기 한정)","🪽"],["aura","inferno","용암 오라 (뽑기 한정)","🌋"]].forEach(([ck,id,nm,ic])=>A(2,{k:"cosm",ck,id,eq:100000000,w:.12,nm,ic}));
 A(1,{k:"boat",id:"gold",eq:3000000,w:.3,nm:"고급 보트 (뽑기 한정)",ic:"🛥️"});A(2,{k:"boat",id:"grand",eq:5000000,w:.6,nm:"최고급 보트 (뽑기 한정)",ic:"⛵"});A(2,{k:"boat",id:"crystal",eq:15000000,w:.3,nm:"화려한 보트 (뽑기 한정)",ic:"🛥️"});A(2,{k:"cash",v:100000000,w:.1,nm:"현금 1억",ic:"💰"});
 PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq||0;});
+/* 같은 등급 안에서는 가치가 낮을수록 잘 나오고 높을수록 귀함 (무게 = (가치/10만)^-0.4) */
+PRIZES.forEach(p=>{p.w=Math.pow(Math.max(p.val,50000)/1e5,-.4);});
 const POOL=PRIZES;
-/* 룰렛 한 판은 25칸: 일반 14 · 희귀 8 · 전설 3. 한 번 돌릴 때 등급 확률이 정해지고, 같은 등급 안에서는 w에 비례 */
-const TP=[.80,.18,.02];
+/* 룰렛 한 판은 25칸: 일반 14 · 희귀 8 · 전설 3. 등급 확률 일반 80 · 희귀 18.5 · 전설 1.5%, 같은 등급 안에서는 w(가치가 낮을수록 큼)에 비례 */
+const TP=[.80,.185,.015];
 function slotProbs(box){const tw=[0,0,0];box.forEach(i=>{tw[PRIZES[i].t]+=PRIZES[i].w;});return box.map(i=>{const q=PRIZES[i];return tw[q.t]?TP[q.t]*q.w/tw[q.t]:0;});}
 /* 당첨된 칸에 들어올 새 상품: 같은 등급, 지금 판에 없는 것 (현금 칸은 다른 금액의 현금) */
 function refill(box,pos,rng){rng=rng||Math.random;const old=PRIZES[box[pos]],cur=new Set(box),pk=a=>a[Math.floor(rng()*a.length)],all=PRIZES.map((q,i)=>i);
