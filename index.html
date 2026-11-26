@@ -1479,7 +1479,7 @@ function drawRod(c,hx,hy,x0,y0,L,t){const T=Math.min(10,Math.floor((L|0)/5));c.s
     const p=.7+Math.sin(t/140)*.3,g=c.createRadialGradient(x0,y0,0,x0,y0,14);g.addColorStop(0,`rgba(255,255,255,${p})`);g.addColorStop(.4,`hsla(${hue},100%,75%,${p*.6})`);g.addColorStop(1,"rgba(255,255,255,0)");c.fillStyle=g;c.beginPath();c.arc(x0,y0,14,0,7);c.fill();sparkle(c,x0,y0,4+Math.sin(t/100)*1.5,"#fff");}
   c.restore();}
 const rodLv=()=>Math.min(50,(me&&me.rodLv)|0);
-const rodBonus=L=>.009*Math.pow(Math.min(50,L)/50,1.5);
+const rodBonus=L=>.012*Math.pow(Math.min(50,L)/50,1.5);
 const enhCost=L=>Math.round(100000*Math.pow(1.14,L)/10000)*10000;
 const enhBase=L=>Math.max(5,90-L*1.9);
 const ENH_DROP_LV=25,enhDropP=L=>L<ENH_DROP_LV?0:Math.min(.5,.25+(L-ENH_DROP_LV)*.01);/* 하락 확률: +25에서 25%, 한 단계마다 +1.0%p (+49에서 49%) */
@@ -1494,7 +1494,9 @@ let fBaitPro=0;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FIS
 function rollFish(){const L=Math.min(50,rodLv()),bp=fBaitPro||0,add=FISH_RARE*.2+bp+rodBonus(L),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);
   /* 낚싯대 강화·미끼가 좋을수록 쓰레기와 싸구려 물고기는 줄고, 중간 가격대가 늘어요 (10만 원 이상 전체 확률은 위 보정 그대로, 나머지 안에서만 재분배) */
   const gt=.5*(L/50)+bp*25,tk=Math.max(.25,1-.7*(L/50)-bp*25);let n0=0,t0=0;const M=FISH.map(f=>{const p=f[1];if(p>=100000)return 0;const m=p<0?tk:Math.min(1.8,Math.max(.4,Math.pow(p/3000,gt)));n0+=f[0]*kN;t0+=f[0]*m;return m;});const sc=t0?n0/t0:1;
-  const W=i=>FISH[i][1]>=100000?FISH[i][0]*kR:FISH[i][0]*M[i]*sc;let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
+  /* 대어(1천만↑)는 장비가 좋을수록 10만 원 이상 안에서 비중이 더 커져요 (10만 이상 전체 확률은 그대로) */
+  const kb=1+.4*(L/50)+bp*30;let go=0,gn=0;for(const f of FISH)if(f[1]>=100000){go+=f[0];gn+=f[0]*(f[1]>=1e7?kb:1);}const gs=gn?go/gn:1;
+  const W=i=>FISH[i][1]>=100000?FISH[i][0]*(FISH[i][1]>=1e7?kb:1)*gs*kR:FISH[i][0]*M[i]*sc;let tot=0;for(let i=0;i<FISH.length;i++)tot+=W(i);let r=Math.random()*tot;for(let i=0;i<FISH.length;i++){r-=W(i);if(r<=0)return i;}return FISH.length-1;}
 const fKey=i=>"f"+i;
 function fishCountOf(p){let n=0;const m=(p&&p.fish)||{};for(const k in m)if(typeof m[k]==="number"&&m[k]>=0)n++;return n;}
 const hasSeen=(p,i)=>{const m=(p&&p.fish)||{};return typeof m[fKey(i)]==="number";};
