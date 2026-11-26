@@ -3752,7 +3752,7 @@ function ofScore(o){if(!o)return 0;let s=0;for(const it of(o.it||[])){const d=OF
 const ofBonus=o=>{const s=ofScore(o);return s/(s+600);};
 /* 직원 한 명의 10분당 수입(세전, 인테리어 보너스 포함) */
 const ofEmpRate=(o,e,b)=>OF_RANK[Math.max(0,Math.min(11,e.rk|0))][1]*(1+(b===undefined?ofBonus(o):b));
-function ofRates(o){const b=ofBonus(o);return(o.em||[]).map(e=>ofEmpRate(o,e,b));}
+function ofRates(o){const b=ofBonus(o),S=new Set(ofSeats(o).map(s=>s.u));return(o.em||[]).map(e=>S.has(e.u)?ofEmpRate(o,e,b):0);}
 const ofRateSum=o=>ofRates(o).reduce((a,b)=>a+b,0);
 const ofNet=o=>ofRateSum(o)*(1-ofL(o).tax);/* 세후 10분당 */
 /* 수금함 쌓기 (직원이 번 돈 · 8시간치까지) */
@@ -3845,16 +3845,28 @@ function ofCanPlace(o,it,skipU){const L=ofL(o),d=OF_IM[it.k];if(!d&&it.k!=="box"
   for(const o2 of(o.it||[])){if(o2.u===skipU||ofIsWall(o2.k)||ofCatOf(o2.k)==="m")continue;for(const[x,y]of ofCells(o2))if(mine.has(x+","+y))return"다른 가구와 겹쳐요";}return"";}
 /* 직원 자리: 책상 위에 모니터가 있고 그 책상 옆에 의자가 붙어 있으면 한 자리 */
 function ofSeats(o){const its=o.it||[],desks=its.filter(i=>ofCatOf(i.k)==="d"),mons=its.filter(i=>ofCatOf(i.k)==="m"),chairs=its.filter(i=>ofCatOf(i.k)==="c").sort((a,b)=>a.u-b.u);
-  const dc=desks.map(d=>({d,cells:new Set(ofCells(d).map(a=>a.join(","))),mons:[],used:0}));
+  const dc=desks.map(d=>({d,cells:new Set(ofCells(d).map(a=>a.join(","))),mons:[],used:new Set()}));
   for(const m of mons){const mc=ofCells(m).map(a=>a.join(","));const t=dc.find(x=>mc.every(k=>x.cells.has(k)));if(t)t.mons.push(m);}
+  /* 의자는 책상을 바라보고(방향 일치), 모니터 화면은 의자 쪽을 봐야 한 자리예요 */
   const seats=[];for(const ch of chairs){const cx=ch.x,cy=ch.y;const nb=[[cx,cy-1,0],[cx+1,cy,1],[cx,cy+1,2],[cx-1,cy,3]];let done=false;
-    for(const[nx,ny,dir]of nb){if(done)break;for(const x of dc){if(x.used<x.mons.length&&x.cells.has(nx+","+ny)){seats.push({u:ch.u,dir,desk:x.d.u,mon:x.mons[x.used].u});x.used++;done=true;break;}}}}
+    for(const[nx,ny,dir]of nb){if(done)break;if(((ch.r|0)%4+4)%4!==dir)continue;for(const x of dc){if(!x.cells.has(nx+","+ny))continue;const m=x.mons.find(mm=>!x.used.has(mm.u)&&(((mm.r|0)%4)+4)%4===dir);if(!m)continue;seats.push({u:ch.u,dir,desk:x.d.u,mon:m.u});x.used.add(m.u);done=true;break;}}}
   return seats;}
+/* 자리가 안 되는 의자와 이유 (책상 옆에 붙어 있는데 일을 못 하는 경우) */
+function ofIssues(o){const res={},its=o.it||[],desks=its.filter(i=>ofCatOf(i.k)==="d"),mons=its.filter(i=>ofCatOf(i.k)==="m"),chairs=its.filter(i=>ofCatOf(i.k)==="c");const S=new Set(ofSeats(o).map(s=>s.u));
+  for(const ch of chairs){if(S.has(ch.u))continue;let reason=null;
+    for(const[nx,ny,dir]of[[ch.x,ch.y-1,0],[ch.x+1,ch.y,1],[ch.x,ch.y+1,2],[ch.x-1,ch.y,3]]){const d=desks.find(dd=>ofCells(dd).some(c=>c[0]===nx&&c[1]===ny));if(!d)continue;
+      const dcs=new Set(ofCells(d).map(a=>a.join(",")));const ms=mons.filter(m=>ofCells(m).every(a=>dcs.has(a.join(","))));let r;
+      if(!ms.length)r="책상 위에 모니터가 없어요";else if(!ms.some(m=>(((m.r|0)%4)+4)%4===dir))r="모니터 화면이 의자 쪽을 보고 있지 않아요\n(모니터를 눌러서 ↻ 회전해 맞춰 주세요)";
+      else if(((ch.r|0)%4+4)%4!==dir)r="의자가 책상 쪽을 보고 있지 않아요\n(의자를 눌러서 ↻ 회전해 맞춰 주세요)";else r="이 책상의 모니터가 모자라요";
+      reason=reason||r;}
+    if(reason)res[ch.u]=reason;}
+  return res;}
 /* 직원이 앉은 자리가 계속 유효한지 */
 function ofSeatsOK(o){const S=ofSeats(o),ok=new Set(S.map(s=>s.u));for(const e of(o.em||[]))if(!ok.has(e.u))return false;return true;}
 /* 가구 하나를 바꿔보고(복사본) 직원 자리가 깨지는지 검사 */
 function ofWouldBreak(o,fn){const c={...o,it:(o.it||[]).map(i=>({...i})),em:(o.em||[]).map(e=>({...e}))};fn(c);return!ofSeatsOK(c);}
 const ofItemBy=(o,u)=>(o.it||[]).find(i=>i.u===u);
+const ofEmpChair=(o,u)=>(o.em||[]).some(e=>e.u===u);
 function ofHasEmpOn(o,u){const S=ofSeats(o);for(const e of(o.em||[])){if(e.u===u)return true;const s=S.find(x=>x.u===e.u);if(s&&(s.desk===u||s.mon===u))return true;}return false;}
 /* ---------- 가구 사고팔고 옮기기 ---------- */
 /* 책상 + 위에 올린 모니터를 함께 옮길 때: 새 위치/방향 계산 */
@@ -3871,21 +3883,17 @@ function ofBuy(k){const o=me.of;if(!o)return;const d=OF_IM[k];if(!d)return;if(me
   const cat=d[2];if(ofCount(o,cat)>=ofCapOf(o,cat))return toast(`${OF_CATN[cat]}은(는) 이 사무실에서 ${ofCapOf(o,cat)}개까지 둘 수 있어요\n(놓은 것을 팔거나 사무실을 넓히면 더 둘 수 있어요)`);
   me.cash-=d[5];o.inv=o.inv||{};o.inv[k]=(o.inv[k]|0)+1;saveMe();renderHeader();toast(`🛒 ${d[1]}을(를) 샀어요\n보관함에서 꺼내서 놓아요`);}
 function ofSellInv(k){const o=me.of;if(!o||!(o.inv&&o.inv[k]>0))return;const d=OF_IM[k];const v=Math.floor(d[5]*OF_SELL);o.inv[k]--;if(o.inv[k]<=0)delete o.inv[k];me.cash+=v;saveMe();renderHeader();toast(`💰 ${d[1]}을(를) ${formatMoneyReadable(v)}에 팔았어요`);}
-function ofSellPlaced(u){const o=me.of,it=ofItemBy(o,u);if(!it||it.k==="box")return false;if(ofHasEmpOn(o,u)){toast("직원이 쓰는 자리예요\n먼저 직원을 해고해 주세요");return false;}
+function ofSellPlaced(u){const o=me.of,it=ofItemBy(o,u);if(!it||it.k==="box")return false;if(ofEmpChair(o,u)){toast("직원이 앉아 있는 의자예요\n먼저 직원을 해고해 주세요");return false;}
   if(ofCatOf(it.k)==="d"&&(o.it||[]).some(m=>ofCatOf(m.k)==="m"&&ofCells(m).every(a=>ofCells(it).some(b=>a[0]===b[0]&&a[1]===b[1])))){toast("책상 위의 모니터를 먼저 치워 주세요");return false;}
   ofSettle(o,ofNow());const v=Math.floor(OF_IM[it.k][5]*OF_SELL);o.it=o.it.filter(i=>i.u!==u);me.cash+=v;saveMe();renderHeader();toast(`💰 ${OF_IM[it.k][1]}을(를) ${formatMoneyReadable(v)}에 팔았어요`);return true;}
-function ofStore(u){const o=me.of,it=ofItemBy(o,u);if(!it||it.k==="box")return false;if(ofHasEmpOn(o,u)){toast("직원이 쓰는 자리예요\n먼저 직원을 해고해 주세요");return false;}
+function ofStore(u){const o=me.of,it=ofItemBy(o,u);if(!it||it.k==="box")return false;if(ofEmpChair(o,u)){toast("직원이 앉아 있는 의자예요\n먼저 직원을 해고해 주세요");return false;}
   if(ofCatOf(it.k)==="d"&&(o.it||[]).some(m=>ofCatOf(m.k)==="m"&&ofCells(m).every(a=>ofCells(it).some(b=>a[0]===b[0]&&a[1]===b[1])))){toast("책상 위의 모니터를 먼저 치워 주세요");return false;}
   ofSettle(o,ofNow());o.it=o.it.filter(i=>i.u!==u);o.inv=o.inv||{};o.inv[it.k]=(o.inv[it.k]|0)+1;saveMe();return true;}
 /* 놓기/옮기기 확정: g={k,x,y,r,u?(옮기는 중이면 기존 번호),fromInv} */
 function ofCommit(g){const o=me.of;
-  if(g.att&&g.att.length){const e=ofGhostErr(o,g);if(e)return toast("⚠️ "+e),false;const ap=ofAttPos(g);
-    const brk=ofWouldBreak(o,c=>{const d=c.it.find(i=>i.u===g.u);d.x=g.x;d.y=g.y;d.r=g.r;for(const a of ap){const m=c.it.find(i=>i.u===a.u);m.x=a.x;m.y=a.y;m.r=a.r;}});
-    if(brk&&(o.em||[]).length){toast("⚠️ 직원 자리가 깨져서 옮길 수 없어요");return false;}
+  if(g.att&&g.att.length){const e=ofGhostErr(o,g);if(e)return toast("⚠️ "+e),false;const ap=ofAttPos(g);ofSettle(o,ofNow());
     const d=ofItemBy(o,g.u);d.x=g.x;d.y=g.y;d.r=g.r;for(const a of ap){const m=ofItemBy(o,a.u);m.x=a.x;m.y=a.y;m.r=a.r;}saveMe();return true;}
   const e=ofCanPlace(o,g,g.u);if(e)return toast("⚠️ "+e),false;
-  const brk=ofWouldBreak(o,c=>{if(g.u)c.it=c.it.filter(i=>i.u!==g.u);c.it.push({u:g.u||9999,k:g.k,x:g.x,y:g.y,r:g.r|0});});
-  if(brk&&g.u&&ofHasEmpOn(o,g.u)){toast("⚠️ 직원 자리가 깨져서 옮길 수 없어요");return false;}
   ofSettle(o,ofNow());
   if(g.u){const it=ofItemBy(o,g.u);it.x=g.x;it.y=g.y;it.r=g.r|0;}else{if(!(o.inv&&o.inv[g.k]>0))return toast("보관함에 없어요"),false;o.inv[g.k]--;if(o.inv[g.k]<=0)delete o.inv[g.k];o.it.push({u:o.nu|0||5,k:g.k,x:g.x,y:g.y,r:g.r|0});o.nu=(o.nu|0||5)+1;}
   saveMe();return true;}
@@ -3947,15 +3955,16 @@ function ofDraw(t){const c=ofS.cx,o=ofS.o;if(!c||!o)return;const L=ofL(o),CS=OF_
   /* 바닥 가구 (아래쪽일수록 앞) */
   const list=[];for(const it of o.it||[]){if(ofIsWall(it.k))continue;if(ofS.held&&ofS.held.u===it.u)continue;if(ofS.ghost&&ofS.ghost.att&&ofS.ghost.att.some(a=>a.u===it.u))continue;const f=ofFt(it);const cat=ofCatOf(it.k);list.push({y:it.y+f.h+(cat==="m"?.02:cat==="d"?-.02:0),f:()=>ofDrawFloorItem(c,it,seatMap,t)});}
   /* 직원 */
-  for(const e of o.em||[]){const s=seats.find(q=>q.u===e.u);if(!s)continue;const ch=ofItemBy(o,e.u);if(!ch)continue;list.push({y:ch.y+1.01,f:()=>{const p=ofCell(ch.x,ch.y);ofWorker(c,p.x+CS/2,p.y+CS/2+(s.dir===2?0:1),e.rk,s.dir===2,s.dir);}});}
+  for(const e of(ofS.mode==="place"?[]:(o.em||[]))){const s=seats.find(q=>q.u===e.u);const ch=ofItemBy(o,e.u);if(!ch)continue;if(!s){list.push({y:ch.y+1.01,f:()=>{const p=ofCell(ch.x,ch.y);c.globalAlpha=.4;ofWorker(c,p.x+CS/2,p.y+CS/2+1,e.rk,true,2);c.globalAlpha=1;}});continue;}list.push({y:ch.y+1.01,f:()=>{const p=ofCell(ch.x,ch.y);ofWorker(c,p.x+CS/2,p.y+CS/2+(s.dir===2?0:1),e.rk,s.dir===2,s.dir);}});}
   /* 사람 */
   list.push({y:ofS.py/CS,f:()=>{drawPerson(c,ofS.px,ofS.py,myName(),chOf(myId),ofS.dir,ofS.walking,null,"idle",true,t);}});
   for(const id in fOthers){const q=fOthers[id];if(q.fa!==100||q.fo!==ofS.own||q.fs==="away")continue;list.push({y:q.y/CS,f:()=>drawPerson(c,q.x,q.y,q.name,chOf(id),q.dir||1,q.walk,null,"idle",false,t)});}
   list.sort((a,b)=>a.y-b.y).forEach(q=>{c.save();try{q.f();}catch(e){}c.restore();});
   /* 직원 머리 위 코인 */
-  for(const e of o.em||[]){const s=seats.find(q=>q.u===e.u),ch=s&&ofItemBy(o,e.u);if(!ch)continue;const ph=((t/1000+e.u*1.7)%7)/7;if(ph<.22){const a=ph/.22,p=ofCell(ch.x,ch.y);c.globalAlpha=Math.sin(a*3.14);c.fillStyle="#f6d56a";c.strokeStyle="#8a5a05";c.lineWidth=1;c.beginPath();c.arc(p.x+CS/2,p.y-6-a*10,5.5,0,7);c.fill();c.stroke();c.fillStyle="#8a5a05";c.font="bold 7px sans-serif";c.textAlign="center";c.fillText("₩",p.x+CS/2,p.y-3.6-a*10);c.globalAlpha=1;}}
+  for(const e of(ofS.mode==="place"?[]:(o.em||[]))){const s=seats.find(q=>q.u===e.u),ch=s&&ofItemBy(o,e.u);if(!ch)continue;const ph=((t/1000+e.u*1.7)%7)/7;if(ph<.22){const a=ph/.22,p=ofCell(ch.x,ch.y);c.globalAlpha=Math.sin(a*3.14);c.fillStyle="#f6d56a";c.strokeStyle="#8a5a05";c.lineWidth=1;c.beginPath();c.arc(p.x+CS/2,p.y-6-a*10,5.5,0,7);c.fill();c.stroke();c.fillStyle="#8a5a05";c.font="bold 7px sans-serif";c.textAlign="center";c.fillText("₩",p.x+CS/2,p.y-3.6-a*10);c.globalAlpha=1;}}
   /* 빈 자리 표시 */
   if(ofS.mine&&ofS.mode==="view"){const emp=new Set((o.em||[]).map(e=>e.u));for(const s of seats){if(emp.has(s.u))continue;const ch=ofItemBy(o,s.u),p=ofCell(ch.x,ch.y);const pu=.6+.4*Math.sin(t/300);c.strokeStyle=`rgba(251,191,36,${pu})`;c.lineWidth=2;c.setLineDash([4,3]);c.strokeRect(p.x+3,p.y+3,CS-6,CS-6);c.setLineDash([]);c.fillStyle="rgba(251,191,36,.9)";c.font="bold 9px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillText("채용",p.x+CS/2,p.y+CS/2+3);}}
+  if(ofS.mine){const iss=ofIssues(o),pu=.6+.4*Math.sin(t/260);for(const u in iss){const ch=ofItemBy(o,+u);if(!ch)continue;const p=ofCell(ch.x,ch.y);c.fillStyle=`rgba(239,68,68,${.75+.25*pu})`;c.strokeStyle="#fff";c.lineWidth=1.4;c.beginPath();c.arc(p.x+CS-6,p.y+7,8,0,7);c.fill();c.stroke();c.fillStyle="#fff";c.font="900 12px sans-serif";c.textAlign="center";c.fillText("!",p.x+CS-6,p.y+11.5);}}
   /* 놓는 중인 가구 (유령) */
   const g=ofS.ghost;if(g){const err=ofGhostErr(o,g),f=ofFt(g),wall=ofIsWall(g.k),p=wall?{x:g.x*CS,y:-CS-1}:ofCell(g.x,g.y);
     c.globalAlpha=.78;ofSpriteDraw(c,g.k,p.x,p.y,f.w*CS,f.h*CS,wall?0:g.r);if(g.att)for(const a of ofAttPos(g)){const q=ofCell(a.x,a.y),mf=ofFt(a);ofSpriteDraw(c,a.k,q.x,q.y,mf.w*CS,mf.h*CS,a.r);}c.globalAlpha=1;c.fillStyle=err?"rgba(239,68,68,.35)":"rgba(34,197,94,.3)";c.strokeStyle=err?"#ef4444":"#22c55e";c.lineWidth=2;
@@ -4041,10 +4050,10 @@ function ofGoTo(it,fn){const f=ofFt(it);const x=it.x*OF_CS+f.w*OF_CS/2,y=it.y*OF
 function ofModeSet(m){ofS.mode=m;ofS.ghost=null;ofS.held=null;ofS.paint=null;ofS.paintCost=0;ofS.tx=null;ofS.want=null;ofBar();ofHint();}
 function ofModeEnd(){if(ofS.paintDirty){ofS.paintDirty=0;saveMe();renderHeader();}ofModeSet("view");}
 function ofHint(){const h=$("ofHint");if(!h)return;h.textContent=ofS.mode==="place"?(ofS.ghost?"끌어서 자리를 정하고 ↻로 방향을 돌려요":"옮기거나 보관할 가구를 눌러요"):ofS.mode==="paint"?"칸을 눌러서(끌어서) 칠해요":"";}
-function ofPick(u,solo){const o=me.of,it=ofItemBy(o,u);if(!it)return;if(ofHasEmpOn(o,u))return toast("직원이 쓰는 자리예요\n먼저 직원을 해고해 주세요");
-  let att=null;
+function ofPick(u,solo){const o=me.of,it=ofItemBy(o,u);if(!it)return;
+  let att=null;if(ofCatOf(it.k)==="m")solo=true;
   if(!solo){let desk=it;if(ofCatOf(it.k)==="m"){const mc=ofCells(it).map(a=>a.join(","));desk=(o.it||[]).find(d=>ofCatOf(d.k)==="d"&&mc.every(k=>ofCells(d).some(b=>b.join(",")===k)))||it;}
-    if(ofCatOf(desk.k)==="d"){if(desk!==it&&ofHasEmpOn(o,desk.u))return toast("직원이 쓰는 자리예요\n먼저 직원을 해고해 주세요");const dc=new Set(ofCells(desk).map(a=>a.join(",")));
+    if(ofCatOf(desk.k)==="d"){const dc=new Set(ofCells(desk).map(a=>a.join(",")));
       const ms=(o.it||[]).filter(m=>ofCatOf(m.k)==="m"&&ofCells(m).every(a=>dc.has(a.join(","))));
       ofS.tapMon=ms.length?(ofCatOf(it.k)==="m"?it.u:ms[0].u):null;
       att=ms.map(m=>({u:m.u,k:m.k,r:m.r|0,cells:ofCells(m).map(a=>[a[0]-desk.x,a[1]-desk.y])}));
@@ -4065,12 +4074,12 @@ function ofBtn(id,txt,bg,col,flex){return `<button id="${id}" style="flex:${flex
 function ofBar(){const b=$("ofBar");if(!b)return;let h="";
   if(!ofS.mine){h=`<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:12.5px;height:46px;border-radius:12px;background:var(--card2)">👀 구경 중이에요 · 수금함을 눌러 보세요</div>`;}
   else if(ofS.mode==="view")h=ofBtn("ofB1","🛒 가구 상점","#26405f","#cfe6ff")+ofBtn("ofB2","🔄 배치 모드","#2c3446","#e6edf7")+ofBtn("ofB3","📦 보관함","#3a2f4a","#e7d6ff");
-  else if(ofS.mode==="place"){h=ofS.ghost?ofBtn("ofGR","↻ 회전","#26405f","#cfe6ff")+ofBtn("ofGP","✔ 두기","#14532d","#bbf7d0")+ofBtn("ofGS","📦 보관","#3a2f4a","#e7d6ff")+(ofS.ghost.att&&ofS.ghost.att.length&&ofS.tapMon?ofBtn("ofGM","🖥️ 모니터만","#26405f","#cfe6ff"):"")+(ofS.ghost.u&&!ofS.ghost.att?ofBtn("ofGD","💰 판매","#3a2a12","#fde68a"):"")+ofBtn("ofGX","✕ 취소","#3a2430","#fecdd3"):ofBtn("ofGI","📦 보관함에서 꺼내기","#3a2f4a","#e7d6ff",1.5)+ofBtn("ofGE","✔ 끝내기","#2c3446","#e6edf7");}
+  else if(ofS.mode==="place"){h=ofS.ghost?ofBtn("ofGR","↻ 회전","#26405f","#cfe6ff")+ofBtn("ofGP","✔ 두기","#14532d","#bbf7d0")+ofBtn("ofGS","📦 보관","#3a2f4a","#e7d6ff")+(ofS.ghost.u&&!ofS.ghost.att?ofBtn("ofGD","💰 판매","#3a2a12","#fde68a"):"")+ofBtn("ofGX","✕ 취소","#3a2430","#fecdd3"):ofBtn("ofGI","📦 보관함에서 꺼내기","#3a2f4a","#e7d6ff",1.5)+ofBtn("ofGE","✔ 끝내기","#2c3446","#e6edf7");}
   else if(ofS.mode==="paint")h=`<div style="flex:1;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--sub);height:46px;border-radius:12px;background:var(--card2)" id="ofPaintInfo">칠하는 중 · 쓴 돈 ${formatMoneyReadable(ofS.paintCost|0)}</div>`+ofBtn("ofGE","✔ 끝내기","#14532d","#bbf7d0");
   b.innerHTML=h;const g=id=>$(id);
   if(g("ofB1"))g("ofB1").onclick=()=>ofShop();if(g("ofB2"))g("ofB2").onclick=()=>ofModeSet("place");if(g("ofB3"))g("ofB3").onclick=()=>ofInv();
   if(g("ofGR"))g("ofGR").onclick=ofRotate;if(g("ofGP"))g("ofGP").onclick=ofPutGhost;if(g("ofGS"))g("ofGS").onclick=ofGhostStore;if(g("ofGD"))g("ofGD").onclick=ofGhostSell;
-  if(g("ofGX"))g("ofGX").onclick=()=>{ofS.ghost=null;ofS.held=null;ofBar();ofHint();};if(g("ofGE"))g("ofGE").onclick=ofModeEnd;if(g("ofGI"))g("ofGI").onclick=()=>ofInv();if(g("ofGM"))g("ofGM").onclick=()=>{const u=ofS.tapMon;if(u)ofPick(u,true);};}
+  if(g("ofGX"))g("ofGX").onclick=()=>{ofS.ghost=null;ofS.held=null;ofBar();ofHint();};if(g("ofGE"))g("ofGE").onclick=ofModeEnd;if(g("ofGI"))g("ofGI").onclick=()=>ofInv();}
 function ofChips(){const o=ofS.o,c=$("ofChips");if(!o||!c)return;const L=ofL(o);const chip=(t,col,bg)=>`<span style="padding:5px 10px;border-radius:14px;font-size:11.5px;font-weight:800;color:${col};background:${bg};border:1px solid ${col}55">${t}</span>`;
   const sc=ofScore(o),bn=Math.round(ofBonus(o)*100);const emN=(o.em||[]).length;
   const nm=ofS.mine?"🏢 내 사무실":"🏢 "+esc(String((players[ofS.own]||{}).name||"?").slice(0,10))+"님의 사무실";
@@ -4118,7 +4127,9 @@ function ofNearTarget(){const o=ofS.o;if(!o||ofS.mode!=="view")return null;let b
   const cand=(it,label,fn)=>{if(!it)return;const f=ofFt(it),x=it.x*OF_CS+f.w*OF_CS/2,y=it.y*OF_CS+f.h*OF_CS/2,d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best={label,fn};}};
   const bx=(o.it||[]).find(i=>i.k==="box");
   if(ofS.mine){cand(bx,"💰|수금함",()=>ofBoxPanel());
-    for(const s of ofSeats(o)){const ch=ofItemBy(o,s.u);if(!ch)continue;const e=(o.em||[]).find(x=>x.u===s.u);cand(ch,e?"👔|직원":"👔|채용",()=>e?ofEmpPanel(e):ofHirePanel(s.u));}}
+    for(const s of ofSeats(o)){const ch=ofItemBy(o,s.u);if(!ch)continue;const e=(o.em||[]).find(x=>x.u===s.u);cand(ch,e?"👔|직원":"👔|채용",()=>e?ofEmpPanel(e):ofHirePanel(s.u));}
+    const iss=ofIssues(o);for(const u in iss){const ch=ofItemBy(o,+u);if(!ch)continue;const e=(o.em||[]).find(x=>x.u===+u);cand(ch,e?"⚠️|직원":"⚠️|확인",()=>e?ofEmpPanel(e):toast("⚠️ 일할 수 없는 자리예요\n"+iss[u]));}
+    for(const e of o.em||[]){if(iss[e.u])continue;if(ofSeats(o).some(s=>s.u===e.u))continue;const ch=ofItemBy(o,e.u);if(ch)cand(ch,"⚠️|직원",()=>ofEmpPanel(e));}}
   else cand(bx,"🤫|금고",()=>{if(typeof ofStealPanel==="function")ofStealPanel();});
   return best;}
 function ofInteract(){if(!ofIn||ofS.sheetEl)return;const t=ofNearTarget();if(t)t.fn();}
@@ -4154,7 +4165,7 @@ function ofHirePanel(chairU){const o=me.of,L=ofL(o),b=ofBonus(o),full=(o.em||[])
 function ofEmpPanel(e){const o=me.of,r=OF_RANK[e.rk],b=ofBonus(o),L=ofL(o);ofSettle(o,ofNow());const sv=ofSeverance(e),net=Math.round(r[1]*(1+b)*(1-L.tax));
   const h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><b style="font-size:16px">👔 ${r[0]}</b><button data-x style="font-size:20px;color:var(--sub);width:34px;height:34px">✕</button></div>
   <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px"><div style="width:64px;height:64px;border-radius:12px;background:#12151c;display:flex;align-items:center;justify-content:center"><canvas id="empWk" width="64" height="64" style="width:64px;height:64px"></canvas></div><div style="font-size:12.5px;line-height:1.9;flex:1"><div style="display:flex;justify-content:space-between"><span style="color:var(--sub)">10분당 수입(세후)</span><b>${formatMoneyReadable(net)}</b></div><div style="display:flex;justify-content:space-between"><span style="color:var(--sub)">지금까지 번 돈(세전)</span><b>${formatMoneyReadable(Math.floor(e.ea||0))}</b></div><div style="display:flex;justify-content:space-between"><span style="color:var(--sub)">해고 퇴직금(10%)</span><b style="color:#fca5a5">${formatMoneyReadable(sv)}</b></div></div></div>
-  <div style="font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:10px">승진은 없어요. 다른 직급이 필요하면 해고하고 새로 채용해요.</div><button data-fire style="width:100%;height:44px;border-radius:12px;background:#ef4444;color:#fff;font-weight:900">해고하기 (퇴직금 ${formatMoneyReadable(sv)})</button>`;
+  ${ofSeats(o).some(s=>s.u===e.u)?"":`<div style="padding:8px 10px;border-radius:10px;background:rgba(239,68,68,.14);color:#fca5a5;font-size:12px;line-height:1.6;margin-bottom:8px">⚠️ 지금은 일을 못 하고 있어요<br>${esc((ofIssues(o)[e.u]||"책상·모니터·의자 세트가 맞지 않아요").replace(/\n/g," "))}</div>`}<div style="font-size:11px;color:var(--sub);line-height:1.6;margin-bottom:10px">승진은 없어요. 다른 직급이 필요하면 해고하고 새로 채용해요.</div><button data-fire style="width:100%;height:44px;border-radius:12px;background:#ef4444;color:#fff;font-weight:900">해고하기 (퇴직금 ${formatMoneyReadable(sv)})</button>`;
   const bg=ofSheet(h);bg.querySelector("[data-x]").onclick=ofSheetClose;const cv=bg.querySelector("#empWk");if(cv){const c=cv.getContext("2d");c.translate(32,34);c.scale(1.5,1.5);try{ofWorker(c,0,0,e.rk,true,2);}catch(_){}}
   bg.querySelector("[data-fire]").onclick=()=>{const m=modal(`<div style="font-size:16px;font-weight:900;margin-bottom:10px">⚠️ ${r[0]}을(를) 해고할까요?</div><div style="font-size:13px;line-height:1.8">퇴직금 <b style="color:#fca5a5">${formatMoneyReadable(sv)}</b>이 나가요.<br><span style="color:var(--sub);font-size:11.5px">채용비는 돌려받지 못해요.</span></div><div style="display:flex;gap:8px;margin-top:12px"><button id="fNo" style="flex:1;height:44px;border-radius:12px;background:var(--card2)">취소</button><button id="fYes" style="flex:1;height:44px;border-radius:12px;background:#ef4444;color:#fff;font-weight:900">해고</button></div>`);
     m.style.zIndex=95;const close=()=>{try{m.remove();}catch(_){}};m.onclick=ev=>{if(ev.target===m)close();};m.querySelector("#fNo").onclick=close;m.querySelector("#fYes").onclick=()=>{close();if(ofFire(e.u))ofSheetClose();};};}
