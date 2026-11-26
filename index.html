@@ -1480,8 +1480,8 @@ function drawRod(c,hx,hy,x0,y0,L,t){const T=Math.min(10,Math.floor((L|0)/5));c.s
   c.restore();}
 const rodLv=()=>Math.min(50,(me&&me.rodLv)|0);
 const rodBonus=L=>.006*Math.pow(Math.min(50,L)/50,1.5);
-const enhCost=L=>Math.round(100000*Math.pow(1.13,L)/10000)*10000;
-const enhBase=L=>Math.max(5,90-L*1.85);
+const enhCost=L=>Math.round(100000*Math.pow(1.14,L)/10000)*10000;
+const enhBase=L=>Math.max(5,90-L*1.9);
 const ENH_DROP_LV=25,enhDropP=L=>L<ENH_DROP_LV?0:Math.min(.5,.15+(L-ENH_DROP_LV)*.008);/* 하락 확률: +25에서 15%, 한 단계마다 +0.8%p (+49에서 약 34%) */
 const ENH_ITEMS={n:{nm:"일반 강화권",ic:"🔨",price:500000,t:"up"},a:{nm:"고급 강화권",ic:"⚒️",price:2000000,t:"up"},rn:{nm:"일반 복구권",ic:"🩹",price:1000000,t:"rc"},ra:{nm:"고급 복구권",ic:"💊",price:3000000,t:"rc"}};
 const eiBoost=(k,L)=>{const b=Math.round((3-2*Math.min(L,49)/49)*10)/10;return k==="n"?b:k==="a"?Math.round(b*20)/10:0;};/* 강화권 1장당 올라가는 성공 확률(%p) */
