@@ -2825,9 +2825,9 @@ A(1,{k:"coin",c:"이더리움",v:600000,w:1,nm:"이더리움 60만원어치",ic:
 A(1,{k:"bait",id:"max",cnt:200,eq:1000000,w:1,nm:"최고급 미끼 200개",ic:"🪱"});A(1,{k:"boat",id:"wood",eq:700000,w:1,nm:"나무 보트 (뽑기 한정)",ic:"🚤"});
 [["aura","star","별빛 오라","✨"],["wing","angel","천사 날개","🪽"],["plate","wood","브론즈 명찰","🏷️"],["aura","fire","불꽃 오라","🔥"],["wing","butterfly","나비 날개","🦋"],["aura","heart","하트 오라 (뽑기 한정)","💖"],["aura","thunder","번개 오라 (뽑기 한정)","⚡"],["wing","ice","얼음 날개 (뽑기 한정)","❄️"],["wing","flame","화염 날개 (뽑기 한정)","🔥"],["plate","ember","불꽃 명찰 (뽑기 한정)","🏷️"],["plate","frost","서리 명찰 (뽑기 한정)","🧊"],["aura","sakura","벚꽃 오라 (뽑기 한정)","🌸"],["wing","bat","박쥐 날개 (뽑기 한정)","🦇"],["plate","sakurap","벚꽃 명찰 (뽑기 한정)","🌸"]].forEach(([ck,id,nm,ic])=>A(1,{k:"cosm",ck,id,eq:850000,w:1,nm,ic}));
 /* 전설: 2칸 랜덤 (현금 1억도 다른 것과 똑같이 후보 중 하나) */
-A(2,{k:"eitem",it:"ra",cnt:1,eq:3000000,w:1,nm:"고급 복구권 1장",ic:"💊"});A(2,{k:"eitem",it:"sn",cnt:1,eq:10000000,w:.5,nm:"최고급 강화권 1장",ic:"🏆"});A(2,{k:"eitem",it:"sr",cnt:1,eq:15000000,w:.4,nm:"최고급 복구권 1장",ic:"🧿"});A(2,{k:"acc",id:"crown",eq:3000000,w:1,nm:"왕관",ic:"👑"});A(2,{k:"acc",id:"starhalo",eq:3000000,w:1,nm:"별무리 후광",ic:"🌟"});
-A(2,{k:"aura",id:"meteor",eq:4000000,w:1,nm:"유성우 오라 (뽑기 한정)",ic:"🌠"});A(2,{k:"wing",id:"crystal",eq:4000000,w:1,nm:"수정 날개 (뽑기 한정)",ic:"🪽"});
-[["aura","aurora","오로라 오라 (뽑기 한정)","🌌"],["wing","rainwing","무지개 날개 (뽑기 한정)","🌈"],["plate","galaxy","은하 명찰 (뽑기 한정)","🌠"],["wing","goldwing","황금 날개 (뽑기 한정)","🪽"],["aura","inferno","용암 오라 (뽑기 한정)","🌋"]].forEach(([ck,id,nm,ic])=>A(2,{k:"cosm",ck,id,eq:4000000,w:1,nm,ic}));
+A(1,{k:"eitem",it:"ra",cnt:1,eq:3000000,w:1,nm:"고급 복구권 1장",ic:"💊"});A(2,{k:"eitem",it:"sn",cnt:1,eq:10000000,w:.5,nm:"최고급 강화권 1장",ic:"🏆"});A(2,{k:"eitem",it:"sr",cnt:1,eq:15000000,w:.4,nm:"최고급 복구권 1장",ic:"🧿"});A(2,{k:"acc",id:"crown",eq:3000000,w:1,nm:"왕관",ic:"👑"});A(2,{k:"acc",id:"starhalo",eq:3000000,w:1,nm:"별무리 후광",ic:"🌟"});
+A(2,{k:"aura",id:"meteor",eq:100000000,w:.12,nm:"유성우 오라 (뽑기 한정)",ic:"🌠"});A(2,{k:"wing",id:"crystal",eq:100000000,w:.12,nm:"수정 날개 (뽑기 한정)",ic:"🪽"});
+[["aura","aurora","오로라 오라 (뽑기 한정)","🌌"],["wing","rainwing","무지개 날개 (뽑기 한정)","🌈"],["plate","galaxy","은하 명찰 (뽑기 한정)","🌠"],["wing","goldwing","황금 날개 (뽑기 한정)","🪽"],["aura","inferno","용암 오라 (뽑기 한정)","🌋"]].forEach(([ck,id,nm,ic])=>A(2,{k:"cosm",ck,id,eq:100000000,w:.12,nm,ic}));
 A(2,{k:"boat",id:"gold",eq:3000000,w:1,nm:"황금 보트 (뽑기 한정)",ic:"🛥️"});A(2,{k:"cash",v:100000000,w:.1,nm:"현금 1억",ic:"💰"});
 PRIZES.forEach((p,i)=>{p.n=i+1;p.val=p.v||p.eq||0;});
 const POOL=PRIZES;
@@ -2963,9 +2963,9 @@ const CLW_LEN=1800000,clwRid=()=>Math.floor(nowS()/CLW_LEN);
 const clwT0=m=>m?(m.t0||((m.r|0)*CLW_LEN)):0;
 const clwNext=()=>(clwRid()+1)*CLW_LEN-nowS();
 const clwDue=m=>!m||!m.keys||m.dl!==2||!m.box||clwRid()>Math.floor(clwT0(m)/CLW_LEN);/* 정각·30분마다 룰렛 칸·인형이 새로 바뀜 (예전 판도 교체) */
-function clwNewRound(rid){const P=CLW.POOL,idx=f=>P.map((q,i)=>[q,i]).filter(([q])=>f(q)).map(([,i])=>i),pick=(a,n)=>a.slice().sort(()=>Math.random()-.5).slice(0,n);
+function clwNewRound(rid){const P=CLW.POOL,idx=f=>P.map((q,i)=>[q,i]).filter(([q])=>f(q)).map(([,i])=>i),pick=(a,n)=>a.slice().sort(()=>Math.random()-.5).slice(0,n);/* 전설은 무게(w)에 비례해서 후보로 뽑혀요 (귀한 상품은 판에 잘 안 들어옴) */const wpick=(a,n)=>{const r=[],c=a.slice();while(r.length<n&&c.length){const tw=c.reduce((t,i)=>t+P[i].w,0);let x=Math.random()*tw,k=0;for(;k<c.length-1;k++){x-=P[c[k]].w;if(x<0)break;}r.push(c.splice(k,1)[0]);}return r;};
   const cs=pick(idx(q=>q.t===0&&q.k==="cash"),5),cn=pick(idx(q=>q.t===0&&q.k==="coin"),3),used=new Set([...cs,...cn]),rest=pick(idx(q=>q.t===0).filter(i=>!used.has(i)),7);
-  const box=[...cs,...cn,...rest,...pick(idx(q=>q.t===1),8),...pick(idx(q=>q.t===2),2)].sort(()=>Math.random()-.5);
+  const box=[...cs,...cn,...rest,...pick(idx(q=>q.t===1),8),...wpick(idx(q=>q.t===2),2)].sort(()=>Math.random()-.5);
   return{r:rid,t0:nowS(),v:1,dl:2,box,keys:CLW.newGame().keys.map(clwPlain)};}
 /* 정각·30분마다(또는 예전 판일 때) 새로 채움 · 누가 하는 중이면 끝난 뒤에 */
 function clwEnsure(){if(!fdb||clw.initing||clw.play||clw.fin)return;if(clw.m&&!clwDue(clw.m))return;if(clw.s&&!clwStale(clw.s))return;
