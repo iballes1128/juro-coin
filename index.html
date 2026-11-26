@@ -984,7 +984,7 @@ function openNts(){fKeys={};stVisit("visitNts");let d=$("ntsMod");if(!d){d=docum
     setInterval(()=>{if(d.style.display!=="flex")return;const b=$("welBtn");if(!b)return;const st=welState();if(b.textContent!==st.msg)b.textContent=st.msg;b.disabled=!st.ok;b.style.background=st.ok?"var(--acc)":"var(--card2)";b.style.color=st.ok?"#111":"var(--sub)";},1000);}ntsTab="in";d.style.display="flex";renderNts();}
 var ntsTab="in";
 /* ===== 🎟️ 로또: 20개 중 4개 + 보너스 · 1시간마다 추첨 · 한 장 5만원 · 1인 50장 · 당첨금은 국세청 재원 ===== */
-var LT_P=50000,LT_MAX=50,LT_H=3600000,LT_N=20,LT_K=4,LT_BASE=100000000,LT_P3=1000000,LT_P4=200000,LT_R1=.85,LT_UP=1.1,LT_TAX=.1;
+var LT_P=50000,LT_MAX=50,LT_H=3600000,LT_N=20,LT_K=4,LT_BASE=300000000,LT_P3=1000000,LT_P4=200000,LT_R1=.85,LT_UP=1.1,LT_TAX=.1;
 var ltLoaded=0,ltDbg="",LT_R0=Math.floor(Date.UTC(2026,10,26,12,0,0)/3600000),ltView=0,ltMsg="",ltMsgT=0,ltQ1=1,ltQa=1,ltHof=[],ltSt={},ltRes=null,ltCur=null,ltCurR=0,ltInit=0,ltSel=[],ltBusy=0,ltBuyBusy=0,ltTRef=null,ltTRefR=0;
 const ltRound=t=>Math.floor(t/LT_H),ltNo=r=>r-LT_R0+1,ltHr=r=>new Date((r+1)*LT_H).getHours();
 function ltPick(){const a=[];for(let i=1;i<=LT_N;i++)a.push(i);for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a.slice(0,LT_K).sort((x,y)=>x-y);}
