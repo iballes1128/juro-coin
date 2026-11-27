@@ -270,7 +270,7 @@ body.evIn #evRot.on{display:flex}
 <script>try{const _si=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==="jc_tab")return;return _si.apply(this,arguments);};}catch(e){}</script>
 <style>#evLv{display:none}#evLv.on{display:flex;position:absolute;inset:0;z-index:12;background:rgba(0,0,0,.62);align-items:center;justify-content:center}#gNotice,#alerts,#ltBan,#dealNote,#updMod,#updBar,#chatFab,#chatSide,#admFab,#rwPop{display:none!important}body.evIn #pirHud,body.evIn #pirRw,body.evIn #updBar,body.evIn #updMod,body.evIn #ltBan,body.evIn #dealNote{display:none!important}#evSplash{position:fixed;inset:0;z-index:30;background:#120d24;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:inherit}#evSplash b{font-size:22px}#evSplash small{color:#9ca3af;font-size:12px}body.evIn #evSplash{display:none}</style>
 <link rel="manifest" href="event.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="주로월드3"><link rel="apple-touch-icon" href="event-192.png"><style>#evGate{display:none}#evGate.on{display:flex;position:fixed;inset:0;z-index:85;background:#120d24;align-items:center;justify-content:center;color:#fff}.evg{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:16px;max-width:92vw}.evg b{font-size:22px}.evgs{font-size:13px;color:#cbd5e1;line-height:1.6}.evg button{padding:13px 22px;border-radius:14px;background:#f59e0b;color:#111;font-weight:900;font-size:15px}.evg button.sk{background:rgba(255,255,255,.12);color:#fff;font-size:13px;padding:10px 18px}#evFsBtn{display:none;position:absolute;right:calc(56px + env(safe-area-inset-right));top:8px;width:40px;height:40px;border-radius:12px;background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:18px;align-items:center;justify-content:center;z-index:4}</style>
-<script>const EVT_BUILD="1795786897";(function(){const B=EVT_BUILD;let busy=0,newB="";function go(){try{sessionStorage.setItem("evtLast",newB);}catch(e){}location.replace(location.pathname+"?r="+Date.now());}async function chk(first){if(busy)return;busy=1;try{const r=await fetch(location.pathname+"?_="+Date.now(),{cache:"no-store"});if(!r.ok){busy=0;return;}const t=await r.text();const m=t.match(/EVT_BUILD="([0-9]+)"/);if(m&&+m[1]>+B){newB=m[1];let last="";try{last=sessionStorage.getItem("evtLast")||"";}catch(e){}if(last!==newB){if(first){go();}else{let bt=document.getElementById("evUpdBtn");if(!bt){bt=document.createElement("button");bt.id="evUpdBtn";bt.textContent="🔄 새 버전 적용";bt.style.cssText="position:fixed;left:8px;top:8px;z-index:95;background:#2563eb;color:#fff;font:800 12px sans-serif;border-radius:999px;padding:8px 14px;border:0;box-shadow:0 4px 14px rgba(0,0,0,.4)";bt.onclick=go;document.body.appendChild(bt);}}}}}catch(e){}busy=0;}setTimeout(()=>chk(true),800);setInterval(()=>chk(false),30000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)chk(true);});})();</script>
+<script>const EVT_BUILD="1795787057";(function(){const B=EVT_BUILD;let busy=0,newB="";function go(){try{sessionStorage.setItem("evtLast",newB);}catch(e){}location.replace(location.pathname+"?r="+Date.now());}async function chk(first){if(busy)return;busy=1;try{const r=await fetch(location.pathname+"?_="+Date.now(),{cache:"no-store"});if(!r.ok){busy=0;return;}const t=await r.text();const m=t.match(/EVT_BUILD="([0-9]+)"/);if(m&&+m[1]>+B){newB=m[1];let last="";try{last=sessionStorage.getItem("evtLast")||"";}catch(e){}if(last!==newB){if(first){go();}else{let bt=document.getElementById("evUpdBtn");if(!bt){bt=document.createElement("button");bt.id="evUpdBtn";bt.textContent="🔄 새 버전 적용";bt.style.cssText="position:fixed;left:8px;top:8px;z-index:95;background:#2563eb;color:#fff;font:800 12px sans-serif;border-radius:999px;padding:8px 14px;border:0;box-shadow:0 4px 14px rgba(0,0,0,.4)";bt.onclick=go;document.body.appendChild(bt);}}}}}catch(e){}busy=0;}setTimeout(()=>chk(true),800);setInterval(()=>chk(false),30000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)chk(true);});})();</script>
 </head>
 <body>
 <div id="evSplash"><div style="font-size:46px">🏆</div><b>주로월드3</b><small>이벤트 화면에 접속하는 중…</small></div>
@@ -3484,26 +3484,36 @@ const EV_TC=["#ef4444","#3b82f6","#22c55e"],EV_TN=["1팀","2팀","3팀"];
 let evTeams={n:0,m:{}},evAnn=null,evMsgs={},evPane={},evUnread={},evLis={},evPanelDirty=1,evTo="all",evSz=1,evDraft=null,evDrawN=2,evLastTeam=-1;
 function evWalk(x,y){return x>=14&&x<=EW-14&&y>=54&&y<=EH-12&&!(x>EV_ST.x-8&&x<EV_ST.x+EV_ST.w+8&&y<EV_ST.y+EV_ST.h+4)&&!(Math.abs(x-EV_SQ.x)<26&&y>EV_SQ.y-12&&y<EV_SQ.y+8);}
 let evSnowCv=null;
-function evSnowBuild(){const W=28,H=34,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(null));
+function evSnowBuild(){const W=40,H=50,g=[];for(let y=0;y<H;y++)g.push(new Array(W).fill(null));
   const P=(x,y,col)=>{x=Math.round(x);y=Math.round(y);if(x>=0&&y>=0&&x<W&&y<H)g[y][x]=col;};
-  const C=(cx,cy,r,col)=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(Math.hypot(x-cx,(y-cy)*1.04)<=r)P(x,y,col);};
-  /* 팔(나뭇가지) */[[7,24,2,21],[2,21,1,19],[2,21,1,23],[21,24,26,21],[26,21,27,19],[26,21,27,23]].forEach(a=>{const n=8;for(let i=0;i<=n;i++)P(a[0]+(a[2]-a[0])*i/n,a[1]+(a[3]-a[1])*i/n,"#7a4a2b");});
-  C(14,26,7.6,"#ffffff");for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(g[y][x]==="#ffffff"&&Math.hypot(x-14,(y-26))>5.2&&x+y>41)g[y][x]="#dbe4ee";
-  /* 뿔 */[[9,7,6,3],[6,3,4,2],[7,5,9,3],[19,7,22,3],[22,3,24,2],[21,5,19,3]].forEach(a=>{const n=8;for(let i=0;i<=n;i++)P(a[0]+(a[2]-a[0])*i/n,a[1]+(a[3]-a[1])*i/n,"#8b5a3c");});
-  C(14,13,7.2,"#ffffff");
-  /* 얼굴 */C(14,14.5,4.6,"#ffdcc2");for(let x=9;x<=19;x++){P(x,10,"#6b4430");if(x>9&&x<19)P(x,11,"#6b4430");}P(9,12,"#6b4430");P(19,12,"#6b4430");P(14,11,"#ffdcc2");P(13,11,"#ffdcc2");
-  P(8,14,"#f9a8b8");P(8,15,"#f9a8b8");P(7,15,"#f9a8b8");P(20,14,"#f9a8b8");P(20,15,"#f9a8b8");P(21,15,"#f9a8b8");P(10,16,"#f6a5b5");P(18,16,"#f6a5b5");
-  P(12,14,"#2b2230");P(12,15,"#2b2230");P(16,14,"#2b2230");P(16,15,"#2b2230");P(14,17,"#d1495b");P(15,17,"#d1495b");
-  /* 목도리 */for(let x=8;x<=20;x++){P(x,20,"#d9302c");P(x,21,"#d9302c");P(x,22,x%3===0?"#a31f1f":"#d9302c");}for(let y=22;y<=27;y++){P(19,y,"#d9302c");P(20,y,"#a31f1f");}
-  /* 단추 */[[14,25],[14,29]].forEach(a=>{P(a[0],a[1],"#e0342e");P(a[0],a[1]+1,"#e0342e");});
-  /* 윤곽선 */const o=g.map(r=>r.slice());for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(!g[y][x]){for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<W&&Y<H&&g[Y][X]){o[y][x]="#3a2f45";break;}}}
+  const L=(a,b,c2,d,col)=>{const n=Math.max(Math.abs(c2-a),Math.abs(d-b))*2||1;for(let k=0;k<=n;k++)P(a+(c2-a)*k/n,b+(d-b)*k/n,col);};
+  const B=(cx,cy,r)=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++){const d=Math.hypot(x-cx,y-cy);if(d<=r){const sh=(x-cx)*.7+(y-cy)*.9;g[y][x]=sh>r*.62?"#b9cbe0":sh>r*.28?"#d6e3f1":"#f7fbff";}}P(cx-r*.45,cy-r*.5,"#ffffff");P(cx-r*.45+1,cy-r*.5,"#ffffff");};
+  /* 팔 */L(11,35,3,29,"#7a4a2b");L(3,29,1,25,"#7a4a2b");L(3,29,0,30,"#7a4a2b");L(3,29,4,26,"#7a4a2b");L(29,35,37,29,"#7a4a2b");L(37,29,39,25,"#7a4a2b");L(37,29,40,30,"#7a4a2b");L(37,29,36,26,"#7a4a2b");
+  B(20,39,10.2);B(20,27,7.8);B(20,16.5,6.4);
+  /* 모자 */for(let x=13;x<=27;x++){P(x,11,"#1f1d2b");P(x,10,"#2b2840");}for(let y=3;y<=9;y++)for(let x=15;x<=25;x++)P(x,y,x<=16?"#4a4766":"#26233a");for(let x=15;x<=25;x++){P(x,8,"#c0392b");P(x,9,"#e2554a");}P(24,10,"#1f1d2b");
+  /* 얼굴 */P(17,15,"#1f1d2b");P(18,15,"#1f1d2b");P(22,15,"#1f1d2b");P(23,15,"#1f1d2b");P(17,14,"#1f1d2b");P(23,14,"#1f1d2b");
+  P(20,17,"#f39c12");P(21,17,"#f39c12");P(22,18,"#e67e22");P(23,18,"#d35400");P(21,18,"#f39c12");
+  P(16,17,"#f7b2c0");P(15,17,"#f7b2c0");P(25,17,"#f7b2c0");P(24,17,"#f7b2c0");
+  [[16,19],[17,20],[19,21],[21,21],[23,20],[24,19]].forEach(a=>P(a[0],a[1],"#2a2433"));
+  /* 목도리 */for(let x=13;x<=27;x++){const st=Math.floor((x+1)/2)%2;P(x,22,st?"#e9f6ff":"#2b8fd6");P(x,23,st?"#e9f6ff":"#2b8fd6");P(x,24,st?"#cfe6f7":"#1f74b3");}for(let y=24;y<=32;y++){const st=Math.floor(y/2)%2;P(24,y,st?"#e9f6ff":"#2b8fd6");P(25,y,st?"#cfe6f7":"#1f74b3");P(26,y,st?"#cfe6f7":"#1f74b3");}
+  /* 단추 */[[20,28],[20,32],[20,36]].forEach(a=>{P(a[0],a[1],"#2a2433");P(a[0]+1,a[1],"#2a2433");P(a[0],a[1]+1,"#2a2433");P(a[0]+1,a[1]+1,"#2a2433");});
+  const o=g.map(r=>r.slice());for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(!g[y][x]){for(const[dx,dy]of[[1,0],[-1,0],[0,1],[0,-1]]){const X=x+dx,Y=y+dy;if(X>=0&&Y>=0&&X<W&&Y<H&&g[Y][X]){o[y][x]="#33405a";break;}}}
   const cv=document.createElement("canvas");cv.width=W;cv.height=H;const q=cv.getContext("2d");for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(o[y][x]){q.fillStyle=o[y][x];q.fillRect(x,y,1,1);}evSnowCv=cv;}
-function evStatue(c,t){if(!evSnowCv)evSnowBuild();const x=EV_SQ.x,y=EV_SQ.y,sc=1.5,w=28*sc,h=34*sc;
+function evStatue(c,t){if(!evSnowCv)evSnowBuild();const x=EV_SQ.x,y=EV_SQ.y,sc=1.15,w=40*sc,h=50*sc;
   c.fillStyle="rgba(0,0,0,.22)";c.beginPath();c.ellipse(x+4,y+2,34,9,0,0,7);c.fill();
   /* 받침대 */c.fillStyle="#8d8a96";c.fillRect(x-26,y-8,52,10);c.fillStyle="#b9b6c2";c.fillRect(x-26,y-8,52,3);c.fillStyle="#6f6c7a";c.fillRect(x-26,y-1,52,3);c.fillStyle="#a5a2b0";c.fillRect(x-20,y-14,40,7);c.fillStyle="#c9c6d3";c.fillRect(x-20,y-14,40,2);
-  c.imageSmoothingEnabled=false;c.drawImage(evSnowCv,x-w/2,y-14-h+2,w,h);
-  /* 이름판 */const ny=y-14-h-10;c.font="bold 10px 'Noto Sans KR',sans-serif";const tw=c.measureText("앙두부").width+16;c.fillStyle="rgba(20,16,36,.88)";c.beginPath();c.roundRect(x-tw/2,ny-9,tw,16,8);c.fill();c.strokeStyle="#fbbf24";c.lineWidth=1.5;c.stroke();c.fillStyle="#fde68a";c.textAlign="center";c.fillText("앙두부",x,ny+3);
-  const sp=(Math.sin(t/300)+1)/2;c.fillStyle=`rgba(255,244,180,${.35+.55*sp})`;c.font="9px sans-serif";c.fillText("✦",x-tw/2-4,ny-6);c.fillText("✦",x+tw/2+4,ny+8);}
+  c.imageSmoothingEnabled=false;c.drawImage(evSnowCv,x-w/2,y-14-h+2,w,h);for(let k=0;k<5;k++){const ph=t/900+k*1.7,fx=x+Math.sin(ph+k)*26,fy=y-14-h+((ph*14)%(h+10));c.fillStyle="rgba(255,255,255,.85)";c.fillRect(fx,fy,1.6,1.6);}
+  /* 챔피언 이름판 */const sp=(Math.sin(t/300)+1)/2,ny=y-14-h-16;
+  {const gl=c.createRadialGradient(x,y-14-h/2,6,x,y-14-h/2,58);gl.addColorStop(0,`rgba(253,224,71,${.14+.1*sp})`);gl.addColorStop(1,"rgba(253,224,71,0)");c.fillStyle=gl;c.fillRect(x-60,y-14-h-20,120,h+40);}
+  c.font="bold 8.5px 'Noto Sans KR',sans-serif";const w1=c.measureText("시즌1 챔피언").width;c.font="bold 13px 'Noto Sans KR',sans-serif";const w2=c.measureText("앙두부").width,tw=Math.max(w1+26,w2+26),th=32,tx=x-tw/2,ty=ny-th/2;
+  const bg=c.createLinearGradient(0,ty,0,ty+th);bg.addColorStop(0,"#2a1f55");bg.addColorStop(1,"#120d2b");c.fillStyle=bg;c.beginPath();c.roundRect(tx,ty,tw,th,9);c.fill();
+  const bd=c.createLinearGradient(tx,0,tx+tw,0);bd.addColorStop(0,"#fde68a");bd.addColorStop(.5,"#f59e0b");bd.addColorStop(1,"#fde68a");c.strokeStyle=bd;c.lineWidth=2;c.stroke();
+  c.strokeStyle="rgba(253,224,71,.35)";c.lineWidth=.8;c.beginPath();c.roundRect(tx+3,ty+3,tw-6,th-6,6);c.stroke();
+  c.textAlign="center";c.font="bold 8.5px 'Noto Sans KR',sans-serif";c.fillStyle="#fbbf24";c.fillText("🏆 시즌1 챔피언",x,ty+12.5);
+  c.font="bold 13px 'Noto Sans KR',sans-serif";c.shadowColor="rgba(253,224,71,.9)";c.shadowBlur=6;c.fillStyle="#fff7d1";c.fillText("앙두부",x,ty+26);c.shadowBlur=0;
+  c.font="13px sans-serif";c.fillText("👑",x,ty-3);
+  c.fillStyle=`rgba(255,244,180,${.4+.55*sp})`;c.font="10px sans-serif";c.fillText("✦",tx-6,ty+6);c.fillText("✦",tx+tw+6,ty+th-4);c.fillText("✦",tx+tw-4,ty-4);
+  /* 받침대 금장 */c.fillStyle="#f6c453";c.fillRect(x-14,y-5,28,4);c.fillStyle="#fde68a";c.fillRect(x-14,y-5,28,1);}
 const evMyTeam=()=>evTeams.m[myId]|0;
 function evGlow(c,x,y,r,rgb,a){const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(1,`rgba(${rgb},0)`);c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2);}
 const EV_PL=[[24,86],[96,86],[624,86],[696,86],[30,200],[690,200]];
