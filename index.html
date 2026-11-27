@@ -2145,8 +2145,8 @@ function rideStep(){const d=fOthers[fRide];if(!d||!isTwin(d.bt)||d.fs==="away"||
 function drawDock(c){{const o=pirOpenNow();if(o>.02)return pirDock(c,o);}c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
   c.fillStyle="#4a301b";for(const py of[DOCK.y,DOCK.y+40,DOCK.y+80]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}}
 /* 보트가 선착장 밑을 지나갈 때: 보트가 있는 부분만 선착장 판자를 위에 다시 덮어서 '다리 밑'처럼 보이게 */
-function dockOver(c){const L=[];if(fBoat)L.push([fp.x,fp.y]);for(const id in fOthers){const o=fOthers[id];if(o&&o.bt&&o.bt<BT_RIDE&&o.fs!=="away")L.push([o.x,o.y]);}
-  for(const[x,y]of L){const x0=Math.max(DOCK.x-4,x-34),x1=Math.min(DOCK.x+DOCK.w+4,x+34);if(x1<=x0)continue;c.save();c.beginPath();c.rect(x0,y-50,x1-x0,66);c.clip();drawDock(c);c.restore();}}
+function dockOver(c){const L=[];if(fBoat)L.push([fp.x,fp.y,fBoat]);for(const id in fOthers){const o=fOthers[id];if(o&&o.bt&&o.bt<BT_RIDE&&o.fs!=="away")L.push([o.x,o.y,o.bt]);}
+  for(const[x,y,sk]of L){const wd=sk=>sk>=5?66:50,x0=Math.max(DOCK.x-4,x-wd(sk)),x1=Math.min(DOCK.x+DOCK.w+4,x+wd(sk));if(x1<=x0)continue;c.save();c.beginPath();c.rect(x0,Math.max(DOCK.y,y-110),x1-x0,Math.min(RIVER+18,y+22)-Math.max(DOCK.y,y-110));c.clip();drawDock(c);c.restore();}}
 const sitW=(o,fn,t)=>{if(!o.bt||o.fs==="away")return fn();const c=fCtx;c.save();c.translate(o.x,o.y+6+boatBob(performance.now()));c.rotate(o.tl||0);c.scale(1,.85);c.translate(-o.x,-o.y);fn();c.restore();};
 function boatBack(c,x,y,t,sk,tl){const G=sk===2,B=sk===3,Z=sk===4,b=boatBob(t);c.save();c.translate(x-(sk>=5&&sk<=7?10:0),y+b+2);c.rotate((tl||0)+Math.sin(t/900)*.015);if(sk>=5&&sk<=7){[boatDrBack,boatDuoBack,boatSwBack][sk-5](c,t);c.restore();return;}
   if(Z){const g=c.createRadialGradient(0,4,4,0,4,40);g.addColorStop(0,"rgba(167,139,250,"+(.42+.12*Math.sin(t/300))+")");g.addColorStop(1,"rgba(34,211,238,0)");c.fillStyle=g;c.beginPath();c.ellipse(0,5,40,13,0,0,7);c.fill();}
@@ -3139,6 +3139,7 @@ async function pirTake(key,b){if(pirGot[key])return;pirGot[key]=1;const cn=myCn=
     toast("🎁 해적선 선물상자를 주웠어요!\n"+g.nm);broadcast(`🏴‍☠️ ${myName()}님이 해적선 선물상자를 가장 먼저 주웠어요!`,"pirate",{cn:myCn});
   }catch(e){pirGot[key]=0;}}
 function pirStep(t){pirListen();const p=pirTime();
+  if(pirBlk())for(const id in fOthers){const o=fOthers[id];if(!o||o.bt||(o.fa|0)!==0)continue;const bad=(x,y)=>x>=DOCK.x-4&&x<=DOCK.x+DOCK.w+4&&y<RIVER+14;if(bad(o.x,o.y)){o.y=RIVER+20;o.x=o.x<DOCK.x+DOCK.w/2?DOCK.x-8:DOCK.x+DOCK.w+8;}if(o.ty!=null&&bad(o.tx,o.ty)){o.tx=o.x;o.ty=o.y;}}
   if(p){if(!pirAnn[p.id])pirAnn[p.id]={};const A=pirAnn[p.id];
     if(p.t>=-4)pirSetup(p);
     if(p.t>=0&&!A.b){A.b=1;toast("🏴‍☠️ 해적선이 나타났어요!\n경험치·좋은 물고기·낚시 속도 2배");}
