@@ -1077,9 +1077,9 @@ async function ltClaimTick(){if(!fdb||!me||!me._loaded||!me.lt)return;const R=lt
 
 /* ===== 🎫 즉석복권: 한 장씩 사서 긁어요 · 12시간마다(오전 10시·오후 10시) 새 회차(판)로 초기화 ===== */
 var ltTab="lt",scCur=null,scPool={a:null,b:null},scWR=-1,scRefs=[],scMsg="",scBusy=0,scInit0=0;
-const SC_WK=7*86400000,SC_R0=Date.UTC(2026,10,22,15,0,0),SC_DAY=1000;
+const SC_WK=7*86400000,SC_R0=Date.UTC(2026,10,22,15,0,0),SC_DAY=Infinity;
 const SC_T={a:{nm:"행운의 숫자",ic:"🎟️",p:50000,N:50000,pz:[0,5e8,2e7,1e6,1e5,5e4,5e4],cnt:[0,2,10,100,3000,15000,0],ds:"당첨 숫자와 같은 숫자가 나오면 당첨!",g:"linear-gradient(160deg,#b91c1c,#7f1d1d)"},
- b:{nm:"같은 그림 찾기",ic:"🖼️",p:100000,N:100000,pz:[0,2e9,1e8,5e6,2e5,1e5,2e5],cnt:[0,2,10,200,6000,21000,0],ds:"그림 두 개가 같으면 당첨!",g:"linear-gradient(160deg,#1d4ed8,#312e81)"}};
+ b:{nm:"같은 그림 찾기",ic:"🖼️",p:100000,N:50000,pz:[0,2e9,1e8,5e6,2e5,1e5,2e5],cnt:[0,1,5,100,3000,10500,0],ds:"그림 두 개가 같으면 당첨!",g:"linear-gradient(160deg,#1d4ed8,#312e81)"}};
 const SC_PIC=["🍎","🍋","🍇","🍒","⭐","🔔","🍀","💎","🎈","🐟","🌙","🎁"];
 const scW=()=>Math.max(0,Math.floor((bankNow()-SC_R0)/SC_WK)),scLeft=()=>SC_R0+(scW()+1)*SC_WK-bankNow();
 const scShort=n=>n>=1e8?(n/1e8).toLocaleString()+"억":(n/1e4).toLocaleString()+"만";
