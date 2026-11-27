@@ -223,6 +223,34 @@ nav button.on{color:var(--tx);font-weight:700}
 </style>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<style id="evCss">
+body.evIn{overflow:hidden}
+body.evIn header,body.evIn #nav,body.evIn #dock,body.evIn #fTkCol,body.evIn #fTkShow,body.evIn #chatFab,body.evIn #admFab,body.evIn #gNotice,body.evIn #dealNote,body.evIn #alerts,body.evIn #ltBan,body.evIn #fishBtn,body.evIn .fhelp,body.evIn #fBoatBtn,body.evIn #fAutoBtn,body.evIn #fMotoBtn,body.evIn #fBoostBtn,body.evIn #fBridgeLock,body.evIn #fFeed,body.evIn #fishRes,body.evIn #evJoin{display:none!important}
+body.evIn #fRow{display:block;margin:0}
+body.evIn #fishWrap{position:fixed;inset:0;z-index:25;width:auto;max-width:none;margin:0;border-radius:0;background:#1b3d25;display:flex;align-items:center;justify-content:center}
+body.evIn #fJoy{display:block}body.evIn #fAct{display:flex}
+body.evIn #fJoy{left:calc(14px + env(safe-area-inset-left));bottom:calc(14px + env(safe-area-inset-bottom))}
+body.evIn #fAct{right:calc(12px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom))}
+#evHud,#evMenuBtn,#evMenu,#evChatBtn,#evRot{display:none}
+body.evIn #evHud{display:block;position:absolute;left:50%;top:8px;transform:translateX(-50%);background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.14);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:6px 14px;white-space:nowrap;pointer-events:none;z-index:3}
+body.evIn #evMenuBtn{display:flex;position:absolute;right:calc(10px + env(safe-area-inset-right));top:8px;width:40px;height:40px;border-radius:12px;background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:20px;align-items:center;justify-content:center;z-index:4}
+body.evIn #evChatBtn{display:flex;position:absolute;right:calc(88px + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));width:48px;height:48px;border-radius:50%;background:rgba(10,14,20,.78);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;align-items:center;justify-content:center;z-index:4}
+body.evIn #evMenu.on{display:flex;flex-direction:column;gap:4px;position:absolute;right:calc(10px + env(safe-area-inset-right));top:54px;min-width:170px;background:rgba(14,18,26,.96);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:8px;z-index:5}
+#evMenu button{color:#fff;text-align:left;font-size:13px;font-weight:700;padding:10px 12px;border-radius:9px;background:rgba(255,255,255,.06)}
+#evMenu button:active{background:rgba(255,255,255,.16)}
+#evMenu button.dg{color:#ff8a96}
+body.evIn.evChat #chatSide{display:flex!important;position:fixed!important;left:auto!important;right:calc(8px + env(safe-area-inset-right))!important;top:54px!important;bottom:84px!important;width:min(44vw,300px)!important;height:auto!important;z-index:27;background:rgba(10,14,20,.78)!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:14px!important;padding:8px!important;box-shadow:none!important}
+body.evIn.evChat #chCur{display:none}
+body.evIn #evRot.on{display:flex}
+#evRot{position:fixed;inset:0;z-index:90;background:#05080c;color:#fff;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;gap:10px}
+#evRot .ph{font-size:54px;animation:evRt 1.6s ease-in-out infinite}
+@keyframes evRt{0%,30%{transform:rotate(0)}70%,100%{transform:rotate(-90deg)}}
+#evRot b{font-size:17px}#evRot small{font-size:12px;color:#9fb3c8;line-height:1.5}
+#evRot button{margin-top:10px;padding:10px 18px;border-radius:12px;background:rgba(255,255,255,.1);color:#fff;font-weight:700;font-size:13px}
+#evJoin{position:fixed;left:50%;bottom:calc(70px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:60;background:linear-gradient(90deg,#b45309,#f59e0b);color:#111;font-weight:900;font-size:14px;border-radius:999px;padding:12px 22px;box-shadow:0 6px 20px rgba(0,0,0,.5);display:none}
+#evJoin.on{display:block}
+
+</style>
 </head>
 <body>
 <header>
@@ -263,6 +291,7 @@ nav button.on{color:var(--tx);font-weight:700}
     <div class="fhelp mo">왼쪽 조이스틱으로 이동 · 오른쪽 버튼으로 낚시/어시장 · 💬 채팅</div>
   </section>
   <section class="sec adm" id="s-admin">
+    <div class="card"><h3>🏆 주로월드3 이벤트</h3><div id="evStat" style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">이벤트 모드가 꺼져 있어요. 켜면 다리 건너편이 가로 전용 이벤트 화면으로 바뀌고 다리가 모두에게 열려요.</div><button class="a" style="width:100%" id="evToggle">🏆 이벤트 모드 켜기</button></div>
     <div class="card"><h3>🔄 전체 새로고침</h3>
       <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">지금 접속 중인 모든 사람 화면에 새로고침 창을 띄워서 5초 뒤 강제로 새로고침해요.</div>
       <button class="a" style="width:100%" id="admReload">모두 새로고침 시키기</button>
@@ -2138,7 +2167,7 @@ function bridgeGate(t){if(!isOwner)return;if(t-fGateT<1500)return;fGateT=t+1e9;f
     bridgeOpen=true;if(all){bridgeAll=true;if(fdb)fdb.ref("market/bridge2").set({open:true,t:Date.now(),by:myId}).then(()=>{toast("🌍 다리가 모두에게 열렸어요!");}).catch(()=>{toast("저장에 실패했어요 (나만 열렸어요)");});if(!fdb)toast("🌍 다리가 열렸어요");}else toast("🔓 다리가 열렸어요! (나만 건널 수 있어요)");done();};
   bg.querySelector("#brOk").onclick=()=>go(false);bg.querySelector("#brAll").onclick=()=>go(true);bg.querySelector("#brNo").onclick=done;bg.querySelector("#brPw").addEventListener("keydown",e=>{if(e.key==="Enter")go(false);});{const i=bg.querySelector("#brPw");let armed=0;const arm=()=>{if(armed)return;armed=1;window.removeEventListener("keyup",onUp,true);i.readOnly=false;i.value="";i.focus();};const onUp=()=>setTimeout(arm,120);
     window.addEventListener("keyup",onUp,true);i.addEventListener("pointerdown",arm);setTimeout(arm,2500);}}
-function fishArea(n,t){fArea=n;fp.x=DOCK.x+DOCK.w/2;fCam=camT();fCamY=camTY();{const F=$("fFeed");if(F)F.innerHTML="";}fp.tx=null;fp.via=null;fp.x=DOCK.x+DOCK.w/2;fp.y=n?FH-40:DOCK.y+36;fCamY=camTY();fAreaT=t||performance.now();fLastSent="";fFloat.push({a:fArea,x:fp.x,y:fp.y-40,s:n?"🌲 다리 건너편":"🏙️ 주로 광장",t:performance.now(),c:"#fff"});setFishBtn();}
+function fishArea(n,t){fArea=n;evUpd();fp.x=DOCK.x+DOCK.w/2;fCam=camT();fCamY=camTY();{const F=$("fFeed");if(F)F.innerHTML="";}fp.tx=null;fp.via=null;fp.x=DOCK.x+DOCK.w/2;fp.y=n?FH-40:DOCK.y+36;if(evIn){fp.x=60;fp.y=EH-52;}fCamY=camTY();fAreaT=t||performance.now();fLastSent="";fFloat.push({a:fArea,x:fp.x,y:fp.y-40,s:n?(evIn?"🏆 주로월드3":"🌲 다리 건너편"):"🏙️ 주로 광장",t:performance.now(),c:"#fff"});setFishBtn();}
 function boatPick(L){const cur=myBoat();const bg=modal(`<div style="font-size:16px;font-weight:900;margin-bottom:10px">🚤 어떤 보트를 탈까요?</div>${L.map(i=>`<button data-b="${i}" style="display:flex;align-items:center;gap:10px;width:100%;padding:12px;border-radius:12px;background:var(--card2);margin-bottom:6px;text-align:left;${i===cur?"outline:2px solid var(--acc);":""}"><span style="font-size:22px">${BOAT_IC[i]}</span><span style="flex:1;font-weight:800;font-size:13.5px">${BOAT_NM[i].replace(" (2인승)","")}</span>${isTwin(i)?'<span style="font-size:11px;color:#67e8f9;font-weight:900">2인승</span>':""}</button>`).join("")}<button id="bpX" style="width:100%;padding:11px 0;border-radius:11px;background:var(--card2);color:var(--sub);font-weight:800;margin-top:2px">취소</button>`);
   bg.onclick=e=>{if(e.target===bg||e.target.id==="bpX"){bg.remove();return;}const b=e.target.closest("[data-b]");if(b){bg.remove();boatBoard(+b.dataset.b);}};}
 function boatBoard(id){if(fBoat||fRide)return;const L=boatList();if(!L.length)return toast("🚤 보트가 없어요 (오락실 인형 뽑기 룰렛에서 나와요)");if(fstate!=="idle")return toast("낚시 중에는 탈 수 없어요");if(!id){if(L.length>1)return boatPick(L);id=L[0];}if(!L.includes(id))return;if((me.boatSel|0)!==id){me.boatSel=id;try{saveMe();}catch(e){}}
@@ -2282,17 +2311,18 @@ function boatSwFront(c,t){
 }
 const inShop=(x,y)=>(x>NTS.x-6&&x<NTS.x+NTS.w+6&&y>NTS.y-4&&y<NTS.y+NTS.h+4)||(x>CAS.x-6&&x<CAS.x+CAS.w+6&&y>CAS.y-4&&y<CAS.y+CAS.h+4)||(x>SHOP.x-6&&x<SHOP.x+SHOP.w+6&&y>SHOP.y-4&&y<SHOP.y+SHOP.h+4)||(x>CLB.x-6&&x<CLB.x+CLB.w+6&&y>CLB.y-4&&y<CLB.y+CLB.h+4)||(x>PHB.x-6&&x<PHB.x+PHB.w+6&&y>PHB.y-4&&y<PHB.y+PHB.h+4)||(x>BNK.x-6&&x<BNK.x+BNK.w+6&&y>BNK.y-4&&y<BNK.y+BNK.h+4)||(x>OFB.x-6&&x<OFB.x+OFB.w+6&&y>OFB.y-4&&y<OFB.y+OFB.h+4)||(x>LTB.x-6&&x<LTB.x+LTB.w+6&&y>LTB.y-4&&y<LTB.y+LTB.h+4);
 const RV1=58;/* 건너편: 아래쪽 강 높이 */
-const walk1=(x,y)=>x>=10&&x<=FW-10&&y>=76&&y<=FH-12&&(y<FH-RV1-2||(x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6));
+const walk1=(x,y)=>evIn?evWalk(x,y):x>=10&&x<=FW-10&&y>=76&&y<=FH-12&&(y<FH-RV1-2||(x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6));
 const inDock=(x,y)=>!pirBlk()&&x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+(isOwner||bridgeAll?16:42)&&y<=RIVER+16;
 const walkable=(x,y)=>!inShop(x,y)&&x>=10&&x<=FW-10&&y<=FH-12&&(y>=RIVER+14||inDock(x,y));
 function fishSpot(x,y){if(fArea)return false;if(inDock(x,y))return y<RIVER-6;return y<=RIVER+34&&!(x>DOCK.x-12&&x<DOCK.x+DOCK.w+12);}
+let evOn=false,evIn=false;const EW=720,EH=360;
 let bridgeAll=false,bridgeOpen=false,fGateT=-9999,fArea=0,fAreaT=-9999,fBoat=0,fRide="",fBV={x:0,y:0},fBoatTilt=0,fWake=[],fWakeT=0;
-let fCam=0,fCamY=0;const camT=()=>Math.max(0,Math.min(FW-VW,fp.x-VW/2)),camTY=()=>{const f=Math.max(0,Math.min(FH-VH,fp.y-VH/2)),r=Math.max(0,Math.min(1,(RIVER+60-fp.y)/80));let y=seaTop()*r+f*(1-r);{const p=pirTime();if(p&&p.t>-2&&p.t<PIR_T+4){const r2=Math.max(0,Math.min(1,(300-fp.y)/60));y=y*(1-r2)+Math.min(y,p.lx?-128:-86)*r2;}}return y;};
+let fCam=0,fCamY=0;const camT=()=>evIn?0:Math.max(0,Math.min(FW-VW,fp.x-VW/2)),camTY=()=>{if(evIn)return 0;const f=Math.max(0,Math.min(FH-VH,fp.y-VH/2)),r=Math.max(0,Math.min(1,(RIVER+60-fp.y)/80));let y=seaTop()*r+f*(1-r);{const p=pirTime();if(p&&p.t>-2&&p.t<PIR_T+4){const r2=Math.max(0,Math.min(1,(300-fp.y)/60));y=y*(1-r2)+Math.min(y,p.lx?-128:-86)*r2;}}return y;};
 let fp={x:120,y:300,dir:1,walk:0,tx:null,ty:null},fstate="idle",fT=0,fBite=0,fBob={x:0,y:0},fKeys={},fCv=null,fCtx=null,fRaf=0,fLastSend=0,fLastSent="",fScale=1,fOthers={},fFloat=[],fRes=null,fTab="dex";
 const DECOR=(()=>{const r=mulberry(777),a=[{t:"bush",x:160,y:205,c:.4},{t:"bush",x:196,y:410,c:.6}];
   a.push({t:"shop",x:SHOP.x,y:SHOP.y+SHOP.h});a.push({t:"nts",x:NTS.x,y:NTS.y+NTS.h});a.push({t:"cas",x:CAS.x,y:CAS.y+CAS.h});a.push({t:"clw",x:CLB.x,y:CLB.y+CLB.h});a.push({t:"phb",x:PHB.x,y:PHB.y+PHB.h});a.push({t:"bnk",x:BNK.x,y:BNK.y+BNK.h});a.push({t:"ofb",x:OFB.x,y:OFB.y+OFB.h});a.push({t:"ltb",x:LTB.x,y:LTB.y+LTB.h});for(let i=0;i<14;i++){const fx=20+r()*320,fy=RIVER+40+r()*(FH-RIVER-60),fc=r();if(fx>RZ.x-8&&fx<RZ.x+RZ.w+8&&fy>RZ.y-8&&fy<RZ.y+RZ.h+16)continue;if(fx>NTS.x-10&&fx<NTS.x+NTS.w+10&&fy>NTS.y-24&&fy<NTS.y+NTS.h+10)continue;if(fx>CAS.x-10&&fx<CAS.x+CAS.w+10&&fy>CAS.y-24&&fy<CAS.y+CAS.h+10)continue;if(fx>CLB.x-10&&fx<CLB.x+CLB.w+10&&fy>CLB.y-24&&fy<CLB.y+CLB.h+10)continue;if(fx>PHB.x-10&&fx<PHB.x+PHB.w+10&&fy>PHB.y-24&&fy<PHB.y+PHB.h+10)continue;if(fx>BNK.x-10&&fx<BNK.x+BNK.w+10&&fy>BNK.y-24&&fy<BNK.y+BNK.h+10)continue;if(fx>OFB.x-10&&fx<OFB.x+OFB.w+10&&fy>OFB.y-24&&fy<OFB.y+OFB.h+10)continue;if(fx>LTB.x-10&&fx<LTB.x+LTB.w+10&&fy>LTB.y-24&&fy<LTB.y+LTB.h+10)continue;a.push({t:"flower",x:fx,y:fy,c:fc});}return a.sort((a,b)=>a.y-b.y);})();
 function fishActive(){return $("s-fish")&&$("s-fish").classList.contains("on");}
-function fishResize(){if(!fCv)return;const top=$("fishWrap").getBoundingClientRect().top+scrollY,avail=innerHeight-top-(TOUCH?66:80);const w=Math.max(240,Math.min($("s-fish").clientWidth-($("fRow").classList.contains("tkoff")?0:(innerWidth>600?136:91)),Math.max(300,avail)*VW/VH,620));if(Math.abs(w-(fishResize.w||0))<2&&fCv.width)return;fishResize.w=w;fScale=w/VW;const dpr=window.devicePixelRatio||1;fCv.style.width=w+"px";fCv.style.height=(VH*fScale)+"px";fCv.width=Math.round(w*dpr);fCv.height=Math.round(VH*fScale*dpr);fCtx.setTransform(dpr*fScale,0,0,dpr*fScale,0,0);}
+function fishResize(){if(!fCv)return;if(evIn){const iw=innerWidth,ih=innerHeight,sc=Math.min(iw/EW,ih/EH),w=Math.round(EW*sc),h=Math.round(EH*sc),dpr=window.devicePixelRatio||1;if(fishResize.w===-1&&Math.abs(fishResize.ew-w)<2&&fishResize.eh===h)return;fishResize.w=-1;fishResize.ew=w;fishResize.eh=h;fScale=sc;fCv.style.width=w+"px";fCv.style.height=h+"px";fCv.width=Math.round(w*dpr);fCv.height=Math.round(h*dpr);fCtx.setTransform(dpr*sc,0,0,dpr*sc,0,0);return;}const top=$("fishWrap").getBoundingClientRect().top+scrollY,avail=innerHeight-top-(TOUCH?66:80);const w=Math.max(240,Math.min($("s-fish").clientWidth-($("fRow").classList.contains("tkoff")?0:(innerWidth>600?136:91)),Math.max(300,avail)*VW/VH,620));if(Math.abs(w-(fishResize.w||0))<2&&fCv.width)return;fishResize.w=w;fScale=w/VW;const dpr=window.devicePixelRatio||1;fCv.style.width=w+"px";fCv.style.height=(VH*fScale)+"px";fCv.width=Math.round(w*dpr);fCv.height=Math.round(VH*fScale*dpr);fCtx.setTransform(dpr*fScale,0,0,dpr*fScale,0,0);}
 function hueOf(s){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return h;}
 
 /* ---------- 🧑 캐릭터 ---------- */
@@ -3011,8 +3041,8 @@ function fishDraw1(t){const c=fCtx,SH=FH-RV1;
   emoSign(c,"🌉","다리를 건너면 주로 광장",DOCK.x+DOCK.w/2,SH-40,"bold 9px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.4)",18);
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1||(f.a|0)!==fArea)continue;c.globalAlpha=1-a*a;c.font="bold 11px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fff";c.fillText(f.s,f.x,f.y-a*24);c.globalAlpha=1;}
   fFloat=fFloat.filter(f=>t-f.t<2600);}
-function fishFade(t){const c=fCtx,a=1-(t-fAreaT)/520;if(a>0&&a<=1){c.fillStyle=`rgba(0,0,0,${a.toFixed(3)})`;c.fillRect(0,0,FW,FH);}}
-function fishDraw(t){const c=fCtx;c.save();c.translate(-Math.round(fCam),-Math.round(fCamY));try{fishDrawW(t);}finally{c.restore();}}
+function fishFade(t){const c=fCtx,a=1-(t-fAreaT)/520;if(a>0&&a<=1){c.fillStyle=`rgba(0,0,0,${a.toFixed(3)})`;c.fillRect(0,0,evIn?EW:FW,evIn?EH:FH);}}
+function fishDraw(t){const c=fCtx;if(evIn){c.save();try{evDraw(t);}catch(e){try{fDrawErr(e);}catch(_){}}finally{c.restore();}return;}c.save();c.translate(-Math.round(fCam),-Math.round(fCamY));try{fishDrawW(t);}finally{c.restore();}}
 function fishDrawW(t){const c=fCtx;if(fArea)return fishDraw1(t);
   seaExt(c,t);
   const g=c.createLinearGradient(0,0,0,RIVER);g.addColorStop(0,"#1d5f8a");g.addColorStop(1,"#2f86b5");c.fillStyle=g;c.fillRect(0,0,FW,RIVER+8);
@@ -3395,6 +3425,7 @@ function motoFront(c,x,y,dir,t,bs,k,tp){if(k===8)return motoFrontT(c,x-6*dir,y,d
   if(bs){c.strokeStyle="rgba(255,255,255,.55)";c.lineWidth=1.6;for(let i=0;i<4;i++){const xx=-60-((t/3+i*40)%70),yy=-70+i*16;c.beginPath();c.moveTo(xx,yy);c.lineTo(xx-26,yy);c.stroke();}}
   c.restore();}
 function fishStep(dt,t){
+  try{evUpd();}catch(e){}
   try{pirStep(t);}catch(e){}
   if(fMRide)motoPassStep();
   autoStep(t);
@@ -3412,13 +3443,71 @@ function fishStep(dt,t){
   {const B=$("fBoatBtn");if(B){{const L=$("fBridgeLock");if(L){const d=isOwner&&fArea&&bridgeAll?"block":"none";if(L.style.display!==d)L.style.display=d;}}
   const own=myBoat()?1:0;if(!own&&fBoat)boatLeave();const rc=(!fBoat&&!fRide&&fstate==="idle")?rideCand():null;const d=(fRide||rc||(own&&(fBoat||(fstate==="idle"&&fp.y<=RIVER+34))))?"block":"none",tx=fRide?"⚓ 내리기":fBoat?"⚓ 보트 내리기":rc?"🚤 동승하기":"🚤 보트 타기";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!(fBoat||fRide));}}}
   if(fstate==="idle"&&!fBoat&&!fRide){if(!fArea&&fp.y<=DOCK.y+22&&fp.x>=DOCK.x+2&&fp.x<=DOCK.x+DOCK.w-2){if(bridgeAll||(isOwner&&bridgeOpen))fishArea(1,t);else if(isOwner)bridgeGate(t);}
-    else if(fArea&&!bridgeAll&&!(isOwner&&bridgeOpen))fishArea(0,t);else if(fArea&&fp.y>=FH-16&&fp.x>=DOCK.x+4&&fp.x<=DOCK.x+DOCK.w-4)fishArea(0,t);}
+    else if(fArea&&!bridgeAll&&!evOn&&!(isOwner&&bridgeOpen))fishArea(0,t);else if(evIn){if(fp.x<=20&&fp.y>=EH-92&&fp.y<=EH-26)fishArea(0,t);}else if(fArea&&fp.y>=FH-16&&fp.x>=DOCK.x+4&&fp.x<=DOCK.x+DOCK.w-4)fishArea(0,t);}
   if(fBoat&&fstate!=="idle")boatStep(dt,t,1);
   fCam+=(camT()-fCam)*Math.min(1,dt/150);fCamY+=(camTY()-fCamY)*Math.min(1,dt/150);
   for(const id in fOthers){const o=fOthers[id];const ek=o.bt&&o.vx!=null?Math.min(240,Math.max(0,t-(o._rt||t))):0,dx=o.tx+(ek?o.vx*ek:0)-o.x,dy=o.ty+(ek?(o.vy||0)*ek:0)-o.y,lk=Math.min(1,dt/(o.bt?95:120));o.walk=Math.hypot(dx,dy)>1;const mx=dx*lk,my=dy*lk;o.x+=mx;o.y+=my;
     if(o.bt){const vx=mx/Math.max(1,dt);o.tl=(o.tl||0)+((vx/.085)*.13-(o.tl||0))*Math.min(1,dt/180);if(Math.hypot(mx,my)/Math.max(1,dt)>.02&&t-(o.wt||0)>110){o.wt=t;fWake.push({x:o.x-mx*8,y:o.y+5,t});if(fWake.length>40)fWake.shift();}}else o.tl=0;}
   for(const id in fOthers){const o=fOthers[id];if(o.bt!==BT_RIDE)continue;const d=driverOf(o);if(d){o.x=d.x-24;o.y=d.y;o.tl=d.tl||0;o.tx=o.x;o.ty=o.y;o.vx=0;o.vy=0;}}
   const s=`${Math.round(fp.x)},${Math.round(fp.y)},${fp.dir},${ofIn?"i":fstate},${fRide?BT_RIDE:fBoat},${fArea},${fMoto?fMoto*2+fBs:0},${fMRide}`+(ofIn?`,${ofIn},${Math.round(ofS.px)},${Math.round(ofS.py)},${ofS.dir}`:"")+","+fWhere();if(s!==fLastSent&&t-fLastSend>(fBoat||fRide?130:180)&&fdb&&myId&&me&&me._loaded&&!sessBlocked){fLastSend=t;fLastSent=s;fdb.ref("online/"+myId).update({ch:normCh(me.ch),au:eqCos("aura"),wg:eqCos("wing"),tt:myTitle(),rl:rodLv(),np:eqCos("plate"),ak:myAwkShow(),ac:eqAcc(),name:myName(),sk:rpsN(),fx:Math.round(fp.x),fy:Math.round(fp.y),fd:fp.dir,fs:ofIn?"idle":fstate,bt:ofIn?0:fRide?BT_RIDE:fBoat|0,mo:ofIn||fRide||fBoat||fArea||fstate!=="idle"?0:(fMoto?fMoto*2+fBs:0),mr:ofIn||fArea?"":(fMRide||""),fa:fArea,fo:ofIn||"",ox:ofIn?Math.round(ofS.px):0,oy:ofIn?Math.round(ofS.py):0,od:ofIn?ofS.dir:0,wh:fWhere(),t:Date.now()}).catch(()=>{});}}
+/* ---------- 🏆 주로월드3 이벤트 모드 (가로 전용 화면) ---------- */
+const EV_ST={x:300,y:90,w:120,h:60};
+function evWalk(x,y){return x>=14&&x<=EW-14&&y>=78&&y<=EH-12&&!(x>EV_ST.x-8&&x<EV_ST.x+EV_ST.w+8&&y<EV_ST.y+EV_ST.h+6);}
+const EV_TREES=(()=>{const r=mulberry(909),a=[];for(let i=0;i<24;i++)a.push({x:12+i*30+r()*10,y:62+r()*16});for(let i=0;i<5;i++){a.push({x:10+r()*8,y:112+i*34+r()*10});}for(let i=0;i<8;i++)a.push({x:EW-12-r()*8,y:110+i*28+r()*10});return a.sort((p,q)=>p.y-q.y);})();
+function evTree(c,tx,ty){c.fillStyle="rgba(0,0,0,.2)";c.beginPath();c.ellipse(tx,ty+2,13,4.5,0,0,7);c.fill();c.fillStyle="#6b4423";c.fillRect(tx-3,ty-14,6,15);c.fillStyle="#2f8a45";c.beginPath();c.arc(tx,ty-22,14,0,7);c.fill();c.fillStyle="#3aa557";c.beginPath();c.arc(tx-4,ty-26,9,0,7);c.fill();}
+function evDraw(t){const c=fCtx;
+  const g=c.createLinearGradient(0,0,0,EH);g.addColorStop(0,"#2c6a3b");g.addColorStop(.5,"#4f9a47");g.addColorStop(1,"#3f8a40");c.fillStyle=g;c.fillRect(0,0,EW,EH);
+  c.fillStyle="rgba(255,255,255,.06)";for(let i=0;i<80;i++){const r=mulberry(i*17)();c.fillRect((i*53)%EW,74+((i*97)%(EH-84)),2,4+r*3);}
+  /* 입구 길 + 광장 */
+  c.fillStyle="#cdb27a";c.fillRect(0,292,170,34);c.beginPath();c.ellipse(EW/2,222,190,78,0,0,7);c.fill();c.fillRect(EW/2-34,140,68,90);
+  c.fillStyle="rgba(0,0,0,.06)";c.beginPath();c.ellipse(EW/2,228,190,78,0,0,7);c.fill();
+  c.strokeStyle="rgba(255,255,255,.18)";c.lineWidth=2;c.setLineDash([6,6]);c.beginPath();c.ellipse(EW/2,222,150,56,0,0,7);c.stroke();c.setLineDash([]);
+  /* 무대 */
+  const S=EV_ST;c.fillStyle="rgba(0,0,0,.22)";c.fillRect(S.x+4,S.y+S.h-2,S.w,8);c.fillStyle="#7a5230";c.fillRect(S.x,S.y+12,S.w,S.h-12);c.fillStyle="#9a6a3c";c.fillRect(S.x,S.y+12,S.w,10);c.fillStyle="#5c3d22";for(let x=S.x+10;x<S.x+S.w;x+=20)c.fillRect(x,S.y+24,2,S.h-26);
+  c.fillStyle="#b91c1c";c.fillRect(S.x-6,S.y-6,S.w+12,22);c.fillStyle="#7f1d1d";c.fillRect(S.x-6,S.y+14,S.w+12,3);
+  c.font="bold 13px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fde047";c.fillText("🏆 주로월드3",S.x+S.w/2,S.y+10);
+  /* 깃발 */
+  for(const fx of[S.x-24,S.x+S.w+24]){c.fillStyle="#d1d5db";c.fillRect(fx-1,S.y-22,2,60);const w=Math.sin(t/260+fx)*3;c.fillStyle="#f59e0b";c.beginPath();c.moveTo(fx+1,S.y-22);c.quadraticCurveTo(fx+13,S.y-22+w,fx+24,S.y-17+w);c.lineTo(fx+1,S.y-8);c.fill();}
+  /* 입구 표지 */
+  emoSign(c,"⬅️","입구 · 광장으로",64,EH-18,"bold 9px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.45)",18);
+  c.fillStyle="rgba(255,255,255,.12)";c.fillRect(0,EH-92,3,66);
+  const people=[];for(const T of EV_TREES)people.push({y:T.y,f:()=>evTree(c,T.x,T.y)});
+  people.push({y:fp.y,f:()=>drawPerson(c,fp.x,fp.y,myName(),chOf(myId),fp.dir,fp.tx!=null||fKeysOn()||!!fJoyV,null,"idle",true,t)});
+  for(const id in fOthers){const o=fOthers[id];if((o.fa|0)!==1||o.fs==="away")continue;people.push({y:o.y,f:()=>{if(o.fo)c.globalAlpha=.42;drawPerson(c,o.x,o.y,o.name,chOf(id),o.dir||1,o.walk,null,"idle",false,t);c.globalAlpha=1;}});}
+  people.sort((a,b)=>a.y-b.y).forEach(p=>{c.save();try{p.f();}catch(e){fDrawErr(e);}c.restore();});
+  const nowMs=Date.now();for(const id in fBubbles){const b=fBubbles[id];if(nowMs-b.t>5000){delete fBubbles[id];continue;}const p=id===myId?fp:fOthers[id];if(p&&(p===fp||((p.fa|0)===1&&!p.fo)))drawBubble(c,p.x,p.y,b.text);}
+  for(const f of fFloat){const a=(t-f.t)/2600;if(a>1||(f.a|0)!==1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fff";c.fillText(f.s,f.x,f.y-a*24);c.globalAlpha=1;}
+}
+let evLockTried=0,evMenuArm=0,evActT=0,evUiT=0;
+function evLock(){if(!TOUCH)return;try{const d=document.documentElement,lk=()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock("landscape").catch(()=>{});}catch(e){}};if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen({navigationUI:"hide"}).then(lk).catch(()=>{});else lk();}catch(e){}}
+function evUnlock(){try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock();}catch(e){}try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});}catch(e){}}
+function evBuild(){if($("evMenuBtn"))return;const W=$("fishWrap");if(!W)return;
+  W.insertAdjacentHTML("beforeend",'<div id="evHud"></div><button id="evMenuBtn">☰</button><div id="evMenu"></div><button id="evChatBtn">💬</button>');
+  document.body.insertAdjacentHTML("beforeend",'<div id="evRot"><div class="ph">📱</div><b>폰을 가로로 돌려 주세요</b><small>주로월드3 이벤트는 가로 화면으로만 진행돼요<br>화면이 안 돌아가면 폰의 "화면 회전 잠금"을 꺼 주세요</small><button id="evRotOut">광장으로 돌아가기</button></div><button id="evJoin">🏆 주로월드3 이벤트 입장</button>');
+  const M=$("evMenu");const menu=()=>{M.innerHTML='<button data-m="chat">💬 채팅 열기/닫기</button><button data-m="set">⚙️ 설정</button><button data-m="info">📖 이벤트 안내</button><button data-m="out">🚪 광장으로 나가기</button>'+(isOwner?'<button class="dg" data-m="end">🛑 이벤트 모드 끄기</button>':'');};menu();
+  $("evMenuBtn").onclick=e=>{e.stopPropagation();document.body.classList.remove("evChat");M.classList.toggle("on");evMenuArm=0;menu();};
+  M.onclick=e=>{const b=e.target.closest("button");if(!b)return;const k=b.dataset.m;if(k==="end"){if(!evMenuArm){evMenuArm=1;b.textContent="한 번 더 누르면 모두 나가요";return;}evSet(false);M.classList.remove("on");return;}M.classList.remove("on");
+    if(k==="chat")document.body.classList.toggle("evChat");
+    else if(k==="set"){const d=document.querySelector('#dock [data-pg="set"]');if(d)d.click();}
+    else if(k==="info")toast("📖 이벤트 안내는 진행 순서가 정해지면 여기에 올라와요");
+    else if(k==="out")fishArea(0,performance.now());};
+  $("evChatBtn").onclick=()=>{document.body.classList.toggle("evChat");M.classList.remove("on");};
+  W.addEventListener("pointerdown",()=>{if(evIn&&!evLockTried){evLockTried=1;if(!document.fullscreenElement)evLock();}},{passive:true});
+  $("evRotOut").onclick=()=>fishArea(0,performance.now());
+  $("evJoin").onclick=()=>{if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");evLock();const b=document.querySelector('#nav button[data-s="fish"]');if(b&&!b.classList.contains("on"))b.click();setTimeout(()=>{if(fishActive()&&evOn)fishArea(1,performance.now());},350);};
+  window.addEventListener("resize",()=>{if(evIn){fishResize.w=0;fishResize();evUi();}});window.addEventListener("orientationchange",()=>setTimeout(()=>{if(evIn){fishResize.w=0;fishResize();evUi();}},250));
+  document.addEventListener("keydown",e=>{if(evIn&&e.key==="Enter"&&!e.isComposing&&document.activeElement!==$("chatIn")){document.body.classList.add("evChat");setTimeout(()=>$("chatIn").focus(),30);}});
+}
+function evUpd(){const v=!!(evOn&&fArea===1&&fishActive());if(v===evIn)return;evIn=v;document.body.classList.toggle("evIn",v);fishResize.w=0;if(v){evBuild();evLockTried=0;evLock();}else{evUnlock();document.body.classList.remove("evChat");const M=$("evMenu");if(M)M.classList.remove("on");}try{fishResize();}catch(e){}evUi();}
+function evUi(){evBuild();const R=$("evRot"),J=$("evJoin"),H=$("evHud");if(R)R.classList.toggle("on",!!(evIn&&innerHeight>innerWidth));if(J)J.classList.toggle("on",!!(evOn&&!evIn&&me&&me._loaded));
+  if(H&&evIn){let n=1;for(const id in fOthers){const o=fOthers[id];if(o&&(o.fa|0)===1&&o.fs!=="away")n++;}H.textContent="🏆 주로월드3 · 입장 대기 중 · 👥 "+n+"명";}
+  const T=$("evToggle"),S=$("evStat");if(T){T.textContent=evOn?"🛑 이벤트 모드 끄기":"🏆 이벤트 모드 켜기";}if(S)S.textContent=evOn?"이벤트 모드 켜짐 · 다리가 열려 있고, 다리 건너편은 가로 이벤트 화면이에요.":"이벤트 모드가 꺼져 있어요. 켜면 다리 건너편이 가로 전용 이벤트 화면으로 바뀌고 다리가 모두에게 열려요.";}
+function evSet(on){if(!isOwner||!fdb)return toast("운영자만 할 수 있어요");const u={};u["market/event"]={on:!!on,t:Date.now(),by:myId};if(on)u["market/bridge2"]={open:true,t:Date.now(),by:myId};fdb.ref().update(u).then(()=>toast(on?"🏆 이벤트 모드가 켜졌어요":"이벤트 모드를 껐어요")).catch(()=>toast("저장에 실패했어요 (Firebase 규칙을 확인해 주세요)"));}
+function evAct(){const n=Date.now();if(n-evActT<1500)return;evActT=n;fishBubble(myId,"👋");chatPush({name:myName(),lv:lvOf(me),text:"👋"});}
+{let arm=0;const w0=setInterval(()=>{const T=$("evToggle");if(!T)return;clearInterval(w0);T.onclick=()=>{if(Date.now()-arm>3000){arm=Date.now();T.textContent=evOn?"한 번 더 누르면 이벤트가 꺼져요":"한 번 더 누르면 이벤트가 켜져요";return;}arm=0;evSet(!evOn);};evUi();},300);}
+{const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/event").on("value",s=>{const v=s.val(),was=evOn;evOn=!!(v&&v.on);evBuild();try{evUpd();}catch(e){}evUi();if(evOn&&!was&&!evIn)toast("🏆 주로월드3 이벤트가 시작됐어요! '이벤트 입장'을 눌러 주세요");if(!evOn&&was&&fArea===1&&fishActive())fishArea(0,performance.now());});},500);}
+setInterval(()=>{try{evUi();}catch(e){}},700);
+
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fishFade(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${dexNo(idx)}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=BIG_V?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
@@ -3428,7 +3517,7 @@ function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id=
     const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});{const pn=performance.now();if(o.tx!=null&&(sp.x!==o.tx||sp.y!==o.ty)){if((v.bt|0)>0&&o._rt!=null){const dm=Math.max(90,Math.min(450,pn-o._rt)),cl=q=>Math.max(-.12,Math.min(.12,q));o.vx=cl((sp.x-o.tx)/dm);o.vy=cl((sp.y-o.ty)/dm);}else{o.vx=0;o.vy=0;}o._rt=pn;}else if(o.tx==null)o._rt=pn;}o.tx=sp.x;o.ty=sp.y;if(o._fa!==(v.fa|0)){o._fa=v.fa|0;o.x=sp.x;o.y=sp.y;}if(o._fo!==(v.fo||"")){o._fo=v.fo||"";o.px=v.ox|0;o.py=v.oy|0;}o.dir=v.fd||1;o.bt=Math.min(9,v.bt|0);o.mo=o.bt?0:Math.min(31,v.mo|0);o.mr=String(v.mr||"").slice(0,40);o.fa=v.fa|0;o.fo=v.fo||"";o.ox=v.ox|0;o.oy=v.oy|0;o.od=v.od||1;o.wh=v.wh||"";o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.rl=Math.min(50,v.rl|0);o.np=v.np||"";o.ak=Math.min(3,v.ak|0);o.ac=(typeof v.ac==="string"&&ACCS.some(x=>x[0]===v.ac))?v.ac:"";o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
     if(v.fc&&v.fc.t&&v.fc.t!==o.fct){if((o.fct||Date.now()-v.fc.t<8000)&&(v.fa|0)===fArea)fishFeed(o.name||"누군가",v.fc.n,v.fc.v,v.fc.i);if(o.fct)fFloat.push({a:v.fa|0,x:o.x,y:o.y,s:`${typeof v.fc.i==="number"?dexNo(v.fc.i)+"번 ":""}${v.fc.n}!`,t:performance.now(),c:v.fc.v>=BIG_V?"#ffcf4d":(v.fc.v<0?"#ff8a96":"#fff")});o.fct=v.fc.t;}}
   for(const id in fOthers)if(!onlineMap[id])delete fOthers[id];}
-function setFishAct(){const a=$("fAct");if(!a)return;const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
+function setFishAct(){const a=$("fAct");if(!a)return;if(evIn){const h="👋<small>인사</small>";if(a.innerHTML!==h)a.innerHTML=h;a.className="";return;}const can=fishSpot(fp.x,fp.y);let ic,tx,cl="";
   if(fAuto){ic="🤖";tx="취소";cl="wait";}else if(fstate==="idle"&&nearNpc(fp.x,fp.y)){ic="🎁";tx="보상";}else if(fstate==="idle"&&nearFmk(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearShop(fp.x,fp.y)){ic="🐟";tx="어시장";}else if(fstate==="idle"&&nearNts(fp.x,fp.y)){ic="🏛️";tx="국세청";}else if(fstate==="idle"&&nearCas(fp.x,fp.y)){ic="🎰";tx="도박장";}else if(fstate==="idle"&&nearClw(fp.x,fp.y)){ic="🕹️";tx="오락실";}else if(fstate==="idle"&&nearPhb(fp.x,fp.y)){ic="📸";tx="인생네컷";}else if(fstate==="idle"&&nearBnk(fp.x,fp.y)){ic="🏦";tx="은행";}else if(fstate==="idle"&&nearOfb(fp.x,fp.y)){ic="🏢";tx="컴퍼니";}else if(fstate==="idle"&&nearLtb(fp.x,fp.y)){ic="🎟️";tx="복권";}else if(fstate==="idle"){ic="🎣";tx=can?"던지기":"강가로";cl=can?"":"off";}else if(fstate==="bite"){ic="❗";tx="당겨!";cl="bite";}else{ic="⏳";tx="기다려";cl="wait";}
   const h=`${ic}<small>${tx}</small>`;if(a.innerHTML!==h)a.innerHTML=h;a.className=cl;}
 function setFishBtn(){setFishAct();const b=$("fishBtn");if(!b)return;const can=fishSpot(fp.x,fp.y);
@@ -3443,7 +3532,7 @@ function setFishBtn(){setFishAct();const b=$("fishBtn");if(!b)return;const can=f
   else if(fstate==="idle"){b.textContent=can?"🎣 낚싯대 던지기":"🚶 강가로 가세요";b.disabled=!can;b.className="fbtn";}
   else if(fstate==="cast"||fstate==="wait"){b.textContent="… 입질 기다리는 중";b.disabled=false;b.className="fbtn wait";}
   else{b.textContent="❗ 지금 당겨!";b.disabled=false;b.className="fbtn bite";}}
-function fishAction(){if(sessBlocked)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");const t=performance.now();
+function fishAction(){if(sessBlocked)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(evIn)return evAct();const t=performance.now();
   if(fAuto){autoStop("🤖 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
   if(fstate==="idle"&&nearNpc(fp.x,fp.y)){fp.tx=null;return rpsClaim();}
   if(fstate==="idle"&&nearFmk(fp.x,fp.y)){fp.tx=null;return openFmk();}
@@ -3514,7 +3603,7 @@ function hofHtml(){return (typeof ltHofHtml==="function"?ltHofHtml():"")+`<div c
 function fishInit(){{let armT=0;$("fBridgeLock").onclick=()=>{const b=$("fBridgeLock");if(Date.now()-armT>3000){armT=Date.now();b.textContent="한 번 더 누르면 모두에게 닫혀요";return;}armT=0;b.textContent="🔒 다리 닫기";bridgeOpen=false;bridgeAll=false;if(fdb)fdb.ref("market/bridge2").set({open:false,t:Date.now(),by:myId}).then(()=>toast("🔒 다리를 닫았어요")).catch(()=>toast("실패"));};}
   $("fBoatBtn").onclick=()=>{if(fBoat||fRide)return boatLeave();const rc=fstate==="idle"?rideCand():null;if(rc)return boatRide(rc);boatBoard();};$("fAutoBtn").onclick=autoToggle;$("fMotoBtn").onclick=motoToggle;{const S=$("fBoostBtn");S.onpointerdown=e=>{e.preventDefault();fBoostHold=1;};S.onpointerup=S.onpointerleave=S.onpointercancel=()=>{fBoostHold=0;};}if(myId){const sp=spawnOf(myId);fp.x=sp.x;fp.y=sp.y;}fCam=camT();fCamY=camTY();fCv=$("fishCv");fCtx=fCv.getContext("2d");fishResize();window.addEventListener("resize",fishResize);
   const pt=e=>{const r=fCv.getBoundingClientRect();return{x:(e.clientX-r.left)/fScale+fCam,y:(e.clientY-r.top)/fScale+fCamY};};let down=false;
-  const go=e=>{if(fstate!=="idle"||fRide||fMRide)return;let{x,y}=pt(e);if(fArea){fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.max(76,Math.min(FH-12,y));fp.via=null;return;}if(fBoat){fp.tx=Math.max(BOAT_X0,Math.min(FW-24,x));fp.ty=Math.max(boatY0(),Math.min(RIVER-8,y));fp.via=null;return;}if(!walkable(x,y)&&!inDock(x,y))y=Math.max(y,RIVER+16);fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.min(FH-12,y);fp.via=null;if(inDock(fp.tx,fp.ty)&&!inDock(fp.x,fp.y))fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+18};else if(!inDock(fp.tx,fp.ty)&&inDock(fp.x,fp.y)&&fp.ty>RIVER+18)fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+20};};
+  const go=e=>{if(fstate!=="idle"||fRide||fMRide)return;let{x,y}=pt(e);if(fArea){if(evIn){fp.tx=Math.max(14,Math.min(EW-14,x));fp.ty=Math.max(76,Math.min(EH-12,y));fp.via=null;return;}fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.max(76,Math.min(FH-12,y));fp.via=null;return;}if(fBoat){fp.tx=Math.max(BOAT_X0,Math.min(FW-24,x));fp.ty=Math.max(boatY0(),Math.min(RIVER-8,y));fp.via=null;return;}if(!walkable(x,y)&&!inDock(x,y))y=Math.max(y,RIVER+16);fp.tx=Math.max(10,Math.min(FW-10,x));fp.ty=Math.min(FH-12,y);fp.via=null;if(inDock(fp.tx,fp.ty)&&!inDock(fp.x,fp.y))fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+18};else if(!inDock(fp.tx,fp.ty)&&inDock(fp.x,fp.y)&&fp.ty>RIVER+18)fp.via={x:DOCK.x+DOCK.w/2,y:RIVER+20};};
   fCv.addEventListener("pointerdown",e=>{if(TOUCH)return;const p0=pt(e),hit=fTapOther(p0.x,p0.y);if(hit){openPMenu(hit,e.clientX,e.clientY);return;}down=true;go(e);});fCv.addEventListener("click",e=>{if(!TOUCH)return;const p0=pt(e),hit=fTapOther(p0.x,p0.y);if(hit)openPMenu(hit,e.clientX,e.clientY);});fCv.addEventListener("pointermove",e=>{if(TOUCH)return;const p0=pt(e);fCv.style.cursor=fTapOther(p0.x,p0.y)?"pointer":"";});fCv.addEventListener("pointermove",e=>{if(down)go(e);});window.addEventListener("pointerup",()=>down=false);
   window.addEventListener("keydown",e=>{if(clwOpen()||phOpen()||arcOpen()||tmOpen()||bbOpen()||ofOpen())return;if(!fishActive()||/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;if($("fMk").style.display==="flex"){if(e.key==="Escape")closeMarket();return;}if(e.key===" "){e.preventDefault();if(!e.repeat)fishAction();return;}if(e.key==="Enter"){e.preventDefault();openFChat();return;}if(e.key==="Shift"){fKeys.Shift=true;return;}if(e.key==="m"||e.key==="M"){motoToggle();return;}if(e.key==="e"||e.key==="E"){if(nearShop(fp.x,fp.y))openMarket();return;}const k=e.key.length===1?e.key.toLowerCase():e.key;if(k in{ArrowUp:1,ArrowDown:1,ArrowLeft:1,ArrowRight:1,w:1,a:1,s:1,d:1}){fKeys[k]=true;e.preventDefault();}});
   window.addEventListener("keyup",e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;fKeys[k]=false;});
