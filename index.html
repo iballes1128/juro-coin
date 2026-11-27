@@ -262,8 +262,18 @@ nav button.on{color:var(--tx);font-weight:700}
     <div class="fhelp mo">왼쪽 조이스틱으로 이동 · 오른쪽 버튼으로 낚시/어시장 · 💬 채팅</div>
   </section>
   <section class="sec adm" id="s-admin">
+    <div class="card"><h3>🔄 전체 새로고침</h3>
+      <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">지금 접속 중인 모든 사람 화면에 새로고침 창을 띄워서 5초 뒤 강제로 새로고침해요.</div>
+      <button class="a" style="width:100%" id="admReload">모두 새로고침 시키기</button>
+    </div>
+    <div class="card"><h3>💰 돈 지급</h3>
+      <select id="admUser"></select>
+      <div class="l"><button class="a" id="admSign" style="flex:none;width:52px">＋ 지급</button><input id="admAmt" inputmode="numeric" placeholder="금액(원)"><button class="a" id="admGive" style="flex:none;width:64px">지급</button></div>
+      <div class="l" style="margin-top:6px"><select id="admGK" style="flex:1"><option value="acc">🎀 악세사리</option><option value="aura">✨ 오라</option><option value="wing">🪽 날개</option><option value="plate">🏷️ 명찰</option><option value="skin">🧑 스킨</option></select><select id="admGI" style="flex:2"></select><button class="a" id="admGrant" style="flex:none;width:64px">🎁 지급</button></div>
+      <div class="l"><button class="a" id="admOfRestore" style="flex:1">🏢 선택한 사람에게 기본 사무실 다시 지급</button></div>
+    </div>
     <div class="card"><h3>📮 건의함</h3><div id="sugBox" style="max-height:340px;overflow-y:auto"></div></div>
-    <div class="card"><h3>👥 접속 기록 (최근 300개)</h3><div class="nick" style="margin-bottom:6px"><input id="accQ" placeholder="이름으로 찾기"><button id="accClr" style="background:var(--card2)">비우기</button></div><div id="accLogBox" style="max-height:340px;overflow-y:auto"></div></div>
+    <div class="card"><h3 id="accHd" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:0">👥 접속 기록 (최근 300개)<span id="accArr" style="color:var(--sub);font-size:13px">▶ 보기</span></h3><div id="accBody" style="display:none;margin-top:8px"><div class="nick" style="margin-bottom:6px"><input id="accQ" placeholder="이름으로 찾기"><button id="accClr" style="background:var(--card2)">비우기</button></div><div id="accLogBox" style="max-height:340px;overflow-y:auto"></div></div></div>
     <div class="card"><h3>🛠️ 전체 시장 (1분간 유지)</h3>
       <div class="g"><button class="a b" data-all="down">📉 하락</button><button class="a b" data-all="crash">💥 폭락</button><button class="a r" data-all="surge">🚀 폭등</button></div>
       <button class="a" style="width:100%" id="admAuto">🔄 개입 해제 (자연 등락)</button>
@@ -274,19 +284,9 @@ nav button.on{color:var(--tx);font-weight:700}
       <div class="lbl">가격 직접 지정</div>
       <div class="l"><input id="admPrice" inputmode="numeric" placeholder="가격(원)"><button class="a" id="admSet">설정</button></div>
     </div>
-    <div class="card"><h3>💰 돈 지급</h3>
-      <select id="admUser"></select>
-      <div class="l"><button class="a" id="admSign" style="flex:none;width:52px">＋ 지급</button><input id="admAmt" inputmode="numeric" placeholder="금액(원)"><button class="a" id="admGive" style="flex:none;width:64px">지급</button></div>
-      <div class="l" style="margin-top:6px"><select id="admGK" style="flex:1"><option value="acc">🎀 악세사리</option><option value="aura">✨ 오라</option><option value="wing">🪽 날개</option><option value="plate">🏷️ 명찰</option><option value="skin">🧑 스킨</option></select><select id="admGI" style="flex:2"></select><button class="a" id="admGrant" style="flex:none;width:64px">🎁 지급</button></div>
-      <div class="l"><button class="a" id="admOfRestore" style="flex:1">🏢 선택한 사람에게 기본 사무실 다시 지급</button></div>
-    </div>
     <div class="card"><h3>👥 플레이어 관리</h3>
       <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">같은 이름이 여러 개면 <b style="color:#ffb020">중복</b>으로 표시돼요. 삭제하면 그 사람 기록이 사라지고, 그 기기에서는 닉네임부터 다시 시작해요.</div>
       <div id="admPlayers"></div>
-    </div>
-    <div class="card"><h3>🔄 전체 새로고침</h3>
-      <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">지금 접속 중인 모든 사람 화면에 새로고침 창을 띄워서 5초 뒤 강제로 새로고침해요.</div>
-      <button class="a" style="width:100%" id="admReload">모두 새로고침 시키기</button>
     </div>
     <div class="card"><h3>🧹 코인 시장 전면 초기화</h3>
       <div style="font-size:11px;color:var(--sub);margin-bottom:8px;line-height:1.5">모든 코인을 기본 가격으로 되돌리고, 모든 사람의 보유 코인을 매수 원금 그대로 현금으로 돌려줘요.</div>
@@ -1625,7 +1625,7 @@ let sugList=[],sugOn=false;function sugListen(){if(sugOn||!fdb||!isOwner)return;
 function renderSug(){const B=$("sugBox");if(!B)return;B.innerHTML=sugList.length?sugList.map(x=>`<div style="padding:8px 2px;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--sub)"><b style="color:var(--tx)">${esc(x.name||"?")}</b><span>${x.t?new Date(x.t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"}):""} <button data-sugdel="${x.k}" style="margin-left:6px;font-size:10.5px;color:var(--up)">삭제</button></span></div><div style="font-size:12.5px;white-space:pre-wrap;margin-top:3px">${esc(x.text||"")}</div></div>`).join(""):'<div style="color:var(--sub);font-size:12px">아직 건의가 없어요</div>';
   B.querySelectorAll("[data-sugdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더";return;}fdb.ref("market/suggest/"+b.dataset.sugdel).remove().catch(()=>toast("삭제 실패"));});}
 function renderAdmin(){try{if($("admGI")&&!$("admGI").options.length)admGrantFill();}catch(e){}if(!isOwner)return;sugListen();renderSug();const s=$("admCoin");if(!s.options.length)s.innerHTML=COINS.map(c=>`<option>${c[0]}</option>`).join("");
-  const u=$("admUser"),v=u.value,all={...players};if(myId)all[myId]=me;u.innerHTML='<option value="">받는 사람</option>'+Object.entries(all).map(([id,p])=>`<option value="${id}">${esc(p.name||'이름없음')}</option>`).join("");u.value=v;renderAdmPlayers();}
+  const u=$("admUser"),v=u.value,all={...players};if(myId)all[myId]=me;const ents=Object.entries(all).filter(([,p])=>p),sig=ents.map(([id,p])=>id+":"+(p.name||"")).join("|");if(u.dataset.sig!==sig&&document.activeElement!==u){u.innerHTML='<option value="">받는 사람</option>'+ents.map(([id,p])=>`<option value="${id}">${esc(p.name||'이름없음')}</option>`).join("");u.value=v;u.dataset.sig=sig;}renderAdmPlayers();}
 let delArm={};function agoTxt(t){if(!t)return"기록 없음";const m=Math.floor((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.floor(m/60)+"시간 전":Math.floor(m/1440)+"일 전";}
 function renderAdmPlayers(){const box=$("admPlayers");if(!box)return;const all={...players};if(myId&&me)all[myId]=me;
   const cnt={};for(const p of Object.values(all)){const n=(p&&p.name)||"이름없음";cnt[n]=(cnt[n]||0)+1;}
@@ -3279,7 +3279,7 @@ let updT=null;function showUpdate(msg){const M=$("updMod");if(M.style.display===
 const LOAD_T=Date.now();{const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("market/forceReload").on("value",s=>{const v=s.val();if(typeof v==="number"&&v>LOAD_T&&Date.now()-v<120000)showUpdate("관리자가 새로고침을 요청했어요");});},300);}
 {const R=$("fRow");try{if(localStorage.getItem("jc_tk")==="0")R.classList.add("tkoff");}catch(e){}
   const set=on=>{R.classList.toggle("tkoff",!on);try{localStorage.setItem("jc_tk",on?"1":"0");}catch(e){}fishResize.w=0;fishResize();};$("fTkHide").onclick=()=>set(false);$("fTkShow").onclick=()=>set(true);}
-$("admFab").onclick=()=>openPg("admin");$("admDock").onclick=()=>openPg("admin");$("accQ").oninput=renderAccLog;$("accClr").onclick=()=>{if(!fdb)return;if(!confirmClr.t||Date.now()-confirmClr.t>3000){confirmClr.t=Date.now();return toast("한 번 더 누르면 접속 기록을 전부 지워요");}confirmClr.t=0;fdb.ref("market/accLog").remove().then(()=>toast("🗑️ 접속 기록을 비웠어요")).catch(()=>toast("지우기 실패"));};function confirmClr(){}setInterval(()=>{$("admDock").style.display=isOwner?"":"none";},800);setInterval(()=>{const f=$("admFab");if(f)f.style.display=isOwner?"":"none";},800);
+$("admFab").onclick=()=>openPg("admin");$("admDock").onclick=()=>openPg("admin");$("accQ").oninput=renderAccLog;$("accHd").onclick=()=>{const b=$("accBody"),o=b.style.display==="none";b.style.display=o?"block":"none";$("accArr").textContent=o?"▼ 닫기":"▶ 보기";if(o)renderAccLog();};$("accClr").onclick=()=>{if(!fdb)return;if(!confirmClr.t||Date.now()-confirmClr.t>3000){confirmClr.t=Date.now();return toast("한 번 더 누르면 접속 기록을 전부 지워요");}confirmClr.t=0;fdb.ref("market/accLog").remove().then(()=>toast("🗑️ 접속 기록을 비웠어요")).catch(()=>toast("지우기 실패"));};function confirmClr(){}setInterval(()=>{$("admDock").style.display=isOwner?"":"none";},800);setInterval(()=>{const f=$("admFab");if(f)f.style.display=isOwner?"":"none";},800);
 /* ---------- ✊ 공용 가위바위보 존 ---------- */
 const RPS_HOST="🎤 MC 가바보",RPS_REV=5000,RPS_MS=65000,RPS_NAME={s:"가위",r:"바위",p:"보"};
 const rpsPick=n=>["s","r","p"][Math.floor(mulberry((n*2654435761)>>>0)()*3)];
