@@ -925,7 +925,7 @@ function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return
   if(k==="bws"||k==="bwn"){const cur=p===me?rpsN():(p.rps|0),best=Math.max(p.rpsBest|0,cur);return k==="bws"?best:Math.max(S.mcWin|0,best);}if(k==="money")return assetOf(p);return 0;}
 function tierOf(id){for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i];return null;}
 const titleOf=(id,p)=>{p=p||me;const t=tierOf(id);if(t&&t[3])return t[1];const at=p&&p.ach&&p.ach[id];if(at&&at<ACH_TITLE_CUT)return ACH_OLD_T[id]||"";return "";};
-const myTitle=()=>isOwner?"운영자":(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
+const myTitle=()=>(isOwner&&me&&me.title==="op")?"운영자":(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
 const achNoted={};
 function achNext(a){const v=achVal(a.k);const i=a.tiers.findIndex((t,j)=>!(me&&me.ach&&me.ach[achId(a.k,j)]));return i<0?null:{i,t:a.tiers[i],v,ready:v>=a.tiers[i][0]};}
 function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();lvMig();if(me.hrOpen)hrListen();if(me.hrPay&&nowS()>me.hrPay.at+3000&&!($("casMod")&&$("casMod").style.display==="flex"&&casTab==="hr"&&hr.view&&hrMyBet(hr.view))){const P=me.hrPay;me.hrPay=null;me.cash+=P.v;saveMe();renderHeader();toast(`🏇 ${P.txt} 적중! ${formatMoneyReadable(P.v)}을 넣어 드렸어요`);if(P.v>P.stake)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${formatMoneyReadable(P.v-P.stake)}`);}
@@ -959,10 +959,10 @@ function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach|
     (L.length?L.map((a,i)=>{const has=(me&&me.ach)||{},done=a.tiers.every((t,j)=>has[achId(a.k,j)]),x=achNext(a);return[a,done?2:(x&&x.ready?0:1),i];}).sort((p,q)=>p[1]-q[1]||p[2]-q[2]).map(p=>achCard(p[0])).join(""):`<div style="color:var(--sub);text-align:center;padding:40px 0;font-size:13px">아직 업적이 없어요</div>`);
     S.querySelectorAll("[data-achc]").forEach(b=>b.onclick=()=>achClaim(b.dataset.achc));
     S.querySelectorAll("[data-achg]").forEach(b=>b.onclick=()=>{achTab=b.dataset.achg;try{localStorage.setItem("jc_achTab",achTab);}catch(e){}renderAch();});}
-  const T=$("s-title");if(T&&pgCur==="my"&&pgSub==="title"){const own=[];for(const id in((me&&me.ach)||{})){const nm=titleOf(id,me);if(nm)own.push([id,nm,""]);}const cur=(me&&me.title&&me.ach&&me.ach[me.title])?me.title:"";
+  const T=$("s-title");if(T&&pgCur==="my"&&pgSub==="title"){const own=[];for(const id in((me&&me.ach)||{})){const nm=titleOf(id,me);if(nm)own.push([id,nm,""]);}if(isOwner)own.unshift(["op","운영자",""]);const cur=(isOwner&&me&&me.title==="op")?"op":(me&&me.title&&me.ach&&me.ach[me.title])?me.title:"";
     T.innerHTML=`<div class="card"><h3>🎖️ 칭호</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">단 칭호는 광장에서 이름 위에 보여요 · 업적을 달성하면 늘어나요</div><div style="display:flex;flex-wrap:wrap;gap:6px">`+
       [["","없음",""]].concat(own).map(([id,nm,c])=>`<button data-tt="${id}" style="padding:8px 12px;border-radius:20px;font-size:12px;font-weight:700;background:${cur===id?"var(--acc)":"var(--card2)"};color:${cur===id?"#111":"var(--tx)"}" title="${c}">${id?"「"+esc(nm)+"」":"칭호 없음"}</button>`).join("")+`</div>${own.length?"":'<div style="color:var(--sub);font-size:12px;margin-top:10px">아직 칭호가 없어요 · 🏅 업적을 달성해 보세요</div>'}</div>`;
-    T.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{me.title=b.dataset.tt;saveMe();lastPres="";pushPresence();renderAch();toast(me.title?`🎖️ 칭호 「${titleOf(me.title)}」 장착!`:"칭호를 뺐어요");});}}
+    T.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{me.title=b.dataset.tt;saveMe();lastPres="";pushPresence();renderAch();toast(me.title?`🎖️ 칭호 「${me.title==="op"?"운영자":titleOf(me.title)}」 장착!`:"칭호를 뺐어요");});}}
 
 const PG_G={set:{t:"⚙️ 설정"},my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["cos","💎 치장"],["misc","🧰 기타"]]},rank:{t:"🏆 순위"},bank:{t:"🏦 은행"},enh:{t:"⚒️ 강화",tabs:[["rod","🎣 낚싯대"],["awk","🌟 각성"]]},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
 let pgCur="my",pgSub="wallet",cosK="aura";
