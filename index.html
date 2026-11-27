@@ -5172,7 +5172,7 @@ function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:90
   sessStart();
   btInit();
   const L=$("chatLog");
-  let chatCb=s=>{const m=s.val()||{};if(m.sys?!(m.cn===undefined||m.cn===0||m.cn===myCn):(m.cn===2?2:1)!==myCn)return;if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300),hr:m.hr?String(m.hr).slice(0,40):"",hrR:!!m.hrR});else{addMsg({me:m.from===myId,from:m.from,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}};
+  let chatCb=s=>{const m=s.val()||{};if(!(m.cn===0||(m.sys&&m.kind==="lotto")||(m.cn===2?2:1)===myCn))return;if(m.sys)addMsg({sys:true,t:m.t,text:String(m.text||"").slice(0,300),hr:m.hr?String(m.hr).slice(0,40):"",hrR:!!m.hrR});else{addMsg({me:m.from===myId,from:m.from,t:m.t,loc:m.loc==="fish"?"fish":(m.loc==="coin"?"coin":""),name:String(m.name||"?").slice(0,12),lv:m.lv,text:String(m.text||"").slice(0,80)});if(m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.from,String(m.text||"").slice(0,80));}};
   window.chatAttach=clr=>{fdb.ref("chat").off("child_added",chatCb);if(clr)$("chatLog").innerHTML="";fdb.ref("chat").limitToLast(60).on("child_added",chatCb);};chatAttach(0);window._chatCbT=chatCb;
   setInterval(()=>{fdb.ref("chat").orderByChild("t").endAt(Date.now()-86400000).limitToFirst(50).once("value",s=>{const v=s.val();if(v)for(const k in v)fdb.ref("chat/"+k).remove().catch(()=>{});});},300000);
   showNotices();renderAll();
