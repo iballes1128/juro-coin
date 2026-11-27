@@ -71,7 +71,7 @@ nav button.on{color:var(--tx);font-weight:700}
 .ochip{display:inline-flex;align-items:center;gap:5px;background:var(--card2);border-radius:999px;padding:4px 10px;margin:0 6px 6px 0;font-size:12px}.ochip i{width:7px;height:7px;border-radius:50%;background:var(--ok);display:inline-block}
 .ochip.me{outline:1px solid var(--acc)}
 #chatSide{position:fixed;z-index:30;background:var(--bg);display:flex;flex-direction:column;padding:12px}
-.chatHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px}#chatClose{font-size:16.5px;color:var(--sub)}
+.chatHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:14px}#chatClose{font-size:19px;color:var(--sub)}
 #chatOn{margin-bottom:8px;max-height:64px;overflow-y:auto}
 #chatLog{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding:4px 0 10px}
 .msg{max-width:88%;background:var(--card);border-radius:11px 11px 11px 4px;padding:6px 10px;font-size:11.5px;line-height:1.4;word-break:break-all}
@@ -326,7 +326,7 @@ nav button.on{color:var(--tx);font-weight:700}
 <div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px">🐟 어시장</b><button id="fMkX" style="font-size:20px;color:var(--sub)">✕</button></div>
   <div class="tabs2" id="fMkTabs" style="margin:0 14px 6px"><button data-m="quick" class="on">🐟 바로 팔기</button><button data-m="list">🛒 매물</button><button data-m="sell">📤 올리기 (판매·교환)</button></div>
   <div id="fMkInfo" style="font-size:10px;color:var(--sub);padding:0 14px 6px">잡은 물고기를 시세대로 바로 팔아요 (수수료 10%)</div><div id="fMkBody"></div></div></div>
-<aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><span style="display:flex;align-items:center;gap:10px"><button id="chCur" style="font-size:12px;font-weight:800;color:var(--acc)">🔀 1채널</button><button id="chatClose">✕</button></span></div>
+<aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><span style="display:flex;align-items:center;gap:26px"><button id="chCur" style="font-size:12px;font-weight:800;color:var(--acc)">🔀 1채널</button><button id="chatClose">✕</button></span></div>
   <div id="chatOn"></div><div id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
 <button id="admFab" class="gone">🛠️</button><button id="navAdmin" class="gone"></button>
@@ -5143,9 +5143,10 @@ function showAuth(onNew,loginOnly){let mode="new";const bg=modal('<div style="fo
   bg.querySelector("#auOk").onclick=go;["auName","auPin"].forEach(x=>bg.querySelector("#"+x).addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing)go();}));setTimeout(()=>bg.querySelector("#auName").focus(),50);}
 function chLbl(){const e=document.getElementById("chCur");if(e)e.textContent="🔀 "+myCn+"채널";}
 function chSet(n){n=n===2?2:1;if(n===myCn)return;myCn=n;try{localStorage.setItem("jc_cn",n===2?"2":"1");}catch(e){}applyOnline();if(typeof updOnline==="function")updOnline();try{fishSyncOthers();}catch(e){}lastPres="";if(me&&me._loaded){me.cn=n;saveMe();}try{pushPresence();}catch(e){}if(window.chatAttach)chatAttach(1);chLbl();try{renderAll();}catch(e){}}
-function chMove(){const bg=modal('<div style="font-size:15.5px;font-weight:900;margin-bottom:12px">🔀 채널 이동</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button id="cm1" style="padding:12px 4px;border-radius:12px;font-weight:900;font-size:14px">1채널 🔒</button><button id="cm2" style="padding:12px 4px;border-radius:12px;font-weight:900;font-size:14px">2채널 🔒</button></div><div id="cmPw" style="display:none">'+PIN_IN("cmP","채널 비밀번호")+'<button id="cmOk" class="go buy" style="margin-top:8px">이동</button></div><div id="cmErr" style="color:#f04452;font-size:11px;min-height:16px;margin-top:6px"></div><button id="cmX" style="width:100%;margin-top:4px;color:var(--sub);font-size:12px">닫기</button>');
+function chMove(){const bg=modal('<div style="font-size:15.5px;font-weight:900;margin-bottom:12px">🔀 채널 이동</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button id="cm1" style="padding:12px 4px;border-radius:12px;font-weight:900;font-size:14px">1채널 🔒<div id="cmN1" style="font-size:11px;font-weight:600;margin-top:3px"></div></button><button id="cm2" style="padding:12px 4px;border-radius:12px;font-weight:900;font-size:14px">2채널 🔒<div id="cmN2" style="font-size:11px;font-weight:600;margin-top:3px"></div></button></div><div id="cmPw" style="display:none">'+PIN_IN("cmP","채널 비밀번호")+'<button id="cmOk" class="go buy" style="margin-top:8px">이동</button></div><div id="cmErr" style="color:#f04452;font-size:11px;min-height:16px;margin-top:6px"></div><button id="cmX" style="width:100%;margin-top:4px;color:var(--sub);font-size:12px">닫기</button>');
   const q=x=>bg.querySelector(x),sty=(el,on)=>{el.style.background=on?"var(--acc)":"var(--card2)";el.style.color=on?"#111":"var(--sub)";el.style.border=on?"2px solid var(--acc)":"2px solid var(--line)";};
-  const up=()=>{sty(q("#cm1"),myCn===1);sty(q("#cm2"),myCn===2);};up();q("#cmX").onclick=()=>bg.remove();
+  const up=()=>{sty(q("#cm1"),myCn===1);sty(q("#cm2"),myCn===2);};up();
+  {const n={1:0,2:0},now=Date.now();let self=0;for(const k in onlineRaw){const v=onlineRaw[k];if(!v||now-(v.t||0)>180000)continue;if(k===myId)self=1;n[cnOf(v.cn)]++;}if(!self&&me&&me._loaded)n[myCn]++;q("#cmN1").textContent=n[1]+"명";q("#cmN2").textContent=n[2]+"명";}q("#cmX").onclick=()=>bg.remove();
   let tg=0;const pick=n=>{if(myCn===n)return;tg=n;q("#cmErr").textContent="";q("#cmP").value="";q("#cmPw").style.display="";q("#cmP").focus();};
   q("#cm2").onclick=()=>pick(2);q("#cm1").onclick=()=>pick(1);
   const go=async()=>{if(!tg)return;if(await sha("ch:"+q("#cmP").value.trim())!==CH_H[tg])return q("#cmErr").textContent="채널 비밀번호가 맞지 않아요";chSet(tg);bg.remove();toast(tg+"채널로 이동했어요");};
