@@ -338,7 +338,7 @@ nav button.on{color:var(--tx);font-weight:700}
 <div id="btMod" class="btBg"><div class="btBox">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px"><b style="font-size:15.5px">⚔️ 배틀</b><button id="btModX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
   <div id="btStat" style="font-size:11px;color:var(--sub);margin-bottom:8px"></div>
-  <div class="tabs2" style="margin:8px 0 4px"><button data-bg="rps" class="on">✊ 가위바위보</button><button data-bg="bb">🏀 농구</button></div>
+  <div class="tabs2" style="margin:8px 0 4px"><button data-bg="rps" class="on">✊ 가위바위보</button><button data-bg="bb">🏀 농구</button><button data-bg="pk">⚽ 승부차기</button></div>
   <div class="lbl" style="margin-top:4px">상대 (접속 중인 사람)</div><select id="btTo"></select>
   <div class="tabs2" style="margin:12px 0 8px"><button data-bk="cash" class="on">💰 돈</button><button data-bk="coin">🪙 코인</button></div>
   <div id="btCashRow"><input id="btAmt" inputmode="numeric" placeholder="판돈 (원)"></div>
@@ -4953,7 +4953,7 @@ function btGive(b,n,cost){
   else me.cash+=b.amt*n;}
 function btActive(){const now=nowS();for(const id in battles){const b=battles[id];if(!b||btDone(id))continue;if(b.st==="play")return id;if(b.st==="pending"&&b.from===myId&&now-b.t<BT_REQ_MS+3000)return id;}return null;}
 
-const btReady=(b,now)=>b.game==="bb"?((Number.isFinite((b.fin||{})[b.from])&&Number.isFinite((b.fin||{})[b.to]))||now>=b.startT+BBB_LEN*1000+12000):now>=b.startT+BT_PICK_MS+BT_GRACE;
+const btReady=(b,now)=>b.game==="pk"?(()=>{const s=pkState(b,now);return s.over&&now>=s.endT+500;})():b.game==="bb"?((Number.isFinite((b.fin||{})[b.from])&&Number.isFinite((b.fin||{})[b.to]))||now>=b.startT+BBB_LEN*1000+12000):now>=b.startT+BT_PICK_MS+BT_GRACE;
 /* 상태 바꾸기 (신청 중일 때만 가능한 트랜잭션) */
 async function btSetSt(id,st,why,extra,fresh){
   try{const r=await fdb.ref(BT_PATH+"/"+id).transaction(cur=>{if(cur===null)return cur;if(cur.st!=="pending")return;if(fresh&&nowS()-cur.t>BT_REQ_MS+2000)return;cur.st=st;cur.why=why||"";if(extra)Object.assign(cur,extra);return cur;});
@@ -4962,6 +4962,9 @@ async function btSetSt(id,st,why,extra,fresh){
 async function btResolve(id){
   if(Date.now()-(btResolving[id]||0)<3000)return;btResolving[id]=Date.now();
   try{const s=await fdb.ref(BT_PATH+"/"+id).once("value");const b=s.val();if(!b||b.result||b.st!=="play")return;
+    if(b.game==="pk"){const s=pkState(b,nowS()),w=(!s.over||s.sa===s.sb)?"draw":(s.sa>s.sb?b.from:b.to);
+      const tr=await fdb.ref(BT_PATH+"/"+id+"/result").transaction(cur=>cur?undefined:{w,pa:s.sa,pb:s.sb});
+      if(tr&&tr.committed)pushNotice(w==="draw"?`⚽ ${b.fromName} ${s.sa} : ${s.sb} ${b.toName}\n🤝 무승부! 판돈은 돌려받아요`:`⚽ ${b.fromName} ${s.sa} : ${s.sb} ${b.toName}\n🏆 ${w===b.from?b.fromName:b.toName}님 승리! (+${btStakeTxt(b)})`);return;}
     if(b.game==="bb"){const fin=b.fin||{},bs=b.bs||{},sc=u=>Number.isFinite(fin[u])?fin[u]:(Number.isFinite(bs[u])?bs[u]:0),pa=sc(b.from),pb=sc(b.to),w=pa===pb?"draw":(pa>pb?b.from:b.to);
       const tr=await fdb.ref(BT_PATH+"/"+id+"/result").transaction(cur=>cur?undefined:{w,pa,pb});
       if(tr&&tr.committed)pushNotice(w==="draw"?`🏀 ${b.fromName} ${pa} : ${pb} ${b.toName}\n🤝 무승부! 판돈은 돌려받아요`:`🏀 ${b.fromName} ${pa} : ${pb} ${b.toName}\n🏆 ${w===b.from?b.fromName:b.toName}님 승리! (+${btStakeTxt(b)})`);return;}
@@ -4993,10 +4996,10 @@ async function btAccept(id){
   if(nowS()-b.t>BT_REQ_MS)return toast("시간이 지난 신청이에요");const act=btActive();if(act&&act!==id)return toast("⚠️ 이미 진행 중인 배틀이 있어요");
   btDismiss[id]=1;const tk=btTake(b);
   if(!tk){await btSetSt(id,"declined","poor");btRender();return toast("💸 판돈이 부족해서 성사되지 않았어요");}
-  saveMe();renderHeader();const startT=nowS()+(b.game==="bb"?BBB_LEAD:300);
+  saveMe();renderHeader();const startT=nowS()+(b.game==="bb"?BBB_LEAD:b.game==="pk"?PK_LEAD:300);
   const ok=await btSetSt(id,"play","",{startT,costB:tk.cost},true);
   if(!ok){btGive(b,1,tk.cost);saveMe();renderAll();return toast("이미 취소됐거나 시간이 지난 신청이에요 (판돈은 돌려받았어요)");}
-  pushNotice(`⚔️ 배틀 성사! ${b.fromName} vs ${b.toName}\n판돈 ${btStakeTxt(b)} · ${b.game==="bb"?"🏀 농구":"가위바위보"} 시작!`);
+  pushNotice(`⚔️ 배틀 성사! ${b.fromName} vs ${b.toName}\n판돈 ${btStakeTxt(b)} · ${btGE(b.game)} 시작!`);
   renderAll();}
 /* 관리자가 돈을 주거나 회수하면 받는 사람 화면에 메시지가 떠요 */
 {let att="";setInterval(()=>{if(!fdb||!myId||att===myId)return;att=myId;const id=myId;fdb.ref("market/adminMsg/"+id).on("value",sn=>{const v=sn.val();if(!v||!v.k||!v.amt||id!==myId)return;let seen="";try{seen=localStorage.getItem("admMsgK_"+id)||"";}catch(e){}if(seen===v.k||Date.now()-(v.t||0)>6*3600000)return;try{localStorage.setItem("admMsgK_"+id,v.k);}catch(e){}
@@ -5019,7 +5022,7 @@ function btProcess(){
       if(!b.result){if(btReady(b,now))btResolve(id);continue;}
       const r=b.result,own=(mine?b.costA:b.costB)||0,opn=mine?b.toName:b.fromName;
       stAdd("btN");if(r.w==="draw"){btGive(b,1,own);me.bd=(me.bd||0)+1;}
-      else if(r.w===myId){btGive(b,2,own+Math.round(b.amt*(b.px||0)));if(b.game==="bb")stAdd("bbBtWin");else{me.bw=(me.bw||0)+1;me.bwStreak=(me.bwStreak||0)+1;if(me.bwStreak>(me.bwBest||0))me.bwBest=me.bwStreak;}if(b.type!=="coin")stAdd("btWonAmt",Math.round(b.amt));broadcast(`⚔️ ${myName()}님이 ${opn}님과의 ${b.game==="bb"?"농구":"가위바위보"} 배틀에서 승리! (+${btStakeTxt(b)})`);}
+      else if(r.w===myId){btGive(b,2,own+Math.round(b.amt*(b.px||0)));if(b.game==="bb")stAdd("bbBtWin");else{me.bw=(me.bw||0)+1;me.bwStreak=(me.bwStreak||0)+1;if(me.bwStreak>(me.bwBest||0))me.bwBest=me.bwStreak;}if(b.type!=="coin")stAdd("btWonAmt",Math.round(b.amt));broadcast(`⚔️ ${myName()}님이 ${opn}님과의 ${btGN(b.game)} 배틀에서 승리! (+${btStakeTxt(b)})`);}
       else{if(b.game!=="bb"){me.bl=(me.bl||0)+1;me.bwStreak=0;}if(b.type!=="coin")stAdd("btLostAmt",Math.round(b.amt));}
       btMarkDone(id);changed=true;}}
   if(changed){saveMe();renderAll();}}
@@ -5050,16 +5053,16 @@ function btRenderPlay(id){
 function btRender(){
   if(!me||!me._loaded||!fdb)return;const now=nowS();let playId=null,inc=null,wait=null;
   for(const id in battles){const b=battles[id];if(!b)continue;
-    if(b.st==="play"&&!btClosed[id]&&now<b.startT+(b.game==="bb"?BBB_LEN*1000+40000:25000)){if(!playId||b.startT>battles[playId].startT)playId=id;}
+    if(b.st==="play"&&!btClosed[id]&&now<b.startT+(b.game==="bb"?BBB_LEN*1000+40000:b.game==="pk"?PK_MAXR*PK_T+60000:25000)){if(!playId||b.startT>battles[playId].startT)playId=id;}
     else if(b.st==="pending"&&now-b.t<BT_REQ_MS){if(b.to===myId&&!btDismiss[id])inc=id;else if(b.from===myId)wait=id;}}
   if(inc){const b=battles[inc];if(!btCanPay(b)){btDismiss[inc]=1;btSetSt(inc,"declined","poor");toast(`💸 판돈이 부족해서 성사되지 않았어요\n(${b.fromName}님의 신청: ${btStakeTxt(b)})`);inc=null;}}
   btPlayId=playId;btIncId=inc;btWaitId=wait;
-  const pbb=!!(playId&&battles[playId].game==="bb");$("btPlay").style.display=playId&&!pbb?"flex":"none";if(playId&&!pbb)btRenderPlay(playId);if(pbb)bbBattleSync(playId);
+  const pg=playId?battles[playId].game:"",isR=!!playId&&pg!=="bb"&&pg!=="pk";$("btPlay").style.display=isR?"flex":"none";if(isR)btRenderPlay(playId);if(pg==="bb")bbBattleSync(playId);if(pg==="pk")pkSync(playId);else pkHide();
   const showInc=!playId&&inc,showWait=!playId&&wait;
   $("btInc").style.display=showInc?"flex":"none";
-  if(showInc){const b=battles[inc];$("btIncT").textContent=`${b.fromName}님의 배틀 신청!`;$("btIncS").textContent=`${b.game==="bb"?"🏀 농구":"가위바위보"} · 판돈 각 ${btStakeTxt(b)} (이기면 전부)`;$("btIncC").textContent=`${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초 안에 답하세요`;}
+  if(showInc){const b=battles[inc];$("btIncT").textContent=`${b.fromName}님의 배틀 신청!`;$("btIncS").textContent=`${btGE(b.game)} · 판돈 각 ${btStakeTxt(b)} (이기면 전부)`;$("btIncC").textContent=`${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초 안에 답하세요`;}
   $("btWait").style.display=showWait?"flex":"none";
-  if(showWait){const b=battles[wait];$("btWaitS").textContent=`${b.toName}님 · ${b.game==="bb"?"🏀 농구 · ":""}판돈 ${btStakeTxt(b)}`;$("btWaitC").textContent=`수락을 기다리는 중… ${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초`;}}
+  if(showWait){const b=battles[wait];$("btWaitS").textContent=`${b.toName}님 · ${b.game==="rps"||!b.game?"":btGE(b.game)+" · "}판돈 ${btStakeTxt(b)}`;$("btWaitC").textContent=`수락을 기다리는 중… ${Math.max(0,Math.ceil((BT_REQ_MS-(now-b.t))/1000))}초`;}}
 
 function btInit(){
   fdb.ref(".info/serverTimeOffset").on("value",s=>{srvOff=s.val()||0;SRV_OFF=srvOff;});
@@ -5077,6 +5080,115 @@ function btInit(){
  g("btGo").onclick=btCreate;g("btIncYes").onclick=()=>btIncId&&btAccept(btIncId);g("btIncNo").onclick=()=>btIncId&&btDecline(btIncId);g("btWaitNo").onclick=()=>btWaitId&&btCancel(btWaitId);
  document.querySelectorAll("#btpRps button").forEach(x=>x.onclick=()=>btPlayId&&btPick(btPlayId,x.dataset.c));
  g("btpOk").onclick=()=>{if(btPlayId)btClosed[btPlayId]=1;btRender();};}
+
+/* ===================== ⚽ 승부차기 (배틀) ===================== */
+const PK_PICK=5000,PK_LOCK=700,PK_ANIM=3800,PK_GAP=500,PK_T=PK_PICK+PK_LOCK+PK_ANIM+PK_GAP,PK_MAXR=20,PK_LEAD=4000;
+const pkDv=v=>v===0||v===2?v:1;
+const btGN=g=>g==="bb"?"농구":g==="pk"?"승부차기":"가위바위보",btGE=g=>g==="bb"?"🏀 농구":g==="pk"?"⚽ 승부차기":"가위바위보";
+/* 라운드마다 신청한 사람(from)과 받은 사람(to)이 번갈아 키커 · 5번씩 · 동점이면 서든데스. 시간표는 startT 기준으로 고정이라 서로 신호 없이 맞춰져요 */
+function pkState(b,now){const pk=b.pk||{};let sa=0,sb=0,over=false,endT=0;const rows=[];
+  for(let i=0;i<PK_MAXR;i++){const t0=b.startT+i*PK_T;if(now<t0+PK_PICK+PK_LOCK)break;
+    const kA=i%2===0,kick=kA?b.from:b.to,keep=kA?b.to:b.from,pr=pk[i]||{},dk=pkDv(pr[kick]),dv=pkDv(pr[keep]),goal=dk!==dv;
+    if(goal){if(kA)sa++;else sb++;}rows.push({i,kick,keep,dk,dv,goal,t0});
+    const n=i+1;let fin=n>=PK_MAXR;
+    if(n<=10){const ra=5-Math.ceil(n/2),rb=5-Math.floor(n/2);if(sa>sb+rb||sb>sa+ra)fin=true;}else if(n%2===0&&sa!==sb)fin=true;
+    if(fin){over=true;endT=t0+PK_T;break;}}
+  return{rows,sa,sb,over,endT};}
+const PKG={id:"",el:null,raf:0,my:{},bg:null,key:"",cv:null,cx:null};
+function pkBgMake(){const S=2,W=360,H=590,cv=document.createElement("canvas");cv.width=W*S;cv.height=H*S;const c=cv.getContext("2d");c.scale(S,S);
+  const bg=c.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#0b1020");bg.addColorStop(1,"#111827");c.fillStyle=bg;c.fillRect(0,0,W,H);
+  c.fillStyle="#1e293b";c.fillRect(0,108,W,52);for(let i=0;i<90;i++){c.fillStyle=["#475569","#64748b","#fbbf24","#f87171","#60a5fa"][i%5];c.globalAlpha=.55;c.fillRect((i*37)%W,112+((i*53)%44),3,3);}c.globalAlpha=1;
+  for(let i=0;i<14;i++){c.fillStyle=i%2?"#2f7d3a":"#2a7034";c.fillRect(0,160+i*32,W,32);}
+  c.strokeStyle="rgba(255,255,255,.75)";c.lineWidth=2;c.strokeRect(48,262,264,120);c.strokeRect(100,262,160,52);c.beginPath();c.arc(180,382,38,.15*Math.PI,.85*Math.PI);c.stroke();
+  const gx=20,gy=146,gw=320,gh=116;c.fillStyle="rgba(15,23,42,.55)";c.fillRect(gx,gy,gw,gh);c.strokeStyle="rgba(255,255,255,.28)";c.lineWidth=1;for(let x=gx;x<=gx+gw;x+=12){c.beginPath();c.moveTo(x,gy);c.lineTo(x,gy+gh);c.stroke();}for(let y=gy;y<=gy+gh;y+=12){c.beginPath();c.moveTo(gx,y);c.lineTo(gx+gw,y);c.stroke();}
+  c.strokeStyle="#f8fafc";c.lineWidth=5;c.beginPath();c.moveTo(gx,gy+gh);c.lineTo(gx,gy);c.lineTo(gx+gw,gy);c.lineTo(gx+gw,gy+gh);c.stroke();
+  c.fillStyle="#fff";c.beginPath();c.arc(180,400,2.5,0,7);c.fill();return cv;}
+/* P:{t(0~1, 음수면 대기),dk(공 방향 0·1·2),dv(키퍼 방향),goal,kn,vn,kMe,vMe,now} */
+function pkScene(c,P){const W=360;if(!PKG.bg)PKG.bg=pkBgMake();c.setTransform(1,0,0,1,0,0);c.drawImage(PKG.bg,0,0);c.scale(2,2);c.textAlign="center";
+  const F=(sz,w)=>{c.font=(w||"900")+" "+sz+"px sans-serif";},rr=(x,y,w,h,r)=>{c.beginPath();c.roundRect(x,y,w,h,r);},cl=(v,a,b)=>Math.max(a,Math.min(b,v)),sm=(a,b,x)=>{x=cl((x-a)/(b-a),0,1);return x*x*(3-2*x);},ea=x=>1-Math.pow(1-x,3);
+  const idle=P.t<0,t=idle?0:P.t,db=P.dk-1,kd=P.dv-1,sv=!P.goal,T=(P.now||0)/1000;
+  const SK="#f2c9a0",HAIR="#4a3328";
+  const limb=(x0,y0,len,ang,w,col)=>{c.save();c.translate(x0,y0);c.rotate(ang);c.fillStyle=col;rr(-w/2,0,w,len,w/2);c.fill();c.restore();return[x0-Math.sin(ang)*len,y0+Math.cos(ang)*len];};
+  const person=o=>{c.save();c.translate(o.x,o.y);c.scale(o.s,o.s);
+    c.fillStyle="rgba(0,0,0,.35)";c.beginPath();c.ellipse(0,1.5,11-(o.lift||0)*.12,3.4-(o.lift||0)*.04,0,0,7);c.fill();
+    c.translate(0,-(o.lift||0));if(o.rot)c.rotate(o.rot);c.translate(0,-14);if(o.lean)c.rotate(o.lean);
+    const lp="#23263a",eL=limb(-3.6,0,14,o.lL||0,5.4,lp),eR=limb(3.6,0,14,o.lR||0,5.4,lp);
+    c.fillStyle="#e5e7eb";c.beginPath();c.ellipse(eL[0],eL[1]+1,3.6,2.3,o.lL||0,0,7);c.fill();c.beginPath();c.ellipse(eR[0],eR[1]+1,3.6,2.3,o.lR||0,0,7);c.fill();
+    const sh=o.shirt;
+    const A=()=>{const al=o.glove?15:11.5,aw=o.glove?5.6:4.6,ac=o.glove?"#c2570f":sh,hL=limb(-8.2,-12,al,o.aL||0,aw,ac),hR=limb(8.2,-12,al,o.aR||0,aw,ac);
+      c.fillStyle=o.glove?"#fde047":SK;c.beginPath();c.arc(hL[0],hL[1],o.glove?4.4:2.4,0,7);c.fill();c.beginPath();c.arc(hR[0],hR[1],o.glove?4.4:2.4,0,7);c.fill();
+      if(o.glove){c.strokeStyle="#a16207";c.lineWidth=.9;c.beginPath();c.arc(hR[0],hR[1],4.4,0,7);c.stroke();c.beginPath();c.arc(hL[0],hL[1],4.4,0,7);c.stroke();}};
+    if(!o.front)A();
+    c.fillStyle=sh;rr(-8.5,-14,17,15,4);c.fill();c.fillStyle="rgba(0,0,0,.16)";c.fillRect(-8.5,-3,17,4);
+    if(!o.front){c.fillStyle="rgba(255,255,255,.85)";F(7);c.fillText("10",0,-5);}
+    c.fillStyle=SK;c.beginPath();c.arc(0,-20.5,7.6,0,7);c.fill();
+    if(o.front){c.fillStyle=HAIR;c.beginPath();c.arc(0,-22,7.8,Math.PI*1.02,Math.PI*1.98);c.fill();c.fillRect(-7.8,-23,15.6,2.4);c.fillStyle="#1f2937";c.beginPath();c.arc(-2.8,-19.6,1,0,7);c.arc(2.8,-19.6,1,0,7);c.fill();c.fillStyle="rgba(248,113,113,.5)";c.beginPath();c.arc(-4.6,-17.6,1.4,0,7);c.arc(4.6,-17.6,1.4,0,7);c.fill();c.strokeStyle="#7f1d1d";c.lineWidth=.8;c.beginPath();c.arc(0,-17.2,1.6,.1*Math.PI,.9*Math.PI);c.stroke();}
+    else{c.fillStyle=HAIR;c.beginPath();c.arc(0,-20.5,7.9,0,7);c.fill();c.fillStyle=SK;c.fillRect(-3,-13.7,6,2.6);}
+    if(o.front)A();c.restore();};
+  /* 키커 타임라인 */
+  let ky,lift=0,lean=0,aL=0,aR=0,lL=0,lR=0;const tRun=sm(0,.26,t);ky=548-tRun*48;const step=Math.sin(t*60);
+  if(t<.30){lL=step*.7;lR=-step*.7;aL=-step*.6;aR=step*.6;lean=.12;lift=Math.abs(step)*3;}
+  else if(t<.40){const u=sm(.30,.40,t);lR=-.15-u*2.35;lL=.25;aL=-1.7;aR=1.0;lean=.1-u*.35;lift=u*20;ky=500-u*4;}
+  else{const u=sm(.40,.62,t),arc=Math.sin(u*Math.PI);lR=-2.5+u*1.2;lL=.45;aL=-2.1;aR=2.1;lean=-.22+u*.22;lift=20+arc*18;ky=496;if(t>.62){lift=Math.max(0,28*(1-sm(.62,.74,t))*Math.abs(Math.cos((t-.62)*8)));aL=aR=0;lL=lR=0;lean=0;}}
+  const cel=t>.72?sm(.72,.9,t):0;if(cel>0){if(sv){lift=0;lean=.25*cel;aL=-2.7;aR=2.7;lL=lR=0;}else{lift=Math.abs(Math.sin((t-.72)*22))*12;aL=-2.6;aR=2.6;}}
+  /* 공 */
+  const tx=sv?(kd===0?180:180+db*140):180+db*120,ty=sv?(kd===0?172:210):(db===0?192:186);
+  const ballPos=tt=>{const f=ea(cl((tt-.38)/.34,0,1));return[180+(tx-180)*f,400+(ty-400)*f-Math.sin(f*Math.PI)*22,22-8*f];};
+  let bx=180,by=400,br=22,trail=[];
+  if(t>=.38){const p=ballPos(t);bx=p[0];by=p[1];br=p[2];for(let k=1;k<=5;k++)trail.push(ballPos(t-k*.014));if(sv&&t>.74){const d=cl((t-.74)/.2,0,1);by=ty+d*d*40;bx=tx-d*3*(db||1);trail=[];}}
+  /* 키퍼 */
+  let kpx=180,kpy=262,krot=0,klift=0,kL=-.9,kR=.9;const dvp=sm(.38,.62,t);
+  if(t<.38){const bob=Math.sin(idle?T*5:t*50);kL=-.8-bob*.2;kR=.8+bob*.2;klift=Math.max(0,bob)*2;}
+  else{kpx=180+kd*dvp*58;krot=kd*dvp*1.2;klift=Math.sin(dvp*Math.PI)*(kd?22:14);kL=-2.95;kR=2.75;kpy=262-dvp*(kd?6:0);if(t>.62){kpx=180+kd*58;krot=kd*1.2;klift=0;kpy=kd?256:262;}}
+  const tag=(x,y,txt,me)=>{F(11);const w=Math.max(34,c.measureText(txt).width+16);c.fillStyle=me?"rgba(250,204,21,.96)":"rgba(15,23,42,.85)";rr(x-w/2,y,w,18,9);c.fill();c.fillStyle=me?"#111":"#f8fafc";c.fillText(txt,x,y+13);};
+  person({x:kpx,y:kpy,s:2.5,lift:klift,rot:krot,front:1,shirt:"#ea7a2a",aL:kL,aR:kR,lL:krot?.25:-.12,lR:krot?-.25:.12,glove:1});
+  tag(kpx,kpy+8,P.vn,P.vMe);
+  trail.forEach((q,i)=>{c.globalAlpha=.32-i*.055;c.fillStyle="#fff";c.beginPath();c.arc(q[0],q[1],q[2]*(1-i*.06),0,7);c.fill();});c.globalAlpha=1;
+  c.fillStyle="rgba(0,0,0,.28)";c.beginPath();c.ellipse(bx,t<.38?410:Math.min(272,by+90),br*.9,br*.32,0,0,7);c.fill();
+  c.save();c.translate(bx,by);c.rotate(t>=.38?(t-.38)*34:0);c.fillStyle="#fff";c.strokeStyle="#111827";c.lineWidth=1.6;c.beginPath();c.arc(0,0,br,0,7);c.fill();c.stroke();c.fillStyle="#111827";c.beginPath();c.arc(0,0,br*.36,0,7);c.fill();for(let k=0;k<5;k++){const a=k*1.2566;c.beginPath();c.arc(Math.cos(a)*br*.82,Math.sin(a)*br*.82,br*.2,0,7);c.fill();}c.restore();
+  if(t>=.36&&t<.5){const u=(t-.36)/.14;c.save();c.translate(180,400);c.globalAlpha=1-u;c.strokeStyle="#fde047";c.lineWidth=3;for(let k=0;k<10;k++){const a=k*.628+.2,r0=16+u*8,r1=r0+14+u*14;c.beginPath();c.moveTo(Math.cos(a)*r0,Math.sin(a)*r0);c.lineTo(Math.cos(a)*r1,Math.sin(a)*r1);c.stroke();}c.fillStyle="rgba(255,255,255,"+(.7*(1-u))+")";c.beginPath();c.arc(0,0,10+u*22,0,7);c.fill();c.restore();}
+  person({x:180,y:ky,s:2.3,lift,lean,front:0,shirt:"#d63a3a",aL,aR,lL,lR});
+  tag(180,ky+8,P.kn,P.kMe);
+  if(t>.66){const u=sm(.66,.76,t),sc=.6+.5*u+Math.sin(u*3.14)*.12;c.save();c.translate(W/2,296);c.scale(sc,sc);c.shadowColor=sv?"#22d3ee":"#fbbf24";c.shadowBlur=20;F(46);c.globalAlpha=u;c.fillStyle=sv?"#67e8f9":"#fde047";c.fillText(sv?"SAVE!":"GOAL!",0,0);c.restore();
+    if(cel>0&&!sv){for(let i=0;i<34;i++){const fx=30+((i*89)%300),fy=170+((i*53+(t-.72)*600)%260);c.fillStyle=["#f87171","#fbbf24","#34d399","#60a5fa"][i%4];c.fillRect(fx,fy,4,4);}}}}
+function pkHide(){if(PKG.raf)cancelAnimationFrame(PKG.raf);PKG.raf=0;if(PKG.el){try{PKG.el.remove();}catch(e){}}PKG.el=null;PKG.id="";PKG.key="";}
+function pkSync(id){if(PKG.id===id&&PKG.el)return;pkHide();PKG.id=id;PKG.my={};
+  const d=document.createElement("div");d.id="pkMod";d.style.cssText="position:fixed;inset:0;z-index:62;background:#0b1020;display:flex;flex-direction:column;align-items:center;color:#e2e8f0";
+  d.innerHTML='<div id="pkHead" style="width:100%;box-sizing:border-box;padding:calc(46px + env(safe-area-inset-top)) 14px 4px;flex:none"></div><div style="flex:1;min-height:0;width:100%;max-width:520px"><canvas id="pkCv" width="720" height="1180" style="width:100%;height:100%;object-fit:contain;display:block"></canvas></div><div id="pkCtl" style="width:100%;max-width:520px;box-sizing:border-box;padding:8px 14px calc(12px + env(safe-area-inset-bottom));flex:none;min-height:116px"></div>';
+  document.body.appendChild(d);PKG.el=d;PKG.cv=d.querySelector("#pkCv");PKG.cx=PKG.cv.getContext("2d");PKG.raf=requestAnimationFrame(pkLoop);}
+function pkPick(dv){const b=battles[PKG.id];if(!b||b.result||!fdb)return;const now=nowS();if(now<b.startT)return;const r=Math.floor((now-b.startT)/PK_T),el=now-b.startT-r*PK_T;if(el>=PK_PICK)return;
+  PKG.my[r]=dv;PKG.key="";fdb.ref(BT_PATH+"/"+PKG.id+"/pk/"+r+"/"+myId).set(dv).catch(()=>{});}
+function pkLoop(){PKG.raf=requestAnimationFrame(pkLoop);const b=battles[PKG.id];if(!b||!PKG.el||!PKG.cx){if(!b)pkHide();return;}
+  const now=nowS(),mine=b.from===myId,opN=mine?b.toName:b.fromName,nm=id=>id===myId?"나":String(id===b.from?b.fromName:b.toName).slice(0,8);
+  let ph="wait",r=0,el=0,rows=[],fullOver=false;
+  if(now>=b.startT){r=Math.floor((now-b.startT)/PK_T);el=now-b.startT-r*PK_T;const full=pkState(b,b.startT+(r+1)*PK_T-1);rows=full.rows;fullOver=full.over;
+    if(r>=rows.length){ph="end";r=rows.length-1;el=PK_T;}else ph=el<PK_PICK?"pick":el<PK_PICK+PK_LOCK?"lock":el<PK_PICK+PK_LOCK+PK_ANIM?"anim":"gap";}
+  const aT=PK_PICK+PK_LOCK,animT=ph==="anim"?(el-aT)/PK_ANIM:(ph==="gap"||ph==="end")?1:-1;
+  const cur=r>=0?rows[r]:null,showCur=!!cur&&(ph==="gap"||ph==="end"||(ph==="anim"&&animT>.72));
+  let sa=0,sb=0;const dots={};dots[b.from]=[];dots[b.to]=[];
+  for(let i=0;i<rows.length;i++){if(i===r&&!showCur&&ph!=="wait")continue;if(i>r&&r>=0)continue;const x=rows[i];if(x.goal){if(x.kick===b.from)sa++;else sb++;}dots[x.kick].push(x.goal?"⚽":"🧤");}
+  const myS=mine?sa:sb,opS=mine?sb:sa;
+  const kickId=cur&&ph!=="wait"?cur.kick:((r<0?0:r)%2===0?b.from:b.to),keepId=kickId===b.from?b.to:b.from,amK=kickId===myId;
+  PKG.cx.save();
+  pkScene(PKG.cx,{t:ph==="wait"||ph==="pick"||ph==="lock"?-1:animT,dk:cur?cur.dk:1,dv:cur?cur.dv:1,goal:cur?cur.goal:true,kn:nm(kickId),vn:nm(keepId),kMe:kickId===myId,vMe:keepId===myId,now:performance.now()});
+  PKG.cx.restore();
+  /* 위쪽 점수판 */
+  const slots=Math.max(5,dots[b.from].length,dots[b.to].length),row=(a,who)=>{let s="";for(let i=0;i<slots;i++)s+=`<span style="display:inline-block;width:20px;text-align:center;opacity:${a[i]?1:.3}">${a[i]||"▫️"}</span>`;return `<div style="display:flex;align-items:center;gap:6px;font-size:11px"><span style="width:44px;text-align:right;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(who)}</span><span>${s}</span></div>`;};
+  const kn=Math.floor((r<0?0:r)/2)+1,rl=ph==="wait"?"곧 시작":kn>5?"서든데스":kn+" / 5";
+  const head=`<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:15px;font-weight:900">나 <span style="font-size:24px;color:${myS>opS?"#4ade80":"#e2e8f0"}">${myS}</span></div><div style="font-size:12px;color:#fbbf24;font-weight:900">⚽ ${rl}</div><div style="font-size:15px;font-weight:900"><span style="font-size:24px;color:${opS>myS?"#f87171":"#e2e8f0"}">${opS}</span> ${esc(String(opN).slice(0,8))}</div></div><div style="display:flex;justify-content:space-between;margin-top:2px">${row(dots[myId],"나")}${row(dots[mine?b.to:b.from],String(opN).slice(0,6))}</div>`;
+  /* 아래 조작부 */
+  const res=b.result,finalShow=ph==="end"||(ph==="gap"&&fullOver&&r===rows.length-1);
+  let ctl="";const sel=PKG.my[r];
+  if(ph==="wait")ctl=`<div style="text-align:center;font-size:15px;font-weight:900;padding:30px 0">${Math.max(0,Math.ceil((b.startT-now)/1000))}</div>`;
+  else if(ph==="pick"){const L=Math.max(0,Math.ceil((PK_PICK-el)/1000)),bt=(v,t1,ic)=>`<button data-pkd="${v}" style="flex:1;padding:14px 0;border-radius:14px;font-size:15px;font-weight:900;background:${sel===v?"var(--acc,#f5b400)":"#1f2937"};color:${sel===v?"#111":"#e2e8f0"};border:2px solid ${sel===v?"var(--acc,#f5b400)":"#334155"}"><div style="font-size:22px">${ic}</div>${t1}</button>`;
+    ctl=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:900"><span style="font-size:14px">${amK?"⚽ 슛 방향":"🧤 막을 방향"}</span><span style="font-size:22px;color:#fbbf24">${L}</span></div><div style="display:flex;gap:8px">${bt(0,"왼쪽","◀")}${bt(1,"가운데","▲")}${bt(2,"오른쪽","▶")}</div>`;}
+  else if(finalShow){
+    if(res){const win=res.w===myId,draw=res.w==="draw";ctl=`<div style="text-align:center"><div style="font-size:22px;font-weight:900;color:${draw?"#e2e8f0":win?"#4ade80":"#f87171"}">${draw?"🤝 무승부":win?"🎉 승리!":"😭 패배"}</div><div style="font-size:13px;margin:4px 0 10px">${draw?"판돈이 돌아와요":win?`<b style="color:#4ade80">+${esc(btStakeTxt(b))}</b> 가져갔어요!`:`<b style="color:#f87171">-${esc(btStakeTxt(b))}</b>`}</div><button id="pkOk" style="width:100%;padding:13px 0;border-radius:12px;background:var(--acc,#f5b400);color:#111;font-weight:900;font-size:15px">확인</button></div>`;}
+    else ctl=`<div style="text-align:center;font-size:13px;color:#94a3b8;padding:30px 0">결과 정리 중…</div>`;}
+  else ctl=`<div style="text-align:center;font-size:14px;font-weight:900;padding:34px 0;color:#94a3b8">${ph==="lock"?"…":ph==="anim"&&animT<.38?"슛!":""}</div>`;
+  const key=head+"|"+ctl;if(key!==PKG.key){PKG.key=key;$("pkHead").innerHTML=head;$("pkCtl").innerHTML=ctl;
+    $("pkCtl").querySelectorAll("[data-pkd]").forEach(x=>x.onclick=()=>pkPick(+x.dataset.pkd));const ok=$("pkOk");if(ok)ok.onclick=()=>{btClosed[PKG.id]=1;pkHide();btRender();};}}
+
 /* BT-END */
 
 /* SESS-BEGIN ===================== 한 계정은 한 기기에서만 ===================== */
