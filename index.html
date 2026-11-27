@@ -910,6 +910,7 @@ function enhDo(){if(enhBusy)return;if(!me||!me._loaded)return toast("닉네임�
   me.cash-=cost;stAdd("enhN");stAdd("enhSpent",cost);stAdd("spent",cost);stAdd("enhMatN",enhMat.length);for(const i of enhMat){const k=fKey(i);me.fish[k]=(me.fish[k]||0)-1;}enhMat=[];const ok=Math.random()*100<tot;stAdd(ok?"enhOk":"enhFail");
   let drop=false,saved=false;if(!ok&&L>=ENH_DROP_LV&&Math.random()<enhDropP(L)){for(const k of["rn","ra","sr"]){if(used[k]){me.enhI[k]=eiHave(k)-used[k];stAdd("enhItemN",used[k]);}}if(prot>0&&Math.random()<prot){saved=true;stAdd("enhSaved");}else{drop=true;me.rodLv=L-1;stAdd("enhDrop");}}
   if(ok)me.enhPity=0;else me.enhPity=(me.enhPity||0)+enhBase(L)*.03;
+  if(drop)broadcast(`💔 ${myName()}님이 낚싯대 강화에 실패해 +${L}강 → +${L-1}강으로 떨어졌어요…`);
   if(ok){me.rodLv=L+1;if(me.rodLv%10===0||me.rodLv>=30)broadcast(`⚒️ ${myName()}님이 낚싯대를 +${me.rodLv}강으로 강화했어요!`);}
   saveMe();renderHeader();renderFishInfo();renderEnh();
   toast(ok?`✨ 강화 성공! 낚싯대 +${L+1}\n좋은 물고기 확률 +${(rodBonus(L+1)*100).toFixed(2)}%p`:(drop?`💔 강화 실패… 레벨 하락! +${L} → +${L-1}`:saved?`🩹 강화 실패! 하지만 복구권으로 레벨 하락을 막았어요 (+${L} 유지)`:`💥 강화 실패… (+${L} 유지)`)+`\n성공 확률 ${tot.toFixed(1)}%였어요`);setTimeout(()=>{enhBusy=false;renderEnh();},600);}
