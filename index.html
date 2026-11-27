@@ -788,11 +788,12 @@ function renderBag(){const S=$("s-bag");if(!S||pgCur!=="my"||pgSub!=="bag")retur
   const sec=(t,rows)=>`<div class="card"><h3>${t}</h3>${rows}</div>`;
   const m=me||{};
   S.innerHTML=bx.map(b=>`<div class="card" style="border:2px solid #fbbf24;background:linear-gradient(160deg,#78350f,#451a03)"><div style="display:flex;align-items:center;gap:12px"><div style="position:relative;font-size:38px;line-height:1">🎁<b class="rwDot">!</b></div><div style="flex:1;font-size:14px;font-weight:900;color:#fde68a">업데이트 보상 상자</div><button data-rwopen="${esc(b.id)}" style="padding:10px 18px;border-radius:11px;background:#fbbf24;color:#111;font-weight:900;font-size:13px">열기</button></div></div>`).join("")+
-   sec("🪱 미끼",row("🪱","최고급 미끼",m.baitM,"개")+row("🪱","고급 미끼",m.baitN,"개")+row("🪱","중급 미끼",m.baitL,"개"))+
+   sec("🪱 미끼",`<div style="font-size:11px;color:var(--sub);margin-bottom:4px">쓸 미끼를 눌러 장착해요. 낚시할 때마다 1개씩 써요.</div>`+[["basic","기본 미끼"],["max","최고급 미끼"],["pro","고급 미끼"],["mid","중급 미끼"]].map(([id,nm])=>{const n=id==="basic"?0:(m[baitKey(id)]|0),on=eqOf("bait")===id,ok=id==="basic"||n>0;return `<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)"><span style="font-size:22px;width:30px;text-align:center">🪱</span><span style="flex:1;font-size:13px">${nm}${id==="basic"?` <small style="color:var(--sub)">무제한</small>`:""}</span>${id==="basic"?"":`<b style="font-size:14.5px;color:${n>0?"var(--acc)":"var(--sub)"}">${n.toLocaleString()}개</b>`}${on?`<span style="font-size:11px;color:var(--acc);font-weight:900;min-width:52px;text-align:center">장착 중</span>`:ok?`<button data-bagbait="${id}" style="background:var(--card2);border-radius:9px;padding:7px 12px;font-size:11px;font-weight:700;min-width:52px">장착</button>`:`<span style="min-width:52px"></span>`}</div>`;}).join(""))+
    sec("⚒️ 강화권",["sn","a","n"].map(k=>row(ENH_ITEMS[k].ic,ENH_ITEMS[k].nm,eiHave(k),"장")).join(""))+
    sec("🩹 복구권",["sr","ra","rn"].map(k=>row(ENH_ITEMS[k].ic,ENH_ITEMS[k].nm,eiHave(k),"장")).join(""))+
    sec("🤖 이용권",row("🤖","자동낚시 이용권",m.autoN,"회"));
-  S.querySelectorAll("[data-rwopen]").forEach(b=>b.onclick=()=>rwOpen(b.dataset.rwopen));}
+  S.querySelectorAll("[data-rwopen]").forEach(b=>b.onclick=()=>rwOpen(b.dataset.rwopen));
+  S.querySelectorAll("[data-bagbait]").forEach(b=>b.onclick=()=>{const id=b.dataset.bagbait;if(!me)return;me.eq=me.eq||{};me.eq.bait=id;saveMe();toast(`🪱 ${gearName("bait")} 장착!`);renderBag();});}
 let rwBusy=0;async function rwOpen(id){if(rwBusy)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(!fdb)return toast("서버에 연결되지 않았어요");rwBusy=1;
   try{const tr=await fdb.ref("market/rwBoxes/"+id+"/u/"+myId).transaction(c=>c?undefined:Date.now());me.rwOpen=me.rwOpen||{};
     if(!tr||!tr.committed){me.rwOpen[id]=1;saveMe();rwBusy=0;rwBadge();renderBag();return toast("이미 연 상자예요");}
