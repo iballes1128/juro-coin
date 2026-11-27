@@ -323,7 +323,7 @@ nav button.on{color:var(--tx);font-weight:700}
 <div id="fMk"><div><div style="display:flex;align-items:center;justify-content:space-between;padding:14px 14px 8px"><b style="font-size:15.5px">🐟 어시장</b><button id="fMkX" style="font-size:20px;color:var(--sub)">✕</button></div>
   <div class="tabs2" id="fMkTabs" style="margin:0 14px 6px"><button data-m="quick" class="on">🐟 바로 팔기</button><button data-m="list">🛒 매물</button><button data-m="sell">📤 올리기 (판매·교환)</button></div>
   <div id="fMkInfo" style="font-size:10px;color:var(--sub);padding:0 14px 6px">잡은 물고기를 시세대로 바로 팔아요 (수수료 10%)</div><div id="fMkBody"></div></div></div>
-<aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><button id="chatClose">✕</button></div>
+<aside id="chatSide"><div class="chatHead"><b>💬 채팅</b><span style="display:flex;align-items:center;gap:10px"><button id="chCur" style="font-size:12px;font-weight:800;color:var(--acc)">🔀 1채널</button><button id="chatClose">✕</button></span></div>
   <div id="chatOn"></div><div id="chatLog"></div>
   <div class="chatIn"><input id="chatIn" maxlength="80" placeholder="메시지 (Enter로 보내기)"><button id="chatSend">전송</button></div></aside>
 <button id="admFab" class="gone">🛠️</button><button id="navAdmin" class="gone"></button>
@@ -5124,7 +5124,8 @@ function showAuth(onNew,loginOnly){let mode="new";const bg=modal('<div style="fo
     else{const low=nm.toLowerCase();let found=null;for(const[id,p]of Object.entries(players)){if(p&&String(p.name||"").trim().toLowerCase()===low&&p.pinH&&p.pinH===await sha(id+":"+pin)){found=id;break;}}
       if(!found)return bg.querySelector("#auErr").textContent="닉네임이나 비밀번호가 맞지 않아요";try{localStorage.setItem("jc_id",found);localStorage.setItem("jc_cn",players[found].cn===2?"2":"1");}catch(e){}fdb.ref("online/"+myId).remove().catch(()=>{});if(sessActive)try{sessRef().remove();}catch(e){}location.reload();}};
   bg.querySelector("#auOk").onclick=go;["auName","auPin"].forEach(x=>bg.querySelector("#"+x).addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing)go();}));setTimeout(()=>bg.querySelector("#auName").focus(),50);}
-function chSet(n){n=n===2?2:1;if(n===myCn)return;myCn=n;try{localStorage.setItem("jc_cn",n===2?"2":"1");}catch(e){}applyOnline();if(typeof updOnline==="function")updOnline();try{fishSyncOthers();}catch(e){}lastPres="";if(me&&me._loaded){me.cn=n;saveMe();}try{pushPresence();}catch(e){}if(window.chatAttach)chatAttach(1);try{renderAll();}catch(e){}}
+function chLbl(){const e=document.getElementById("chCur");if(e)e.textContent="🔀 "+myCn+"채널";}
+function chSet(n){n=n===2?2:1;if(n===myCn)return;myCn=n;try{localStorage.setItem("jc_cn",n===2?"2":"1");}catch(e){}applyOnline();if(typeof updOnline==="function")updOnline();try{fishSyncOthers();}catch(e){}lastPres="";if(me&&me._loaded){me.cn=n;saveMe();}try{pushPresence();}catch(e){}if(window.chatAttach)chatAttach(1);chLbl();try{renderAll();}catch(e){}}
 function chMove(){const bg=modal('<div style="font-size:15.5px;font-weight:900;margin-bottom:12px">🔀 채널 이동</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><button id="cm1" style="padding:12px 4px;border-radius:12px;font-weight:900;font-size:14px">1채널 🔒</button><button id="cm2" style="padding:12px 4px;border-radius:12px;font-weight:900;font-size:14px">2채널</button></div><div id="cmPw" style="display:none">'+PIN_IN("cmP","채널 비밀번호")+'<button id="cmOk" class="go buy" style="margin-top:8px">이동</button></div><div id="cmErr" style="color:#f04452;font-size:11px;min-height:16px;margin-top:6px"></div><button id="cmX" style="width:100%;margin-top:4px;color:var(--sub);font-size:12px">닫기</button>');
   const q=x=>bg.querySelector(x),sty=(el,on)=>{el.style.background=on?"var(--acc)":"var(--card2)";el.style.color=on?"#111":"var(--sub)";el.style.border=on?"2px solid var(--acc)":"2px solid var(--line)";};
   const up=()=>{sty(q("#cm1"),myCn===1);sty(q("#cm2"),myCn===2);};up();q("#cmX").onclick=()=>bg.remove();
@@ -5170,6 +5171,7 @@ $("admLogin").onclick=async()=>{if(isOwner){isOwner=false;try{localStorage.remov
 if(isOwner)$("admLogin").textContent="🔓 관리자 로그아웃";
 $("pinChange").onclick=()=>{if(me&&me._loaded)askSetPin();};
 $("chMove").onclick=()=>{if(me&&me._loaded)chMove();};
+$("chCur").onclick=()=>{if(me&&me._loaded)chMove();};chLbl();
 $("accSwitch").onclick=()=>{if(!me||!me._loaded)return;if(!me.pinH){toast("먼저 이 계정의 비밀번호를 만들어 두세요\n(안 그러면 이 계정으로 돌아올 수 없어요)");return askSetPin();}showAuth(()=>{},true);};
 
 </script>
