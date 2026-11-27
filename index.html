@@ -4059,7 +4059,7 @@ function openBb(bt){if(!me||!me._loaded)return toast("닉네임부터 정해 주
     if(bb.oq){try{bb.oq.off();}catch(e){}}bb.oq=fdb.ref(BT_PATH+"/"+bt+"/bs/"+bb.opId);bb.oq.on("value",s=>{bb.opS=s.val()||0;});}
   d.style.display="flex";if(!bt){bbListen();bbPanel();bbClaim();}bbRender();cancelAnimationFrame(bb.raf);bbLoop();}
 const bbBusy=()=>bb.phase==="play"||bb.phase==="between"||bb.phase==="count";
-function bbClose(force){if(!force&&bbBusy())return toast("🏀 게임 중에는 나갈 수 없어요");const d=$("bbMod");if(d)d.style.display="none";if(bb.battle){btClosed[bb.battle]=1;bb.battle=null;bb.len=BB_LEN;bb.phase="idle";if(bb.oq){try{bb.oq.off();}catch(e){}bb.oq=null;}}cancelAnimationFrame(bb.raf);bbUnlisten();}
+function bbClose(force){if(!force&&bbBusy())return toast("🏀 게임 중에는 나갈 수 없어요");const d=$("bbMod");if(d)d.style.display="none";if(bb.battle){btCl(bb.battle);bb.battle=null;bb.len=BB_LEN;bb.phase="idle";if(bb.oq){try{bb.oq.off();}catch(e){}bb.oq=null;}}cancelAnimationFrame(bb.raf);bbUnlisten();}
 function bbRender(){const B=$("bbBtn"),s=$("bbSub");if(!B)return;const ph=bb.phase;B.style.background="var(--acc)";B.style.color="#111";
   if(bb.battle){B.style.background="var(--card2)";B.style.color="var(--sub)";
     if(ph==="play"){B.textContent="🏀 꾹 눌렀다 떼서 던지기 (스페이스)";B.style.background="#f97316";B.style.color="#fff";s.innerHTML=`⚔️ vs <b>${esc(bb.opN)}</b> · 점수가 높은 쪽이 판돈을 가져가요`;}
@@ -4281,7 +4281,7 @@ $("admReload").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/forceReload
 const BBB_LEN=40,BBB_LEAD=6000;
 const BT_REQ_MS=60000,BT_PICK_MS=5000,BT_GRACE=1000,BT_PATH="market/battles";
 const BT_EMO={r:"✊",s:"✌️",p:"🖐️"},BT_BEATS={r:"s",s:"p",p:"r"};
-let srvOff=0,bFrom={},bTo={},battles={},btClosed={},btDismiss={},btMy={},btResolving={},btIncId=null,btWaitId=null,btPlayId=null,btKind="cash",btGame="rps";
+let srvOff=0,bFrom={},bTo={},battles={},btClosed=(()=>{try{return JSON.parse(localStorage.getItem("jc_btc")||"{}")||{};}catch(e){return{};}})(),BT_BOOT=Date.now(),btDismiss={},btMy={},btResolving={},btIncId=null,btWaitId=null,btPlayId=null,btKind="cash",btGame="rps";
 const nowS=()=>Date.now()+srvOff;
 
 /* ===== 상점 10분 할인 이벤트: 10분마다 물품 1종 10% (소모품은 최대 3개, 영구 물품은 1개) · 시간 기준이라 모두 같은 물품 ===== */
@@ -4962,9 +4962,9 @@ async function btSetSt(id,st,why,extra,fresh){
 async function btResolve(id){
   if(Date.now()-(btResolving[id]||0)<3000)return;btResolving[id]=Date.now();
   try{const s=await fdb.ref(BT_PATH+"/"+id).once("value");const b=s.val();if(!b||b.result||b.st!=="play")return;
-    if(b.game==="pk"){const s=pkState(b,nowS()),w=(!s.over||s.sa===s.sb)?"draw":(s.sa>s.sb?b.from:b.to);
+    if(b.game==="pk"){const s=pkState(b,nowS()),w=s.ff?(s.ff===b.from?b.to:b.from):(!s.over||s.sa===s.sb)?"draw":(s.sa>s.sb?b.from:b.to);
       const tr=await fdb.ref(BT_PATH+"/"+id+"/result").transaction(cur=>cur?undefined:{w,pa:s.sa,pb:s.sb});
-      if(tr&&tr.committed)pushNotice(w==="draw"?`⚽ ${b.fromName} ${s.sa} : ${s.sb} ${b.toName}\n🤝 무승부! 판돈은 돌려받아요`:`⚽ ${b.fromName} ${s.sa} : ${s.sb} ${b.toName}\n🏆 ${w===b.from?b.fromName:b.toName}님 승리! (+${btStakeTxt(b)})`);return;}
+      if(tr&&tr.committed)pushNotice(w==="draw"?`⚽ ${b.fromName} ${s.sa} : ${s.sb} ${b.toName}\n🤝 무승부! 판돈은 돌려받아요`:s.ff?`🏳️ ${s.ff===b.from?b.fromName:b.toName}님이 승부차기를 포기했어요\n🏆 ${w===b.from?b.fromName:b.toName}님 승리! (+${btStakeTxt(b)})`:`⚽ ${b.fromName} ${s.sa} : ${s.sb} ${b.toName}\n🏆 ${w===b.from?b.fromName:b.toName}님 승리! (+${btStakeTxt(b)})`);return;}
     if(b.game==="bb"){const fin=b.fin||{},bs=b.bs||{},sc=u=>Number.isFinite(fin[u])?fin[u]:(Number.isFinite(bs[u])?bs[u]:0),pa=sc(b.from),pb=sc(b.to),w=pa===pb?"draw":(pa>pb?b.from:b.to);
       const tr=await fdb.ref(BT_PATH+"/"+id+"/result").transaction(cur=>cur?undefined:{w,pa,pb});
       if(tr&&tr.committed)pushNotice(w==="draw"?`🏀 ${b.fromName} ${pa} : ${pb} ${b.toName}\n🤝 무승부! 판돈은 돌려받아요`:`🏀 ${b.fromName} ${pa} : ${pb} ${b.toName}\n🏆 ${w===b.from?b.fromName:b.toName}님 승리! (+${btStakeTxt(b)})`);return;}
@@ -5053,7 +5053,7 @@ function btRenderPlay(id){
 function btRender(){
   if(!me||!me._loaded||!fdb)return;const now=nowS();let playId=null,inc=null,wait=null;
   for(const id in battles){const b=battles[id];if(!b)continue;
-    if(b.st==="play"&&!btClosed[id]&&now<b.startT+(b.game==="bb"?BBB_LEN*1000+40000:b.game==="pk"?PK_MAXR*PK_T+60000:25000)){if(!playId||b.startT>battles[playId].startT)playId=id;}
+    if(b.st==="play"&&!btClosed[id]&&now<b.startT+(b.game==="bb"?BBB_LEN*1000+40000:b.game==="pk"?PK_MAXR*PK_T+60000:25000)&&!(b.game==="pk"&&b.result&&pkState(b,now).endT<btBootS())){if(!playId||b.startT>battles[playId].startT)playId=id;}
     else if(b.st==="pending"&&now-b.t<BT_REQ_MS){if(b.to===myId&&!btDismiss[id])inc=id;else if(b.from===myId)wait=id;}}
   if(inc){const b=battles[inc];if(!btCanPay(b)){btDismiss[inc]=1;btSetSt(inc,"declined","poor");toast(`💸 판돈이 부족해서 성사되지 않았어요\n(${b.fromName}님의 신청: ${btStakeTxt(b)})`);inc=null;}}
   btPlayId=playId;btIncId=inc;btWaitId=wait;
@@ -5079,22 +5079,25 @@ function btInit(){
  document.querySelectorAll("[data-bg]").forEach(b=>b.onclick=()=>{btGame=b.dataset.bg;document.querySelectorAll("[data-bg]").forEach(x=>x.classList.toggle("on",x===b));});
  g("btGo").onclick=btCreate;g("btIncYes").onclick=()=>btIncId&&btAccept(btIncId);g("btIncNo").onclick=()=>btIncId&&btDecline(btIncId);g("btWaitNo").onclick=()=>btWaitId&&btCancel(btWaitId);
  document.querySelectorAll("#btpRps button").forEach(x=>x.onclick=()=>btPlayId&&btPick(btPlayId,x.dataset.c));
- g("btpOk").onclick=()=>{if(btPlayId)btClosed[btPlayId]=1;btRender();};}
+ g("btpOk").onclick=()=>{if(btPlayId)btCl(btPlayId);btRender();};}
 
 /* ===================== ⚽ 승부차기 (배틀) ===================== */
+function btCl(id){btClosed[id]=1;try{const k=Object.keys(btClosed);if(k.length>60)k.slice(0,k.length-60).forEach(x=>delete btClosed[x]);localStorage.setItem("jc_btc",JSON.stringify(btClosed));}catch(e){}}
+const btBootS=()=>nowS()-(Date.now()-BT_BOOT);
 const PK_PICK=5000,PK_LOCK=700,PK_ANIM=3800,PK_GAP=500,PK_T=PK_PICK+PK_LOCK+PK_ANIM+PK_GAP,PK_MAXR=20,PK_LEAD=4000;
 const pkDv=v=>v===0||v===2?v:1;
 const btGN=g=>g==="bb"?"농구":g==="pk"?"승부차기":"가위바위보",btGE=g=>g==="bb"?"🏀 농구":g==="pk"?"⚽ 승부차기":"가위바위보";
 /* 라운드마다 신청한 사람(from)과 받은 사람(to)이 번갈아 키커 · 5번씩 · 동점이면 서든데스. 시간표는 startT 기준으로 고정이라 서로 신호 없이 맞춰져요 */
-function pkState(b,now){const pk=b.pk||{};let sa=0,sb=0,over=false,endT=0;const rows=[];
-  for(let i=0;i<PK_MAXR;i++){const t0=b.startT+i*PK_T;if(now<t0+PK_PICK+PK_LOCK)break;
+function pkState(b,now){const pk=b.pk||{},ffs=pk.ff||{},ffId=Object.keys(ffs)[0]||"",ffT=ffId?+ffs[ffId]||0:0;let sa=0,sb=0,over=false,endT=0,ffo="";const rows=[];
+  for(let i=0;i<PK_MAXR;i++){const t0=b.startT+i*PK_T;if(now<t0+PK_PICK+PK_LOCK)break;if(ffT&&t0+PK_PICK+PK_LOCK>ffT)break;
     const kA=i%2===0,kick=kA?b.from:b.to,keep=kA?b.to:b.from,pr=pk[i]||{},dk=pkDv(pr[kick]),dv=pkDv(pr[keep]),goal=dk!==dv;
     if(goal){if(kA)sa++;else sb++;}rows.push({i,kick,keep,dk,dv,goal,t0});
     const n=i+1;let fin=n>=PK_MAXR;
     if(n<=10){const ra=5-Math.ceil(n/2),rb=5-Math.floor(n/2);if(sa>sb+rb||sb>sa+ra)fin=true;}else if(n%2===0&&sa!==sb)fin=true;
     if(fin){over=true;endT=t0+PK_T;break;}}
-  return{rows,sa,sb,over,endT};}
-const PKG={id:"",el:null,raf:0,my:{},bg:null,key:"",cv:null,cx:null};
+  if(!over&&ffId&&now>=ffT){over=true;endT=ffT;ffo=ffId;}
+  return{rows,sa,sb,over,endT,ff:ffo};}
+const PKG={ffAsk:0,id:"",el:null,raf:0,my:{},bg:null,key:"",cv:null,cx:null};
 function pkBgMake(){const S=2,W=360,H=590,cv=document.createElement("canvas");cv.width=W*S;cv.height=H*S;const c=cv.getContext("2d");c.scale(S,S);
   const bg=c.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#0b1020");bg.addColorStop(1,"#111827");c.fillStyle=bg;c.fillRect(0,0,W,H);
   c.fillStyle="#1e293b";c.fillRect(0,108,W,52);for(let i=0;i<90;i++){c.fillStyle=["#475569","#64748b","#fbbf24","#f87171","#60a5fa"][i%5];c.globalAlpha=.55;c.fillRect((i*37)%W,112+((i*53)%44),3,3);}c.globalAlpha=1;
@@ -5156,13 +5159,15 @@ function pkSync(id){if(PKG.id===id&&PKG.el)return;pkHide();PKG.id=id;PKG.my={};
   const d=document.createElement("div");d.id="pkMod";d.style.cssText="position:fixed;inset:0;z-index:62;background:#0b1020;display:flex;flex-direction:column;align-items:center;color:#e2e8f0";
   d.innerHTML='<div id="pkHead" style="width:100%;box-sizing:border-box;padding:calc(46px + env(safe-area-inset-top)) 14px 4px;flex:none"></div><div style="flex:1;min-height:0;width:100%;max-width:520px"><canvas id="pkCv" width="720" height="1180" style="width:100%;height:100%;object-fit:contain;display:block"></canvas></div><div id="pkCtl" style="width:100%;max-width:520px;box-sizing:border-box;padding:8px 14px calc(12px + env(safe-area-inset-bottom));flex:none;min-height:116px"></div>';
   document.body.appendChild(d);PKG.el=d;PKG.cv=d.querySelector("#pkCv");PKG.cx=PKG.cv.getContext("2d");PKG.raf=requestAnimationFrame(pkLoop);}
-function pkPick(dv){const b=battles[PKG.id];if(!b||b.result||!fdb)return;const now=nowS();if(now<b.startT)return;const r=Math.floor((now-b.startT)/PK_T),el=now-b.startT-r*PK_T;if(el>=PK_PICK)return;
+function pkFf(){const b=battles[PKG.id];if(!b||b.result||!fdb||(b.pk&&b.pk.ff))return;PKG.ffAsk=0;PKG.key="";fdb.ref(BT_PATH+"/"+PKG.id+"/pk/ff/"+myId).set(nowS()).catch(()=>{});}
+function pkPick(dv){const b=battles[PKG.id];if(!b||b.result||!fdb||(b.pk&&b.pk.ff))return;const now=nowS();if(now<b.startT)return;const r=Math.floor((now-b.startT)/PK_T),el=now-b.startT-r*PK_T;if(el>=PK_PICK)return;
   PKG.my[r]=dv;PKG.key="";fdb.ref(BT_PATH+"/"+PKG.id+"/pk/"+r+"/"+myId).set(dv).catch(()=>{});}
 function pkLoop(){PKG.raf=requestAnimationFrame(pkLoop);const b=battles[PKG.id];if(!b||!PKG.el||!PKG.cx){if(!b)pkHide();return;}
   const now=nowS(),mine=b.from===myId,opN=mine?b.toName:b.fromName,nm=id=>id===myId?"나":String(id===b.from?b.fromName:b.toName).slice(0,8);
   let ph="wait",r=0,el=0,rows=[],fullOver=false;
   if(now>=b.startT){r=Math.floor((now-b.startT)/PK_T);el=now-b.startT-r*PK_T;const full=pkState(b,b.startT+(r+1)*PK_T-1);rows=full.rows;fullOver=full.over;
     if(r>=rows.length){ph="end";r=rows.length-1;el=PK_T;}else ph=el<PK_PICK?"pick":el<PK_PICK+PK_LOCK?"lock":el<PK_PICK+PK_LOCK+PK_ANIM?"anim":"gap";}
+  const st0=now>=b.startT?pkState(b,now):null;if(st0&&st0.ff){ph="end";r=rows.length-1;}
   const aT=PK_PICK+PK_LOCK,animT=ph==="anim"?(el-aT)/PK_ANIM:(ph==="gap"||ph==="end")?1:-1;
   const cur=r>=0?rows[r]:null,showCur=!!cur&&(ph==="gap"||ph==="end"||(ph==="anim"&&animT>.72));
   let sa=0,sb=0;const dots={};dots[b.from]=[];dots[b.to]=[];
@@ -5170,7 +5175,7 @@ function pkLoop(){PKG.raf=requestAnimationFrame(pkLoop);const b=battles[PKG.id];
   const myS=mine?sa:sb,opS=mine?sb:sa;
   const kickId=cur&&ph!=="wait"?cur.kick:((r<0?0:r)%2===0?b.from:b.to),keepId=kickId===b.from?b.to:b.from,amK=kickId===myId;
   PKG.cx.save();
-  pkScene(PKG.cx,{t:ph==="wait"||ph==="pick"||ph==="lock"?-1:animT,dk:cur?cur.dk:1,dv:cur?cur.dv:1,goal:cur?cur.goal:true,kn:nm(kickId),vn:nm(keepId),kMe:kickId===myId,vMe:keepId===myId,now:performance.now()});
+  pkScene(PKG.cx,{t:ph==="wait"||ph==="pick"||ph==="lock"||!cur?-1:animT,dk:cur?cur.dk:1,dv:cur?cur.dv:1,goal:cur?cur.goal:true,kn:nm(kickId),vn:nm(keepId),kMe:kickId===myId,vMe:keepId===myId,now:performance.now()});
   PKG.cx.restore();
   /* 위쪽 점수판 */
   const slots=Math.max(5,dots[b.from].length,dots[b.to].length),row=(a,who)=>{let s="";for(let i=0;i<slots;i++)s+=`<span style="display:inline-block;width:20px;text-align:center;opacity:${a[i]?1:.3}">${a[i]||"▫️"}</span>`;return `<div style="display:flex;align-items:center;gap:6px;font-size:11px"><span style="width:44px;text-align:right;color:#94a3b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(who)}</span><span>${s}</span></div>`;};
@@ -5186,8 +5191,9 @@ function pkLoop(){PKG.raf=requestAnimationFrame(pkLoop);const b=battles[PKG.id];
     if(res){const win=res.w===myId,draw=res.w==="draw";ctl=`<div style="text-align:center"><div style="font-size:22px;font-weight:900;color:${draw?"#e2e8f0":win?"#4ade80":"#f87171"}">${draw?"🤝 무승부":win?"🎉 승리!":"😭 패배"}</div><div style="font-size:13px;margin:4px 0 10px">${draw?"판돈이 돌아와요":win?`<b style="color:#4ade80">+${esc(btStakeTxt(b))}</b> 가져갔어요!`:`<b style="color:#f87171">-${esc(btStakeTxt(b))}</b>`}</div><button id="pkOk" style="width:100%;padding:13px 0;border-radius:12px;background:var(--acc,#f5b400);color:#111;font-weight:900;font-size:15px">확인</button></div>`;}
     else ctl=`<div style="text-align:center;font-size:13px;color:#94a3b8;padding:30px 0">결과 정리 중…</div>`;}
   else ctl=`<div style="text-align:center;font-size:14px;font-weight:900;padding:34px 0;color:#94a3b8">${ph==="lock"?"…":ph==="anim"&&animT<.38?"슛!":""}</div>`;
+  if(!finalShow&&ph!=="wait")ctl+=PKG.ffAsk?`<div style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:12.5px;font-weight:800"><span style="flex:1;color:#f87171">포기하면 바로 패배예요</span><button data-pkff="1" style="padding:8px 14px;border-radius:10px;background:#dc2626;color:#fff;font-weight:900">포기하기</button><button data-pkff="0" style="padding:8px 14px;border-radius:10px;background:#334155;color:#e2e8f0;font-weight:900">취소</button></div>`:`<div style="text-align:center;margin-top:10px"><button data-pkff="ask" style="padding:6px 16px;border-radius:10px;background:#1f2937;color:#94a3b8;font-size:12px;font-weight:900">🏳️ 포기</button></div>`;
   const key=head+"|"+ctl;if(key!==PKG.key){PKG.key=key;$("pkHead").innerHTML=head;$("pkCtl").innerHTML=ctl;
-    $("pkCtl").querySelectorAll("[data-pkd]").forEach(x=>x.onclick=()=>pkPick(+x.dataset.pkd));const ok=$("pkOk");if(ok)ok.onclick=()=>{btClosed[PKG.id]=1;pkHide();btRender();};}}
+    $("pkCtl").querySelectorAll("[data-pkd]").forEach(x=>x.onclick=()=>pkPick(+x.dataset.pkd));$("pkCtl").querySelectorAll("[data-pkff]").forEach(x=>x.onclick=()=>{const v=x.dataset.pkff;if(v==="1")pkFf();else{PKG.ffAsk=v==="ask"?1:0;PKG.key="";}});const ok=$("pkOk");if(ok)ok.onclick=()=>{btCl(PKG.id);pkHide();btRender();};}}
 
 /* BT-END */
 
