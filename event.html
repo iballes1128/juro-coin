@@ -271,6 +271,7 @@ body.evIn #evRot.on{display:flex}
 </style>
 <script>try{const _si=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==="jc_tab")return;return _si.apply(this,arguments);};}catch(e){}</script>
 <style>#evLv{display:none}#evLv.on{display:flex;position:absolute;inset:0;z-index:12;background:rgba(0,0,0,.62);align-items:center;justify-content:center}#evSplash{position:fixed;inset:0;z-index:30;background:#120d24;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:inherit}#evSplash b{font-size:22px}#evSplash small{color:#9ca3af;font-size:12px}body.evIn #evSplash{display:none}</style>
+<link rel="manifest" href="event.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="주로월드3"><link rel="apple-touch-icon" href="event-192.png"><style>#evGate{display:none}#evGate.on{display:flex;position:fixed;inset:0;z-index:85;background:#120d24;align-items:center;justify-content:center;color:#fff}.evg{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:16px;max-width:92vw}.evg b{font-size:22px}.evgs{font-size:13px;color:#cbd5e1;line-height:1.6}.evg button{padding:13px 22px;border-radius:14px;background:#f59e0b;color:#111;font-weight:900;font-size:15px}.evg button.sk{background:rgba(255,255,255,.12);color:#fff;font-size:13px;padding:10px 18px}#evFsBtn{display:none;position:absolute;right:calc(56px + env(safe-area-inset-right));top:8px;width:40px;height:40px;border-radius:12px;background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:18px;align-items:center;justify-content:center;z-index:4}body.evIn.evChat #evChat{right:calc(102px + env(safe-area-inset-right))!important}</style>
 </head>
 <body>
 <div id="evSplash"><div style="font-size:46px">🏆</div><b>주로월드3</b><small>이벤트 화면에 접속하는 중…</small></div>
@@ -3605,7 +3606,7 @@ function evUpd(){const v=!!(evOn&&fArea===1&&fishActive());if(v===evIn)return;ev
   if(v){evBuild();evLockTried=0;evLock();if(!evWalk(fp.x,fp.y)||fp.x>EW||fp.y>EH){fp.x=60;fp.y=EH-52;}fp.tx=null;fp.via=null;fKeys={};evPanelDirty=1;}
   else{evUnlock();document.body.classList.remove("evChat");const M=$("evMenu");if(M)M.classList.remove("on");const B=$("evTB");if(B)B.classList.remove("on");}
   try{fishResize();}catch(e){}evUi();}
-function evUi(){evBuild();const R=$("evRot"),J=$("evJoin"),H=$("evHud");if(R)R.classList.toggle("on",!!(evIn&&TOUCH&&innerHeight>innerWidth));if(J)J.classList.toggle("on",!!(evOn&&!evIn&&me&&me._loaded));
+function evUi(){evBuild();try{evFsUi();}catch(e){}const R=$("evRot"),J=$("evJoin"),H=$("evHud");if(R)R.classList.toggle("on",!!(evIn&&TOUCH&&innerHeight>innerWidth));if(J)J.classList.toggle("on",!!(evOn&&!evIn&&me&&me._loaded));
   if(H&&evIn){let n=0;for(const id in fOthers){const o=fOthers[id];if(o&&(o.fa|0)===1&&o.fs!=="away")n++;}if(!isOwner)n++;const t=evMyTeam();H.textContent="🏆 주로월드3 · "+(t?EV_TN[t-1]+" · ":"")+"👥 "+n+"명";H.style.borderColor=t?EV_TC[t-1]:"";}
   if(evPanelDirty)try{evRender();}catch(e){}
   const T=$("evToggle"),S=$("evStat");if(T){T.textContent=evOn?"🛑 이벤트 모드 끄기":"🏆 이벤트 모드 켜기";}if(S)S.textContent=evOn?"이벤트 모드 켜짐 · 다리가 열려 있고, 다리 건너편은 가로 이벤트 화면이에요."+(evTeams.n?` (팀 ${evTeams.n}개 확정됨)`:""):"이벤트 모드가 꺼져 있어요. 켜면 다리 건너편이 가로 전용 이벤트 화면으로 바뀌고 다리가 모두에게 열려요.";}
@@ -3617,6 +3618,19 @@ function evTeamPop(){const t=evMyTeam();if(t===evLastTeam)return;evLastTeam=t;if
 setInterval(()=>{try{evUi();evTeamPop();}catch(e){}},700);
 
 setInterval(()=>{try{if(fCv&&fishActive()&&me&&me._loaded&&fArea!==1)fishArea(1,performance.now());}catch(e){}},400);
+
+const EV_STAND=()=>!!((window.matchMedia&&(matchMedia("(display-mode: standalone)").matches||matchMedia("(display-mode: fullscreen)").matches))||navigator.standalone);
+const EV_IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+const EV_CANFS=!!document.documentElement.requestFullscreen;let evGateDone=false;
+function evFsEns(){if($("evGate"))return;
+  document.body.insertAdjacentHTML("beforeend",'<div id="evGate"><div class="evg"><div style="font-size:42px">🏆</div><b>주로월드3</b><div class="evgs">'+(EV_IOS?'📱 아이폰은 브라우저 규칙상 자동 전체화면이 안 돼요.<br>아래 <b>공유 버튼(⬆) → 홈 화면에 추가</b>를 한 뒤<br>그 아이콘으로 열면 주소창 없이 전체화면이에요.':'주소창 없이 게임 화면만 보려면<br>아래 버튼을 눌러 전체화면으로 시작해 주세요.')+'</div>'+(EV_IOS?'':'<button id="evGoFs">⛶ 전체화면으로 시작</button>')+'<button id="evGoSkip" class="sk">'+(EV_IOS?'확인하고 시작하기':'그냥 시작하기')+'</button></div></div>');
+  const W=$("fishWrap");if(W)W.insertAdjacentHTML("beforeend",'<button id="evFsBtn">⛶</button>');
+  const done=()=>{evGateDone=true;$("evGate").classList.remove("on");};
+  if($("evGoFs"))$("evGoFs").onclick=()=>{evLock();done();};$("evGoSkip").onclick=done;
+  if($("evFsBtn"))$("evFsBtn").onclick=()=>{if(document.fullscreenElement){evUnlock();}else evLock();};}
+function evFsUi(){evFsEns();const G=$("evGate"),B=$("evFsBtn");if(G)G.classList.toggle("on",!!(evIn&&TOUCH&&!EV_STAND()&&!evGateDone&&!document.fullscreenElement));
+  if(B)B.style.display=(evIn&&TOUCH&&EV_CANFS&&!EV_STAND())?"flex":"none";}
+
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fishFade(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${dexNo(idx)}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=BIG_V?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
