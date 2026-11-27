@@ -2107,18 +2107,20 @@ const BOAT_ID=["","wood","gold","grand","crystal","dragon","duo","swan"],BOAT_NM
 const boatOwned=id=>isOwner||!!(me&&me.boat&&me.boat[BOAT_ID[id]]);
 const boatList=()=>BOAT_RK.filter(boatOwned);
 const myBoat=()=>{const L=boatList();if(!L.length)return 0;const sl=me?(me.boatSel|0):0;return sl&&L.includes(sl)?sl:L[0];};
-const SEA_EXT=230,seaTop=()=>isOwner?-SEA_EXT:0;/* 🌊 위쪽 먼바다 (지금은 관리자만) */
+const SEA_EXT=230,seaTop=()=>isOwner?-SEA_EXT:0,SEA_ISL=[[300,-190,30,1],[40,-110,24,1],[250,-80,15,0],[60,-200,12,0]];/* 🌊 위쪽 먼바다 (지금은 관리자만) */
 const BH={x:DOCK.x+DOCK.w+56,y:88},BOAT_X0=22,boatY0=()=>54+seaTop()*(isOwner?.87:0);
 const boatOK=(x,y)=>x>=BOAT_X0&&x<=FW-24&&y>=boatY0()&&y<=RIVER-8;
 const boatBob=t=>Math.sin(t/650)*1.4;
 function fDrawErr(e){if(!fDrawErr.n){fDrawErr.n=1;try{console.error("광장 그리기 오류",e);}catch(_){}}}
-function boatStep(dt,t,noIn){const bv=fBV,SP=.085;let ix=0,iy=0;
+function boatStep(dt,t,noIn){const bv=fBV;let SP=.085,ix=0,iy=0;
   if(!noIn){if(fKeys.ArrowLeft||fKeys.a)ix--;if(fKeys.ArrowRight||fKeys.d)ix++;if(fKeys.ArrowUp||fKeys.w)iy--;if(fKeys.ArrowDown||fKeys.s)iy++;
     if(fJoyV){ix=fJoyV.x*Math.max(.45,fJoyV.m);iy=fJoyV.y*Math.max(.45,fJoyV.m);}
     const l=Math.hypot(ix,iy);if(l>0){fp.tx=null;if(l>1){ix/=l;iy/=l;}}
     else if(fp.tx!=null){const dx=fp.tx-fp.x,dy=fp.ty-fp.y,d=Math.hypot(dx,dy);if(d<5){fp.tx=null;}else{const k=Math.min(1,d/110);ix=dx/d*k;iy=dy/d*k;}}}
+  if(isOwner){const hold=fBoostHold||fKeys.Shift,want=hold&&(ix||iy)&&fGas>0&&!noIn;if(want){fGas=Math.max(0,fGas-34*dt/1000);if(!fGas)fBoostHold=0;SP*=1.8;}else fGas=Math.min(100,fGas+(hold?0:20)*dt/1000);if(want!==!!fBs){fBs=want?1:0;}}
   const a=1-Math.exp(-dt/(fp.tx!=null?260:(ix||iy)?420:700));bv.x+=(ix*SP-bv.x)*a;bv.y+=(iy*SP-bv.y)*a;
   let nx=fp.x+bv.x*dt,ny=fp.y+bv.y*dt;const X0=BOAT_X0,X1=FW-24,Y0=boatY0(),Y1=RIVER-8;if(nx<X0){nx=X0;if(bv.x<0)bv.x=0;}else if(nx>X1){nx=X1;if(bv.x>0)bv.x=0;}if(ny<Y0){ny=Y0;if(bv.y<0)bv.y=0;}else if(ny>Y1){ny=Y1;if(bv.y>0)bv.y=0;}
+  if(isOwner)for(const q of SEA_ISL){const rx=q[2]*1.1+16,ry=q[2]*.6+9,ex=(nx-q[0])/rx,ey=(ny-q[1])/ry,d=Math.hypot(ex,ey);if(d<1){const ux=d>1e-4?ex/d:0,uy=d>1e-4?ey/d:-1;nx=q[0]+ux*rx;ny=q[1]+uy*ry;let gx=ux/rx,gy=uy/ry;const gl=Math.hypot(gx,gy);gx/=gl;gy/=gl;const vn=bv.x*gx+bv.y*gy;if(vn<0){bv.x-=vn*gx;bv.y-=vn*gy;}}}
   fp.x=nx;fp.y=ny;if(Math.abs(bv.x)>.006)fp.dir=bv.x>0?1:-1;
   fBoatTilt+=((bv.x/SP)*.13-fBoatTilt)*Math.min(1,dt/180);
   if(Math.hypot(bv.x,bv.y)>.02&&t-fWakeT>110){fWakeT=t;fWake.push({x:fp.x-bv.x*70,y:fp.y+5,t});if(fWake.length>40)fWake.shift();}}
@@ -2149,7 +2151,7 @@ function seaDockExt(c){if(!isOwner)return;const y0=-SEA_EXT;c.fillStyle="rgba(0,
 function seaExt(c,t){const T=-SEA_EXT,g=c.createLinearGradient(0,T,0,0);g.addColorStop(0,"#0f3f66");g.addColorStop(.55,"#1d5f8a");g.addColorStop(1,"#1d5f8a");c.fillStyle=g;c.fillRect(0,T-40,FW,SEA_EXT+42);
   c.strokeStyle="rgba(255,255,255,.14)";c.lineWidth=1.2;for(let i=0;i<24;i++){const y=T+6+i*10,o=(t/40+i*37)%(FW+60)-30;c.beginPath();c.moveTo(o,y);c.quadraticCurveTo(o+8,y-3,o+16,y);c.stroke();c.beginPath();c.moveTo((o+170)%(FW+60)-30,y+5);c.quadraticCurveTo((o+178)%(FW+60)-30,y+2,(o+186)%(FW+60)-30,y+5);c.stroke();}
   const isl=(x,y,r,tr)=>{c.fillStyle="rgba(0,0,0,.18)";c.beginPath();c.ellipse(x+3,y+5,r*1.1,r*.55,0,0,7);c.fill();c.fillStyle="#e2cf98";c.beginPath();c.ellipse(x,y,r*1.1,r*.6,0,0,7);c.fill();c.fillStyle="#5aa34a";c.beginPath();c.ellipse(x,y-2,r*.85,r*.42,0,0,7);c.fill();if(tr){c.font=(r*.9)+"px sans-serif";c.textAlign="center";c.fillText("🌴",x,y-r*.1);}};
-  isl(300,T+40,30,1);isl(40,T+120,24,1);isl(250,T+150,15,0);isl(60,T+30,12,0);
+  for(const q of SEA_ISL)isl(q[0],q[1],q[2],q[3]);
   c.font="15px sans-serif";c.textAlign="center";for(const[x,y]of[[200,T+80],[160,T+190],[300,T+110],[330,T+190]])c.fillText("🛟",x,y+Math.sin(t/500+x)*1.5);
   c.font="24px sans-serif";c.fillText("🗼",335,T+100);c.font="bold 9px 'Noto Sans KR',sans-serif";c.fillStyle="rgba(255,255,255,.8)";c.fillText("🌊 먼바다",FW/2+40,T+16);}
 function drawDock(c){{const o=pirOpenNow();if(o>.02)return pirDock(c,o);}c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
@@ -3228,7 +3230,7 @@ function motoStep(dt,moving){if(fMoto&&!motoOK()){fMoto=0;fBs=0;fLastSent="";}
   const want=fMoto&&(fBoostHold||fKeys.Shift)&&moving&&fGas>0;if(want){fGas=Math.max(0,fGas-34*dt/1000);if(!fGas)fBoostHold=0;}else fGas=Math.min(100,fGas+(fMoto&&(fBoostHold||fKeys.Shift)?0:20)*dt/1000);
   const b=want?1:0;if(b!==fBs){fBs=b;fLastSent="";}return fMoto?(fBs?3:2):1;}
 function motoBtnUpd(){const B=$("fMotoBtn"),S=$("fBoostBtn");if(!B||!S)return;const rc=fMRide?"":motoRideCand(),can=fMoto||fMRide||rc||(motoOK()&&fstate==="idle"&&(isOwner||motoList().length>0)),d=can?"block":"none";if(B.style.display!==d)B.style.display=d;const tx=(fMoto||fMRide)?"🏍️ 내리기":rc?"🏍️ 동승하기":"🏍️ 오토바이 타기";if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!(fMoto||fMRide));}
-  const sd=fMoto?"block":"none";if(S.style.display!==sd)S.style.display=sd;const st=`🔥 부스트 ${Math.round(fGas)}%`;if(S.textContent!==st)S.textContent=st;S.classList.toggle("on",!!fBs);}
+  const sd=(fMoto||(fBoat&&isOwner))?"block":"none";if(S.style.display!==sd)S.style.display=sd;const st=`🔥 부스트 ${Math.round(fGas)}%`;if(S.textContent!==st)S.textContent=st;S.classList.toggle("on",!!fBs);}
 const MOTO_ID=["","neon","inferno","royal","basic","dragon","delivery","unicorn","striker"],MOTO_NM=["","네온 오토바이","인페르노 오토바이","","일반 오토바이","용왕 오토바이","배달 오토바이","유니콘 오토바이","쌍성 스트라이커 (2인승)"],MOTO_IC=["","🏍️","🔥","","🛵","🐉","📦","🦄","🏁"],MOTO_ORDER=[4,6,1,2,5,7],motoLift=k=>(k===5||k===7)?16:13;
 const MOTO_T=[null,{body:"#1d4ed8",b2:"#60a5fa",acc:"#22d3ee",glow:"34,211,238",f1:"#e0f2fe",f2:"#38bdf8"},{body:"#b91c1c",b2:"#f87171",acc:"#fb923c",glow:"251,113,60",f1:"#fff7ed",f2:"#fb923c"},null,{plain:1,body:"#475569",b2:"#cbd5e1",acc:"#94a3b8",glow:"148,163,184",f1:"#f8fafc",f2:"#fbbf24"},{body:"#1e1b4b",b2:"#7c3aed",acc:"#fbbf24",glow:"168,85,247",f1:"#fff",f2:"#fbbf24"},{plain:1,body:"#d97706",b2:"#fde68a",acc:"#b45309",glow:"245,158,11",f1:"#fff7ed",f2:"#fbbf24"}];
 const motoOwned=k=>isOwner||!!(me&&me.moto&&me.moto[MOTO_ID[k]]);
