@@ -1629,8 +1629,9 @@ function renderAdmin(){try{if($("admGI")&&!$("admGI").options.length)admGrantFil
 let delArm={};function agoTxt(t){if(!t)return"기록 없음";const m=Math.floor((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.floor(m/60)+"시간 전":Math.floor(m/1440)+"일 전";}
 function renderAdmPlayers(){const box=$("admPlayers");if(!box)return;const all={...players};if(myId&&me)all[myId]=me;
   const cnt={};for(const p of Object.values(all)){const n=(p&&p.name)||"이름없음";cnt[n]=(cnt[n]||0)+1;}
-  const list=Object.entries(all).filter(([,p])=>p).sort((a,b)=>((a[1].name||"")+"").localeCompare(b[1].name||"")||(b[1].t||0)-(a[1].t||0));
-  box.innerHTML=list.length?list.map(([id,p])=>{const n=p.name||"이름없음",dup=cnt[n]>1,on=!!onlineMap[id],armed=delArm[id]&&Date.now()-delArm[id]<4000;
+  const isOn=id=>{const v=onlineRaw&&onlineRaw[id];return id===myId||!!(v&&Date.now()-(v.t||0)<=180000);};
+  const list=Object.entries(all).filter(([,p])=>p).sort((a,b)=>(isOn(b[0])-isOn(a[0]))||((b[1].t||0)-(a[1].t||0))||((a[1].name||"")+"").localeCompare(b[1].name||""));
+  box.innerHTML=list.length?list.map(([id,p])=>{const n=p.name||"이름없음",dup=cnt[n]>1,on=isOn(id),armed=delArm[id]&&Date.now()-delArm[id]<4000;
     return `<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06)"><div style="flex:1;min-width:0"><div style="font-weight:700">${on?'🟢 ':''}${esc(n)}${id===myId?' (나)':''}${dup?' <small style="color:#ffb020">중복</small>':''}</div><div style="font-size:10px;color:var(--sub)">Lv.${lvOf(p)} · ${formatMoneyReadable(Math.round(assetOf(p)))} · 마지막 활동 ${agoTxt(p.t)}</div></div>${id===myId?'':`<button class="a ${armed?'r':''}" data-del="${id}" style="padding:6px 10px;font-size:11px">${armed?'정말 삭제':'삭제'}</button>`}</div>`;}).join(""):'<div style="color:var(--sub)">플레이어가 없어요</div>';
   box.querySelectorAll("[data-del]").forEach(b=>b.onclick=async()=>{const id=b.dataset.del;if(!(delArm[id]&&Date.now()-delArm[id]<4000)){delArm[id]=Date.now();renderAdmPlayers();setTimeout(renderAdmPlayers,4100);return;}
     delete delArm[id];const nm=(players[id]&&players[id].name)||"";try{await fdb.ref("market/kicked/"+id).set(Date.now());await fdb.ref("players/"+id).remove();await fdb.ref("online/"+id).remove();toast(`${nm}님 삭제 완료`);}catch(e){toast("삭제 실패");}});}
