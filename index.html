@@ -922,7 +922,7 @@ function achVal(k,p){p=p||me||{};if(k==="att")return p.att|0;if(k==="dex")return
   if(k==="bws"||k==="bwn"){const cur=p===me?rpsN():(p.rps|0),best=Math.max(p.rpsBest|0,cur);return k==="bws"?best:Math.max(S.mcWin|0,best);}if(k==="money")return assetOf(p);return 0;}
 function tierOf(id){for(const a of ACH)for(let i=0;i<a.tiers.length;i++)if(achId(a.k,i)===id)return a.tiers[i];return null;}
 const titleOf=(id,p)=>{p=p||me;const t=tierOf(id);if(t&&t[3])return t[1];const at=p&&p.ach&&p.ach[id];if(at&&at<ACH_TITLE_CUT)return ACH_OLD_T[id]||"";return "";};
-const myTitle=()=>(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
+const myTitle=()=>isOwner?"운영자":(me&&me.title&&me.ach&&me.ach[me.title])?titleOf(me.title,me):"";
 const achNoted={};
 function achNext(a){const v=achVal(a.k);const i=a.tiers.findIndex((t,j)=>!(me&&me.ach&&me.ach[achId(a.k,j)]));return i<0?null:{i,t:a.tiers[i],v,ready:v>=a.tiers[i][0]};}
 function achCheck(){if(!me||!me._loaded||sessBlocked)return;achMig();lvMig();if(me.hrOpen)hrListen();if(me.hrPay&&nowS()>me.hrPay.at+3000&&!($("casMod")&&$("casMod").style.display==="flex"&&casTab==="hr"&&hr.view&&hrMyBet(hr.view))){const P=me.hrPay;me.hrPay=null;me.cash+=P.v;saveMe();renderHeader();toast(`🏇 ${P.txt} 적중! ${formatMoneyReadable(P.v)}을 넣어 드렸어요`);if(P.v>P.stake)broadcast(`🏇 ${myName()}님 ${P.txt} 적중! ${P.m}배 → +${formatMoneyReadable(P.v-P.stake)}`);}
@@ -2905,13 +2905,20 @@ function renderAwkPv(){const P=$("awkPvPick"),R=$("awkPvRow"),own=awkOf(me,awkPv
   P.querySelectorAll("button").forEach(b=>b.onclick=()=>{awkPvCh=+b.dataset.pc;renderAwkPv();});
   R.innerHTML=nm.map((n,l)=>`<div style="background:var(--card);border-radius:12px;padding:6px 6px 8px;text-align:center"><canvas data-l="${l}" width="200" height="240" style="width:100%"></canvas><div style="font-size:12.5px;font-weight:900">${n}</div><div style="font-size:11px;color:${l&&l<=own?"var(--up,#4ade80)":"var(--sub)"}">${l===0?"기본 모습":l<=own?"✔ 달성":formatMoneyReadable(AWK_COST[l-1])}</div></div>`).join("");}
 $("awkPvX").onclick=()=>{$("awkPv").style.display="none";clearInterval(awkPvTm);};$("awkPv").onclick=e=>{if(e.target===$("awkPv")){$("awkPv").style.display="none";clearInterval(awkPvTm);}};
+function drawOpTitle(c,x,y,t){c.save();c.font="bold 8px 'Noto Sans KR',sans-serif";c.textAlign="center";const tx="운영자",tw=c.measureText(tx).width+28,h=13,px=x-tw/2;
+  c.shadowColor="rgba(251,191,36,"+(.5+.25*Math.sin(t/260))+")";c.shadowBlur=7;const g=c.createLinearGradient(px,0,px+tw,0);g.addColorStop(0,"#2e1065");g.addColorStop(.5,"#7f1d1d");g.addColorStop(1,"#2e1065");c.fillStyle=g;c.beginPath();c.roundRect(px,y,tw,h,6.5);c.fill();c.shadowBlur=0;
+  c.save();c.beginPath();c.roundRect(px,y,tw,h,6.5);c.clip();const sx=px-14+((t/16)%(tw+28)),sg=c.createLinearGradient(sx,0,sx+14,0);sg.addColorStop(0,"rgba(255,255,255,0)");sg.addColorStop(.5,"rgba(255,244,190,.7)");sg.addColorStop(1,"rgba(255,255,255,0)");c.fillStyle=sg;c.fillRect(sx,y,14,h);c.restore();
+  c.strokeStyle="#fbbf24";c.lineWidth=1;c.beginPath();c.roundRect(px+.5,y+.5,tw-1,h-1,6);c.stroke();
+  const cx=px+9.5,cy=y+h/2+.5;c.fillStyle="#fde047";c.beginPath();c.moveTo(cx-4.2,cy+3);c.lineTo(cx-4.6,cy-2.6);c.lineTo(cx-2.1,cy-.2);c.lineTo(cx,cy-3.6);c.lineTo(cx+2.1,cy-.2);c.lineTo(cx+4.6,cy-2.6);c.lineTo(cx+4.2,cy+3);c.closePath();c.fill();c.fillStyle="#f97316";c.fillRect(cx-4.2,cy+1.6,8.4,1.4);
+  c.fillStyle="#fff7d6";c.fillText(tx,x+6,y+9.7);
+  const sp=.5+.5*Math.sin(t/190),sx2=px+tw-2,sy2=y-.5,r=2.2+2.2*sp;c.globalAlpha=.55+.45*sp;c.fillStyle="#fffbe0";c.beginPath();c.moveTo(sx2,sy2-r);c.lineTo(sx2+r*.28,sy2-r*.28);c.lineTo(sx2+r,sy2);c.lineTo(sx2+r*.28,sy2+r*.28);c.lineTo(sx2,sy2+r);c.lineTo(sx2-r*.28,sy2+r*.28);c.lineTo(sx2-r,sy2);c.lineTo(sx2-r*.28,sy2-r*.28);c.closePath();c.fill();c.restore();}
 function drawPerson(c,x,y,name,hue,dir,walk,rod,state,isMe,t){
   const H=typeof hue==="object"?hue:{hue,ch:-1};hue=H.hue;
   const bob=walk?Math.sin(t/90)*1.5:0;const lg=walk?Math.sin(t/90)*3:0;
   drawAura(c,x,y,H.au,t,0);c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,y+2,9,3.5,0,0,7);c.fill();
   drawWing(c,x,y,dir,H.wg,t,bob);drawCharAwk(c,x,y,H.ch,hue,dir,bob,lg,H.ak|0,t,!!H.wg,!!(H.ac&&ACC_TOP[H.ac]));if(H.ac)drawAccFor(c,x,y,H.ch,H.ac,t,bob,dir,H.ak|0);drawAura(c,x,y,H.au,t,1);const ex=Math.max(awkLift(H.ak),accLift(H.ch,H.ac,H.ak|0));
   if(rod)drawRod(c,x+dir*5,y-16,rod.x0,rod.y0,H.rl|0,t);
-  drawPlate(c,x,y-ex,name,H.np||"",t,isMe);if(H.tt){c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;const ty=H.np==="royal"?9:H.np==="legend"?16:H.np==="diamond"?7:0;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64-ty-ex,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8-ty-ex);}
+  drawPlate(c,x,y-ex,name,H.np||"",t,isMe);if(H.tt){const ty=H.np==="royal"?9:H.np==="legend"?16:H.np==="diamond"?7:0;if(H.tt==="운영자")drawOpTitle(c,x,y-65-ty-ex,t);else{c.font="bold 8px 'Noto Sans KR',sans-serif";const tw=c.measureText(H.tt).width+10;c.fillStyle="rgba(124,58,237,.9)";c.beginPath();c.roundRect(x-tw/2,y-64-ty-ex,tw,11,5.5);c.fill();c.fillStyle="#fde68a";c.fillText(H.tt,x,y-55.8-ty-ex);}}
   if(state==="bite"){c.font="bold 14.5px sans-serif";c.fillStyle="#ff4757";c.fillText("!",x+12,y-34);}}
 function drawLine(c,x0,y0,bx,by,dip,t){c.strokeStyle="rgba(255,255,255,.7)";c.lineWidth=.8;c.beginPath();c.moveTo(x0,y0);c.quadraticCurveTo((x0+bx)/2,Math.min(y0,by)-14,bx,by);c.stroke();
   const d=dip?3+Math.sin(t/40)*2:Math.sin(t/300)*1.2;c.fillStyle="rgba(255,255,255,.35)";c.beginPath();c.ellipse(bx,by+3,6+(dip?Math.sin(t/60)*2:0),2,0,0,7);c.fill();
@@ -5166,8 +5173,8 @@ function askSetPin(){const bg=modal(`<div style="font-size:15.5px;font-weight:90
   setInterval(()=>{fdb.ref("chat").orderByChild("t").endAt(Date.now()-86400000).limitToFirst(50).once("value",s=>{const v=s.val();if(v)for(const k in v)fdb.ref("chat/"+k).remove().catch(()=>{});});},300000);
   showNotices();renderAll();
 }catch(e){console.error(e);toast("서버 연결 실패: 새로고침해 주세요");}})();
-$("admLogin").onclick=async()=>{if(isOwner){isOwner=false;try{localStorage.removeItem("jc_admin");}catch(e){}$("navAdmin").style.display="none";$("admLogin").textContent="🔑 관리자 로그인";return toast("관리자 로그아웃");}
-  const pw=prompt("관리자 비밀번호");if(!pw)return;if(await sha(pw)!==ADMIN_HASH)return toast("비밀번호가 달라요");isOwner=true;sessOwnerOn();try{localStorage.setItem("jc_admin","1");}catch(e){}$("navAdmin").style.display="";$("admLogin").textContent="🔓 관리자 로그아웃";renderAll();toast("관리자 모드 켜짐");};
+$("admLogin").onclick=async()=>{if(isOwner){isOwner=false;try{localStorage.removeItem("jc_admin");}catch(e){}$("navAdmin").style.display="none";$("admLogin").textContent="🔑 관리자 로그인";lastPres="";pushPresence();return toast("관리자 로그아웃");}
+  const pw=prompt("관리자 비밀번호");if(!pw)return;if(await sha(pw)!==ADMIN_HASH)return toast("비밀번호가 달라요");isOwner=true;sessOwnerOn();try{localStorage.setItem("jc_admin","1");}catch(e){}$("navAdmin").style.display="";$("admLogin").textContent="🔓 관리자 로그아웃";lastPres="";pushPresence();renderAll();toast("관리자 모드 켜짐");};
 if(isOwner)$("admLogin").textContent="🔓 관리자 로그아웃";
 $("pinChange").onclick=()=>{if(me&&me._loaded)askSetPin();};
 $("chMove").onclick=()=>{if(me&&me._loaded)chMove();};
