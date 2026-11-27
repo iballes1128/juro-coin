@@ -299,7 +299,7 @@ body.evIn #evRot.on{display:flex}
     <div class="card"><h3>💰 돈 지급</h3>
       <select id="admUser"></select>
       <div class="l"><button class="a" id="admSign" style="flex:none;width:52px">＋ 지급</button><input id="admAmt" inputmode="numeric" placeholder="금액(원)"><button class="a" id="admGive" style="flex:none;width:64px">지급</button></div>
-      <div class="l" style="margin-top:6px"><select id="admGK" style="flex:1"><option value="acc">🎀 악세사리</option><option value="aura">✨ 오라</option><option value="wing">🪽 날개</option><option value="plate">🏷️ 명찰</option><option value="skin">🧑 스킨</option></select><select id="admGI" style="flex:2"></select><button class="a" id="admGrant" style="flex:none;width:64px">🎁 지급</button></div>
+      <div class="l" style="margin-top:6px"><select id="admGK" style="flex:1"><option value="acc">🎀 악세사리</option><option value="aura">✨ 오라</option><option value="wing">🪽 날개</option><option value="plate">🏷️ 명찰</option><option value="skin">🧑 스킨</option><option value="moto">🏍️ 오토바이</option><option value="boat">🚤 보트</option></select><select id="admGI" style="flex:2"></select><button class="a" id="admGrant" style="flex:none;width:64px">🎁 지급</button></div>
       <div class="l"><button class="a" id="admOfRestore" style="flex:1">🏢 선택한 사람에게 기본 사무실 다시 지급</button></div>
     </div>
     <div class="card"><h3>🏴‍☠️ 해적선 이벤트</h3><button class="a" style="width:100%" id="pirNow">🏴‍☠️ 해적선 지금 부르기</button><button class="a" style="width:100%;margin-top:6px" id="pirNowL">💎 황금 해적선 지금 부르기</button><div style="font-size:10px;color:var(--sub);margin-top:5px">매시 5~54분 사이 자동 등장 · 이 버튼은 테스트용(바로 출발)</div></div>
@@ -1676,15 +1676,15 @@ $("admGive").onclick=async()=>{const id=$("admUser").value,raw=parseInt(($("admA
   if(id===myId){me.cash+=amt;saveMe();}else{const p=players[id];if(!p)return;try{await fdb.ref("players/"+id+"/cash").set((p.cash||0)+amt);}catch(e){return toast("지급 실패");}}
   $("admAmt").value="";const nm=id===myId?myName():(players[id].name||"");if(id!==myId&&fdb)fdb.ref("market/adminMsg/"+id).set({amt,t:Date.now(),k:Math.random().toString(36).slice(2,9)}).catch(()=>{});toast(amt<0?"회수 완료":"지급 완료");renderAll();};
 /* 관리자: 선택한 사람에게 악세사리·오라·날개·명찰·스킨 지급 (서버에서 한 번에 고치고 ver도 올려서, 오래된 기기가 덮어쓰지 못하게 해요) */
-function admGrantList(k){if(k==="acc")return ACCS.map(a=>[a[0],a[2]+" "+a[1]]);if(k==="skin")return CH_ORDER.map(v=>[String(v),CHARS[v][0]]);return((COS[k]||{}).list||[]).map(x=>[x[0],x[1]]);}
+function admGrantList(k){if(k==="acc")return ACCS.map(a=>[a[0],a[2]+" "+a[1]]);if(k==="skin")return CH_ORDER.map(v=>[String(v),CHARS[v][0]]);if(k==="moto")return MOTO_ID.map((id,j)=>id&&MOTO_NM[j]?[id,MOTO_IC[j]+" "+MOTO_NM[j]]:null).filter(Boolean);if(k==="boat")return BOAT_ID.map((id,j)=>id&&BOAT_NM[j]?[id,BOAT_IC[j]+" "+BOAT_NM[j]]:null).filter(Boolean);return((COS[k]||{}).list||[]).map(x=>[x[0],x[1]]);}
 function admGrantFill(){const k=$("admGK").value;$("admGI").innerHTML=admGrantList(k).map(([i,n])=>`<option value="${esc(i)}">${esc(n)}</option>`).join("");}
-function admGrantApply(d,k,i){if(k==="acc"){d.acc=d.acc||{};d.acc[i]=true;}else if(k==="skin"){d.skins=d.skins||{};d.skins["s"+i]=true;}else{d.cos=d.cos||{};d.cos[k+"_"+i]=true;}}
+function admGrantApply(d,k,i){if(k==="acc"){d.acc=d.acc||{};d.acc[i]=true;}else if(k==="skin"){d.skins=d.skins||{};d.skins["s"+i]=true;}else if(k==="moto"){d.moto=d.moto||{};d.moto[i]=true;}else if(k==="boat"){d.boat=d.boat||{};d.boat[i]=true;}else{d.cos=d.cos||{};d.cos[k+"_"+i]=true;}}
 $("admGK").onchange=admGrantFill;
 $("admGrant").onclick=async()=>{const id=$("admUser").value,k=$("admGK").value,i=$("admGI").value;if(!id||!i)return;const nm=($("admGI").selectedOptions[0]||{}).textContent||i;
   if(id===myId){admGrantApply(me,k,i);saveMe();renderAll();return toast("🎁 지급 완료: "+nm);}
   const p=players[id];if(!p)return toast("플레이어를 찾을 수 없어요");if(!fdb)return toast("서버에 연결되지 않았어요");
   try{const r=await fdb.ref("players/"+id).transaction(cur=>{if(!cur)return cur;admGrantApply(cur,k,i);cur.ver=(cur.ver|0)+1;return cur;});
-    if(r&&r.committed&&r.snapshot&&r.snapshot.val())toast(`🎁 ${esc(p.name||"")}님께 지급 완료: ${nm}`);else toast("지급하지 못했어요. 다시 시도해 주세요");}
+    if(r&&r.committed&&r.snapshot&&r.snapshot.val()){toast(`🎁 ${esc(p.name||"")}님께 지급 완료: ${nm}`);fdb.ref("market/adminMsg/"+id).set({it:nm,t:Date.now(),k:Math.random().toString(36).slice(2,9)}).catch(()=>{});}else toast("지급하지 못했어요. 다시 시도해 주세요");}
   catch(e){toast("지급 실패 ("+String((e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}};
 $("admReset").onclick=async()=>{if(!confirmReset())return;const t=Date.now();
   for(const[id,p]of Object.entries(players)){if(id===myId)continue;let sum=0;for(const n in(p.coins||{}))sum+=p.coins[n].cost||0;try{await fdb.ref("players/"+id).update({cash:(p.cash||0)+sum,coins:null,t});}catch(e){}}
@@ -5442,7 +5442,8 @@ async function btAccept(id){
   pushNotice(`⚔️ 배틀 성사! ${b.fromName} vs ${b.toName}\n판돈 ${btStakeTxt(b)} · ${btGE(b.game)} 시작!`);
   renderAll();}
 /* 관리자가 돈을 주거나 회수하면 받는 사람 화면에 메시지가 떠요 */
-{let att="";setInterval(()=>{if(!fdb||!myId||att===myId)return;att=myId;const id=myId;fdb.ref("market/adminMsg/"+id).on("value",sn=>{const v=sn.val();if(!v||!v.k||!v.amt||id!==myId)return;let seen="";try{seen=localStorage.getItem("admMsgK_"+id)||"";}catch(e){}if(seen===v.k||Date.now()-(v.t||0)>6*3600000)return;try{localStorage.setItem("admMsgK_"+id,v.k);}catch(e){}
+{let att="";setInterval(()=>{if(!fdb||!myId||att===myId)return;att=myId;const id=myId;fdb.ref("market/adminMsg/"+id).on("value",sn=>{const v=sn.val();if(!v||!v.k||(!v.amt&&!v.it)||id!==myId)return;let seen="";try{seen=localStorage.getItem("admMsgK_"+id)||"";}catch(e){}if(seen===v.k||Date.now()-(v.t||0)>6*3600000)return;try{localStorage.setItem("admMsgK_"+id,v.k);}catch(e){}
+  if(v.it&&!v.amt){const g=modal(`<div style="text-align:center"><div style="font-size:34px">🎁</div><div style="font-size:15px;font-weight:900;margin:6px 0">관리자가 선물을 지급했어요</div><div style="font-size:19px;font-weight:900;color:var(--acc);margin:4px 0 14px">${esc(String(v.it))}</div><button id="admMsgOk" style="width:100%;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">확인</button></div>`);g.style.zIndex=80;const o=g.querySelector("#admMsgOk");if(o)o.onclick=()=>{try{g.remove();}catch(e){}};try{renderAll();}catch(e){}return;}
   const pos=v.amt>0,bg=modal(`<div style="text-align:center"><div style="font-size:34px">${pos?"💰":"🧾"}</div><div style="font-size:15px;font-weight:900;margin:6px 0">관리자가 ${pos?"돈을 지급했어요":"돈을 회수했어요"}</div><div style="font-size:22px;font-weight:900;color:${pos?"var(--acc)":"var(--up)"};margin:4px 0 14px">${pos?"+":"-"}${formatMoneyReadable(Math.abs(v.amt))}</div><button id="admMsgOk" style="width:100%;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">확인</button></div>`);
   bg.style.zIndex=80;const cl=()=>{try{bg.remove();}catch(e){}};const ok=bg.querySelector("#admMsgOk");if(ok)ok.onclick=cl;});},1000);}
 function pushNotice(text){if(fdb)fdb.ref("market/notice").set({text,t:Date.now(),k:Math.random().toString(36).slice(2,8)}).catch(()=>{});}
