@@ -242,7 +242,7 @@ body.evIn #evMenu.on{display:flex;flex-direction:column;gap:4px;position:absolut
 body.evIn.evChat #evChat{display:flex;flex-direction:column;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom));width:min(50vw,440px);z-index:6;gap:3px}
 #evChips{display:flex;gap:10px;padding:0 4px;overflow-x:auto;scrollbar-width:none}
 #evChips button{display:flex;align-items:center;gap:5px;flex:none;font-size:12px;font-weight:800;color:#fff;background:none;padding:6px 4px;opacity:.5;text-shadow:0 1px 2px #000;min-height:32px}
-#evChips button.on{opacity:1}#evChips .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+#evChips button.on{opacity:1}#evChips .sz{margin-left:auto;opacity:1;font-size:13px;background:rgba(20,24,30,.7);border-radius:6px;padding:4px 12px;min-height:30px}#evChips .sz+.sz{margin-left:4px}#evChips .sz:disabled{opacity:.3}#evChips .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
 #evLog{height:96px;overflow-y:auto;background:rgba(20,24,30,.55);border-radius:6px;padding:5px 8px;font-size:13px;line-height:1.45;font-weight:700;color:#fff;text-shadow:0 1px 2px #000;word-break:break-all;scrollbar-width:none}
 #evLog::-webkit-scrollbar{display:none}#evLog b{font-weight:800}#evLog i{font-style:normal;opacity:.85}
 .eva{color:#fdba74;border-bottom:1px solid rgba(253,186,116,.35);margin-bottom:3px;padding-bottom:3px}.eva u{color:#fff;margin-left:4px}
@@ -3472,7 +3472,7 @@ function fishStep(dt,t){
 /* ---------- 🏆 주로월드3 이벤트 모드 (가로 전용 화면) ---------- */
 const EV_ST={x:280,y:60,w:160,h:66};
 const EV_TC=["#ef4444","#3b82f6","#22c55e"],EV_TN=["1팀","2팀","3팀"];
-let evTeams={n:0,m:{}},evAnn=null,evMsgs={},evPane={},evUnread={},evLis={},evPanelDirty=1,evTo="all",evDraft=null,evDrawN=2,evLastTeam=-1;
+let evTeams={n:0,m:{}},evAnn=null,evMsgs={},evPane={},evUnread={},evLis={},evPanelDirty=1,evTo="all",evSz=1,evDraft=null,evDrawN=2,evLastTeam=-1;
 function evWalk(x,y){return x>=14&&x<=EW-14&&y>=54&&y<=EH-12&&!(x>EV_ST.x-8&&x<EV_ST.x+EV_ST.w+8&&y<EV_ST.y+EV_ST.h+4);}
 const evMyTeam=()=>evTeams.m[myId]|0;
 function evGlow(c,x,y,r,rgb,a){const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,`rgba(${rgb},${a})`);g.addColorStop(1,`rgba(${rgb},0)`);c.fillStyle=g;c.fillRect(x-r,y-r,r*2,r*2);}
@@ -3546,10 +3546,10 @@ function evAttach(){if(!fdb)return;const want=new Set(evChs());
   evPanelDirty=1;}
 const evLc=ch=>ch==="all"?"#ffffff":["#fca5a5","#93c5fd","#86efac"][+ch.slice(1)-1];
 function evRender(){const P=$("evChat");if(!P||!document.body.classList.contains("evChat"))return;const chs=evChs();if(!chs.includes(evTo)&&evTo!=="ann")evTo="all";
-  $("evChips").innerHTML=chs.map(ch=>`<button data-c="${ch}" class="${evPaneOn(ch)?"on":""}"><i class="dot" style="background:${evCol(ch)}"></i>${evLab(ch)}${evUnread[ch]&&!evPaneOn(ch)?" •":""}</button>`).join("")+(chs.length>2?'<button data-c="*" class="on">모두 켜기</button>':"");
+  $("evChips").innerHTML=chs.map(ch=>`<button data-c="${ch}" class="${evPaneOn(ch)?"on":""}"><i class="dot" style="background:${evCol(ch)}"></i>${evLab(ch)}${evUnread[ch]&&!evPaneOn(ch)?" •":""}</button>`).join("")+(chs.length>2?'<button data-c="*" class="on">모두 켜기</button>':"")+'<button data-z="-1" class="sz" '+(evSz<=0?'disabled':'')+'>▼</button><button data-z="1" class="sz" '+(evSz>=3?'disabled':'')+'>▲</button>';
   const on=chs.filter(evPaneOn);on.forEach(ch=>evUnread[ch]=0);
   const e2=s=>String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
-  const L=$("evLog"),near=L.scrollHeight-L.scrollTop-L.clientHeight<30;
+  const L=$("evLog");L.style.height=Math.max(36,Math.min([40,96,170,250][evSz],innerHeight-(document.body.classList.contains("evKb")?110:126)))+"px";const near=L.scrollHeight-L.scrollTop-L.clientHeight<30;
   const lines=[];on.forEach(ch=>(evMsgs[ch]||[]).forEach(m=>lines.push({ch,m})));lines.sort((x,y)=>(x.m.t||0)-(y.m.t||0));
   const multi=on.length>1;
   L.innerHTML=(on.includes("all")&&evAnn&&evAnn.text?`<div class="eva">📢 ${e2(evAnn.text)}${isOwner?' <u data-ann="x">내리기</u>':""}</div>`:"")+(lines.length||(evAnn&&evAnn.text)?"":'<div style="opacity:.6;font-weight:600">아직 채팅이 없어요</div>')+lines.slice(-40).map(l=>`<div style="color:${evLc(l.ch)}">${multi?`<i>[${evLab(l.ch)}]</i> `:""}<b>${e2(l.m.n)}</b>: ${e2(l.m.x)}</div>`).join("");
@@ -3588,7 +3588,7 @@ function evBuild(){if($("evMenuBtn"))return;const W=$("fishWrap");if(!W)return;
     };
   evTap($("evChatBtn"),()=>{M.classList.remove("on");chatOpen(!document.body.classList.contains("evChat"));});evTap($("fAct"),()=>fishAction());
   
-  $("evChips").onclick=e=>{const b=e.target.closest("button");if(!b)return;const c=b.dataset.c;if(c==="*"){evChs().forEach(ch=>evPane[ch]=true);}else evPane[c]=!evPaneOn(c);evUnread[c]=0;evRender();};
+  $("evChips").onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.z){evSz=Math.max(0,Math.min(3,evSz+(+b.dataset.z)));evPanelDirty=1;evRender();return;}const c=b.dataset.c;if(c==="*"){evChs().forEach(ch=>evPane[ch]=true);}else evPane[c]=!evPaneOn(c);evUnread[c]=0;evRender();};
   $("evLog").onclick=e=>{if(e.target.dataset&&e.target.dataset.ann&&isOwner&&fdb)fdb.ref("evt/state/ann").remove().catch(()=>{});};
   $("evIn").addEventListener("focus",()=>{if(TOUCH){document.body.classList.add("evKb");evPanelDirty=1;setTimeout(evRender,60);}});$("evIn").addEventListener("blur",()=>{document.body.classList.remove("evKb");evPanelDirty=1;setTimeout(evRender,60);});if(window.visualViewport)window.visualViewport.addEventListener("resize",()=>{if(document.body.classList.contains("evKb")){evPanelDirty=1;evRender();}});$("evSd").onclick=evSend;$("evIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();evSend();}});$("evTo").onchange=()=>{evTo=$("evTo").value;};
   document.querySelectorAll("#evTB [data-n]").forEach(b=>b.onclick=()=>{evDrawN=+b.dataset.n;evDraft=null;$("evTSave").disabled=true;$("evTGo").textContent="🎲 추첨하기";evTbRender();});
