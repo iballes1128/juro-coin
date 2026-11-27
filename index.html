@@ -4577,6 +4577,12 @@ const PH_POSE=[["base","기본","🧍"],["v","브이","✌️"],["up","만세","
 const PH_W=320,PH_H=380,PH_Y0=168,PH_Y1=372,PH_MAX=6,PH_STEP=5000,PH_CUTS=4,PH_LEAD=3000;
 const PH_SKIN={18:"#7b8794",17:"#f3c98b",5:"#8b5a2b",6:"#f59e0b",7:"#4ade80",8:"#1f2937",9:"#9ca3af",10:"#f1f5f9",15:"#fde047",16:"#f8fafc"};
 const ph={rooms:{},rid:"",ren:{},keys:{},shots:[],t0:0,phase:"idle",me:{x:160,y:310,d:1,p:"base",tx:null,ty:null},raf:0,lt:0,lastSend:0,lastSent:"",lastHb:0,on:false,ctlKey:"",flash:0,last:null,names:[],joinAt:0,h:null,busy:false};
+/* 모바일 탭: click이 씹히는 기기 대비 (터치 끝에서 직접 실행, 350ms 중복 방지) */
+function phTap(el,fn){if(!el)return;let last=0,sx=0,sy=0,mv=0;const go=e=>{if(Date.now()-last<350)return;last=Date.now();fn(e);};
+  el.addEventListener("touchstart",e=>{const t=e.touches[0];sx=t.clientX;sy=t.clientY;mv=0;},{passive:true});
+  el.addEventListener("touchmove",e=>{const t=e.touches[0];if(Math.abs(t.clientX-sx)>10||Math.abs(t.clientY-sy)>10)mv=1;},{passive:true});
+  el.addEventListener("touchend",e=>{if(mv||el.disabled)return;e.preventDefault();go(e);},{passive:false});
+  el.addEventListener("click",e=>{if(el.disabled)return;go(e);});}
 const phOpen=()=>{const d=$("phMod");return !!d&&d.style.display==="flex";};
 const phRoom=()=>ph.rid?ph.rooms[ph.rid]||null:null;
 const phRef=id=>fdb.ref("market/photo/rooms"+(id?"/"+id:""));
@@ -4616,12 +4622,18 @@ function phCompose(){const fr=PH_FR.find(f=>f[0]===(ph.fr||"white"))||PH_FR[0],C
   const d=new Date(),ds=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,"0")}.${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
   c.fillStyle=fr[3];c.textAlign="center";c.font="bold 44px 'Noto Sans KR',sans-serif";c.fillText("🪙 주로월드 · 인생네컷",W/2,M+CH*2+G+64);c.font="26px 'Noto Sans KR',sans-serif";c.fillText(ds,W/2,M+CH*2+G+104);c.font="24px 'Noto Sans KR',sans-serif";c.fillText((ph.names||[]).join(" · ").slice(0,42),W/2,M+CH*2+G+140);
   return cv;}
-function phSave(){const cv=ph.last&&ph.last.cv;if(!cv)return;const nm=`주로월드_인생네컷_${Date.now()}.png`;cv.toBlob(b=>{if(!b)return toast("저장에 실패했어요");const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=nm;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),5000);toast("💾 사진을 저장했어요");},"image/png");}
-function phShare(){const cv=ph.last&&ph.last.cv;if(!cv)return;cv.toBlob(b=>{if(!b)return;const f=new File([b],"주로월드_인생네컷.png",{type:"image/png"});if(navigator.canShare&&navigator.canShare({files:[f]}))navigator.share({files:[f],title:"주로월드 인생네컷"}).catch(()=>{});else phSave();},"image/png");}
-function phResult(){if(!ph.last)return;const old=$("phRes");if(old)old.remove();const can=!!(navigator.canShare&&navigator.share);
-  const bg=modal(`<div style="text-align:center"><div style="font-size:15px;font-weight:900;margin-bottom:8px">📸 인생네컷 완성!</div><img id="phImg" alt="인생네컷" style="width:100%;border-radius:8px;display:block;background:#fff"><div style="font-size:11px;color:var(--sub);margin:6px 0 10px">사진을 꾹 눌러서 저장할 수도 있어요</div><div style="display:flex;gap:8px"><button id="phSv" style="flex:1;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">💾 저장</button>${can?'<button id="phSh" style="flex:1;padding:12px 0;border-radius:11px;background:var(--card2);font-weight:900">📤 공유</button>':""}<button id="phCl" style="flex:1;padding:12px 0;border-radius:11px;background:var(--card2);font-weight:900">닫기</button></div></div>`);
+function phSave(){const cv=ph.last&&ph.last.cv;if(!cv)return;const nm=`주로월드_인생네컷_${Date.now()}.png`;
+  cv.toBlob(b=>{if(!b)return toast("저장에 실패했어요");
+    const f=(()=>{try{return new File([b],nm,{type:"image/png"});}catch(e){return null;}})();
+    const dl=()=>{try{const u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=nm;a.rel="noopener";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),8000);toast("💾 저장했어요 (안 보이면 사진을 꾹 눌러 저장하세요)");}catch(e){toast("사진을 꾹 눌러서 저장해 주세요");}};
+    const mobile=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform));
+    if(mobile&&f&&navigator.canShare&&navigator.canShare({files:[f]})&&navigator.share){navigator.share({files:[f],title:"주로월드 인생네컷"}).catch(err=>{if(err&&err.name==="AbortError")return;dl();});}
+    else dl();},"image/png");}
+function phShare(){phSave();}
+function phResult(){if(!ph.last)return;const old=$("phRes");if(old)old.remove();const can=false;
+  const bg=modal(`<div style="text-align:center"><div style="font-size:15px;font-weight:900;margin-bottom:8px">📸 인생네컷 완성!</div><img id="phImg" alt="인생네컷" style="width:100%;max-height:60vh;object-fit:contain;border-radius:8px;display:block;background:#fff;-webkit-touch-callout:default;-webkit-user-select:auto;user-select:auto;touch-action:manipulation"><div style="font-size:11px;color:var(--sub);margin:6px 0 10px">사진을 꾹 눌러서 저장할 수도 있어요</div><div style="display:flex;gap:8px"><button id="phSv" style="flex:1;padding:14px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">💾 저장</button>${can?'<button id="phSh" style="flex:1;padding:12px 0;border-radius:11px;background:var(--card2);font-weight:900">📤 공유</button>':""}<button id="phCl" style="flex:1;padding:14px 0;border-radius:11px;background:var(--card2);font-weight:900">닫기</button></div></div>`);
   bg.id="phRes";bg.style.zIndex=70;const im=bg.querySelector("#phImg");if(im)try{im.src=ph.last.cv.toDataURL("image/png");}catch(e){}
-  const cl=()=>{try{bg.remove();}catch(e){}};const g=q=>bg.querySelector(q);if(g("#phSv"))g("#phSv").onclick=phSave;if(g("#phSh"))g("#phSh").onclick=phShare;if(g("#phCl"))g("#phCl").onclick=cl;}
+  const cl=()=>{try{bg.remove();}catch(e){}};const g=q=>bg.querySelector(q);phTap(g("#phSv"),phSave);phTap(g("#phCl"),cl);}
 /* ---------- 방 ---------- */
 function phEnter(rid){ph.rid=rid;ph.ren={};ph.phase="idle";ph.t0=0;ph.shots=[];ph.joinAt=Date.now();ph.me.tx=null;ph.me.ty=null;ph.ctlKey="";phBuild();}
 function phCreate(){if(ph.busy||!fdb)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");ph.busy=true;const rid=phRef().push().key;ph.me={x:160,y:310,d:1,p:"base",tx:null,ty:null};
@@ -4632,7 +4644,7 @@ function phJoin(rid){if(ph.busy||!fdb)return;if(!me||!me._loaded)return toast("�
 function phLeave(cb){const rid=ph.rid;ph.rid="";ph.phase="idle";if(!rid||!fdb){if(cb)cb();return;}
   phRef(rid).transaction(r=>{if(r===null)return r;const m=r.m||{};delete m[myId];const ids=Object.keys(m);if(!ids.length)return null;r.m=m;if(r.host===myId){ids.sort((a,b)=>(m[a].j||0)-(m[b].j||0));r.host=ids[0];r.hn=m[ids[0]].n;}return r;}).catch(()=>{}).then(()=>{if(cb)cb();});}
 function phStart(){const R=phRoom();if(!R||R.host!==myId||R.st!=="wait"||ph.busy)return;ph.busy=true;
-  phRef(ph.rid).transaction(r=>{if(r===null)return r;if(r.host!==myId||r.st!=="wait")return;r.st="shoot";r.t0=nowS()+PH_LEAD;return r;},(err,ok)=>{ph.busy=false;if(err||!ok)toast("지금은 시작할 수 없어요");},false);}
+  phRef(ph.rid).transaction(r=>{if(r===null)return r;if(r.host!==myId||r.st!=="wait")return;r.st="shoot";r.t0=nowS()+PH_LEAD;return r;},(err,ok)=>{ph.busy=false;if(err||!ok)toast("지금은 시작할 수 없어요 (잠시 뒤 다시 눌러 주세요)");},false);}
 function phSet(k,v){const R=phRoom();if(!R||R.host!==myId||R.st!=="wait")return;phRef(ph.rid).update({[k]:v}).catch(()=>{});}
 function phSweep(){if(!fdb)return;const now=nowS();for(const rid in ph.rooms){const r=ph.rooms[rid];if(!r)continue;const m=r.m||{},ids=Object.keys(m),fresh=ids.filter(i=>now-(m[i].hb||0)<20000);
     if(!ids.length||(!fresh.length&&now-(r.ct||0)>25000)){phRef(rid).remove().catch(()=>{});continue;}
@@ -4650,26 +4662,26 @@ function phListen(){if(ph.on||!fdb)return;ph.on=true;ph.h=phRef().on("value",sn=
 function phUnlisten(){if(!ph.on||!fdb)return;ph.on=false;try{phRef().off("value",ph.h);}catch(e){}}
 function phBuild(){const d=$("phMod");if(!d)return;
   if(!ph.rid){d.innerHTML=`<div class="btBox" style="max-width:420px"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">📸 인생네컷</b><button id="phX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div><div style="font-size:11.5px;color:var(--sub);margin:4px 0 10px;line-height:1.5">친구들과 한 방에 모여 10초마다 한 컷씩, 총 4컷을 찍어요. 사진은 2x2로 합쳐서 저장할 수 있어요!</div><button id="phNew" class="go buy" style="margin-bottom:10px;background:var(--acc);color:#111">➕ 방 만들기</button><div id="phList"></div></div>`;
-    $("phX").onclick=phClose;$("phNew").onclick=phCreate;ph.ctlKey="";phCtl();return;}
+    phTap($("phX"),phClose);phTap($("phNew"),phCreate);ph.ctlKey="";phCtl();return;}
   d.innerHTML=`<div class="btBox" style="max-width:380px;padding:12px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b id="phTitle" style="font-size:14.5px">📸 인생네컷</b><button id="phX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div><div style="position:relative"><canvas id="phCv" width="640" height="760" style="width:100%;border-radius:10px;display:block;touch-action:none;background:#111"></canvas></div><div id="phCtl" style="margin-top:8px"></div></div>`;
-  $("phX").onclick=phClose;const cv=$("phCv"),pt=e=>{const r=cv.getBoundingClientRect();ph.me.tx=Math.max(22,Math.min(PH_W-22,(e.clientX-r.left)/r.width*PH_W));ph.me.ty=Math.max(PH_Y0,Math.min(PH_Y1,(e.clientY-r.top)/r.height*PH_H));};
+  phTap($("phX"),phClose);const cv=$("phCv"),pt=e=>{const r=cv.getBoundingClientRect();ph.me.tx=Math.max(22,Math.min(PH_W-22,(e.clientX-r.left)/r.width*PH_W));ph.me.ty=Math.max(PH_Y0,Math.min(PH_Y1,(e.clientY-r.top)/r.height*PH_H));};
   cv.addEventListener("pointerdown",e=>{ph.drag=true;pt(e);});cv.addEventListener("pointermove",e=>{if(ph.drag)pt(e);});window.addEventListener("pointerup",()=>{ph.drag=false;});ph.ctlKey="";phCtl();}
 function phCtl(){const d=$("phMod");if(!d||d.style.display!=="flex")return;
   if(!ph.rid){const L=$("phList");if(!L)return;const now=nowS(),rows=Object.entries(ph.rooms).filter(([id,r])=>r&&r.m&&Object.keys(r.m).length).sort((a,b)=>(b[1].ct||0)-(a[1].ct||0));
     const key="L"+JSON.stringify(rows.map(([id,r])=>[id,r.st,Object.keys(r.m).length,r.bg]));if(ph.ctlKey===key)return;ph.ctlKey=key;
     L.innerHTML=rows.length?rows.map(([id,r])=>{const n=Object.keys(r.m).length,ok=r.st==="wait"&&n<PH_MAX,bn=(PH_BG.find(b=>b[0]===r.bg)||PH_BG[0])[1];return `<div style="display:flex;align-items:center;gap:8px;padding:10px 4px;border-bottom:1px solid var(--line)"><div style="flex:1;min-width:0"><b style="font-size:13px">${esc(String(r.hn||"?"))}님의 방</b><div style="font-size:11px;color:var(--sub)">👥 ${n}/${PH_MAX} · ${r.st==="wait"?"대기 중":"📸 촬영 중"} · ${esc(bn)}</div></div><button data-j="${id}" ${ok?"":"disabled"} style="padding:8px 14px;border-radius:10px;background:${ok?"var(--acc)":"var(--card2)"};color:${ok?"#111":"var(--sub)"};font-weight:900;font-size:12px">${ok?"들어가기":r.st==="wait"?"가득 참":"촬영 중"}</button></div>`;}).join(""):'<div style="color:var(--sub);font-size:12px;text-align:center;padding:22px 0">열려 있는 방이 없어요<br>방을 만들어 친구를 기다려 보세요!</div>';
-    L.querySelectorAll("button[data-j]").forEach(b=>b.onclick=()=>phJoin(b.dataset.j));return;}
+    L.querySelectorAll("button[data-j]").forEach(b=>phTap(b,()=>phJoin(b.dataset.j)));return;}
   const R=phRoom();if(!R){return;}const m=R.m||{},ids=Object.keys(m),host=R.host===myId,shoot=R.st==="shoot"||ph.phase==="shoot";
   const key="R"+JSON.stringify([R.st,R.host,R.bg,R.fr,ids.map(i=>[i,m[i].n]),ph.me.p,ph.phase,!!ph.last]);if(ph.ctlKey===key)return;ph.ctlKey=key;const C=$("phCtl");if(!C)return;
   const tt=$("phTitle");if(tt)tt.textContent=`📸 ${R.hn||""}님의 방 · 👥 ${ids.length}/${PH_MAX}`;
   const chips=ids.sort((a,b)=>(m[a].j||0)-(m[b].j||0)).map(i=>`<span class="ochip${i===myId?" me":""}">${i===R.host?"👑 ":""}${esc(m[i].n||"?")}</span>`).join("");
   const poses=PH_POSE.map(([k,n,e])=>`<button data-po="${k}" style="flex:none;padding:6px 9px;border-radius:12px;background:${ph.me.p===k?"var(--acc)":"var(--card2)"};color:${ph.me.p===k?"#111":"var(--tx)"};font-size:11.5px;font-weight:800">${e} ${n}</button>`).join("");
   let host_ui="";if(host&&!shoot){host_ui=`<div style="font-size:11px;color:var(--sub);margin:8px 0 4px">🎨 배경 (방장만 바꿀 수 있어요)</div><div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px">${PH_BG.map(([k,n])=>`<button data-bg="${k}" style="flex:none;padding:5px 9px;border-radius:10px;background:${R.bg===k?"var(--acc)":"var(--card2)"};color:${R.bg===k?"#111":"var(--tx)"};font-size:11px;font-weight:700">${n}</button>`).join("")}</div><div style="font-size:11px;color:var(--sub);margin:6px 0 4px">🖼️ 프레임 색</div><div style="display:flex;gap:8px">${PH_FR.map(([k,n,col])=>`<button data-fr="${k}" title="${n}" style="width:30px;height:30px;border-radius:50%;background:${col};border:3px solid ${R.fr===k?"var(--acc)":"var(--line)"}"></button>`).join("")}</div>`;}
-  const start=host?(shoot?`<div style="text-align:center;font-size:12px;color:var(--acc);font-weight:900;padding:12px 0">📸 촬영 중이에요!</div>`:`<button id="phGo" class="go buy" style="margin-top:10px;background:var(--acc);color:#111">📸 시작하기 (${ids.length}명)</button>`):`<div style="text-align:center;font-size:12px;color:var(--sub);padding:12px 0">${shoot?"📸 촬영 중이에요! 포즈를 취하세요":"방장이 시작하길 기다리는 중… (배경: "+esc((PH_BG.find(b=>b[0]===R.bg)||PH_BG[0])[1])+")"}</div>`;
+  const start=host?(shoot?`<div style="text-align:center;font-size:12px;color:var(--acc);font-weight:900;padding:12px 0">📸 촬영 중이에요!</div>`:`<button id="phGo" class="go buy" style="position:sticky;bottom:0;z-index:2;box-shadow:0 -8px 12px var(--bg);margin-top:10px;background:var(--acc);color:#111">📸 시작하기 (${ids.length}명)</button>`):`<div style="text-align:center;font-size:12px;color:var(--sub);padding:12px 0">${shoot?"📸 촬영 중이에요! 포즈를 취하세요":"방장이 시작하길 기다리는 중… (배경: "+esc((PH_BG.find(b=>b[0]===R.bg)||PH_BG[0])[1])+")"}</div>`;
   C.innerHTML=`<div style="margin-bottom:6px">${chips}</div><div style="font-size:11px;color:var(--sub);margin-bottom:4px">🕺 포즈 · 화면을 눌러 이동 (방향키·WASD도 돼요)</div><div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:4px">${poses}</div>${host_ui}${start}${ph.last?'<button id="phLast" style="width:100%;margin-top:6px;padding:9px 0;border-radius:10px;background:var(--card2);font-size:12px;font-weight:700">📷 방금 찍은 사진 다시 보기</button>':""}<div style="font-size:10.5px;color:var(--sub);text-align:center;margin-top:8px;line-height:1.5">시작하면 ${Math.round(PH_LEAD/1000)}초 뒤부터 ${PH_STEP/1000}초마다 한 컷씩, 총 ${PH_CUTS}컷이 찍혀요</div>`;
-  C.querySelectorAll("button[data-po]").forEach(b=>b.onclick=()=>{ph.me.p=b.dataset.po;phSend(true);ph.ctlKey="";phCtl();});
-  C.querySelectorAll("button[data-bg]").forEach(b=>b.onclick=()=>phSet("bg",b.dataset.bg));C.querySelectorAll("button[data-fr]").forEach(b=>b.onclick=()=>phSet("fr",b.dataset.fr));
-  const go=$("phGo");if(go)go.onclick=phStart;const ls=$("phLast");if(ls)ls.onclick=phResult;}
+  C.querySelectorAll("button[data-po]").forEach(b=>phTap(b,()=>{ph.me.p=b.dataset.po;phSend(true);ph.ctlKey="";phCtl();}));
+  C.querySelectorAll("button[data-bg]").forEach(b=>phTap(b,()=>phSet("bg",b.dataset.bg)));C.querySelectorAll("button[data-fr]").forEach(b=>phTap(b,()=>phSet("fr",b.dataset.fr)));
+  const go=$("phGo");if(go)phTap(go,phStart);const ls=$("phLast");if(ls)phTap(ls,phResult);}
 function phSend(force){const R=phRoom();if(!R||!R.m||!R.m[myId]||!fdb)return;const now=Date.now(),m=ph.me,pl={x:Math.round(m.x),y:Math.round(m.y),d:m.d,p:m.p},s=JSON.stringify(pl);
   if(!force&&s===ph.lastSent&&now-ph.lastHb<4000)return;if(!force&&now-ph.lastSend<130)return;ph.lastSend=now;ph.lastSent=s;ph.lastHb=now;pl.hb=nowS();phRef(ph.rid+"/m/"+myId).update(pl).catch(()=>{});}
 function phTick(dt,now){const R=phRoom();if(!R)return;const K=ph.keys,m=ph.me;let dx=(K.r?1:0)-(K.l?1:0),dy=(K.d?1:0)-(K.u?1:0);
