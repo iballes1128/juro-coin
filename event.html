@@ -233,25 +233,21 @@ body.evIn #fJoy{left:calc(14px + env(safe-area-inset-left));bottom:calc(14px + e
 body.evIn #fAct{right:calc(12px + env(safe-area-inset-right));bottom:calc(14px + env(safe-area-inset-bottom))}
 #evHud,#evMenuBtn,#evMenu,#evChatBtn,#evRot,#evChat,#evTB,#evTP{display:none}
 body.evIn #evHud{display:block;position:absolute;left:50%;top:8px;transform:translateX(-50%);background:rgba(10,14,20,.72);border:2px solid rgba(255,255,255,.14);color:#fff;font-size:12px;font-weight:800;border-radius:999px;padding:6px 14px;white-space:nowrap;pointer-events:none;z-index:3}
-body.evIn #evMenuBtn{display:flex;position:absolute;right:calc(10px + env(safe-area-inset-right));top:8px;width:40px;height:40px;border-radius:12px;background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:20px;align-items:center;justify-content:center;z-index:4}
-body.evIn #evChatBtn{display:flex;position:absolute;right:calc(88px + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));width:48px;height:48px;border-radius:50%;background:rgba(10,14,20,.78);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;align-items:center;justify-content:center;z-index:4}
-body.evIn #evMenu.on{display:flex;flex-direction:column;gap:4px;position:absolute;right:calc(10px + env(safe-area-inset-right));top:54px;min-width:170px;background:rgba(14,18,26,.96);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:8px;z-index:9}
-#evMenu button{color:#fff;text-align:left;font-size:13px;font-weight:700;padding:10px 12px;border-radius:9px;background:rgba(255,255,255,.06)}
+body.evIn #evMenuBtn{display:flex;position:absolute;right:calc(10px + env(safe-area-inset-right));top:8px;width:46px;height:46px;border-radius:13px;background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:20px;align-items:center;justify-content:center;z-index:4}
+body.evIn #evChatBtn{display:flex;position:absolute;right:calc(88px + env(safe-area-inset-right));bottom:calc(20px + env(safe-area-inset-bottom));width:52px;height:52px;border-radius:50%;background:rgba(10,14,20,.78);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;align-items:center;justify-content:center;z-index:4}
+body.evIn #evMenu.on{display:flex;flex-direction:column;gap:4px;position:absolute;right:calc(10px + env(safe-area-inset-right));top:60px;min-width:180px;background:rgba(14,18,26,.96);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:8px;z-index:9}
+#evMenu button{color:#fff;text-align:left;font-size:14px;font-weight:700;padding:13px 14px;border-radius:9px;background:rgba(255,255,255,.06)}
 #evMenu button:active{background:rgba(255,255,255,.16)}
 #evMenu button.dg{color:#ff8a96}
-body.evIn.evChat #evChat{display:flex;flex-direction:column;position:absolute;right:calc(56px + env(safe-area-inset-right));top:8px;background:rgba(10,14,20,.84);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:6px;z-index:6;gap:6px;max-width:94vw}
-.evch{display:flex;align-items:center;gap:6px}#evChips{display:flex;gap:5px;flex:1;overflow-x:auto;scrollbar-width:none}
-#evChips button{flex:none;font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;border:1px solid var(--c);color:var(--c);background:transparent;opacity:.55}
-#evChips button.on{background:var(--c);color:#111;opacity:1}
-#evCx{flex:none;width:26px;height:26px;border-radius:8px;background:rgba(255,255,255,.12);color:#fff;font-size:16px}
-body.evKb.evChat #evChat{top:2px!important}
-#evPanes{flex:1;display:flex;flex-direction:column;gap:4px;min-height:0}
-.evp{flex:1;min-width:0;display:flex;flex-direction:column;background:rgba(0,0,0,.3);border-radius:10px;overflow:hidden}
-.evph{font-size:11px;font-weight:900;padding:3px 8px;color:#111}
-.evpl{flex:1;overflow-y:auto;padding:4px 8px;font-size:12.5px;color:#e5e7eb;line-height:1.4;word-break:break-all}
-.evpl b{color:#fde68a}.evpl .me b{color:#93c5fd}
-.eva{background:rgba(251,191,36,.18);border:1px solid rgba(251,191,36,.5);color:#fde68a;font-size:11px;font-weight:800;padding:5px 7px;border-radius:8px;margin-bottom:4px}.eva u{cursor:pointer;color:#fff;margin-left:4px}
-.evci{display:flex;gap:5px}.evci select{background:#1f2937;color:#fff;border-radius:8px;padding:4px;font-size:12px;max-width:34%}.evci input{flex:1;min-width:0;background:#1f2937;color:#fff;border-radius:8px;padding:8px;font-size:16px}.evci button{background:#f59e0b;color:#111;font-weight:900;border-radius:8px;padding:0 12px}
+body.evIn.evChat #evChat{display:flex;flex-direction:column;position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom));width:min(50vw,440px);z-index:6;gap:3px}
+#evChips{display:flex;gap:10px;padding:0 4px;overflow-x:auto;scrollbar-width:none}
+#evChips button{display:flex;align-items:center;gap:5px;flex:none;font-size:12px;font-weight:800;color:#fff;background:none;padding:6px 4px;opacity:.5;text-shadow:0 1px 2px #000;min-height:32px}
+#evChips button.on{opacity:1}#evChips .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+#evLog{height:96px;overflow-y:auto;background:rgba(20,24,30,.55);border-radius:6px;padding:5px 8px;font-size:13px;line-height:1.45;font-weight:700;color:#fff;text-shadow:0 1px 2px #000;word-break:break-all;scrollbar-width:none}
+#evLog::-webkit-scrollbar{display:none}#evLog b{font-weight:800}#evLog i{font-style:normal;opacity:.85}
+.eva{color:#fdba74;border-bottom:1px solid rgba(253,186,116,.35);margin-bottom:3px;padding-bottom:3px}.eva u{color:#fff;margin-left:4px}
+.evci{display:flex;gap:4px}.evci select{flex:none;width:78px;background:rgba(30,34,44,.88);color:#fff;border-radius:6px;padding:0 4px;font-size:13px;font-weight:800;min-height:38px}.evci input{flex:1;min-width:0;background:rgba(20,24,30,.72);color:#fff;border-radius:6px;padding:8px;font-size:16px;min-height:38px}.evci button{flex:none;white-space:nowrap;background:#f59e0b;color:#111;font-weight:900;border-radius:6px;padding:0 14px;min-height:38px}
+#fishWrap button,#fishWrap select{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 #evTB.on{display:flex;position:absolute;inset:0;z-index:8;background:rgba(0,0,0,.62);align-items:center;justify-content:center}
 .evtb{background:#111827;border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:14px;width:min(92%,580px);max-height:92%;display:flex;flex-direction:column;gap:8px;color:#fff}
 .evtr{display:flex;gap:6px;align-items:center;font-size:12px;flex-wrap:wrap}.evtr button{background:rgba(255,255,255,.1);color:#fff;font-weight:800;border-radius:9px;padding:8px 12px;font-size:12px}.evtr button.on{background:#f59e0b;color:#111}.evtr button:disabled{opacity:.4}
@@ -271,7 +267,7 @@ body.evIn #evRot.on{display:flex}
 </style>
 <script>try{const _si=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(k==="jc_tab")return;return _si.apply(this,arguments);};}catch(e){}</script>
 <style>#evLv{display:none}#evLv.on{display:flex;position:absolute;inset:0;z-index:12;background:rgba(0,0,0,.62);align-items:center;justify-content:center}#evSplash{position:fixed;inset:0;z-index:30;background:#120d24;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-family:inherit}#evSplash b{font-size:22px}#evSplash small{color:#9ca3af;font-size:12px}body.evIn #evSplash{display:none}</style>
-<link rel="manifest" href="event.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="주로월드3"><link rel="apple-touch-icon" href="event-192.png"><style>#evGate{display:none}#evGate.on{display:flex;position:fixed;inset:0;z-index:85;background:#120d24;align-items:center;justify-content:center;color:#fff}.evg{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:16px;max-width:92vw}.evg b{font-size:22px}.evgs{font-size:13px;color:#cbd5e1;line-height:1.6}.evg button{padding:13px 22px;border-radius:14px;background:#f59e0b;color:#111;font-weight:900;font-size:15px}.evg button.sk{background:rgba(255,255,255,.12);color:#fff;font-size:13px;padding:10px 18px}#evFsBtn{display:none;position:absolute;right:calc(56px + env(safe-area-inset-right));top:8px;width:40px;height:40px;border-radius:12px;background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:18px;align-items:center;justify-content:center;z-index:4}body.evIn.evChat #evChat{right:calc(102px + env(safe-area-inset-right))!important}</style>
+<link rel="manifest" href="event.webmanifest"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="주로월드3"><link rel="apple-touch-icon" href="event-192.png"><style>#evGate{display:none}#evGate.on{display:flex;position:fixed;inset:0;z-index:85;background:#120d24;align-items:center;justify-content:center;color:#fff}.evg{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:16px;max-width:92vw}.evg b{font-size:22px}.evgs{font-size:13px;color:#cbd5e1;line-height:1.6}.evg button{padding:13px 22px;border-radius:14px;background:#f59e0b;color:#111;font-weight:900;font-size:15px}.evg button.sk{background:rgba(255,255,255,.12);color:#fff;font-size:13px;padding:10px 18px}#evFsBtn{display:none;position:absolute;right:calc(56px + env(safe-area-inset-right));top:8px;width:40px;height:40px;border-radius:12px;background:rgba(10,14,20,.72);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:18px;align-items:center;justify-content:center;z-index:4}</style>
 </head>
 <body>
 <div id="evSplash"><div style="font-size:46px">🏆</div><b>주로월드3</b><small>이벤트 화면에 접속하는 중…</small></div>
@@ -3536,6 +3532,7 @@ function evDraw(t){const c=fCtx,S=EV_ST,cx=EW/2;
   for(const f of fFloat){const a=(t-f.t)/2600;if(a>1||(f.a|0)!==1)continue;c.globalAlpha=1-a*a;c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="#fff";c.fillText(f.s,f.x,f.y-a*24);c.globalAlpha=1;}
 }
 let evLockTried=0,evMenuArm=0,evActT=0,evTpT=0;
+function evTap(el,fn){if(!el)return;let t=0;el.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse")return;e.preventDefault();t=Date.now();fn(e);},{passive:false});el.addEventListener("click",e=>{if(Date.now()-t<600){e.preventDefault();e.stopImmediatePropagation();return;}fn(e);},true);}
 function evLock(){if(!TOUCH)return;try{const d=document.documentElement,lk=()=>{try{screen.orientation&&screen.orientation.lock&&screen.orientation.lock("landscape").catch(()=>{});}catch(e){}};if(!document.fullscreenElement&&d.requestFullscreen)d.requestFullscreen({navigationUI:"hide"}).then(lk).catch(()=>{});else lk();}catch(e){}}
 function evUnlock(){try{screen.orientation&&screen.orientation.unlock&&screen.orientation.unlock();}catch(e){}try{if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});}catch(e){}}
 /* ---- 이벤트 채팅 (전체 / 팀별, 여러 방 동시에 켜기) ---- */
@@ -3547,14 +3544,16 @@ function evAttach(){if(!fdb)return;const want=new Set(evChs());
   for(const ch in evLis){if(!want.has(ch)){try{fdb.ref("evt/chat/"+ch).off("child_added",evLis[ch]);}catch(e){}delete evLis[ch];delete evMsgs[ch];}}
   want.forEach(ch=>{if(evLis[ch])return;evMsgs[ch]=[];const cb=s=>{const m=s.val();if(!m)return;const a=evMsgs[ch];a.push({n:String(m.n||"?").slice(0,12),f:m.f,t:m.t,x:String(m.x||"").slice(0,80)});if(a.length>80)a.shift();if(ch==="all"&&m.t&&Math.abs(Date.now()-m.t)<30000)fishBubble(m.f,String(m.x||"").slice(0,60));if(!document.body.classList.contains("evChat")||!evPaneOn(ch))evUnread[ch]=1;evPanelDirty=1;};evLis[ch]=cb;fdb.ref("evt/chat/"+ch).limitToLast(50).on("child_added",cb);});
   evPanelDirty=1;}
+const evLc=ch=>ch==="all"?"#ffffff":["#fca5a5","#93c5fd","#86efac"][+ch.slice(1)-1];
 function evRender(){const P=$("evChat");if(!P||!document.body.classList.contains("evChat"))return;const chs=evChs();if(!chs.includes(evTo)&&evTo!=="ann")evTo="all";
-  $("evChips").innerHTML=chs.map(ch=>`<button data-c="${ch}" class="${evPaneOn(ch)?"on":""}" style="--c:${evCol(ch)}">${evLab(ch)}${evUnread[ch]&&!evPaneOn(ch)?" •":""}</button>`).join("")+(chs.length>2?'<button data-c="*" style="--c:#e5e7eb">모두 켜기</button>':"");
-  const on=chs.filter(evPaneOn);if(on.length)for(const ch of on)evUnread[ch]=0;
-  const esc2=s=>String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
-  const prev={};P.querySelectorAll(".evpl").forEach(e=>{prev[e.dataset.p]=e.scrollHeight-e.scrollTop-e.clientHeight<30;});
-  $("evPanes").innerHTML=on.length?on.map(ch=>`<div class="evp"><div class="evph" style="background:${evCol(ch)}">${evLab(ch)}</div><div class="evpl" data-p="${ch}">${ch==="all"&&evAnn&&evAnn.text?`<div class="eva">📢 ${esc2(evAnn.text)}${isOwner?' <u data-ann="x">내리기</u>':""}</div>`:""}${(evMsgs[ch]||[]).map(m=>`<div class="${m.f===myId?"me":""}"><b>${esc2(m.n)}</b> ${esc2(m.x)}</div>`).join("")}</div></div>`).join(""):'<div style="color:#9ca3af;font-size:12px;padding:10px">위의 칩을 눌러 채팅방을 켜 주세요</div>';
-  P.querySelectorAll(".evpl").forEach(e=>{if(prev[e.dataset.p]!==false)e.scrollTop=e.scrollHeight;});
-  P.style.width=Math.min(innerWidth*.56,360)+"px";P.style.height=Math.min((window.visualViewport&&document.body.classList.contains("evKb")?window.visualViewport.height:innerHeight)-(document.body.classList.contains("evKb")?12:66),84+Math.max(1,on.length)*150)+"px";
+  $("evChips").innerHTML=chs.map(ch=>`<button data-c="${ch}" class="${evPaneOn(ch)?"on":""}"><i class="dot" style="background:${evCol(ch)}"></i>${evLab(ch)}${evUnread[ch]&&!evPaneOn(ch)?" •":""}</button>`).join("")+(chs.length>2?'<button data-c="*" class="on">모두 켜기</button>':"");
+  const on=chs.filter(evPaneOn);on.forEach(ch=>evUnread[ch]=0);
+  const e2=s=>String(s).replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m]));
+  const L=$("evLog"),near=L.scrollHeight-L.scrollTop-L.clientHeight<30;
+  const lines=[];on.forEach(ch=>(evMsgs[ch]||[]).forEach(m=>lines.push({ch,m})));lines.sort((x,y)=>(x.m.t||0)-(y.m.t||0));
+  const multi=on.length>1;
+  L.innerHTML=(on.includes("all")&&evAnn&&evAnn.text?`<div class="eva">📢 ${e2(evAnn.text)}${isOwner?' <u data-ann="x">내리기</u>':""}</div>`:"")+(lines.length||(evAnn&&evAnn.text)?"":'<div style="opacity:.6;font-weight:600">아직 채팅이 없어요</div>')+lines.slice(-40).map(l=>`<div style="color:${evLc(l.ch)}">${multi?`<i>[${evLab(l.ch)}]</i> `:""}<b>${e2(l.m.n)}</b>: ${e2(l.m.x)}</div>`).join("");
+  if(near||!L.dataset.i){L.scrollTop=L.scrollHeight;L.dataset.i=1;}
   const sel=$("evTo"),opts=chs.map(ch=>`<option value="${ch}">${evLab(ch)}</option>`).join("")+(isOwner?'<option value="ann">📢 공지</option>':"");if(sel.innerHTML!==opts){sel.innerHTML=opts;}sel.value=evTo;
   evPanelDirty=0;}
 function evSend(){const inp=$("evIn"),v=inp.value.trim().slice(0,80);if(!v||!fdb)return;const to=$("evTo").value;inp.value="";evTo=to;
@@ -3575,11 +3574,11 @@ function evDrawGo(){const ppl=evPeople();if(ppl.length<evDrawN)return toast0("�
   evTbRender();}
 function evTeamSave(){if(!evDraft||!evDraft.rows.every(r=>r.done)||!fdb)return;const m={};evDraft.rows.forEach(r=>m[r.id]=r.t);fdb.ref("evt/state/teams").set({n:evDrawN,m,t:Date.now()}).then(()=>{toast0("✅ 팀이 확정됐어요");$("evTB").classList.remove("on");evDraft=null;}).catch(()=>toast0("저장 실패 (Firebase 규칙을 확인해 주세요)"));}
 function evBuild(){if($("evMenuBtn"))return;const W=$("fishWrap");if(!W)return;
-  W.insertAdjacentHTML("beforeend",'<div id="evHud"></div><button id="evMenuBtn">☰</button><div id="evMenu"></div><button id="evChatBtn">💬</button><div id="evChat"><div class="evch"><div id="evChips"></div><button id="evCx">✕</button></div><div id="evPanes"></div><div class="evci"><select id="evTo"></select><input id="evIn" maxlength="80" placeholder="메시지" autocomplete="off"><button id="evSd">전송</button></div></div><div id="evTB"><div class="evtb"><b>👥 팀 나누기</b><div style="font-size:12px;color:#9ca3af">참가자 <span id="evTn">0</span>명 (운영자 제외) · 이름 옆 팀 버튼을 누르면 팀을 옮길 수 있어요</div><div class="evtr">팀 수 <button data-n="2">2팀</button><button data-n="3">3팀</button></div><div id="evTl"></div><div class="evtr"><button id="evTGo">🎲 추첨하기</button><button id="evTSave" disabled>✅ 확정</button><button id="evTClr">팀 해제</button><button id="evTX">닫기</button></div></div></div><div id="evTP"></div>');
+  W.insertAdjacentHTML("beforeend",'<div id="evHud"></div><button id="evMenuBtn">☰</button><div id="evMenu"></div><button id="evChatBtn">💬</button><div id="evChat"><div id="evChips"></div><div id="evLog"></div><div class="evci"><select id="evTo"></select><input id="evIn" maxlength="80" placeholder="메시지" autocomplete="off"><button id="evSd">전송</button></div></div><div id="evTB"><div class="evtb"><b>👥 팀 나누기</b><div style="font-size:12px;color:#9ca3af">참가자 <span id="evTn">0</span>명 (운영자 제외) · 이름 옆 팀 버튼을 누르면 팀을 옮길 수 있어요</div><div class="evtr">팀 수 <button data-n="2">2팀</button><button data-n="3">3팀</button></div><div id="evTl"></div><div class="evtr"><button id="evTGo">🎲 추첨하기</button><button id="evTSave" disabled>✅ 확정</button><button id="evTClr">팀 해제</button><button id="evTX">닫기</button></div></div></div><div id="evTP"></div>');
   document.body.insertAdjacentHTML("beforeend",'<div id="evRot"><div class="ph">📱</div><b>폰을 가로로 돌려 주세요</b><small>주로월드3 이벤트는 가로 화면으로만 진행돼요<br>화면이 안 돌아가면 폰의 "화면 회전 잠금"을 꺼 주세요</small></div><button id="evJoin">🏆 주로월드3 이벤트 입장</button>');
   const M=$("evMenu");const menu=()=>{M.innerHTML='<button data-m="chat">💬 채팅</button>'+(isOwner?'<button data-m="team">👥 팀 나누기</button>':'<button data-m="my">👥 내 팀 확인</button>')+'<button data-m="set">⚙️ 설정</button><button data-m="info">📖 이벤트 안내</button>'+(isOwner?'':'');};menu();
   const chatOpen=o=>{document.body.classList.toggle("evChat",o);if(o){evPanelDirty=1;evRender();}};
-  $("evMenuBtn").onclick=e=>{e.stopPropagation();chatOpen(false);M.classList.toggle("on");evMenuArm=0;menu();};
+  evTap($("evMenuBtn"),()=>{M.classList.toggle("on");evMenuArm=0;menu();});
   M.onclick=e=>{const b=e.target.closest("button");if(!b)return;const k=b.dataset.m;if(k==="end"){if(!evMenuArm){evMenuArm=1;b.textContent="한 번 더 누르면 모두 나가요";return;}evSet(false);M.classList.remove("on");return;}M.classList.remove("on");
     if(k==="chat")chatOpen(true);
     else if(k==="team"){evDraft=null;$("evTGo").textContent="🎲 추첨하기";$("evTGo").disabled=false;$("evTSave").disabled=true;evTbRender();$("evTB").classList.add("on");}
@@ -3587,10 +3586,10 @@ function evBuild(){if($("evMenuBtn"))return;const W=$("fishWrap");if(!W)return;
     else if(k==="set"){const d=document.querySelector('#dock [data-pg="set"]');if(d)d.click();}
     else if(k==="info")toast0("📖 이벤트 안내는 진행 순서가 정해지면 여기에 올라와요");
     };
-  $("evChatBtn").onclick=()=>{M.classList.remove("on");chatOpen(!document.body.classList.contains("evChat"));};
-  $("evCx").onclick=()=>chatOpen(false);
+  evTap($("evChatBtn"),()=>{M.classList.remove("on");chatOpen(!document.body.classList.contains("evChat"));});evTap($("fAct"),()=>fishAction());
+  
   $("evChips").onclick=e=>{const b=e.target.closest("button");if(!b)return;const c=b.dataset.c;if(c==="*"){evChs().forEach(ch=>evPane[ch]=true);}else evPane[c]=!evPaneOn(c);evUnread[c]=0;evRender();};
-  $("evPanes").onclick=e=>{if(e.target.dataset&&e.target.dataset.ann&&isOwner&&fdb)fdb.ref("evt/state/ann").remove().catch(()=>{});};
+  $("evLog").onclick=e=>{if(e.target.dataset&&e.target.dataset.ann&&isOwner&&fdb)fdb.ref("evt/state/ann").remove().catch(()=>{});};
   $("evIn").addEventListener("focus",()=>{if(TOUCH){document.body.classList.add("evKb");evPanelDirty=1;setTimeout(evRender,60);}});$("evIn").addEventListener("blur",()=>{document.body.classList.remove("evKb");evPanelDirty=1;setTimeout(evRender,60);});if(window.visualViewport)window.visualViewport.addEventListener("resize",()=>{if(document.body.classList.contains("evKb")){evPanelDirty=1;evRender();}});$("evSd").onclick=evSend;$("evIn").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.isComposing){e.preventDefault();evSend();}});$("evTo").onchange=()=>{evTo=$("evTo").value;};
   document.querySelectorAll("#evTB [data-n]").forEach(b=>b.onclick=()=>{evDrawN=+b.dataset.n;evDraft=null;$("evTSave").disabled=true;$("evTGo").textContent="🎲 추첨하기";evTbRender();});
   $("evTGo").onclick=evDrawGo;$("evTSave").onclick=evTeamSave;$("evTX").onclick=()=>{$("evTB").classList.remove("on");evDraft=null;};
@@ -3603,7 +3602,7 @@ function evBuild(){if($("evMenuBtn"))return;const W=$("fishWrap");if(!W)return;
   document.addEventListener("keydown",e=>{if(evIn&&e.key==="Enter"&&!e.isComposing&&document.activeElement!==$("evIn")){e.preventDefault();chatOpen(true);setTimeout(()=>$("evIn").focus(),30);}});
 }
 function evUpd(){const v=!!(evOn&&fArea===1&&fishActive());if(v===evIn)return;evIn=v;document.body.classList.toggle("evIn",v);fishResize.w=0;
-  if(v){evBuild();evLockTried=0;evLock();if(!evWalk(fp.x,fp.y)||fp.x>EW||fp.y>EH){fp.x=60;fp.y=EH-52;}fp.tx=null;fp.via=null;fKeys={};evPanelDirty=1;}
+  if(v){evBuild();evLockTried=0;evLock();if(!evWalk(fp.x,fp.y)||fp.x>EW||fp.y>EH){fp.x=60;fp.y=EH-52;}fp.tx=null;fp.via=null;fKeys={};evPanelDirty=1;document.body.classList.add("evChat");}
   else{evUnlock();document.body.classList.remove("evChat");const M=$("evMenu");if(M)M.classList.remove("on");const B=$("evTB");if(B)B.classList.remove("on");}
   try{fishResize();}catch(e){}evUi();}
 function evUi(){evBuild();try{evFsUi();}catch(e){}const R=$("evRot"),J=$("evJoin"),H=$("evHud");if(R)R.classList.toggle("on",!!(evIn&&TOUCH&&innerHeight>innerWidth));if(J)J.classList.toggle("on",!!(evOn&&!evIn&&me&&me._loaded));
@@ -3611,7 +3610,7 @@ function evUi(){evBuild();try{evFsUi();}catch(e){}const R=$("evRot"),J=$("evJoin
   if(evPanelDirty)try{evRender();}catch(e){}
   const T=$("evToggle"),S=$("evStat");if(T){T.textContent=evOn?"🛑 이벤트 모드 끄기":"🏆 이벤트 모드 켜기";}if(S)S.textContent=evOn?"이벤트 모드 켜짐 · 다리가 열려 있고, 다리 건너편은 가로 이벤트 화면이에요."+(evTeams.n?` (팀 ${evTeams.n}개 확정됨)`:""):"이벤트 모드가 꺼져 있어요. 켜면 다리 건너편이 가로 전용 이벤트 화면으로 바뀌고 다리가 모두에게 열려요.";}
 function evSet(on){if(!isOwner||!fdb)return toast0("운영자만 할 수 있어요");const u={"evt/state/on":!!on,"evt/state/t":Date.now(),"evt/state/by":myId};fdb.ref().update(u).then(()=>toast0(on?"🏆 이벤트 모드가 켜졌어요":"이벤트 모드를 껐어요")).catch(()=>toast0("저장에 실패했어요 (Firebase 규칙을 확인해 주세요)"));}
-function evAct(){const n=Date.now();if(n-evActT<1500||!fdb)return;evActT=n;fishBubble(myId,"👋");fdb.ref("evt/chat/all").push({n:myName(),f:myId,x:"👋",t:n}).catch(()=>{});}
+function evAct(){const n=Date.now();if(n-evActT<1500||!fdb)return;evActT=n;fishBubble(myId,"👋");fdb.ref("evt/chat/all").push({n:myName(),f:myId,x:"👋",t:n}).catch(()=>toast0("전송 실패 (Firebase 규칙을 확인해 주세요)"));}
 function evTeamPop(){const t=evMyTeam();if(t===evLastTeam)return;evLastTeam=t;if(!t||!evIn)return;const P=$("evTP");if(!P)return;P.textContent="🎉 당신은 "+EV_TN[t-1]+"!";P.style.background=EV_TC[t-1];P.classList.add("on");setTimeout(()=>P.classList.remove("on"),3800);}
 {let arm=0;const w0=setInterval(()=>{const T=$("evToggle");if(!T)return;clearInterval(w0);T.onclick=()=>{if(Date.now()-arm>3000){arm=Date.now();T.textContent=evOn?"한 번 더 누르면 이벤트가 꺼져요":"한 번 더 누르면 이벤트가 켜져요";return;}arm=0;evSet(!evOn);};evUi();},300);}
 {const w=setInterval(()=>{if(!fdb)return;clearInterval(w);fdb.ref("evt/state").on("value",s=>{const v=s.val()||{},was=evOn;evOn=true;const tm=v.teams;evTeams=tm&&tm.n?{n:tm.n|0,m:tm.m||{}}:{n:0,m:{}};evAnn=v.ann||null;evBuild();try{evUpd();}catch(e){}try{evAttach();}catch(e){}evUi();evTeamPop();if(evOn&&!was&&!evIn)toast0("🏆 주로월드3 이벤트가 시작됐어요! '이벤트 입장'을 눌러 주세요");if(!evOn&&was&&fArea===1&&fishActive())fishArea(0,performance.now());});},500);}
@@ -3627,14 +3626,14 @@ function evFsEns(){if($("evGate"))return;
   const W=$("fishWrap");if(W)W.insertAdjacentHTML("beforeend",'<button id="evFsBtn">⛶</button>');
   const done=()=>{evGateDone=true;$("evGate").classList.remove("on");};
   if($("evGoFs"))$("evGoFs").onclick=()=>{evLock();done();};$("evGoSkip").onclick=done;
-  if($("evFsBtn"))$("evFsBtn").onclick=()=>{if(document.fullscreenElement){evUnlock();}else evLock();};}
+  if($("evFsBtn"))evTap($("evFsBtn"),()=>{if(document.fullscreenElement){evUnlock();}else evLock();});}
 function evFsUi(){evFsEns();const G=$("evGate"),B=$("evFsBtn");if(G)G.classList.toggle("on",!!(evIn&&TOUCH&&!EV_STAND()&&!evGateDone&&!document.fullscreenElement));
   if(B)B.style.display=(evIn&&TOUCH&&EV_CANFS&&!EV_STAND())?"flex":"none";}
 
 let fPrev=0;function fishLoop(t){if(!fishActive()){fRaf=0;return;}if(!fishLoop.r||t-fishLoop.r>1000){fishLoop.r=t;fishResize();}const dt=Math.min(60,t-(fPrev||t));fPrev=t;fishStep(dt,t);fishDraw(t);fishFade(t);fRaf=requestAnimationFrame(fishLoop);}
 function fishFeed(name,fish,v,idx){if(typeof idx==="number")fish=`${dexNo(idx)}번 ${fish}`;const F=$("fFeed");if(!F)return;const d=document.createElement("div");const col=v>=BIG_V?"#ffcf4d":(v<0?"#ff8a96":"#9be7c4");d.innerHTML=`🎣 <b>${esc(name)}</b>님이 <b style="color:${col}">${esc(fish)}</b>${v<0?"(을)를 건졌어요… 💸":"(을)를 낚았어요!"}`;F.appendChild(d);while(F.children.length>3)F.firstChild.remove();setTimeout(()=>{d.style.opacity="0";setTimeout(()=>d.remove(),600);},6000);}
 function spawnOf(id){let h=hueOf(id)*7919+String(id).length*131;for(let i=0;i<20;i++){const x=30+(h%300),y=RIVER+50+((h>>3)%(FH-RIVER-90));if(walkable(x,y))return{x,y};h=h*31+17;}return{x:180,y:330};}
-function fTapOther(x,y){let best=null,bd=1e9;for(const id in fOthers){const o=fOthers[id];if(!o||o.fs==="away"||(o.fa|0)!==fArea)continue;const hw=Math.max(15,String(o.name||"").length*5+6);if((Math.abs(x-o.x)<15&&y>o.y-40&&y<o.y+6)||(Math.abs(x-o.x)<hw&&y>o.y-55&&y<o.y-36)){const d=Math.abs(x-o.x)+Math.abs(y-(o.y-20));if(d<bd){bd=d;best=id;}}}return best;}
+function fTapOther(x,y){if(evIn)return null;let best=null,bd=1e9;for(const id in fOthers){const o=fOthers[id];if(!o||o.fs==="away"||(o.fa|0)!==fArea)continue;const hw=Math.max(15,String(o.name||"").length*5+6);if((Math.abs(x-o.x)<15&&y>o.y-40&&y<o.y+6)||(Math.abs(x-o.x)<hw&&y>o.y-55&&y<o.y-36)){const d=Math.abs(x-o.x)+Math.abs(y-(o.y-20));if(d<bd){bd=d;best=id;}}}return best;}
 function fishSyncOthers(){const now=Date.now();for(const id in onlineMap){if(id===myId)continue;const v=onlineMap[id];if(!v||now-(v.t||0)>180000){delete fOthers[id];continue;}
     const has=typeof v.fx==="number",sp=has?{x:v.fx,y:v.fy}:spawnOf(id);
     const o=fOthers[id]||(fOthers[id]={x:sp.x,y:sp.y});{const pn=performance.now();if(o.tx!=null&&(sp.x!==o.tx||sp.y!==o.ty)){if((v.bt|0)>0&&o._rt!=null){const dm=Math.max(90,Math.min(450,pn-o._rt)),cl=q=>Math.max(-.12,Math.min(.12,q));o.vx=cl((sp.x-o.tx)/dm);o.vy=cl((sp.y-o.ty)/dm);}else{o.vx=0;o.vy=0;}o._rt=pn;}else if(o.tx==null)o._rt=pn;}o.tx=sp.x;o.ty=sp.y;if(o._fa!==(v.fa|0)){o._fa=v.fa|0;o.x=sp.x;o.y=sp.y;}if(o._fo!==(v.fo||"")){o._fo=v.fo||"";o.px=v.ox|0;o.py=v.oy|0;}o.dir=v.fd||1;o.bt=Math.min(9,v.bt|0);o.mo=o.bt?0:Math.min(31,v.mo|0);o.mr=String(v.mr||"").slice(0,40);o.fa=v.fa|0;o.fo=v.fo||"";o.ox=v.ox|0;o.oy=v.oy|0;o.od=v.od||1;o.wh=v.wh||"";o.sk=v.sk|0;o.ch=typeof v.ch==="number"?v.ch:-1;o.au=v.au||"";o.wg=v.wg||"";o.tt=String(v.tt||"").slice(0,12);o.rl=Math.min(50,v.rl|0);o.np=v.np||"";o.ak=Math.min(3,v.ak|0);o.ac=(typeof v.ac==="string"&&ACCS.some(x=>x[0]===v.ac))?v.ac:"";o.fs=has?(v.fs||"idle"):"away";o.name=String(v.name||(players[id]&&players[id].name)||o.name||"").slice(0,10);
