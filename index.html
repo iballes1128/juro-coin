@@ -364,6 +364,7 @@ const NEWCOINS=["테더골드","플라즈마","페페","아이리스"];
 const K_V2_T=Date.parse("2026-11-24T12:25:00Z"),K_V3_T=Date.parse("2026-11-24T14:10:00Z"),K_V4_T=Date.parse("2026-11-25T02:10:00Z"),K_V5_T=Date.parse("2026-11-25T03:00:00Z");/* v5: 가끔 큰 출렁임(점프·짧은 파동) *//* v4: 변동폭 소폭 확대 */const TICK=10000,RELIST=2160,MANUAL=60000,START_CASH=10000000,RELIST_MS=RELIST*TICK;
 /* 11/25 15:57(KST)부터 1초마다 시세 갱신 (그 전 기록은 10초 틱 그대로) */
 const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=12,APP_V=23;
+/* 11/27 11:50(KST)부터 v14: 바닥 근처에서 폭락·하락 국면이 덜 나옴 (상폐 확률 살짝 감소, 그 전 가격 기록은 그대로) */const F14_T=Date.parse("2026-11-27T02:50:00Z");let K14=0;
 /* 11/25 19:15(KST)부터 v13: 등락폭 20% 확대 (단타용, 그 전 가격 기록은 그대로) */const F13_T=Date.parse("2026-11-25T10:15:00Z");let K13=0;const VOL13=1.2;
 /* 11/25 17:22(KST)부터 v10 방식으로 되돌림 (지그재그 해제) */const F12_T=Date.parse("2026-11-25T08:22:00Z");let K12=0;
 /* 11/25 17:05(KST)부터 v11: 지그재그 파동 */const F11_T=Date.parse("2026-11-25T08:05:00Z");let K11=0;
@@ -371,7 +372,7 @@ const FAST_T=Date.parse("2026-11-25T06:57:00Z"),FTICK=1000,ENG_V=12,APP_V=23;
 /* 11/25 16:36(KST)부터 v9: 15분마다 2개 코인 큰 코스 + 점프 뒤 모멘텀 */const F9_T=Date.parse("2026-11-25T07:36:00Z");let K9=0,LISTK=[];
 /* 11/25 16:22(KST)부터 v8: 매끈하게 흐르다 가끔 한 번에 2~6% 툭 */const F8_T=Date.parse("2026-11-25T07:22:00Z");let K8=0;
 /* 11/25 16:14(KST)부터 v7 변동폭 (단타용으로 더 크게) */const F7_T=Date.parse("2026-11-25T07:14:00Z");let K7=0;let KS=0,TSe=0;
-function fastInit(){K7=0;K8=0;K9=0;K10=0;K11=0;K12=0;K13=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));K9=KS+Math.max(1,Math.ceil((Math.max(F9_T,TSe)-TSe)/FTICK));K10=KS+Math.max(1,Math.ceil((Math.max(F10_T,TSe)-TSe)/FTICK));K11=KS+Math.max(1,Math.ceil((Math.max(F11_T,TSe)-TSe)/FTICK));K12=KS+Math.max(1,Math.ceil((Math.max(F12_T,TSe)-TSe)/FTICK));K13=KS+Math.max(1,Math.ceil((Math.max(F13_T,TSe)-TSe)/FTICK));
+function fastInit(){K7=0;K8=0;K9=0;K10=0;K11=0;K12=0;K13=0;K14=0;const t=Math.max(FAST_T,EPOCH);KS=Math.ceil((t-EPOCH)/TICK);TSe=EPOCH+KS*TICK;K7=KS+Math.max(1,Math.ceil((Math.max(F7_T,TSe)-TSe)/FTICK));K8=KS+Math.max(1,Math.ceil((Math.max(F8_T,TSe)-TSe)/FTICK));K9=KS+Math.max(1,Math.ceil((Math.max(F9_T,TSe)-TSe)/FTICK));K10=KS+Math.max(1,Math.ceil((Math.max(F10_T,TSe)-TSe)/FTICK));K11=KS+Math.max(1,Math.ceil((Math.max(F11_T,TSe)-TSe)/FTICK));K12=KS+Math.max(1,Math.ceil((Math.max(F12_T,TSe)-TSe)/FTICK));K13=KS+Math.max(1,Math.ceil((Math.max(F13_T,TSe)-TSe)/FTICK));K14=KS+Math.max(1,Math.ceil((Math.max(F14_T,TSe)-TSe)/FTICK));
   LISTK=COINS.map(([n])=>LIST_T[n]?(LIST_T[n]<=TSe?Math.max(0,Math.floor((LIST_T[n]-EPOCH)/TICK)):KS+Math.ceil((LIST_T[n]-TSe)/FTICK)):0);}
 const tickT=k=>k<=KS?EPOCH+k*TICK:TSe+(k-KS)*FTICK;
 var SRV_OFF=0;const tnow=()=>Date.now()+SRV_OFF;/* 서버 시각 기준 (폰 시계가 몇 초 틀려도 모두 같은 시세) */
@@ -529,7 +530,7 @@ function fastStep5(c,k,r,base,ci,K0){const sid=COINS[ci][5],t=k-K0,s=Math.floor(
   else{if(c.inC){c.inC=0;c.rgk=0;if(r()<.7)c.a=lp;}/* 코스 끝: 대부분 그 가격대가 새 기준 */
     const dv=lp-c.a;
     if(!(c.rgk>0)){if(r()<.4)c.a=lp;/* 국면 바뀔 때 40%는 지금 가격대를 새 기준으로 */
-      const hi=far<0||dv>.5,lo=far>0||dv<-.5,from=c.rg||"calm";let W=FAST_RG[from].map(([g,w])=>[g,w*(hi?(g==="pump"?.3:g==="dump"||g==="bleed"?2:1):lo?(g==="pump"?2:g==="dump"||g==="bleed"?.35:1):1)]);
+      const hi=far<0||dv>.5,lo=far>0||dv<-.5,from=c.rg||"calm";let W=FAST_RG[from].map(([g,w])=>[g,w*(hi?(g==="pump"?.3:g==="dump"||g==="bleed"?2:1):lo?(g==="pump"?2:g==="dump"||g==="bleed"?(k>=K14?.25:.35):1):1)]);
       const tot=W.reduce((s,x)=>s+x[1],0);let tt=r()*tot,g=W[W.length-1][0];for(const[x,w]of W){tt-=w;if(tt<=0){g=x;break;}}
       const L=F5_LEN[g];c.rg=g;c.rgk=L[0]+Math.floor(r()*(L[1]-L[0]));const q=r();
       c.rgd=g==="pump"?Math.log(1.03+.2*q*q)/c.rgk:g==="dump"?Math.log(1-(.05+.14*q))/c.rgk:g==="bleed"?Math.log(1-(.03+.08*q))/c.rgk:0;c.rgA=lp;}
