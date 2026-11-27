@@ -272,6 +272,7 @@ nav button.on{color:var(--tx);font-weight:700}
       <div class="l" style="margin-top:6px"><select id="admGK" style="flex:1"><option value="acc">🎀 악세사리</option><option value="aura">✨ 오라</option><option value="wing">🪽 날개</option><option value="plate">🏷️ 명찰</option><option value="skin">🧑 스킨</option></select><select id="admGI" style="flex:2"></select><button class="a" id="admGrant" style="flex:none;width:64px">🎁 지급</button></div>
       <div class="l"><button class="a" id="admOfRestore" style="flex:1">🏢 선택한 사람에게 기본 사무실 다시 지급</button></div>
     </div>
+    <div class="card"><h3>🏴‍☠️ 해적선 이벤트</h3><button class="a" style="width:100%" id="pirNow">🏴‍☠️ 해적선 지금 부르기</button><div style="font-size:10px;color:var(--sub);margin-top:5px">매시 5~54분 사이 자동 등장 · 이 버튼은 테스트용(바로 출발)</div></div>
     <div class="card"><h3>🎁 업데이트 보상</h3><button class="a" style="width:100%;margin-bottom:6px" id="rwSend">🎁 보상 상자 모두에게 보내기</button><div id="rwList"></div></div>
     <div class="card"><h3>📮 건의함</h3><div id="sugBox" style="max-height:340px;overflow-y:auto"></div></div>
     <div class="card"><h3 id="accHd" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:0">👥 접속 기록 (최근 300개)<span id="accArr" style="color:var(--sub);font-size:13px">▶ 보기</span></h3><div id="accBody" style="display:none;margin-top:8px"><div class="nick" style="margin-bottom:6px"><input id="accQ" placeholder="이름으로 찾기"><button id="accClr" style="background:var(--card2)">비우기</button></div><div id="accLogBox" style="max-height:340px;overflow-y:auto"></div></div></div>
@@ -777,6 +778,7 @@ function rwListen(){rwRender();}
 function rwRender(){const B=$("rwList");if(!B)return;const ks=Object.entries(rwBoxes||{}).filter(([,v])=>v&&v.t).sort((a,b)=>b[1].t-a[1].t);
   B.innerHTML=ks.length?ks.map(([k,v])=>`<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-top:1px solid var(--line)"><span style="flex:1;font-size:12.5px">${new Date(v.t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}</span><small style="color:var(--sub);white-space:nowrap">${Object.keys(v.u||{}).length}명 열었어요</small><button class="a r" data-rwdel="${esc(k)}" style="flex:none;padding:6px 9px;font-size:11px">회수</button></div>`).join(""):'<div style="color:var(--sub);font-size:12px">보낸 상자가 없어요</div>';
   B.querySelectorAll("[data-rwdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더";return;}fdb.ref("market/rwBoxes/"+b.dataset.rwdel).remove().catch(()=>toast("회수 실패"));});}
+$("pirNow").onclick=()=>{if(!isOwner||!fdb)return;fdb.ref("market/pirateNow").set(bankNow()+5000).then(()=>toast("🏴‍☠️ 5초 뒤 해적선이 나타나요")).catch(()=>toast("전송 실패"));};
 $("rwSend").onclick=()=>{if(!isOwner||!fdb)return;const b=$("rwSend");if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더 누르면 모두에게 전송!";setTimeout(()=>{b.dataset.arm="";b.textContent="🎁 보상 상자 모두에게 보내기";},3000);return;}b.dataset.arm="";b.textContent="🎁 보상 상자 모두에게 보내기";
   fdb.ref("market/rwBoxes").push({t:Date.now()}).then(()=>toast("🎁 모두의 가방에 상자를 보냈어요")).catch(()=>toast("전송 실패"));};
 /* 📍 위치 옮기기 모드: 광장 화면에서 조이스틱·버튼을 끌어서 옮김 */
@@ -2082,7 +2084,7 @@ const eiSum=(L,use)=>{const u=use||enhUse,ib=(u.n|0)*eiBoost("n",L)+(u.a|0)*eiBo
 const matTier=v=>v<=0?0:Math.max(1,Math.log10(v));
 const matBonus=(i,L)=>{const t=matTier(FISH[i][3]||FISH[i][1]);return t?.5*Math.pow(1.6,t)*Math.exp(-L/(2.5*t)):0;};
 let fBaitPro=0;const FISH_RARE=FISH.reduce((a,f)=>a+(f[1]>=100000?f[0]:0),0)/FISH.reduce((a,f)=>a+f[0],0);
-function rollFish(){const L=Math.min(50,rodLv()),bp=fBaitPro||0,add=FISH_RARE*.2+bp+rodBonus(L),kR=(FISH_RARE+add)/FISH_RARE,kN=(1-FISH_RARE-add)/(1-FISH_RARE);
+function rollFish(){const L=Math.min(50,rodLv()),bp=fBaitPro||0,add=FISH_RARE*.2+bp+rodBonus(L),sh=Math.min(.9,(FISH_RARE+add)*(pirBuff()?2:1)),kR=sh/FISH_RARE,kN=(1-sh)/(1-FISH_RARE);
   /* 낚싯대 강화·미끼가 좋을수록 쓰레기와 싸구려 물고기는 줄고, 중간 가격대가 늘어요 (10만 원 이상 전체 확률은 위 보정 그대로, 나머지 안에서만 재분배) */
   const gt=.5*(L/50)+bp*25,tk=Math.max(.25,1-.7*(L/50)-bp*25);let n0=0,t0=0;const M=FISH.map(f=>{const p=f[1];if(p>=100000)return 0;const m=p<0?tk:Math.min(1.8,Math.max(.4,Math.pow(p/3000,gt)));n0+=f[0]*kN;t0+=f[0]*m;return m;});const sc=t0?n0/t0:1;
   /* 대어(1천만↑)는 장비가 좋을수록 10만 원 이상 안에서 비중이 더 커져요 (10만 이상 전체 확률은 그대로) */
@@ -2140,7 +2142,7 @@ function driverOf(o){let best=null,bd=60;if(isTwin(fBoat)){const d=Math.hypot(o.
 function rideCand(){if(fBoat||fRide||fstate!=="idle")return null;let best=null,bd=62;for(const id in fOthers){const o=fOthers[id];if(!o||!isTwin(o.bt)||o.fs==="away"||(o.fa|0)!==fArea)continue;const d=Math.hypot(o.x-fp.x,o.y-fp.y);if(d<bd&&!dragonRider(o)){bd=d;best=id;}}return best;}
 function boatRide(id){const o=fOthers[id];if(!o||!isTwin(o.bt)||fBoat||fRide)return;if(dragonRider(o))return toast("🐉 이미 뒷자리에 누가 타고 있어요");if(Math.hypot(o.x-fp.x,o.y-fp.y)>70)return toast("보트 가까이 가야 탈 수 있어요");fRide=id;fp.tx=null;fp.via=null;fp.x=o.x-24;fp.y=o.y;fp.dir=o.dir||1;fBoatTilt=o.tl||0;fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"🐉 동승!",t:performance.now(),c:"#a5f3fc"});fLastSent="";setFishBtn();}
 function rideStep(){const d=fOthers[fRide];if(!d||!isTwin(d.bt)||d.fs==="away"||(d.fa|0)!==fArea){fstate="idle";fBoat=0;fRide="";if(fp.x>=DOCK.x-26&&fp.x<=DOCK.x+DOCK.w+26){fp.x=DOCK.x+DOCK.w-14;fp.y=Math.max(DOCK.y+24,Math.min(RIVER+6,fp.y));}else{fp.x=Math.max(20,Math.min(FW-20,fp.x));fp.y=RIVER+22;}fp.tx=null;fp.via=null;fLastSent="";setFishBtn();return toast("🐉 보트가 멈춰서 내렸어요");}fp.x=d.x-24;fp.y=d.y;fp.dir=d.dir||1;fBoatTilt=d.tl||0;}
-function drawDock(c){c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
+function drawDock(c){{const o=pirOpenNow();if(o>.02)return pirDock(c,o);}c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,DOCK.y+6,DOCK.w,DOCK.h+10);c.fillStyle="#7a5230";c.fillRect(DOCK.x,DOCK.y,DOCK.w,DOCK.h+16);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,DOCK.y,3,DOCK.h+16);c.fillRect(DOCK.x+DOCK.w-3,DOCK.y,3,DOCK.h+16);c.strokeStyle="#5c3d22";c.lineWidth=1;for(let y=DOCK.y+6;y<RIVER+16;y+=8){c.beginPath();c.moveTo(DOCK.x,y);c.lineTo(DOCK.x+DOCK.w,y);c.stroke();}
   c.fillStyle="#4a301b";for(const py of[DOCK.y,DOCK.y+40,DOCK.y+80]){c.fillRect(DOCK.x-3,py-2,6,10);c.fillRect(DOCK.x+DOCK.w-3,py-2,6,10);}}
 /* 보트가 선착장 밑을 지나갈 때: 보트가 있는 부분만 선착장 판자를 위에 다시 덮어서 '다리 밑'처럼 보이게 */
 function dockOver(c){const L=[];if(fBoat)L.push([fp.x,fp.y]);for(const id in fOthers){const o=fOthers[id];if(o&&o.bt&&o.bt<BT_RIDE&&o.fs!=="away")L.push([o.x,o.y]);}
@@ -2265,7 +2267,7 @@ function boatSwFront(c,t){
 const inShop=(x,y)=>(x>NTS.x-6&&x<NTS.x+NTS.w+6&&y>NTS.y-4&&y<NTS.y+NTS.h+4)||(x>CAS.x-6&&x<CAS.x+CAS.w+6&&y>CAS.y-4&&y<CAS.y+CAS.h+4)||(x>SHOP.x-6&&x<SHOP.x+SHOP.w+6&&y>SHOP.y-4&&y<SHOP.y+SHOP.h+4)||(x>CLB.x-6&&x<CLB.x+CLB.w+6&&y>CLB.y-4&&y<CLB.y+CLB.h+4)||(x>PHB.x-6&&x<PHB.x+PHB.w+6&&y>PHB.y-4&&y<PHB.y+PHB.h+4)||(x>BNK.x-6&&x<BNK.x+BNK.w+6&&y>BNK.y-4&&y<BNK.y+BNK.h+4)||(x>OFB.x-6&&x<OFB.x+OFB.w+6&&y>OFB.y-4&&y<OFB.y+OFB.h+4)||(x>LTB.x-6&&x<LTB.x+LTB.w+6&&y>LTB.y-4&&y<LTB.y+LTB.h+4);
 const RV1=58;/* 건너편: 아래쪽 강 높이 */
 const walk1=(x,y)=>x>=10&&x<=FW-10&&y>=76&&y<=FH-12&&(y<FH-RV1-2||(x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6));
-const inDock=(x,y)=>x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+(isOwner||bridgeAll?16:42)&&y<=RIVER+16;
+const inDock=(x,y)=>!pirBlk()&&x>=DOCK.x+6&&x<=DOCK.x+DOCK.w-6&&y>=DOCK.y+(isOwner||bridgeAll?16:42)&&y<=RIVER+16;
 const walkable=(x,y)=>!inShop(x,y)&&x>=10&&x<=FW-10&&y<=FH-12&&(y>=RIVER+14||inDock(x,y));
 function fishSpot(x,y){if(fArea)return false;if(inDock(x,y))return y<RIVER-6;return y<=RIVER+34&&!(x>DOCK.x-12&&x<DOCK.x+DOCK.w+12);}
 let bridgeAll=false,bridgeOpen=false,fGateT=-9999,fArea=0,fAreaT=-9999,fBoat=0,fRide="",fBV={x:0,y:0},fBoatTilt=0,fWake=[],fWakeT=0;
@@ -3002,7 +3004,7 @@ function fishDrawW(t){const c=fCtx;if(fArea)return fishDraw1(t);
   const gg=c.createLinearGradient(0,RIVER+20,0,FH);gg.addColorStop(0,"#5aa34a");gg.addColorStop(1,"#3f7d36");c.fillStyle=gg;c.fillRect(0,RIVER+20,FW,FH);
   c.fillStyle="rgba(255,255,255,.06)";for(let i=0;i<25;i++){const r=mulberry(i*13)();c.fillRect((i*53)%FW,RIVER+30+((i*97)%(FH-RIVER-40)),2,4+r*3);}
   c.strokeStyle="#4f8a3a";c.lineWidth=2;for(let x=6;x<FW;x+=17){if(x>DOCK.x-8&&x<DOCK.x+DOCK.w+8)continue;const s=Math.sin(t/700+x)*2;c.beginPath();c.moveTo(x,RIVER+16);c.lineTo(x+s,RIVER+2);c.stroke();}
-  drawDock(c);
+  drawDock(c);try{pirDraw(c,t);}catch(e){fDrawErr(e);}
   c.font="bold 10px 'Noto Sans KR',sans-serif";c.textAlign="center";c.fillStyle="rgba(255,255,255,.85)";emoSign(c,"","주로 광장",FW/2,FH-16,"bold 10px 'Noto Sans KR',sans-serif","#fff","rgba(0,0,0,.35)",20);
   {c.fillStyle="rgba(0,0,0,.12)";c.beginPath();c.roundRect(RZ.x+2,RZ.y+4,RZ.w,RZ.h,14);c.fill();c.save();c.beginPath();c.roundRect(RZ.x,RZ.y,RZ.w,RZ.h,10);c.clip();c.fillStyle="#e8d59a";c.fillRect(RZ.x,RZ.y,RZ.w,RZ.h);
     for(let yy=RZ.y+3;yy<RZ.y+RZ.h;yy+=4){c.fillStyle=(yy-RZ.y)%8<4?"rgba(176,140,62,.22)":"rgba(255,255,255,.18)";c.fillRect(RZ.x,yy,RZ.w,1.5);}
@@ -3088,7 +3090,7 @@ function autoStep(t){if(!fAuto)return;
   if(away||fKeysOn()||fJoyV||fp.tx!=null){autoStop(away?"🤖 낚시터를 벗어나서 자동낚시를 취소했어요":"🤖 움직여서 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
   if(fstate==="idle"){if(t>=fAutoT){if((me.autoN|0)<=0){autoStop("🤖 자동낚시 이용권을 다 썼어요");return;}
     fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};fAutoR=420+Math.random()*520;setFishBtn();}}
-  else if(fstate==="bite"&&t-fT>=fAutoR){fstate="idle";me.autoN=Math.max(0,(me.autoN|0)-1);fAutoT=t+650+Math.random()*450;fAutoCatch=1;try{landFish(t);}finally{fAutoCatch=0;}
+  else if(fstate==="bite"&&t-fT>=fAutoR){fstate="idle";me.autoN=Math.max(0,(me.autoN|0)-1);fAutoT=t+(650+Math.random()*450)/(pirBuff()?2:1);fAutoCatch=1;try{landFish(t);}finally{fAutoCatch=0;}
     if((me.autoN|0)<=0)autoStop("🤖 자동낚시가 끝났어요!");else{setFishBtn();autoBtnUpd();}}}
 const AUTO_RST="#2";/* 11/26 오늘 구매 기록 초기화: 값을 바꾸면 그날 산 기록이 모두 리셋돼요 */
 function autoK(){if(!me)return 0;if(me.autoK&&me.autoK.d===todayKey()+AUTO_RST)return me.autoK.k|0;return 0;}
@@ -3104,7 +3106,92 @@ function autoFreeGet(){if(!me||!me._loaded)return toast("닉네임부터 정해 
 function autoFreeCardHtml(){const got=!!(me&&me.autoFree===todayKey());return `<div class="card${got?"":" dealHi"}" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:28px">🎁</span><div style="flex:1;min-width:0"><b>무료 자동낚시 이용권 ${AUTO_FREE_N}회</b>${got?"":'<span class="dealBd">🎁 받을 수 있어요</span>'}<div style="font-size:10.5px;color:var(--ok);margin-top:2px;line-height:1.5">하루에 한 번 공짜로 받을 수 있어요 (한국 시간 0시에 새로 받아요)</div></div></div><button data-afree style="width:100%;margin-top:8px;height:36px;border-radius:10px;background:${got?"var(--card2)":"var(--ok)"};color:${got?"var(--sub)":"#111"};font-weight:900;font-size:12.5px">${got?"오늘은 이미 받았어요 (내일 또 받아요)":"무료로 받기"}</button></div>`;}
 function autoCardHtml(){const n=me?(me.autoN|0):0,k=autoK();return `<div class="card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:28px">🤖</span><div style="flex:1;min-width:0"><b>자동낚시 이용권</b> <span style="color:var(--sub);font-size:11px">남은 ${n}회</span><div style="font-size:10.5px;color:var(--ok);margin-top:2px;line-height:1.5">낚시터에서 🤖 버튼을 누르면 알아서 던지고 당겨 줘요 · 내 낚싯대·미끼 그대로(미끼는 소모) · 한 번 누르면 끝까지 혼자 해요 · 끝나면 결과 창이 떠요 · 움직이거나 낚시터를 벗어나면 취소돼요(남은 횟수는 유지)</div><div style="font-size:10.5px;color:var(--sub);margin-top:3px">단계마다 하루 1번 · 앞 단계를 사야 다음 단계가 열려요</div></div></div>`+AUTO_TIERS.map(([N,P],i)=>{const done=i<k,open=i===k;return `<button data-abuy="${i}" style="width:100%;margin-top:6px;height:38px;border-radius:10px;background:${open?"var(--acc)":"var(--card2)"};color:${open?"#111":"var(--sub)"};font-weight:900;font-size:12.5px;opacity:${open?1:.75}">${done?`✅ ${N}장 구매 완료`:open?`${N}장 · ${formatMoneyReadable(P)} · 구매`:`🔒 ${N}장 · ${formatMoneyReadable(P)} (앞 단계를 먼저)`}</button>`;}).join("")+`</div>`;}
 const fKeysOn=()=>fKeys.ArrowUp||fKeys.ArrowDown||fKeys.ArrowLeft||fKeys.ArrowRight||fKeys.w||fKeys.a||fKeys.s||fKeys.d;
+const PIR_T=60,PIR_COLS=["#ef4444","#3b82f6","#a855f7","#22c55e","#f59e0b"];
+const PIR_RW=[{k:"cash",v:1000000,nm:"현금 100만 원"},{k:"cash",v:3000000,nm:"현금 300만 원"},{k:"cash",v:5000000,nm:"현금 500만 원"},{k:"bait",id:"mid",cnt:300,nm:"중급 미끼 300개"},{k:"bait",id:"pro",cnt:200,nm:"고급 미끼 200개"},{k:"bait",id:"max",cnt:100,nm:"최고급 미끼 100개"},{k:"eitem",it:"a",cnt:5,nm:"고급 강화권 5개"},{k:"eitem",it:"a",cnt:3,nm:"고급 강화권 3개"},{k:"eitem",it:"ra",cnt:4,nm:"고급 복구권 4개"},{k:"eitem",it:"ra",cnt:2,nm:"고급 복구권 2개"},{k:"auto",cnt:50,nm:"자동낚시 이용권 50회"}];
+const pirRnd=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s);};
+const pirSm=(a,b,x)=>{x=Math.max(0,Math.min(1,(x-a)/(b-a)));return x*x*(3-2*x);};
+let pirForce=0,pirBank={},pirBankCn=0,pirBankRef=null,pirGot={},pirCap={},pirAnn={},pirThr=[];
+function pirStartOf(H){return H*3600000+(5+Math.floor(pirRnd(H)*50))*60000+Math.floor(pirRnd(H+7)*60)*1000;}
+function pirTime(){const now=bankNow(),H=Math.floor(now/3600000);let id="h"+H,s=pirStartOf(H);
+  if(pirForce&&now>=pirForce-10000&&now<pirForce+(PIR_T+25)*1000){id="f"+pirForce;s=pirForce;}
+  const t=(now-s)/1000;return t>=-10&&t<=PIR_T+20?{id,s,t}:null;}
+const pirShipX=t=>-200+t*(610/PIR_T);
+const pirOpenAt=t=>pirSm(6.5,9.5,t)-pirSm(34,37,t);
+function pirOpenNow(){const p=pirTime();return p?pirOpenAt(p.t):0;}
+const pirBlk=()=>pirOpenNow()>.02;
+function pirBuff(){const p=pirTime();return !!p&&p.t>=0&&p.t<=PIR_T;}
+function pirListen(){const cn=myCn===2?2:1;if(!fdb||pirBankCn===cn)return;try{if(pirBankRef)pirBankRef.off();}catch(e){}pirBankCn=cn;pirBank={};pirBankRef=fdb.ref("market/pirBank/c"+cn);pirBankRef.on("value",s=>{pirBank=s.val()||{};},()=>{});}
+function pirGrant(g){if(g.k==="cash"){me.cash+=g.v;stAdd("pirCash",g.v);}else if(g.k==="eitem"){me.enhI=me.enhI||{};me.enhI[g.it]=(me.enhI[g.it]|0)+g.cnt;}else if(g.k==="auto"){me.autoN=(me.autoN|0)+g.cnt;}else{const bk=baitKey(g.id);me[bk]=(me[bk]|0)+g.cnt;}}
+async function pirSetup(p){const A=pirAnn[p.id];if(A.s||!fdb||!me||!me._loaded)return;A.s=1;const cn=myCn===2?2:1;
+  try{const L=Object.keys((await fdb.ref("market/pirBank/c"+cn).once("value")).val()||{}).length,n=Math.max(0,5-L);
+    const tr=await fdb.ref("market/pirate/"+p.id+"/c"+cn+"/meta").transaction(c=>c?undefined:{n,t:Date.now()});if(!tr||!tr.committed)return;
+    const span=28-3.5*(Math.max(1,n)-1),u=Array.from({length:n},()=>Math.random()*span).sort((a,b)=>a-b),up={};
+    for(let i=0;i<n;i++){const tb=+(14+u[i]+3.5*i).toFixed(1),mid=pirShipX(tb)+112;let lx=Math.max(34,Math.min(326,mid+(Math.random()-.5)*70)),ly=148+Math.random()*22;
+      for(let k=0;k<12&&!walkable(lx,ly);k++){ly=146+((k*9)%36);lx=Math.max(34,Math.min(326,lx+(k%2?14:-14)*(1+k*.2)));}
+      up[p.id+"_"+i]={e:p.id,s:p.s,tb,sx:Math.round(mid),lx:Math.round(lx),ly:Math.round(ly),col:i%5,i};}
+    if(n)await fdb.ref("market/pirBank/c"+cn).update(up);}catch(e){A.s=0;}}
+async function pirTake(key,b){if(pirGot[key])return;pirGot[key]=1;const cn=myCn===2?2:1;let bumped=0;
+  try{const cr=fdb.ref("market/pirate/"+b.e+"/u/c"+cn+"/"+myId);
+    const t1=await cr.transaction(c=>(c|0)>=3?undefined:(c|0)+1);if(!t1||!t1.committed){pirCap[b.e]=1;return;}bumped=1;
+    let saw=null;const t2=await fdb.ref("market/pirBank/c"+cn+"/"+key).transaction(c=>{saw=c;return c?null:c;});
+    if(!t2||!t2.committed||!saw){await cr.transaction(c=>Math.max(0,(c|0)-1));return;}
+    const g=PIR_RW[Math.floor(Math.random()*PIR_RW.length)];pirGrant(g);stAdd("pirBox");saveMe();renderHeader();
+    toast("🎁 해적선 선물상자를 주웠어요!\n"+g.nm);broadcast(`🏴‍☠️ ${myName()}님이 해적선 선물상자를 가장 먼저 주웠어요!`,"pirate",{cn:myCn});
+  }catch(e){pirGot[key]=0;}}
+function pirStep(t){pirListen();const p=pirTime();
+  if(p){if(!pirAnn[p.id])pirAnn[p.id]={};const A=pirAnn[p.id];
+    if(p.t>=-4)pirSetup(p);
+    if(p.t>=0&&!A.b){A.b=1;toast("🏴‍☠️ 해적선이 나타났어요!\n경험치·좋은 물고기·낚시 속도 2배");}
+    if(pirBlk()&&fp.x>=DOCK.x-4&&fp.x<=DOCK.x+DOCK.w+4&&fp.y<RIVER+14&&!fArea&&!fBoat&&!fRide){if(fstate!=="idle"){fstate="idle";try{setFishBtn();}catch(e){}}fp.tx=null;fp.via=null;fp.y=RIVER+20;if(!A.c){A.c=1;toast("🌉 다리가 열려요! 해적선이 지나가요");}}}
+  if(fdb&&me&&me._loaded&&myId&&!fArea&&!fBoat&&!fRide){const now=bankNow();for(const key in pirBank){const b=pirBank[key];if(!b||pirCap[b.e]||pirGot[key])continue;if((now-b.s)/1000-b.tb<1.1)continue;if(Math.hypot(fp.x-b.lx,fp.y-b.ly)<22)pirTake(key,b);}}}
+function pirDock(c,o){const half=RIVER/2,h=half-(half-5)*o;
+  const leaf=(y,hh)=>{c.fillStyle="rgba(0,0,0,.18)";c.fillRect(DOCK.x+4,y+5,DOCK.w,hh);c.fillStyle="#9a6b3c";c.fillRect(DOCK.x,y,DOCK.w,hh);c.fillStyle="#5c3d22";c.fillRect(DOCK.x,y,3,hh);c.fillRect(DOCK.x+DOCK.w-3,y,3,hh);c.strokeStyle="#5c3d22";c.lineWidth=1;const n=Math.max(1,Math.floor(hh/8));for(let i=1;i<n;i++){const yy=y+i*hh/n;c.beginPath();c.moveTo(DOCK.x,yy);c.lineTo(DOCK.x+DOCK.w,yy);c.stroke();}};
+  leaf(0,h);leaf(RIVER-h,h+16);c.strokeStyle="#e5e7eb";c.lineWidth=1.4;for(const x of[DOCK.x+8,DOCK.x+DOCK.w-8]){c.beginPath();c.moveTo(x,0);c.lineTo(x,h);c.stroke();c.beginPath();c.moveTo(x,RIVER);c.lineTo(x,RIVER-h);c.stroke();}
+  c.fillStyle="#4a301b";for(const[x,y]of[[DOCK.x-3,0],[DOCK.x+DOCK.w-3,0],[DOCK.x-3,RIVER+8],[DOCK.x+DOCK.w-3,RIVER+8]])c.fillRect(x,y-2,6,10);}
+function pirCrew(c,x,y,col,arm){c.fillStyle=col;c.fillRect(x-3,y-11,6,11);c.fillStyle="#f2c9a0";c.beginPath();c.arc(x,y-14,3.4,0,7);c.fill();c.fillStyle="#111";c.beginPath();c.moveTo(x-5,y-15);c.lineTo(x,y-22);c.lineTo(x+5,y-15);c.closePath();c.fill();c.fillStyle="#f5f5f5";c.fillRect(x-1,y-18,2,1.6);c.strokeStyle="#f2c9a0";c.lineWidth=2;c.beginPath();c.moveTo(x+2,y-9);c.lineTo(x+6,y-9-arm*8);c.stroke();}
+function pirGlow(c,x,y,r,a){const g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,"rgba(255,214,120,"+a+")");g.addColorStop(1,"rgba(255,214,120,0)");c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,7);c.fill();}
+function pirShip(c,t){const sx=pirShipX(t);if(sx>FW+30||sx<-230)return;const bob=Math.sin(t*1.6)*1.4,roll=Math.sin(t*1.3)*.012;
+  c.save();c.translate(sx,102+bob);c.rotate(roll);
+  for(let i=0;i<9;i++){const a=((t*1.4+i*.13)%1);c.globalAlpha=.7*(1-a);c.fillStyle="#fff";c.beginPath();c.ellipse(-6-a*70-i*3,2+((i%2)?3:-2),12+a*10,2.8,0,0,7);c.fill();}
+  c.globalAlpha=1;c.fillStyle="rgba(255,255,255,.55)";c.beginPath();c.ellipse(86,4,96,5,0,0,7);c.fill();
+  c.strokeStyle="rgba(30,20,10,.55)";c.lineWidth=.8;for(const p of[[48,-92,0,-36],[48,-92,100,-26],[92,-98,0,-36],[92,-98,160,-30],[132,-88,100,-26],[132,-88,174,-38],[48,-92,6,-44]]){c.beginPath();c.moveTo(p[0],p[1]);c.lineTo(p[2],p[3]);c.stroke();}
+  const hg=c.createLinearGradient(0,-34,0,6);hg.addColorStop(0,"#5a3820");hg.addColorStop(1,"#2a180d");c.fillStyle=hg;
+  c.beginPath();c.moveTo(2,-28);c.lineTo(150,-28);c.quadraticCurveTo(168,-30,182,-44);c.quadraticCurveTo(176,-14,150,0);c.quadraticCurveTo(100,10,40,6);c.quadraticCurveTo(6,2,0,-10);c.closePath();c.fill();
+  c.fillStyle="#3a2314";c.fillRect(0,-48,44,22);c.fillStyle="#e0b030";c.fillRect(0,-50,46,3);c.fillRect(0,-28,46,2.4);
+  [8,18,28,38].forEach((x,i)=>{c.fillStyle=Math.sin(t*3+i)>-.3?"#ffd56b":"#c58a2b";c.fillRect(x,-42,5,7);});
+  c.fillStyle="#e0b030";c.fillRect(2,-30,150,3.4);c.fillStyle="#9a1b1b";c.fillRect(4,-23,150,3);
+  for(let i=0;i<7;i++){const x=22+i*20;c.fillStyle="#1b1008";c.beginPath();c.arc(x,-12,3.2,0,7);c.fill();c.fillStyle="#4b4b4b";c.fillRect(x-1.5,-13,6,3);c.strokeStyle="#e0b030";c.lineWidth=.8;c.beginPath();c.arc(x,-12,3.2,0,7);c.stroke();}
+  c.fillStyle="#e0b030";c.beginPath();c.moveTo(176,-44);c.quadraticCurveTo(190,-52,196,-40);c.lineTo(186,-38);c.quadraticCurveTo(184,-34,176,-34);c.closePath();c.fill();c.fillStyle="#7f1d1d";c.beginPath();c.arc(188,-44,1.6,0,7);c.fill();
+  c.strokeStyle="#e0b030";c.lineWidth=2;c.beginPath();c.moveTo(150,-28);c.lineTo(194,-46);c.stroke();
+  c.fillStyle="#3b2412";for(const m of[[48,-92],[92,-98],[132,-88]])c.fillRect(m[0]-2,m[1],4,-m[1]-26);c.fillStyle="#2a1a0d";c.fillRect(86,-100,14,5);
+  const bl=Math.sin(t*1.9)*3;
+  const sail=(x,top,w,h,fill,emb)=>{c.fillStyle="#2a1a0d";c.fillRect(x-w/2-3,top,w+6,2.6);c.fillStyle=fill;c.strokeStyle="#b8902c";c.lineWidth=1.2;
+    c.beginPath();c.moveTo(x-w/2,top+2);c.quadraticCurveTo(x+bl+w*.9,top+h*.5,x+w/2,top+h);c.lineTo(x-w/2,top+h-3);c.quadraticCurveTo(x-w/2-bl,top+h*.5,x-w/2,top+2);c.closePath();c.fill();c.stroke();
+    if(emb){const cx=x+bl*.5,cy=top+h*.42;c.fillStyle="#111";c.beginPath();c.arc(cx,cy,7,0,7);c.fill();c.fillStyle="#fff";c.beginPath();c.arc(cx,cy-1,5.6,0,7);c.fill();c.fillRect(cx-3.4,cy+2,6.8,4);c.fillStyle="#111";c.beginPath();c.arc(cx-2.2,cy-1.4,1.5,0,7);c.arc(cx+2.2,cy-1.4,1.5,0,7);c.fill();c.fillRect(cx-.6,cy+.6,1.2,1.6);c.strokeStyle="#111";c.lineWidth=2;c.beginPath();c.moveTo(cx-9,cy+10);c.lineTo(cx+9,cy-6);c.moveTo(cx+9,cy+10);c.lineTo(cx-9,cy-6);c.stroke();}};
+  sail(48,-86,34,46,"#7a1d1d",0);sail(92,-92,44,56,"#f3ead0",1);sail(132,-82,32,42,"#7a1d1d",0);
+  c.fillStyle="#fde68a";c.fillRect(90.5,-98,3,3);const fl=Math.sin(t*6)*3;
+  c.fillStyle="#0b0b0b";c.beginPath();c.moveTo(92,-98);c.lineTo(92,-116);c.quadraticCurveTo(108,-120+fl,124,-112);c.quadraticCurveTo(110,-110-fl,92,-104);c.closePath();c.fill();
+  c.fillStyle="#fff";c.beginPath();c.arc(104,-112,3.2,0,7);c.fill();c.fillStyle="#0b0b0b";c.fillRect(102.2,-113,1.3,1.3);c.fillRect(104.6,-113,1.3,1.3);
+  c.fillStyle="#c0272d";for(const m of[[48,-92],[132,-88]]){c.beginPath();c.moveTo(m[0],m[1]);c.lineTo(m[0]-22,m[1]-3+Math.sin(t*5)*2);c.lineTo(m[0],m[1]+5);c.closePath();c.fill();}
+  pirGlow(c,30,-50,16,.5+.2*Math.sin(t*4));pirGlow(c,164,-34,14,.45+.2*Math.sin(t*4+1));c.fillStyle="#ffd56b";c.fillRect(29,-56,3,6);c.fillRect(163,-40,3,6);
+  const thr=pirThr.some(tb=>t>tb-.6&&t<tb+.3);
+  pirCrew(c,70,-28,"#1d4ed8",thr?1:.2);pirCrew(c,104,-28,"#b91c1c",.2);pirCrew(c,122,-28,"#0f766e",thr?1:.3);pirCrew(c,18,-48,"#4338ca",.2);
+  c.restore();}
+function pirGifts(c){const now=bankNow(),T=performance.now()/1000;
+  for(const key in pirBank){const b=pirBank[key];if(!b||pirGot[key]===2)continue;const dt=(now-b.s)/1000-b.tb;if(dt<0)continue;
+    const fly=Math.min(1,dt/1.1),land=dt>=1.1,x=b.sx+(b.lx-b.sx)*fly,y=62+(b.ly-62)*fly-Math.sin(fly*Math.PI)*46+(land?Math.sin(T*3+b.i)*1.2:0);
+    c.fillStyle="rgba(0,0,0,.25)";c.beginPath();c.ellipse(x,(land?b.ly:y+12)+8,8,2.6,0,0,7);c.fill();
+    c.save();c.translate(x,y);if(!land)c.rotate(fly*6.28);else{const sc=1+Math.sin(T*4+b.i)*.06;c.scale(sc,sc);}
+    c.fillStyle=PIR_COLS[b.col|0];c.fillRect(-7,-7,14,14);c.fillStyle="#fde68a";c.fillRect(-1.6,-7,3.2,14);c.fillRect(-7,-1.6,14,3.2);c.beginPath();c.arc(-3,-9,3,0,7);c.arc(3,-9,3,0,7);c.fill();c.restore();
+    if(land){const s=(T*3+b.i)%1;c.fillStyle="rgba(255,255,255,"+(.9-s*.8)+")";c.fillRect(b.lx+8,y-10-s*6,2,2);c.fillRect(b.lx-10,y-4-s*5,2,2);}}}
+function pirDraw(c,t){const p=pirTime();if(p){pirThr=Object.values(pirBank).filter(b=>b&&b.e===p.id).map(b=>b.tb);if(p.t>-1&&p.t<PIR_T+3)pirShip(c,p.t);}pirGifts(c);}
+function pirHudUpd(){const w=$("fishWrap");if(!w)return;let d=$("pirHud");if(!d){d=document.createElement("div");d.id="pirHud";d.style.cssText="position:absolute;left:50%;top:44px;transform:translateX(-50%);z-index:6;display:none;background:rgba(127,29,29,.92);color:#fff;border-radius:10px;padding:3px 9px;font-size:10px;font-weight:800;text-align:center;line-height:1.4;pointer-events:none;white-space:nowrap";w.appendChild(d);}
+  const p=pirTime();let tx="";if(p&&fishActive()){if(p.t<0&&p.t>=-5)tx=`🏴‍☠️ 해적선이 ${Math.ceil(-p.t)}초 뒤 나타나요!`;else if(p.t>=0&&p.t<=PIR_T)tx=`🏴‍☠️ 해적의 가호 · 경험치·좋은 물고기·낚시속도 ×2 · ${Math.ceil(PIR_T-p.t)}초`;}
+  if(tx){if(d.dataset.k!==tx){d.innerHTML=tx;d.dataset.k=tx;}d.style.display="block";}else if(d.style.display!=="none")d.style.display="none";}
+setInterval(()=>{try{pirHudUpd();}catch(e){}},300);
+{let att=0;setInterval(()=>{if(!fdb||att)return;att=1;fdb.ref("market/pirateNow").on("value",s=>{const v=s.val();pirForce=typeof v==="number"?v:0;},()=>{});},1000);}
 function fishStep(dt,t){
+  try{pirStep(t);}catch(e){}
   autoStep(t);
   if(fRide)rideStep();
   if(fstate==="idle"&&fBoat){boatStep(dt,t);}
@@ -3113,7 +3200,7 @@ function fishStep(dt,t){
     if(fJoyV){vx=fJoyV.x;vy=fJoyV.y;}if(vx||vy){fp.tx=null;fp.via=null;}else if(fp.tx!=null){const gx=fp.via?fp.via.x:fp.tx,gy=fp.via?fp.via.y:fp.ty;const dx=gx-fp.x,dy=gy-fp.y,dd=Math.hypot(dx,dy);if(dd<=Math.max(2,.11*dt)){fp.x=gx;fp.y=gy;if(fp.via)fp.via=null;else fp.tx=null;}else{vx=dx/dd;vy=dy/dd;}}
     if(vx||vy){const l=Math.hypot(vx,vy),sp=(fBoat?.085:.11)*dt*(fJoyV?Math.max(.45,fJoyV.m):1);const nx=fp.x+vx/l*sp,ny=fp.y+vy/l*sp;if(wk(nx,ny)){fp.x=nx;fp.y=ny;}else if(wk(nx,fp.y))fp.x=nx;else if(wk(fp.x,ny))fp.y=ny;else fp.tx=null;if(vx)fp.dir=vx>0?1:-1;}}
   else if(fstate==="cast"&&t-fT>550){fstate="wait";fT=t;const bid=eqOf("bait"),fx=BAIT_FX[bid]||BAIT_FX.basic;fBaitPro=fx[1];if(bid!=="basic"){const bk=baitKey(bid);me[bk]=Math.max(0,(me[bk]|0)-1);if(!me[bk]){me.eq.bait="basic";saveMe();toast(`🪱 ${({mid:"중급",pro:"고급",max:"최고급"})[bid]} 미끼를 다 썼어요! 기본 미끼로 바뀌었어요`);}}fBite=(1500+Math.random()*4000)*fx[0];setFishBtn();}
-  else if(fstate==="wait"&&t-fT>fBite){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
+  else if(fstate==="wait"&&t-fT>(pirBuff()?fBite/2:fBite)){fstate="bite";fT=t;setFishBtn();if(navigator.vibrate)try{navigator.vibrate(120);}catch(e){}}
   else if(fstate==="bite"&&t-fT>1300){fstate="idle";fFloat.push({a:fArea,x:fp.x,y:fp.y,s:"놓쳤다... 💨",t,c:"#9fb3c8"});setFishBtn();}
   autoBtnUpd();
   {const B=$("fBoatBtn");if(B){{const L=$("fBridgeLock");if(L){const d=isOwner&&fArea&&bridgeAll?"block":"none";if(L.style.display!==d)L.style.display=d;}}
@@ -3198,7 +3285,7 @@ function emoSign(c,emo,txt,cx,cy,font,col,bg,h){c.save();c.font=font;const tw=c.
 function landFish(t){const au=fAutoCatch,i=rollFish(),[,base,name]=FISH[i];const tax=base>0?Math.round(base*.1):0,got=base-tax;
   me.fish=me.fish||{};const first=!hasSeen(me,i);me.fish[fKey(i)]=(me.fish[fKey(i)]||0)+1;me.fishN=(me.fishN||0)+1;if(base>=BIG_V)me.bigN=(me.bigN|0)+1;if(base<0){me.cash+=base;me.fishEarn=(me.fishEarn||0)+base;}
   let bonus="";if(!me.fishDone&&fishCountOf(me)===FISH.length){me.fishDone=true;me.cash+=100000000;bonus=`\n🎉 도감 ${FISH.length}종 완성! 보상 1억 원 지급!`;broadcast(`🎉 ${myName()}님이 낚시 도감 ${FISH.length}종을 모두 모았어요! (보상 1억 원)`);}
-  const fx=fishExp(i);stAdd(base>0?"fishGoodN":"fishTrashN");if(base>0)stAdd("fishValue",base);stMax("fishBest",base);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
+  const fx=fishExp(i)*(pirBuff()?2:1);stAdd(base>0?"fishGoodN":"fishTrashN");if(base>0)stAdd("fishValue",base);stMax("fishBest",base);if(fx>0)addExp(fx,"낚시",true);else saveMe();renderHeader();
   if(!au||base>=BIG_V)fFloat.push({a:fArea,x:fp.x,y:fp.y,s:`${dexNo(i)}번 ${name}`+(first?" ✨NEW":"")+(fx>0?` ⭐+${fx}`:""),t,c:base>=BIG_V?"#ffcf4d":(base<0?"#ff8a96":"#fff")});
   if(au)autoRec(i,base,name,first,fx);fishFeed(myName(),name,base,i);if(fdb&&myId)fdb.ref("online/"+myId+"/fc").set({n:name,v:base,i,t:Date.now()}).catch(()=>{});
   const r=$("fishRes");if(!au||base>=BIG_V){r.innerHTML=`<div style="font-size:11px;color:var(--sub)">도감 ${dexNo(i)}번${first?' · <b style="color:#ffcf4d">✨ 신규 도감 등록!</b>':''}</div><div style="font-size:18.5px;font-weight:900;margin:4px 0">${esc(name)}</div><div class="${base<0?'down':'up'}" style="font-weight:700">${base<0?formatMoneyReadable(base)+" 손해... 💸":"시세 "+formatMoneyReadable(base)}</div>${base>0?`<div style="font-size:10px;color:var(--sub)">🐟 어시장에 팔면 ${formatMoneyReadable(got)} (수수료 10%) · <b style="color:#ffcf4d">⭐ +${fx} 경험치</b></div>`:''}${bonus?`<div style="color:#ffcf4d;font-weight:700;margin-top:4px;white-space:pre-line">${bonus.trim()}</div>`:''}`;
