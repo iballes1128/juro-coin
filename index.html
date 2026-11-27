@@ -272,7 +272,7 @@ nav button.on{color:var(--tx);font-weight:700}
       <div class="l" style="margin-top:6px"><select id="admGK" style="flex:1"><option value="acc">🎀 악세사리</option><option value="aura">✨ 오라</option><option value="wing">🪽 날개</option><option value="plate">🏷️ 명찰</option><option value="skin">🧑 스킨</option></select><select id="admGI" style="flex:2"></select><button class="a" id="admGrant" style="flex:none;width:64px">🎁 지급</button></div>
       <div class="l"><button class="a" id="admOfRestore" style="flex:1">🏢 선택한 사람에게 기본 사무실 다시 지급</button></div>
     </div>
-    <div class="card"><h3>🎁 업데이트 보상 키</h3><div class="nick" style="margin-bottom:6px"><input id="rwName" placeholder="키 (비우면 자동 생성)" maxlength="20" autocapitalize="characters"><button id="rwMk" style="background:var(--acc);color:#111;font-weight:900">만들기</button></div><div id="rwList"></div></div>
+    <div class="card"><h3>🎁 업데이트 보상</h3><button class="a" style="width:100%;margin-bottom:6px" id="rwSend">🎁 보상 상자 모두에게 보내기</button><div id="rwList"></div></div>
     <div class="card"><h3>📮 건의함</h3><div id="sugBox" style="max-height:340px;overflow-y:auto"></div></div>
     <div class="card"><h3 id="accHd" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;margin:0">👥 접속 기록 (최근 300개)<span id="accArr" style="color:var(--sub);font-size:13px">▶ 보기</span></h3><div id="accBody" style="display:none;margin-top:8px"><div class="nick" style="margin-bottom:6px"><input id="accQ" placeholder="이름으로 찾기"><button id="accClr" style="background:var(--card2)">비우기</button></div><div id="accLogBox" style="max-height:340px;overflow-y:auto"></div></div></div>
     <div class="card"><h3>🛠️ 전체 시장 (1분간 유지)</h3>
@@ -732,8 +732,8 @@ function renderRank(){const all=anonAll({...players,...(me&&myId?{[myId]:me}:{})
 /* ===================== 거래 시트 ===================== */
 function openSheet(ci){if($("pgMod"))$("pgMod").style.display="none";curCoin=ci;$("qty").value="";setMode(M.coins[ci].delisted?"sell":"buy");$("sheetBg").style.display="block";requestAnimationFrame(()=>$("sheet").classList.add("on"));renderSheet();}
 $("shClose").onclick=()=>closeSheet();
-["dex","equip","shop","enh","ach","title","set"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
-["s-wallet","s-dex","s-equip","s-title","s-shop","s-bank","s-enh","s-ach","s-rank","s-admin","s-set"].forEach(id=>$("pgBody").appendChild($(id)));
+["dex","equip","shop","enh","ach","title","bag","set"].forEach(k=>{const e=document.createElement("section");e.className="sec";e.id="s-"+k;$("pgBody").appendChild(e);});
+["s-wallet","s-dex","s-equip","s-title","s-bag","s-shop","s-bank","s-enh","s-ach","s-rank","s-admin","s-set"].forEach(id=>$("pgBody").appendChild($(id)));
 /* ⚙️ 설정: 화면 버튼(크기·위치), 낚시 알림 크기, 건의함 */
 const CTL={joy:["fJoy","left bottom","🕹️ 조이스틱"],act:["fAct","right bottom","🎣 오른쪽 아래 버튼"],feed:["fFeed","right top","🐟 낚시 알림(오른쪽 위)"]};
 function ctlGet(k){try{const v=+localStorage.getItem("jc_ctl_"+k);return v>=50&&v<=200?v:100;}catch(e){return 100;}}
@@ -744,28 +744,41 @@ function ctlBind(root){root.querySelectorAll("[data-ctl]").forEach(r=>{r.oninput
 function ctlReset(){for(const k in CTL){try{localStorage.removeItem("jc_ctl_"+k);localStorage.removeItem("jc_ctlp_"+k);}catch(e){}}document.querySelectorAll("[data-ctl]").forEach(x=>x.value=100);document.querySelectorAll("[data-ctlv]").forEach(x=>x.textContent="100%");ctlApply();toast("버튼 크기·위치를 기본으로 돌렸어요");}
 $("s-set").innerHTML=`<div class="card"><h3>📱 화면 버튼 · 알림</h3><div style="font-size:11px;color:var(--sub);margin-bottom:6px">폰 광장 화면의 조이스틱·버튼 크기와 위치, 낚시 알림 크기를 바꿔요</div>`+ctlSliders(["joy","act","feed"])+
   `<div style="display:flex;gap:6px;margin-top:8px"><button id="ctlEditGo" style="flex:2;padding:9px 0;border-radius:9px;background:var(--acc);color:#111;font-weight:900;font-size:12.5px">📍 화면 보면서 위치 옮기기</button><button id="ctlReset" style="flex:1;padding:9px 0;border-radius:9px;background:var(--card2);font-size:12px">기본으로</button></div></div>`+
-  `<div class="card"><h3>📮 건의함</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">건의 및 문의할 내용을 남겨주세요</div><textarea id="sugIn" maxlength="500" rows="4" style="width:100%;box-sizing:border-box;background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:13px;resize:vertical"></textarea><button id="sugBtn" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">보내기</button></div>`+
-  `<div class="card"><h3>🎁 보상 키</h3><div class="nick"><input id="rwIn" placeholder="보상 키 입력" maxlength="20" autocomplete="off" autocapitalize="characters"><button id="rwBtn" style="background:var(--acc);color:#111;font-weight:900">받기</button></div></div>`;
+  `<div class="card"><h3>📮 건의함</h3><div style="font-size:11px;color:var(--sub);margin-bottom:8px">건의 및 문의할 내용을 남겨주세요</div><textarea id="sugIn" maxlength="500" rows="4" style="width:100%;box-sizing:border-box;background:var(--card2);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:13px;resize:vertical"></textarea><button id="sugBtn" style="margin-top:8px;width:100%;padding:10px 0;border-radius:10px;background:var(--acc);color:#111;font-weight:900">보내기</button></div>`;
 ctlBind($("s-set"));$("ctlReset").onclick=ctlReset;
-/* 🎁 업데이트 보상 키: 관리자가 만든 키를 입력하면 사람마다 한 번, 아래 7가지 중 하나가 같은 확률로 나가요 */
+/* 🎁 업데이트 보상 상자: 관리자가 버튼을 누르면 모두의 🎒 가방에 상자가 들어가요 · 열면 아래 7가지 중 하나가 같은 확률로 나와요 */
 const RW_LIST=[{k:"bait",id:"max",cnt:30,nm:"최고급 미끼 30개",ic:"🪱"},{k:"bait",id:"pro",cnt:50,nm:"고급 미끼 50개",ic:"🪱"},{k:"bait",id:"mid",cnt:100,nm:"중급 미끼 100개",ic:"🪱"},{k:"eitem",it:"n",cnt:3,nm:"일반 강화권 3개",ic:"🔨"},{k:"eitem",it:"a",cnt:1,nm:"고급 강화권 1개",ic:"⚒️"},{k:"eitem",it:"rn",cnt:2,nm:"일반 복구권 2개",ic:"🩹"},{k:"eitem",it:"ra",cnt:1,nm:"고급 복구권 1개",ic:"💊"}];
-const rwNorm=s=>String(s||"").trim().toUpperCase().replace(/[^A-Z0-9가-힣_-]/g,"").slice(0,20);
-let rwBusy=0;async function rwClaim(){if(rwBusy)return;const k=rwNorm($("rwIn").value);if(!k)return toast("보상 키를 입력해 주세요");if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(!fdb)return toast("서버에 연결되지 않았어요");
-  me.rwK=me.rwK||{};if(me.rwK[k])return toast("이미 받은 키예요");rwBusy=1;
-  try{const sn=await fdb.ref("market/rwKeys/"+k).once("value"),v=sn.val();if(!v||!v.t){rwBusy=0;return toast("없는 키예요");}
-    const tr=await fdb.ref("market/rwKeys/"+k+"/u/"+myId).transaction(c=>c?undefined:Date.now());if(!tr||!tr.committed){me.rwK[k]=1;saveMe();rwBusy=0;return toast("이미 받은 키예요");}
-    const g=RW_LIST[Math.floor(Math.random()*RW_LIST.length)];me.rwK[k]=1;
+{const s=document.createElement("style");s.textContent=".rwDot{position:absolute;top:-5px;right:-7px;min-width:17px;height:17px;border-radius:9px;background:#ef4444;color:#fff;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 3px;box-shadow:0 0 0 2px #0f1218;animation:rwPulse 1.2s infinite;pointer-events:none}@keyframes rwPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}@keyframes rwShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-14deg)}40%{transform:rotate(12deg)}60%{transform:rotate(-10deg)}80%{transform:rotate(8deg)}}";document.head.appendChild(s);}
+let rwBoxes={};
+const rwUn=()=>{const now=Date.now();return Object.entries(rwBoxes||{}).filter(([id,b])=>b&&b.t&&now-b.t<14*86400000&&!(me&&me.rwOpen&&me.rwOpen[id])&&!(b.u&&b.u[myId])).sort((a,b)=>a[1].t-b[1].t).map(([id,b])=>({id,...b}));};
+function rwBadge(){const on=rwUn().length>0,set=(el)=>{if(!el)return;let d=el.querySelector(":scope > .rwDot");if(on){if(!d){el.style.position="relative";d=document.createElement("b");d.className="rwDot";d.textContent="!";el.appendChild(d);}}else if(d)d.remove();};set(document.querySelector('#dock [data-pg="my"]'));set(document.querySelector('#pgTabs [data-pt="bag"]'));}
+function renderBag(){const S=$("s-bag");if(!S||pgCur!=="my"||pgSub!=="bag")return;const bx=rwUn();
+  const row=(ic,nm,n,u)=>`<div style="display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line)"><span style="font-size:22px;width:30px;text-align:center">${ic}</span><span style="flex:1;font-size:13px">${nm}</span><b style="font-size:14.5px;color:${n>0?"var(--acc)":"var(--sub)"}">${(n|0).toLocaleString()}${u}</b></div>`;
+  const sec=(t,rows)=>`<div class="card"><h3>${t}</h3>${rows}</div>`;
+  const m=me||{};
+  S.innerHTML=bx.map(b=>`<div class="card" style="border:2px solid #fbbf24;background:linear-gradient(160deg,#78350f,#451a03)"><div style="display:flex;align-items:center;gap:12px"><div style="position:relative;font-size:38px;line-height:1">🎁<b class="rwDot">!</b></div><div style="flex:1;font-size:14px;font-weight:900;color:#fde68a">업데이트 보상 상자</div><button data-rwopen="${esc(b.id)}" style="padding:10px 18px;border-radius:11px;background:#fbbf24;color:#111;font-weight:900;font-size:13px">열기</button></div></div>`).join("")+
+   sec("🪱 미끼",row("🪱","최고급 미끼",m.baitM,"개")+row("🪱","고급 미끼",m.baitN,"개")+row("🪱","중급 미끼",m.baitL,"개"))+
+   sec("⚒️ 강화권",["sn","a","n"].map(k=>row(ENH_ITEMS[k].ic,ENH_ITEMS[k].nm,eiHave(k),"장")).join(""))+
+   sec("🩹 복구권",["sr","ra","rn"].map(k=>row(ENH_ITEMS[k].ic,ENH_ITEMS[k].nm,eiHave(k),"장")).join(""))+
+   sec("🤖 이용권",row("🤖","자동낚시 이용권",m.autoN,"회"));
+  S.querySelectorAll("[data-rwopen]").forEach(b=>b.onclick=()=>rwOpen(b.dataset.rwopen));}
+let rwBusy=0;async function rwOpen(id){if(rwBusy)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");if(!fdb)return toast("서버에 연결되지 않았어요");rwBusy=1;
+  try{const tr=await fdb.ref("market/rwBoxes/"+id+"/u/"+myId).transaction(c=>c?undefined:Date.now());me.rwOpen=me.rwOpen||{};
+    if(!tr||!tr.committed){me.rwOpen[id]=1;saveMe();rwBusy=0;rwBadge();renderBag();return toast("이미 연 상자예요");}
+    const g=RW_LIST[Math.floor(Math.random()*RW_LIST.length)];me.rwOpen[id]=1;
     if(g.k==="eitem"){me.enhI=me.enhI||{};me.enhI[g.it]=(me.enhI[g.it]|0)+g.cnt;}else{const bk=baitKey(g.id);me[bk]=(me[bk]|0)+g.cnt;}
-    stAdd("rwKey");saveMe();renderHeader();$("rwIn").value="";rwBusy=0;
-    const bg=modal(`<div style="text-align:center"><div style="font-size:34px">🎁</div><div style="font-size:15px;font-weight:900;margin:6px 0">업데이트 보상!</div><div style="font-size:20px;font-weight:900;color:var(--acc);margin:6px 0 14px">${g.ic} ${esc(g.nm)}</div><button id="rwOk" style="width:100%;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">확인</button></div>`);bg.style.zIndex=80;bg.querySelector("#rwOk").onclick=()=>{try{bg.remove();}catch(e){}};
-  }catch(e){rwBusy=0;toast("받기 실패 ("+String((e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}}
-$("rwBtn").onclick=rwClaim;$("rwIn").onkeydown=e=>{if(e.key==="Enter")rwClaim();};
-let rwKeys={},rwOn=false;function rwListen(){if(rwOn||!fdb||!isOwner)return;rwOn=true;fdb.ref("market/rwKeys").on("value",s=>{rwKeys=s.val()||{};rwRender();},()=>{});}
-function rwRender(){const B=$("rwList");if(!B)return;const ks=Object.entries(rwKeys).filter(([,v])=>v).sort((a,b)=>(b[1].t||0)-(a[1].t||0));
-  B.innerHTML=ks.length?ks.map(([k,v])=>`<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-top:1px solid var(--line)"><b style="flex:1;font-size:14px;letter-spacing:1px;user-select:all;word-break:break-all">${esc(k)}</b><small style="color:var(--sub);white-space:nowrap">${Object.keys(v.u||{}).length}명 받음</small><button class="a" data-rwcp="${esc(k)}" style="flex:none;padding:6px 9px;font-size:11px">복사</button><button class="a r" data-rwdel="${esc(k)}" style="flex:none;padding:6px 9px;font-size:11px">삭제</button></div>`).join(""):'<div style="color:var(--sub);font-size:12px">만든 키가 없어요</div>';
-  B.querySelectorAll("[data-rwcp]").forEach(b=>b.onclick=()=>{try{navigator.clipboard.writeText(b.dataset.rwcp);toast("📋 키를 복사했어요");}catch(e){toast("길게 눌러서 복사해 주세요");}});
-  B.querySelectorAll("[data-rwdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더";return;}fdb.ref("market/rwKeys/"+b.dataset.rwdel).remove().catch(()=>toast("삭제 실패"));});}
-$("rwMk").onclick=async()=>{if(!isOwner||!fdb)return;let k=rwNorm($("rwName").value);if(!k)k=Math.random().toString(36).slice(2,10).toUpperCase();if(rwKeys[k])return toast("이미 있는 키예요");try{await fdb.ref("market/rwKeys/"+k).set({t:Date.now()});$("rwName").value="";toast("🎁 키를 만들었어요: "+k);}catch(e){toast("키 만들기 실패");}};
+    stAdd("rwBox");saveMe();renderHeader();rwBusy=0;
+    const bg=modal(`<div style="text-align:center;min-height:150px"><div id="rwBx" style="font-size:64px;display:inline-block;animation:rwShake .9s ease-in-out">🎁</div><div id="rwRes" style="display:none"><div style="font-size:15px;font-weight:900;margin:2px 0">업데이트 보상!</div><div style="font-size:20px;font-weight:900;color:var(--acc);margin:8px 0 16px">${g.ic} ${esc(g.nm)}</div><button id="rwOk" style="width:100%;padding:12px 0;border-radius:11px;background:var(--acc);color:#111;font-weight:900">확인</button></div></div>`);bg.style.zIndex=80;
+    setTimeout(()=>{const a=bg.querySelector("#rwBx"),r=bg.querySelector("#rwRes");if(a)a.style.display="none";if(r)r.style.display="block";},950);bg.onclick=e=>{if(e.target.id==="rwOk"||e.target===bg){try{bg.remove();}catch(_){}}};
+    rwBadge();renderBag();
+  }catch(e){rwBusy=0;toast("열기 실패 ("+String((e&&e.code)||(e&&e.message)||"?").slice(0,40)+")");}}
+{let att="";setInterval(()=>{if(!fdb||!myId||att===myId)return;att=myId;fdb.ref("market/rwBoxes").limitToLast(10).on("value",s=>{rwBoxes=s.val()||{};rwBadge();renderBag();if(isOwner)rwRender();},()=>{});},1000);}
+function rwListen(){rwRender();}
+function rwRender(){const B=$("rwList");if(!B)return;const ks=Object.entries(rwBoxes||{}).filter(([,v])=>v&&v.t).sort((a,b)=>b[1].t-a[1].t);
+  B.innerHTML=ks.length?ks.map(([k,v])=>`<div style="display:flex;align-items:center;gap:6px;padding:7px 0;border-top:1px solid var(--line)"><span style="flex:1;font-size:12.5px">${new Date(v.t).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})}</span><small style="color:var(--sub);white-space:nowrap">${Object.keys(v.u||{}).length}명 열었어요</small><button class="a r" data-rwdel="${esc(k)}" style="flex:none;padding:6px 9px;font-size:11px">회수</button></div>`).join(""):'<div style="color:var(--sub);font-size:12px">보낸 상자가 없어요</div>';
+  B.querySelectorAll("[data-rwdel]").forEach(b=>b.onclick=()=>{if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더";return;}fdb.ref("market/rwBoxes/"+b.dataset.rwdel).remove().catch(()=>toast("회수 실패"));});}
+$("rwSend").onclick=()=>{if(!isOwner||!fdb)return;const b=$("rwSend");if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="한 번 더 누르면 모두에게 전송!";setTimeout(()=>{b.dataset.arm="";b.textContent="🎁 보상 상자 모두에게 보내기";},3000);return;}b.dataset.arm="";b.textContent="🎁 보상 상자 모두에게 보내기";
+  fdb.ref("market/rwBoxes").push({t:Date.now()}).then(()=>toast("🎁 모두의 가방에 상자를 보냈어요")).catch(()=>toast("전송 실패"));};
 /* 📍 위치 옮기기 모드: 광장 화면에서 조이스틱·버튼을 끌어서 옮김 */
 let ctlEdit=false;
 {const st=document.createElement("style");st.textContent=`body.ctlEdit #fJoy{display:block!important;outline:2px dashed #ffcf4d;outline-offset:3px}body.ctlEdit #fAct{display:flex!important;outline:2px dashed #ffcf4d;outline-offset:3px}#ctlBar{display:none;position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:6;background:rgba(14,16,20,.94);border:1px solid var(--acc);border-radius:12px;padding:8px 10px;width:min(300px,calc(100% - 16px));box-sizing:border-box;font-size:11px}body.ctlEdit #ctlBar{display:block}`;document.head.appendChild(st);
@@ -985,7 +998,7 @@ function renderAch(){const S=$("s-ach");if(S&&pgCur==="ach"){me&&(me.ach=me.ach|
       [["","없음",""]].concat(own).map(([id,nm,c])=>`<button data-tt="${id}" style="padding:8px 12px;border-radius:20px;font-size:12px;font-weight:700;background:${cur===id?"var(--acc)":"var(--card2)"};color:${cur===id?"#111":"var(--tx)"}" title="${c}">${id?"「"+esc(nm)+"」":"칭호 없음"}</button>`).join("")+`</div>${own.length?"":'<div style="color:var(--sub);font-size:12px;margin-top:10px">아직 칭호가 없어요 · 🏅 업적을 달성해 보세요</div>'}</div>`;
     T.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{me.title=b.dataset.tt;saveMe();lastPres="";pushPresence();renderAch();toast(me.title?`🎖️ 칭호 「${me.title==="op"?"운영자":titleOf(me.title)}」 장착!`:"칭호를 뺐어요");});}}
 
-const PG_G={set:{t:"⚙️ 설정"},my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["cos","💎 치장"],["misc","🧰 기타"]]},rank:{t:"🏆 순위"},bank:{t:"🏦 은행"},enh:{t:"⚒️ 강화",tabs:[["rod","🎣 낚싯대"],["awk","🌟 각성"]]},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
+const PG_G={set:{t:"⚙️ 설정"},my:{t:"👤 마이",tabs:[["wallet","👛 자산"],["dex","📖 도감"],["equip","🎽 장비"],["title","🎖️ 칭호"],["bag","🎒 가방"]]},ach:{t:"🏅 업적"},shop:{t:"🛍️ 상점",tabs:[["ch","🧑 캐릭터"],["bait","🪱 미끼"],["cos","💎 치장"],["misc","🧰 기타"]]},rank:{t:"🏆 순위"},bank:{t:"🏦 은행"},enh:{t:"⚒️ 강화",tabs:[["rod","🎣 낚싯대"],["awk","🌟 각성"]]},admin:{t:"🛠️ 관리"},wallet:{t:"👤 마이"}};
 let pgCur="my",pgSub="wallet",cosK="aura";
 function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;try{dealTabs();dealBar();}catch(e){}if(pgSub==="ch"){if(!$("shGrid"))S.innerHTML=`<div style="font-size:11px;color:var(--sub);margin-bottom:8px">기본 남자·여자는 무료예요. 🔒 누르면 구매 창이 떠요 (사면 바로 입어요).</div><button id="shAwkPv" style="width:100%;padding:10px 0;border-radius:10px;background:var(--card);font-weight:800;font-size:12.5px;margin-bottom:8px">🌟 캐릭터별 각성 모습 미리보기 (기본·1·2·3각성)</button><div id="shGrid" class="cgrid" style="padding:0"></div>`;$("shAwkPv").onclick=()=>openAwkPv(me&&me.ch);renderCharPick();}
   else if(pgSub==="bait")renderGear();
@@ -994,8 +1007,8 @@ function renderShop(){const S=$("s-shop");if(pgCur!=="shop")return;try{dealTabs(
   else{const n={rod:"🎣 낚싯대",aura:"✨ 오라",wing:"🪽 날개"}[pgSub];S.innerHTML=`<div class="card" style="text-align:center;padding:40px 10px"><div style="font-size:37px">🚧</div><b style="font-size:14.5px">${n}</b><div style="color:var(--sub);font-size:12px;margin-top:6px">준비 중이에요. 곧 열려요!</div></div>`;}}
 function openPg(p,sub){if(p==="shop"&&(sub==="aura"||sub==="wing"||sub==="plate")){cosK=sub;sub="cos";}if(p==="wallet"){p="my";sub="wallet";}if(p==="dex"){p="my";sub="dex";}const G=PG_G[p];pgCur=p;pgSub=sub||(G.tabs?G.tabs[0][0]:p);fKeys={};
   const T=$("pgTabs");T.style.display=G.tabs?"flex":"none";T.innerHTML=G.tabs?G.tabs.map(([k,n])=>`<button data-pt="${k}" class="${k===pgSub?"on":""}" style="font-size:11px">${n}</button>`).join(""):"";T.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>openPg(p,b.dataset.pt));
-  const sec=p==="my"?pgSub:p;["wallet","dex","equip","title","shop","bank","enh","ach","rank","admin","set"].forEach(x=>$("s-"+x).classList.toggle("on",x===sec));
-  $("pgTitle").textContent=G.t;$("pgMod").style.display="flex";$("pgBody").scrollTop=0;if(sec==="dex"){fTab="dex";}if(sec!=="dex")fDexOf=null;renderAll();renderShop();renderCharPick();renderGear();renderCos();renderEnh();renderAch();renderFishInfo();renderBank();if(p==="admin")renderAccLog();}
+  const sec=p==="my"?pgSub:p;["wallet","dex","equip","title","bag","shop","bank","enh","ach","rank","admin","set"].forEach(x=>$("s-"+x).classList.toggle("on",x===sec));
+  $("pgTitle").textContent=G.t;$("pgMod").style.display="flex";$("pgBody").scrollTop=0;if(sec==="dex"){fTab="dex";}if(sec!=="dex")fDexOf=null;renderAll();renderShop();renderCharPick();renderGear();renderCos();renderEnh();renderAch();renderFishInfo();renderBank();renderBag();try{rwBadge();}catch(e){}if(p==="admin")renderAccLog();}
 function closePg(){$("pgMod").style.display="none";}
 document.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>openPg(b.dataset.pg));$("pgX").onclick=closePg;$("pgMod").onclick=e=>{if(e.target.id==="pgMod")closePg();};
 window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("pgMod").style.display==="flex")closePg();});window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("sheet").classList.contains("on"))closeSheet();});window.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("sheet").classList.contains("on"))closeSheet();});
