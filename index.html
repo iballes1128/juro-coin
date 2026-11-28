@@ -1381,7 +1381,7 @@ const BOT_FAQ=[
 {t:"계정·비밀번호",k:"비밀번호변경|비번변경|비번바꾸|비번잊|비번까먹|비밀번호잊|비밀번호까먹|다른기기|다른폰|로그인|계정|기기바꾸|폰바꾸|이어서",a:"처음 시작할 때 닉네임과 숫자 4자리 비밀번호를 정해요. 다른 폰이나 컴퓨터에서는 [계정 있어요]로 같은 닉네임·비밀번호를 입력하면 이어서 할 수 있어요. 비밀번호를 바꾸려면 마이 → 자산 맨 아래 [🔐 비밀번호 변경]을 눌러요. 비밀번호를 잊어버리면 직접 복구하기 어려우니 꼭 기억해 두세요!"},
 /* 코인 */
 {t:"코인 사고팔기",k:"코인|매수|매도|코인사는법|코인파는법|코인거래|코인사|코인팔|비트코인|이더|도지|시바|리플|차트|시세",a:"📈 코인 화면에서 코인을 누르면 차트가 열려요. 수량을 넣고 [매수하기]로 사고, 보유 중이면 [매도]로 팔아요. 싸게 사서 오르면 파는 게 기본이에요. 코인마다 가격 움직임이 달라서, 작은 금액으로 먼저 해 보는 걸 추천해요. 팔 때는 매도세가 붙어요.",},
-{t:"코인 세금",k:"매도세|코인세금|코인수수료|거래세|팔때세금|팔때수수료|코인팔때",a:"코인을 팔 때 매도 금액에 세금이 붙고, 내 자산에 따라 비율이 달라요.\n• 자산 1억 원 이하: 5%\n• 1억 초과: 10%\n• 10억 초과: 12.5%\n• 50억 초과: 15%\n• 100억 초과: 17.5%\n• 500억 초과: 20%\n• 100조 이상: 25%\n이 세금은 국세청에 쌓여서 지원금과 로또 상금에 쓰여요.",pub:1},
+{t:"코인 세금",k:"매도세|코인세금|코인수수료|거래세|팔때세금|팔때수수료|코인팔때",a:"코인을 팔 때 매도 금액에 세금이 붙고, 내 자산에 따라 비율이 달라요.\n• 자산 1억 원 이하: 5%\n• 1억 초과: 10%\n• 10억 초과: 12.5%\n• 50억 초과: 15%\n• 100억 초과: 17.5%\n• 500억 초과: 20%\n• 1000억 초과: 27.5%\n• 5000억 초과: 30%\n• 1조 이상: 35%\n• 1000조 이상: 35%에 더해 복권·로또 각 10조\n이 세금은 국세청에 쌓여서 지원금과 로또 상금에 쓰여요.",pub:1},
 {t:"상장폐지",k:"상장폐지|상폐|폐지|없어진코인|코인사라짐|코인망",a:"코인이 상장폐지되면 더 이상 거래할 수 없어요. 새 코인이 계속 생기니 시세와 공지를 자주 확인해 보세요."},
 /* 낚시 */
 {t:"낚시하는 법",k:"낚시|낚시법|낚시방법|낚시터|낚싯대던|물고기잡|입질|던지|당기",a:"🎣 광장의 낚시터(물가)에 서서 낚시 버튼(PC는 스페이스)을 누르면 낚싯대를 던져요. 기다리다 입질이 오면 한 번 더 눌러서 당기면 돼요. 잡은 물고기는 도감에 등록되고, 어시장에서 팔 수 있어요. 가끔 쓰레기가 나오면 손해가 나요. 낚싯대 강화와 좋은 미끼로 더 좋은 물고기를 노려 보세요."},
@@ -1572,7 +1572,7 @@ function renderNts(){const d=$("ntsMod");if(!d)return;const all=anonAll({...play
   d.innerHTML=`<div class="btBox"><div style="display:flex;align-items:center;justify-content:space-between"><b style="font-size:15.5px">🏛️ 국세청</b><button id="ntsX" style="font-size:20px;color:var(--sub);width:36px;height:36px">✕</button></div>
     <div style="display:flex;gap:6px;margin:8px 0 4px">${tb("in","💰 걷힌 세금")}${tb("out","🎁 세금 쓰임새")}</div>`+(ntsTab==="out"?outHtml:inHtml)+`</div>`;
   $("ntsX").onclick=()=>d.style.display="none";d.querySelectorAll("[data-ntab]").forEach(b=>b.onclick=()=>{ntsTab=b.dataset.ntab;renderNts();const bx=d.querySelector(".btBox");if(bx)bx.scrollTop=0;});const wb=$("welBtn");if(wb)wb.onclick=claimWelfare;}
-function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.25)+2e13,name:"25% + 복권·로또 각 10조"};if(asset>=1e14)return{fee:Math.round(raw*.25),name:"25%"};if(asset>5e10)return{fee:Math.round(raw*.2),name:"20%"};if(asset>1e10)return{fee:Math.round(raw*.175),name:"17.5%"};if(asset>5e9)return{fee:Math.round(raw*.15),name:"15%"};if(asset>1e9)return{fee:Math.round(raw*.125),name:"12.5%"};if(asset>1e8)return{fee:Math.round(raw*.1),name:"10%"};return{fee:Math.round(raw*.05),name:"5% · 자산 1억 이하"};}
+function taxInfo(raw,asset){if(asset>=1e15)return{fee:Math.round(raw*.35)+2e13,name:"35% + 복권·로또 각 10조"};if(asset>=1e12)return{fee:Math.round(raw*.35),name:"35%"};if(asset>5e11)return{fee:Math.round(raw*.3),name:"30%"};if(asset>1e11)return{fee:Math.round(raw*.275),name:"27.5%"};if(asset>5e10)return{fee:Math.round(raw*.2),name:"20%"};if(asset>1e10)return{fee:Math.round(raw*.175),name:"17.5%"};if(asset>5e9)return{fee:Math.round(raw*.15),name:"15%"};if(asset>1e9)return{fee:Math.round(raw*.125),name:"12.5%"};if(asset>1e8)return{fee:Math.round(raw*.1),name:"10%"};return{fee:Math.round(raw*.05),name:"5% · 자산 1억 이하"};}
 function renderSheet(){if(curCoin<0||!me)return;const ci=curCoin,c=M.coins[ci],[n,base,mn,mx,col]=COINS[ci],p=priceOf(ci);
   $("shName").innerHTML=esc(n)+badges(ci);$("shPrice").textContent=c.delisted?"거래 정지":formatCoinPrice(p);$("shPrice").className="big "+(c.rate>0?"up":c.rate<0?"down":"");
   $("shRate").innerHTML=c.pre?'<span class="flat">곧 신규 상장 · 기본가 '+formatCoinPrice(base)+'</span>':c.delisted?'<span class="flat">상장폐지 · '+Math.ceil((RELIST_MS-(tickT(M.k)-tickT(c.delistK)))/60000)+'분 뒤 재상장</span>':(c.rate>0?'<span class="up">+'+c.rate+'% ▲</span>':c.rate<0?'<span class="down">'+c.rate+'% ▼</span>':'<span class="flat">0% -</span>')+' <span class="flat" style="font-weight:400">직전 '+(curTick()/1000)+'초</span>';
@@ -3122,7 +3122,7 @@ function drawBubble(c,x,y,text){c.font="8.5px 'Noto Sans KR',sans-serif";const w
   c.fillStyle="rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,w,h,8);c.fill();c.beginPath();c.moveTo(x-5,by+h);c.lineTo(x+5,by+h);c.lineTo(x,by+h+6);c.fill();c.fillStyle="#111";c.textAlign="left";ls.forEach((l,i)=>c.fillText(l,bx+5,by+12.5+i*12));c.textAlign="center";}
 /* ===== 🤖 자동낚시: 이용권(me.autoN회)을 쓰면 수동 낚시처럼 던지고 기다렸다가 알아서 당겨 줘요 · 움직이거나 낚시터를 벗어나면 취소 ===== */
 var AUTO_TIERS=[[20,1500000],[50,3000000],[100,5000000]],fAuto=0,fAutoT=0,fAutoR=0,fAutoCatch=0,fAutoLog=null;
-function autoBtnUpd(){const B=$("fAutoBtn");if(!B)return;const n=me?(me.autoN|0):0,show=(n>0||fAuto)&&!fRide&&(fAuto||fstate==="idle")&&(fAuto||fishSpot(fp.x,fp.y)),tx=fAuto?`⏹ 끄기 (${n}회)`:`🤖 자동낚시 ${n}회`,d=show?"block":"none";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fAuto);}}
+function autoBtnUpd(){const B=$("fAutoBtn");if(!B)return;const n=me?(me.autoN|0):0,show=(n>0||fAuto)&&(fAuto||fstate==="idle")&&(fAuto||fishSpot(fp.x,fp.y)),tx=fAuto?`⏹ 끄기 (${n}회)`:`🤖 자동낚시 ${n}회`,d=show?"block":"none";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fAuto);}}
 function autoStop(msg){if(!fAuto)return;fAuto=0;if(msg)toast(msg);setFishBtn();autoBtnUpd();autoSummary();}
 function autoRec(i,base,name,first,fx){const G=fAutoLog;if(!G)return;G.n++;const e=G.L[name]||(G.L[name]={c:0,v:base,i});e.c++;if(base>0){G.pos+=base;G.sell+=base-Math.round(base*.1);}else G.loss+=base;if(first)G.newN++;G.exp+=fx||0;}
 function autoSummary(){const G=fAutoLog;fAutoLog=null;if(!G||!G.n)return;const rows=Object.entries(G.L).sort((a,b)=>b[1].v-a[1].v),big=rows.filter(r=>r[1].v>=BIG_V);
@@ -3131,12 +3131,14 @@ function autoSummary(){const G=fAutoLog;fAutoLog=null;if(!G||!G.n)return;const r
 function autoToggle(){if(sessBlocked)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");
   if(fAuto){autoStop("🤖 자동낚시를 껐어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
   if((me.autoN|0)<=0)return toast("🤖 자동낚시 이용권이 없어요\n🛍️ 상점 → 기타에서 살 수 있어요");
+  if(fRide){const d=fOthers[fRide];if(!d||d.walk)return toast("🚤 앞사람이 멈춰 있을 때 눌러 주세요");}
   if(fstate!=="idle"||!fishSpot(fp.x,fp.y))return toast("🎣 낚시할 수 있는 강가에 서서 눌러 주세요");
   fp.tx=null;fAuto=1;fAutoT=0;fAutoLog={n:0,pos:0,sell:0,loss:0,exp:0,newN:0,L:{}};toast(`🤖 자동낚시 시작! (${me.autoN|0}회 남음)\n움직이거나 낚시터를 벗어나면 취소돼요`);setFishBtn();autoBtnUpd();}
 function autoStep(t){if(!fAuto)return;
-  if(sessBlocked||!me||!me._loaded||fRide){autoStop();return;}
+  if(sessBlocked||!me||!me._loaded){autoStop();return;}
+  if(fRide){const d=fOthers[fRide];if(!d||d.walk){autoStop(d?"🤖 앞사람이 움직여서 자동낚시를 취소했어요":"🤖 보트가 멈춰서 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}}
   const away=!fishSpot(fp.x,fp.y);
-  if(away||fKeysOn()||fJoyV||fp.tx!=null){autoStop(away?"🤖 낚시터를 벗어나서 자동낚시를 취소했어요":"🤖 움직여서 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
+  if(away||(!fRide&&(fKeysOn()||fJoyV||fp.tx!=null))){autoStop(away?"🤖 낚시터를 벗어나서 자동낚시를 취소했어요":"🤖 움직여서 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
   if(fstate==="idle"){if(t>=fAutoT){if((me.autoN|0)<=0){autoStop("🤖 자동낚시 이용권을 다 썼어요");return;}
     fstate="cast";fT=t;if(inDock(fp.x,fp.y))fp.dir=fp.x<DOCK.x+DOCK.w/2?-1:1;fBob={x:fishBobX(fp.x,fp.y,fp.dir),y:fishBobY(fp.x,fp.y)};fAutoR=420+Math.random()*520;setFishBtn();}}
   else if(fstate==="bite"&&t-fT>=fAutoR){fstate="idle";me.autoN=Math.max(0,(me.autoN|0)-1);fAutoT=t+(650+Math.random()*450)/pirMul();fAutoCatch=1;try{landFish(t);}finally{fAutoCatch=0;}
