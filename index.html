@@ -3122,7 +3122,7 @@ function drawBubble(c,x,y,text){c.font="8.5px 'Noto Sans KR',sans-serif";const w
   c.fillStyle="rgba(255,255,255,.95)";c.beginPath();c.roundRect(bx,by,w,h,8);c.fill();c.beginPath();c.moveTo(x-5,by+h);c.lineTo(x+5,by+h);c.lineTo(x,by+h+6);c.fill();c.fillStyle="#111";c.textAlign="left";ls.forEach((l,i)=>c.fillText(l,bx+5,by+12.5+i*12));c.textAlign="center";}
 /* ===== 🤖 자동낚시: 이용권(me.autoN회)을 쓰면 수동 낚시처럼 던지고 기다렸다가 알아서 당겨 줘요 · 움직이거나 낚시터를 벗어나면 취소 ===== */
 var AUTO_TIERS=[[20,1500000],[50,3000000],[100,5000000]],fAuto=0,fAutoT=0,fAutoR=0,fAutoCatch=0,fAutoLog=null;
-function autoBtnUpd(){const B=$("fAutoBtn");if(!B)return;const n=me?(me.autoN|0):0,show=(n>0||fAuto)&&!fBoat&&!fRide&&(fAuto||fstate==="idle")&&(fAuto||fishSpot(fp.x,fp.y)),tx=fAuto?`⏹ 끄기 (${n}회)`:`🤖 자동낚시 ${n}회`,d=show?"block":"none";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fAuto);}}
+function autoBtnUpd(){const B=$("fAutoBtn");if(!B)return;const n=me?(me.autoN|0):0,show=(n>0||fAuto)&&!fRide&&(fAuto||fstate==="idle")&&(fAuto||fishSpot(fp.x,fp.y)),tx=fAuto?`⏹ 끄기 (${n}회)`:`🤖 자동낚시 ${n}회`,d=show?"block":"none";if(B.style.display!==d)B.style.display=d;if(B.textContent!==tx){B.textContent=tx;B.classList.toggle("on",!!fAuto);}}
 function autoStop(msg){if(!fAuto)return;fAuto=0;if(msg)toast(msg);setFishBtn();autoBtnUpd();autoSummary();}
 function autoRec(i,base,name,first,fx){const G=fAutoLog;if(!G)return;G.n++;const e=G.L[name]||(G.L[name]={c:0,v:base,i});e.c++;if(base>0){G.pos+=base;G.sell+=base-Math.round(base*.1);}else G.loss+=base;if(first)G.newN++;G.exp+=fx||0;}
 function autoSummary(){const G=fAutoLog;fAutoLog=null;if(!G||!G.n)return;const rows=Object.entries(G.L).sort((a,b)=>b[1].v-a[1].v),big=rows.filter(r=>r[1].v>=BIG_V);
@@ -3130,11 +3130,11 @@ function autoSummary(){const G=fAutoLog;fAutoLog=null;if(!G||!G.n)return;const r
   bg.style.zIndex=70;bg.querySelector("#auX").onclick=()=>{try{bg.remove();}catch(e){}};}
 function autoToggle(){if(sessBlocked)return;if(!me||!me._loaded)return toast("닉네임부터 정해 주세요");
   if(fAuto){autoStop("🤖 자동낚시를 껐어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
-  if((me.autoN|0)<=0)return toast("🤖 자동낚시 이용권이 없어요\n🛍️ 상점 → 기타에서 살 수 있어요");if(fBoat)return toast("🚤 보트에서는 쓸 수 없어요");
+  if((me.autoN|0)<=0)return toast("🤖 자동낚시 이용권이 없어요\n🛍️ 상점 → 기타에서 살 수 있어요");
   if(fstate!=="idle"||!fishSpot(fp.x,fp.y))return toast("🎣 낚시할 수 있는 강가에 서서 눌러 주세요");
   fp.tx=null;fAuto=1;fAutoT=0;fAutoLog={n:0,pos:0,sell:0,loss:0,exp:0,newN:0,L:{}};toast(`🤖 자동낚시 시작! (${me.autoN|0}회 남음)\n움직이거나 낚시터를 벗어나면 취소돼요`);setFishBtn();autoBtnUpd();}
 function autoStep(t){if(!fAuto)return;
-  if(sessBlocked||!me||!me._loaded||fBoat){autoStop();return;}
+  if(sessBlocked||!me||!me._loaded||fRide){autoStop();return;}
   const away=!fishSpot(fp.x,fp.y);
   if(away||fKeysOn()||fJoyV||fp.tx!=null){autoStop(away?"🤖 낚시터를 벗어나서 자동낚시를 취소했어요":"🤖 움직여서 자동낚시를 취소했어요");if(fstate==="cast"||fstate==="wait"||fstate==="bite")fstate="idle";setFishBtn();return;}
   if(fstate==="idle"){if(t>=fAutoT){if((me.autoN|0)<=0){autoStop("🤖 자동낚시 이용권을 다 썼어요");return;}
