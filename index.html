@@ -1058,7 +1058,7 @@ function setMode(m){mode=m;document.querySelectorAll(".bs button").forEach(b=>b.
 document.querySelectorAll(".bs button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
 $("qty").oninput=()=>renderSheet();
 document.querySelectorAll("#ranges button").forEach(b=>b.onclick=()=>{chartN=+b.dataset.n;document.querySelectorAll("#ranges button").forEach(x=>x.classList.toggle("on",x===b));renderSheet();});
-const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",lotto:"🎟️ 로또 판매금",mkt:"🏪 어시장 거래 수수료",casino:"🎰 도박장"};let taxAll={},taxPre={};
+const TAX_K={coin:"📈 코인 매도세",fmk:"🐟 어시장 수수료",send:"💸 송금 수수료",lotto:"🎟️ 로또 판매금",mkt:"🏪 어시장 거래 수수료",casino:"🎰 도박장",office:"🏢 컴퍼니 세금"};let taxAll={},taxPre={};
 function addTax(k,amt){amt=Math.round(amt);if(!(amt>0))return;if(me){me.taxPaid=(me.taxPaid||0)+amt;stAdd("tax_"+k,amt);}if(fdb)fdb.ref("market/tax").transaction(c=>{c=c||{};c.total=(c.total||0)+amt;c[k]=(c[k]||0)+amt;return c;}).catch(()=>{});}
 /* ===== 💝 복지 지원금: 걷힌 세금에서 자산 1000만원 이하인 사람에게 300만원 (1시간에 1번) ===== */
 const WEL_AMT=3000000,WEL_MAX=10000000,WEL_CD=3600000;let welAll={},welLog=[];
@@ -1564,7 +1564,7 @@ function renderNts(){const d=$("ntsMod");if(!d)return;const all=anonAll({...play
   const row=(a,b,c)=>`<div style="display:flex;justify-content:space-between;padding:8px 2px;border-bottom:1px solid var(--line);font-size:13px"><span style="color:var(--sub)">${a}</span><b${c?` style="color:${c}"`:""}>${b}</b></div>`;
   const tb=(k,t)=>`<button data-ntab="${k}" style="flex:1;padding:9px 0;border-radius:10px;font-size:12.5px;font-weight:900;background:${ntsTab===k?"var(--acc)":"var(--card2)"};color:${ntsTab===k?"#111":"var(--tx)"}">${t}</button>`;
   const inHtml=`<div style="text-align:center;margin:8px 0 12px"><div style="font-size:11px;color:var(--sub)">지금까지 걷힌 세금 총합</div><div style="font-size:24px;font-weight:900;color:var(--acc)">${taxAll.total==null?"불러오는 중…":formatMoneyReadable(taxAll.total)}</div></div>`+
-    [["📈 코인 매도세",["coin"]],["🐟 어시장 수수료",["fmk","mkt"]],["💸 송금 수수료",["send"]],["🎟️ 복권·로또 판매금",["lotto","scr"]],["🎰 도박장",["casino"]]].map(([t,ks])=>row(t,taxAll.total==null?"…":formatMoneyReadable(ks.reduce((a,k)=>a+(taxAll[k]||0),0)))).join("")+
+    [["📈 코인 매도세",["coin"]],["🐟 어시장 수수료",["fmk","mkt"]],["💸 송금 수수료",["send"]],["🎟️ 복권·로또 판매금",["lotto","scr"]],["🎰 도박장",["casino"]],["🏢 컴퍼니 세금",["office"]]].map(([t,ks])=>row(t,taxAll.total==null?"…":formatMoneyReadable(ks.reduce((a,k)=>a+(taxAll[k]||0),0)))).join("")+
     `<div style="margin-top:12px">`+row("🧾 내가 낸 세금",formatMoneyReadable(((me&&me.taxPaid)||0)+(taxPre[myId]||0)),"var(--acc)")+`</div>`+
     `<div style="font-size:12px;font-weight:900;margin:14px 0 4px">🏅 성실 납세자 TOP 3</div>`+(top.length?top.map((x,i)=>row(`${["🥇","🥈","🥉"][i]} ${esc(x.n)}`,formatMoneyReadable(x.v))).join(""):'<div style="color:var(--sub);font-size:12px">아직 없어요</div>')+
     `<div style="font-size:10px;color:var(--sub);margin-top:10px;text-align:center">${taxAll.backfilled?"이전 세금은 남아 있는 거래 기록으로 추정해서 합쳤어요":"이번 업데이트부터 걷힌 세금이 집계돼요"}</div>`;
@@ -4899,7 +4899,7 @@ function ofFloorCh(o,x,y){const s=o.fl||"";return s[y*OF_MAXC+x]||"0";}
 function ofScore(o){if(!o)return 0;let s=0;for(const it of(o.it||[])){const d=OF_IM[it.k];if(d)s+=d[6];}
   const L=ofL(o);for(let y=0;y<L.r;y++)for(let x=0;x<L.c;x++)s+=(OF_FLM[ofFloorCh(o,x,y)]||OF_FLM["0"])[4];
   const w=OF_WLM[o.wl||"0"]||OF_WLM["0"];s+=w[4]*L.c;return Math.round(s*10)/10;}
-const ofBonus=o=>{const s=ofScore(o);return s/(s+600);};
+const ofBonus=o=>{const s=ofScore(o);return .5*s/(s+600);};
 /* 직원 한 명의 10분당 수입(세전, 인테리어 보너스 포함) */
 const ofEmpRate=(o,e,b)=>OF_RANK[Math.max(0,Math.min(11,e.rk|0))][1]*(1+(b===undefined?ofBonus(o):b));
 function ofRates(o){const b=ofBonus(o),S=new Set(ofSeats(o).map(s=>s.u));return(o.em||[]).map(e=>S.has(e.u)?ofEmpRate(o,e,b):0);}
@@ -5325,7 +5325,7 @@ function ofHire(u,rk){const o=me.of,L=ofL(o);if((o.em||[]).length>=L.n)return to
 function ofSeverance(e){return Math.floor((e.ea||0)*OF_SEV);}
 function ofFire(u){const o=me.of,i=(o.em||[]).findIndex(e=>e.u===u);if(i<0)return;const e=o.em[i];ofSettle(o,ofNow());const sv=ofSeverance(e);if(me.cash<sv)return toast(`💸 퇴직금이 부족해요 (${formatMoneyReadable(sv)} 필요)`);
   me.cash-=sv;o.em.splice(i,1);saveMe();renderHeader();ofChips();toast(`👋 ${OF_RANK[e.rk][0]}을(를) 해고했어요\n퇴직금 ${formatMoneyReadable(sv)}`);return true;}
-function ofCollect(){const o=me.of;ofSettle(o,ofNow());const a=Math.floor(o.bx.a);if(a<=0)return toast("아직 쌓인 돈이 없어요");const tax=Math.floor(a*ofL(o).tax),net=a-tax;o.bx.a-=a;me.cash+=net;stAdd("ofEarn",net);saveMe();renderHeader();ofChips();
+function ofCollect(){const o=me.of;ofSettle(o,ofNow());const a=Math.floor(o.bx.a);if(a<=0)return toast("아직 쌓인 돈이 없어요");const tax=Math.floor(a*ofL(o).tax),net=a-tax;o.bx.a-=a;me.cash+=net;addTax("office",tax);stAdd("ofEarn",net);saveMe();renderHeader();ofChips();
   toast(`💰 ${formatMoneyReadable(net)} 회수!\n(세금 ${ofTaxPct(o)}% ${formatMoneyReadable(tax)} 뗌)`);return net;}
 function ofHirePanel(chairU){const o=me.of,L=ofL(o),b=ofBonus(o),full=(o.em||[]).length>=L.n;
   let h=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><b style="font-size:16px">👔 직원 채용</b><button data-x style="font-size:20px;color:var(--sub);width:34px;height:34px">✕</button></div><div style="font-size:11.5px;color:var(--sub);margin-bottom:8px;line-height:1.6">이 자리에 앉을 직원을 골라요 · 채용비는 한 번만 내요<br>수입은 10분당 (세금 ${ofTaxPct(o)}% 뗀 뒤 · 인테리어 +${Math.round(b*100)}% 반영) · 직원 ${(o.em||[]).length}/${L.n}명</div>`;
